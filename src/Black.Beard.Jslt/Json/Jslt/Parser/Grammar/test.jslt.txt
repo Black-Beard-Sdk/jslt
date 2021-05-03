@@ -1,0 +1,29 @@
+{
+
+
+    "v1" : $..toto | new method1($.key1),
+
+    "v2" : new unique($..toto),
+
+    "v3" : new get($.id, "sourceName", $..toto),
+
+    "test1": .(arg1, arg2) {
+        
+    }
+
+    "$mymethod": .(arg1, arg2, arg3) {
+
+
+            
+    },
+
+    "v4" : new mymethod($.id, "sourceName", $..toto),
+
+    // test
+    "$where" : new unique($.uniqueKey),
+
+    // reposition la source d'info sur le bloque
+    "$source" : new unique($.uniqueKey),
+
+
+}
