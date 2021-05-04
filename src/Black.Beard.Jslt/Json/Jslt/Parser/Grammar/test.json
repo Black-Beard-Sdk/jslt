@@ -1,0 +1,11 @@
+{
+  "$funcs": {
+    "nameFunction": {
+      "language": ".js",
+      "parameters": [
+        "arg1"
+      ],
+      "body": "/* (arg1) => { return null;  }  */"
+    }
+  }
+}

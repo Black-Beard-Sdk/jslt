@@ -1,12 +1,13 @@
 using Bb.Json.Jslt.Parser;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 using System.Globalization;
 
 namespace Black.Beard.Jslt.UnitTests
 {
     [TestClass]
-    public class UnitTest1
+    public class ParsingUnitTest1
     {
 
         [TestMethod]
@@ -118,6 +119,30 @@ namespace Black.Beard.Jslt.UnitTests
 
         }
 
+        [TestMethod]
+        public void TestMObjectWithFunctionNamed()
+        {
+
+            var functionBody = new JfunctionBodyDefinition(".js", "fi(arg1){ return arg1; }");
+            var fnc = new JfunctionDefinition("f1", functionBody);
+
+            var o = new JObject(new JProperty("$funcs", new JObject()
+            {
+                fnc
+            }));
+
+            var expected = o.ToString(Newtonsoft.Json.Formatting.None);
+            var parser = ScriptParser.ParseString(new System.Text.StringBuilder(expected));
+            var visitor = new ScriptVisitor(CultureInfo.InvariantCulture);
+
+            var result = (JObject)parser.Visit(visitor);
+
+            var fnc2 = visitor.EmbeddedFunctions["f1"];
+            var resultTxt = fnc2.ToString(Newtonsoft.Json.Formatting.None);
+
+            Assert.AreEqual(fnc.ToString(Newtonsoft.Json.Formatting.None), resultTxt);
+
+        }
 
     }
 }

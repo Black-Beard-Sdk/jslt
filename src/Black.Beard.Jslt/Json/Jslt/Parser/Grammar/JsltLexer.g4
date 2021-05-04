@@ -55,6 +55,12 @@ STRING
    : '"' (ESC | SAFECODEPOINT)* '"'
    ;
 
+MULTI_LINE_COMMENT : '/*' .*? '*/' ;
+CODE_STRING:  QUOTE_CODE_STRING LANGUAGE WS .*? QUOTE_CODE_STRING;
+QUOTE_CODE_STRING:  '\'\'\'';
+
+
+
 fragment ESC
    : '\\' (["\\/bfnrt] | UNICODE)
    ;
@@ -91,4 +97,8 @@ WS
 
 ID
    : [_A-Za-z] [_A-Za-z0-9]*
+   ;
+
+LANGUAGE
+   : SUBSCRIPT [_A-Za-z] [_A-Za-z0-9]*
    ;

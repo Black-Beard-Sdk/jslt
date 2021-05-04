@@ -59,9 +59,11 @@ jsonValue :
    | jsonValueNumber
    | jsonValueNull
    | jsonLt
+   | jsonValueCodeString
    ;
 
 jsonValueString : STRING;
+jsonValueCodeString : CODE_STRING;
 jsonValueNumber : NUMBER;
 jsonValueInteger : INT;
 jsonValueBoolean : TRUE | FALSE;
