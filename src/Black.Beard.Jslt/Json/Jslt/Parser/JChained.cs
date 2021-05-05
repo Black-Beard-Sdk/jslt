@@ -2,6 +2,7 @@
 
 namespace Bb.Json.Jslt.Parser
 {
+
     public class JChained : JArray
     {
 

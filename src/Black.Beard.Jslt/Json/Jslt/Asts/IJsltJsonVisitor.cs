@@ -1,0 +1,27 @@
+﻿using Bb.Json.Jslt.Services;
+
+namespace Bb.Json.Jslt.Asts
+{
+    public interface IJsltJsonVisitor
+    {
+
+
+        TranformJsonAstConfiguration Configuration { get; set; }
+
+        object VisitArray(JsltArray node);
+
+        object VisitConstant(JsltConstant node);
+
+        object VisitObject(JsltObject node);
+
+        object VisitProperty(JsltProperty node);
+
+        object VisitType(JsltFunction node);
+
+        object VisitJPath(JsltPath node);
+
+        object VisitMapProperty(JsltMapProperty node);
+
+    }
+
+}

@@ -25,6 +25,10 @@ SUBSCRIPT : '.' ;
 WILDCARD_SUBSCRIPT : '*' ;
 PIPE : '|';
 
+URI : 'uri';
+TIME : 'time';
+DATETIME : 'datetime';
+
 AND : 'and' ;
 EQ : '=' ;
 GE : '>=' ;

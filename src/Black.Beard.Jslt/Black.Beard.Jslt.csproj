@@ -12,7 +12,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Json\Jslt\Builds\" />
     <Folder Include="Json\Jslt\Parser\Grammar\.antlr\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Black.Beard.Expressions\Src\Black.Beard.Expressions\Black.Beard.Expressions.csproj" />
   </ItemGroup>
 
 </Project>

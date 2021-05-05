@@ -60,6 +60,7 @@ jsonValue :
    | jsonValueNull
    | jsonLt
    | jsonValueCodeString
+   | jsonType
    ;
 
 jsonValueString : STRING;
@@ -77,6 +78,11 @@ jsonCtor :
 jsonValueList : 
    jsonValue (COMMA jsonValue)*
    ;
+
+jsonType : 
+   CURRENT_VALUE (URI | TIME | DATETIME)
+   ;
+
 
 // ---------------------------- jslt ----------------------------
 

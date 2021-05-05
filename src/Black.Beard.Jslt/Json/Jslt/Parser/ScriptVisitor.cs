@@ -210,10 +210,44 @@ namespace Bb.Json.Jslt.Parser
 
         public override object VisitJsonValueString([NotNull] JsltParser.JsonValueStringContext context)
         {
-
             var txt = context.GetText().Trim().Trim('\"');
             var data = new JValue(txt);
             return AddPosition(data, context.Start, context.Stop);
+        }
+
+        public override object VisitJsonType([NotNull] JsltParser.JsonTypeContext context)
+        {
+
+            var txt = context.GetText().Substring(1);
+
+            if (context.URI() != null)
+            {
+                return new JType(txt)
+                {
+                    Type = typeof(Uri),
+                };
+            }
+            
+            else if (context.TIME() != null)
+            {
+                return new JType(txt)
+                {
+                    Type = typeof(TimeSpan),
+                };
+
+            }
+
+            else if (context.DATETIME() != null)
+            {
+                return new JType(txt)
+                {
+                    Type = typeof(DateTime),
+                };
+
+            }
+
+            throw new NotImplementedException(context.GetText());
+
         }
 
         public override object VisitJsonValueNull([NotNull] JsltParser.JsonValueNullContext context)

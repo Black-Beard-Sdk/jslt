@@ -2,12 +2,18 @@
 
     "$funcs" : {
 
-        "nameFunction": '''.js
+        "nameFunction1": '''.js
     (arg1) => 
     {
         return null;  
     }       
-'''
+''',
+        "nameFunction2": new cast("", @type, null)
+        /*
+            @type
+            date:{}
+        
+        */
     }
 
     "v1" : $..toto | new method1($.key1),
