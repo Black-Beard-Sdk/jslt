@@ -12,11 +12,11 @@ namespace Bb.Json.Jslt.Services
     public class TranformJsonTemplateReader
     {
 
-        public TranformJsonTemplateReader(JToken root, TranformJsonAstConfiguration configuration, Dictionary<string, JfunctionDefinition> functions)
+        internal TranformJsonTemplateReader(JToken root, TranformJsonAstConfiguration configuration, FunctionFoundry foundry)
         {
             this._root = root;
             this._configuration = configuration;
-            this._functions = functions;
+            this._FunctionFoundry = foundry;
         }
 
         public JsltJson Tree()
@@ -24,32 +24,6 @@ namespace Bb.Json.Jslt.Services
             if (_root != null)
                 return Read(_root);
             return null;
-        }
-
-        public Func<RuntimeContext, JToken, JToken> Get(JsltJson tree)
-        {
-
-            Func<RuntimeContext, JToken, JToken> fnc;
-
-            if (tree != null)
-            {
-                var builder = new TemplateBuilder() { Configuration = this._configuration, EmbbededFunction = this._functions };
-                fnc = builder.Compile(tree);
-            }
-            else // Template empty
-            {
-                var arg = Expression.Parameter(typeof(RuntimeContext), "arg0");
-                var arg1 = Expression.Parameter(typeof(JToken), "arg1");
-                var lbd = Expression.Lambda<Func<RuntimeContext, JToken, JToken>>(arg1, arg, arg1);
-
-                if (lbd.CanReduce)
-                    lbd.ReduceAndCheck();
-
-                fnc = lbd.Compile();
-            }
-
-            return fnc;
-
         }
 
         #region read values
@@ -256,21 +230,21 @@ namespace Bb.Json.Jslt.Services
             foreach (var item in n)
             {
 
-                var it = arr.Item = Read(item);
+                var it = /*arr.Item =*/ Read(item);
 
-                if (it.Source != null)
-                {
-                    arr.Source = it.Source;
-                    it.Source = null;
-                }
-                else
-                    throw new MissingFieldException("$source");
+                //if (it.Where != null)
+                //{
+                //    arr.Where = it.Where;
+                //    it.Where = null;
+                //}
 
-                if (it.Where != null)
-                {
-                    arr.Where = it.Where;
-                    it.Where = null;
-                }
+                //if (it.Source != null)
+                //{
+                //    arr.Source = it.Source;
+                //    it.Source = null;
+                //}
+
+                arr.Append(it);
 
             }
 
@@ -286,21 +260,7 @@ namespace Bb.Json.Jslt.Services
             foreach (var item in n)
             {
 
-                var it = arr.Item = Read(item);
-
-                if (it.Source != null)
-                {
-                    arr.Source = it.Source;
-                    it.Source = null;
-                }
-                else
-                    throw new MissingFieldException("$source");
-
-                if (it.Where != null)
-                {
-                    arr.Where = it.Where;
-                    it.Where = null;
-                }
+                var it = Read(item);
 
             }
 
@@ -399,7 +359,7 @@ namespace Bb.Json.Jslt.Services
 
         private readonly JToken _root;
         private readonly TranformJsonAstConfiguration _configuration;
-        private readonly Dictionary<string, JfunctionDefinition> _functions;
+        private readonly FunctionFoundry _FunctionFoundry;
         //private Stack<object> _path;
 
     }

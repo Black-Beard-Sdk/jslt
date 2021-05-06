@@ -9,6 +9,7 @@ namespace Bb.Json.Jslt.Asts
         public JsltArray(int count)
         {
             this.Kind = JsltKind.Array;
+            _items = new List<JsltJson>();
         }
 
 
@@ -23,9 +24,11 @@ namespace Bb.Json.Jslt.Asts
             return visitor.VisitArray(this);
         }
 
-        public JsltJson Item { get; internal set; }
+        //public JsltJson Item { get; internal set; }
+        public List<JsltJson> Items { get => _items; }
 
         private readonly List<JsltJson> _items;
+
 
     }
 

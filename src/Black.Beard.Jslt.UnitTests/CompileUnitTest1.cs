@@ -42,46 +42,45 @@ namespace Black.Beard.Jslt.UnitTests
             RuntimeContext result = Test(template, source);
             var o2 = result.TokenResult as JObject;
 
-            Assert.AreEqual(o2["propertyName"], 6);
+            Assert.AreEqual(o2["propertyName"], 6L);
+
+        }
+
+        [TestMethod]
+        public void TestMObjectWithPropertyNumber2()
+        {
+
+            var o = new JObject(new JProperty("propertyName", 6.7)).ToString();
+
+            var template = o.ToString();
+            var source = "{ }";
+
+            RuntimeContext result = Test(template, source);
+            var o2 = result.TokenResult as JObject;
+
+            Assert.AreEqual(o2["propertyName"], 6.7D);
 
         }
 
 
-        //[TestMethod]
-        //public void TestMObjectWithPropertyNumber2()
-        //{
+        [TestMethod]
+        public void TestMObjectWithPropertyArray()
+        {
 
-        //    var o = new JObject(new JProperty("propertyName", 6.6)).ToString();
+            var o = new JObject(new JProperty("propertyName", new JArray() { 6.6, "test", new JObject() { new JProperty("test2", 6) } }));
 
-        //    var expected = o.ToString();
-        //    var parser = ScriptParser.ParseString(new System.Text.StringBuilder(expected));
-        //    var visitor = new ScriptVisitor(CultureInfo.InvariantCulture);
+            var expected = o.ToString(Newtonsoft.Json.Formatting.None);
+            var parser = ScriptParser.ParseString(new System.Text.StringBuilder(expected));
+            var visitor = new ScriptVisitor(CultureInfo.InvariantCulture);
 
-        //    var result = (JObject)parser.Visit(visitor);
+            var source = "{ }";
 
-        //    var resultTxt = result.ToString();
+            RuntimeContext result = Test(expected, source);
 
-        //    Assert.AreEqual(expected, resultTxt);
+            var r = result.TokenResult.ToString(Newtonsoft.Json.Formatting.None);
+            Assert.AreEqual(expected, r);
 
-        //}
-
-        //[TestMethod]
-        //public void TestMObjectWithPropertyArray()
-        //{
-
-        //    var o = new JObject(new JProperty("propertyName", new JArray() { 6.6, "test", new JObject() { new JProperty("test2", 6) } }));
-
-        //    var expected = o.ToString(Newtonsoft.Json.Formatting.None);
-        //    var parser = ScriptParser.ParseString(new System.Text.StringBuilder(expected));
-        //    var visitor = new ScriptVisitor(CultureInfo.InvariantCulture);
-
-        //    var result = (JObject)parser.Visit(visitor);
-
-        //    var resultTxt = result.ToString(Newtonsoft.Json.Formatting.None);
-
-        //    Assert.AreEqual(expected, resultTxt);
-
-        //}
+        }
 
 
         //[TestMethod]

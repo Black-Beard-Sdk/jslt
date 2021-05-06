@@ -192,14 +192,10 @@ namespace Bb.Json.Jslt.Parser
                 if (value.Contains(this._currentCulture.NumberFormat.NumberDecimalSeparator))
                 {
                     var p = double.Parse(value, this._currentCulture);
-                    if (p <= float.MaxValue)
-                        return AddPosition(new JValue((float)p), context.Start, context.Stop);
                     return AddPosition(new JValue(p), context.Start, context.Stop);
                 }
 
                 var o = Int64.Parse(value);
-                if (o <= Int32.MaxValue)
-                    return AddPosition(new JValue((Int32)o), context.Start, context.Stop);
                 return AddPosition(new JValue(o), context.Start, context.Stop);
 
             }

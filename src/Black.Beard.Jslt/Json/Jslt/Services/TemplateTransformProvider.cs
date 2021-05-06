@@ -1,9 +1,11 @@
-﻿using Bb.Json.Jslt.Parser;
+﻿using Bb.Json.Jslt.Asts;
+using Bb.Json.Jslt.Parser;
 using Bb.JSon;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace Bb.Json.Jslt.Services
@@ -52,19 +54,45 @@ namespace Bb.Json.Jslt.Services
                 throw new ParsingJsonException("Failed to parse Json. " + e.Message, e);
             }
 
-            
+            var foundry = new FunctionFoundry(this._configuration, functions);
 
-            TranformJsonTemplateReader reader = new TranformJsonTemplateReader(obj, this._configuration, functions);
+            TranformJsonTemplateReader reader = new TranformJsonTemplateReader(obj, this._configuration, foundry);
             var tree = reader.Tree();
 
             JsltTemplate result = new JsltTemplate()
             {
                 Rule = sb,
                 Configuration = this._configuration,
-                Rules = reader.Get(tree)
+                Rules = Get(tree, foundry)
             };
 
             return result;
+
+        }
+
+        private Func<RuntimeContext, JToken, JToken> Get(JsltJson tree, FunctionFoundry foundry)
+        {
+
+            Func<RuntimeContext, JToken, JToken> fnc;
+
+            if (tree != null)
+            {
+                var builder = new TemplateBuilder() { Configuration = this._configuration, EmbbededFunctions = foundry };
+                fnc = builder.Compile(tree);
+            }
+            else // Template empty
+            {
+                var arg = Expression.Parameter(typeof(RuntimeContext), "arg0");
+                var arg1 = Expression.Parameter(typeof(JToken), "arg1");
+                var lbd = Expression.Lambda<Func<RuntimeContext, JToken, JToken>>(arg1, arg, arg1);
+
+                if (lbd.CanReduce)
+                    lbd.ReduceAndCheck();
+
+                fnc = lbd.Compile();
+            }
+
+            return fnc;
 
         }
 
