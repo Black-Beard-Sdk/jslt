@@ -16,11 +16,13 @@ namespace Bb.Json.Jslt.Asts
 
         object VisitProperty(JsltProperty node);
 
-        object VisitType(JsltFunction node);
+        object VisitFunction(JsltFunction node);
 
         object VisitJPath(JsltPath node);
 
         object VisitMapProperty(JsltMapProperty node);
+
+        object VisitLinkedCode(JsltLinkedCode node);
 
     }
 

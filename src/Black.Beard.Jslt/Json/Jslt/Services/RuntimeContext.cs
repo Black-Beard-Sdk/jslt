@@ -14,7 +14,7 @@ namespace Bb.Json.Jslt.Services
         static RuntimeContext()
         {
             _addLikeProperty = RuntimeContext.AddLikeProperty;
-            _mapPropertyService = RuntimeContext.MapPropertyService;
+            //_mapPropertyService = RuntimeContext.MapPropertyService;
             _getContentByJPath = RuntimeContext.GetContentByJPath;
             _getContentFromService = RuntimeContext.GetContentFromService;
             _addProperty = typeof(RuntimeContext).GetMethod("AddProperty", new Type[] { typeof(JObject), typeof(JProperty) });
@@ -57,34 +57,36 @@ namespace Bb.Json.Jslt.Services
 
         }
 
-        public static ITransformJsonService MapPropertyService(RuntimeContext ctx, ITransformJsonService service, string propertyName, JToken value)
-        {
+        //public static ITransformJsonService MapPropertyService(RuntimeContext ctx, TranformJsonAstConfiguration.Factory<ITransformJsonService> factory, string propertyName, JToken value)
+        //{
 
-            (PropertyInfo, Action<object, object>) writer = GetWriter(service.GetType(), propertyName);
+        //    ITransformJsonService service = factory.Creator();
 
-            if (writer.Item1 != null)
-            {
+        //    (PropertyInfo, Action<object, object>) writer = GetWriter(service.GetType(), propertyName);
 
-                var type = writer.Item1.PropertyType;
-                if (type == typeof(string))
-                    writer.Item2(service, value.ToString());
+        //    if (writer.Item1 != null)
+        //    {
 
-                else if (type.IsValueType)
-                    writer.Item2(service, Convert.ChangeType(value.ToString(), type));
+        //        var type = writer.Item1.PropertyType;
+        //        if (type == typeof(string))
+        //            writer.Item2(service, value.ToString());
 
-                else if (value is JObject o)
-                    writer.Item2(service, o.ToObject(type));
+        //        else if (type.IsValueType)
+        //            writer.Item2(service, Convert.ChangeType(value.ToString(), type));
 
-                else
-                {
-                    writer.Item2(service, value);
-                }
+        //        else if (value is JObject o)
+        //            writer.Item2(service, o.ToObject(type));
 
-            }
+        //        else
+        //        {
+        //            writer.Item2(service, value);
+        //        }
 
-            return service;
+        //    }
 
-        }
+        //    return service;
+
+        //}
 
         public static JToken GetContentFromService(RuntimeContext ctx, JToken token, ITransformJsonService service)
         {
@@ -162,7 +164,7 @@ namespace Bb.Json.Jslt.Services
         public static readonly Func<RuntimeContext, JToken, Func<RuntimeContext, JToken, JToken>, JToken> _getProjectionFromSource;
         public static readonly Func<RuntimeContext, JToken, string, JToken> _getContentByJPath;
         public static readonly Func<RuntimeContext, JToken, ITransformJsonService, JToken> _getContentFromService;
-        public static readonly Func<RuntimeContext, ITransformJsonService, string, JToken, ITransformJsonService> _mapPropertyService;
+        //public static readonly Func<RuntimeContext, TranformJsonAstConfiguration.Factory<ITransformJsonService>, string, JToken, ITransformJsonService> _mapPropertyService;
         public static readonly Func<RuntimeContext, JToken, JToken, JToken, string, JToken> _addLikeProperty;
         public static readonly MethodInfo _addProperty;
 

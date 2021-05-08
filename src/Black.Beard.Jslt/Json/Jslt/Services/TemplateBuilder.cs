@@ -24,7 +24,6 @@ namespace Bb.Json.Jslt.Services
             this._AddJArray = typeof(JArray).GetMethod("Add", new Type[] { typeof(object) });
             this._propJArray_Item = typeof(JArray).GetProperty("Item", new Type[] { typeof(Int32) });
 
-
             this._ctorJValueObject = typeof(JValue).GetConstructor(new Type[] { typeof(object) });
             this._ctorJValueLong = typeof(JValue).GetConstructor(new Type[] { typeof(long) });
             this._ctorJValueDateTime = typeof(JValue).GetConstructor(new Type[] { typeof(DateTimeOffset) });
@@ -34,7 +33,6 @@ namespace Bb.Json.Jslt.Services
             this._ctorJValueUri = typeof(JValue).GetConstructor(new Type[] { typeof(Uri) });
             this._ctorJValueTimeSpan = typeof(JValue).GetConstructor(new Type[] { typeof(TimeSpan) });
             this._jValueGetNull = typeof(JValue).GetMethod("CreateNull");
-
 
             this.source = new MethodCompiler();
 
@@ -160,6 +158,8 @@ namespace Bb.Json.Jslt.Services
         public object VisitConstant(JsltConstant node)
         {
 
+            var isCtor = this.CurrentCtx().IsCtor;
+
             switch (node.Kind)
             {
 
@@ -167,28 +167,46 @@ namespace Bb.Json.Jslt.Services
                     return Expression.Call(null, _jValueGetNull);
 
                 case JsltKind.Integer:
+                    if (isCtor)
+                        return Expression.Constant(node.Value);
                     return Expression.New(_ctorJValueLong, Expression.Constant(node.Value));
 
                 case JsltKind.TimeSpan:
+                    if (isCtor)
+                        return Expression.Constant(node.Value);
                     return Expression.New(_ctorJValueTimeSpan, Expression.Constant(node.Value));
 
                 case JsltKind.Uri:
-                        return Expression.New(_ctorJValueUri, Expression.Constant(node.Value));
-                
+                    if (isCtor)
+                        return Expression.Constant(node.Value);
+                    return Expression.New(_ctorJValueUri, Expression.Constant(node.Value));
+
                 case JsltKind.Guid:
+                    if (isCtor)
+                        return Expression.Constant(node.Value);
                     return Expression.New(_ctorJValueGuid, Expression.Constant(node.Value));
 
                 case JsltKind.Date:
+                    if (isCtor)
+                        return Expression.Constant(node.Value);
                     return Expression.New(_ctorJValueDateTime, Expression.Constant(node.Value));
 
                 case JsltKind.Float:
+                    if (isCtor)
+                        return Expression.Constant(node.Value);
                     return Expression.New(_ctorJValueDouble, Expression.Constant(node.Value));
 
                 case JsltKind.Boolean:
+                    if (isCtor)
+                        return Expression.Constant(node.Value);
                     return Expression.New(_ctorJValueBool, Expression.Constant(node.Value));
 
-                case JsltKind.Bytes:
                 case JsltKind.String:
+                    if (isCtor)
+                        return Expression.Constant(node.Value);
+                    return Expression.New(_ctorJValueObject, Expression.Constant(node.Value));
+
+                case JsltKind.Bytes:
                 case JsltKind.Object:
                     return Expression.New(_ctorJValueObject, Expression.Constant(node.Value));
 
@@ -216,25 +234,6 @@ namespace Bb.Json.Jslt.Services
             throw new NotImplementedException(node.Kind.ToString());
 
         }
-
-        private ConstructorInfo _ctorJArray;
-        private readonly MethodInfo _AddJArray;
-        private readonly MethodInfo _jValueGetNull;
-        private readonly PropertyInfo _propJArray_Item;
-        private readonly MethodCompiler source;
-        private readonly ConstructorInfo _ctorJProperty;
-
-        private readonly ConstructorInfo _ctorJValueObject;
-        private readonly ConstructorInfo _ctorJValueLong;
-        private readonly ConstructorInfo _ctorJObject;
-        private readonly ConstructorInfo _ctorJValueDouble;
-        private readonly ConstructorInfo _ctorJValueBool;
-        private readonly ConstructorInfo _ctorJValueUri;
-        private readonly ConstructorInfo _ctorJValueGuid;
-        private readonly ConstructorInfo _ctorJValueTimeSpan;
-        private readonly ConstructorInfo _ctorJValueDateTime;
-
-        
 
         public object VisitObject(JsltObject node)
         {
@@ -284,21 +283,25 @@ namespace Bb.Json.Jslt.Services
             return this._ctorJProperty.CreateObject(name, getValue);
         }
 
-        public object VisitType(JsltFunction node)
+        public object VisitFunction(JsltFunction node)
         {
 
             using (CurrentContext ctx = NewContext())
             {
 
-                Expression expressionCreatetService = Expression.Call(Expression.Constant(node.ServiceProvider), TransformJsonServiceProvider.Method, PrivatedIndex.GetNewIndex().AsConstant());
-
+                ctx.Current.IsCtor = true;
+                List<Expression> args = new List<Expression>();
                 foreach (var property in node.Properties)
                 {
                     var value = (Expression)property.Value.Accept(this);
-                    expressionCreatetService = Expression.Call(null, RuntimeContext._mapPropertyService.Method, ctx.Current.Context, expressionCreatetService, Expression.Constant(property.Name), value);
+                    args.Add(value);
                 }
 
-                var result = Expression.Call(RuntimeContext._getContentFromService.Method, ctx.Current.Context, ctx.Current.RootSource, expressionCreatetService);
+                var arguments = typeof(object).NewArray(args.ToArray());
+
+                var expressionCreateService = Expression.Constant(node.ServiceProvider).Call(node.ServiceProvider.Method, arguments);
+
+                var result = Expression.Call(RuntimeContext._getContentFromService.Method, ctx.Current.Context, ctx.Current.RootSource, expressionCreateService);
 
                 return result;
 
@@ -313,12 +316,29 @@ namespace Bb.Json.Jslt.Services
 
             var value = (Expression)node.Value.Accept(this);
 
-            Expression.Call(ctx.Context, null, Expression.Constant(node.Name), value);
-
-            return null;
+            return Expression.Call(ctx.Context, null, Expression.Constant(node.Name), value);
 
         }
 
+        public object VisitLinkedCode(JsltLinkedCode node)
+        {
+
+            object result = null;
+
+            foreach (var item in node.Items)
+            {
+
+                var o = item.Accept(this);
+                if (result == null)
+                    result = o;
+
+            }
+
+           
+
+            return result;
+
+        }
         public object VisitJPath(JsltPath node)
         {
 
@@ -385,6 +405,12 @@ namespace Bb.Json.Jslt.Services
 
         }
 
+        private BuildContext CurrentCtx()
+        {
+            var ctx = _stack.Peek();
+            return ctx;
+        }
+
         private class CurrentContext : IDisposable
         {
 
@@ -419,7 +445,30 @@ namespace Bb.Json.Jslt.Services
             public Expression RootTarget;
 
             public SourceCode Source;
+
+            public bool IsCtor { get; internal set; }
         }
+
+
+
+        private ConstructorInfo _ctorJArray;
+        private readonly MethodInfo _AddJArray;
+        private readonly MethodInfo _jValueGetNull;
+        private readonly PropertyInfo _propJArray_Item;
+        private readonly MethodCompiler source;
+        private readonly ConstructorInfo _ctorJProperty;
+
+        private readonly ConstructorInfo _ctorJValueObject;
+        private readonly ConstructorInfo _ctorJValueLong;
+        private readonly ConstructorInfo _ctorJObject;
+        private readonly ConstructorInfo _ctorJValueDouble;
+        private readonly ConstructorInfo _ctorJValueBool;
+        private readonly ConstructorInfo _ctorJValueUri;
+        private readonly ConstructorInfo _ctorJValueGuid;
+        private readonly ConstructorInfo _ctorJValueTimeSpan;
+        private readonly ConstructorInfo _ctorJValueDateTime;
+
+
 
     }
 

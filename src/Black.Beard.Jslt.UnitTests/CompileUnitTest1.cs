@@ -2,8 +2,10 @@ using Bb.Json.Jslt.Parser;
 using Bb.Json.Jslt.Services;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 
 namespace Black.Beard.Jslt.UnitTests
@@ -70,8 +72,6 @@ namespace Black.Beard.Jslt.UnitTests
             var o = new JObject(new JProperty("propertyName", new JArray() { 6.6, "test", new JObject() { new JProperty("test2", 6) } }));
 
             var expected = o.ToString(Newtonsoft.Json.Formatting.None);
-            var parser = ScriptParser.ParseString(new System.Text.StringBuilder(expected));
-            var visitor = new ScriptVisitor(CultureInfo.InvariantCulture);
 
             var source = "{ }";
 
@@ -83,24 +83,22 @@ namespace Black.Beard.Jslt.UnitTests
         }
 
 
-        //[TestMethod]
-        //public void TestMObjectWithconstructor()
-        //{
+        [TestMethod]
+        public void TestMObjectWithconstructor()
+        {
 
-        //    var o = new JObject(new JProperty("propertyName", new JConstructor("myMethod",  6.6, "test", new JObject() { new JProperty("test2", 6) }) ));
+            var o = new JObject(new JProperty("propertyName", new JConstructor("myMethod", 6.6, "test")));
 
-        //    var expected = o.ToString(Newtonsoft.Json.Formatting.None);
-        //    var parser = ScriptParser.ParseString(new System.Text.StringBuilder(expected));
-        //    var visitor = new ScriptVisitor(CultureInfo.InvariantCulture);
+            var expected = o.ToString(Newtonsoft.Json.Formatting.None);
 
-        //    var result = (JObject)parser.Visit(visitor);
+            var source = "{ }";
 
-        //    var resultTxt = result.ToString(Newtonsoft.Json.Formatting.None);
+            RuntimeContext result = Test(expected, source, ("myMethod", typeof(DataClass)));
+            Assert.AreEqual(result.TokenResult["propertyName"]["Uuid"], 6.6);
 
-        //    Assert.AreEqual(expected, resultTxt);
+        }
 
-        //}
-
+     
         //[TestMethod]
         //public void TestMObjectWithJPath()
         //{
@@ -146,29 +144,56 @@ namespace Black.Beard.Jslt.UnitTests
 
 
 
-        private static RuntimeContext Test(string templatePayload, string source)
+        private static RuntimeContext Test(string templatePayload, string source, params (string, Type)[] services)
         {
             var src = new Sources(SourceJson.GetFromText(source));
-            var template = GetProvider(templatePayload);
+            var template = GetProvider(templatePayload, services);
             var result = template.Transform(src);
             return result;
         }
 
-        private static JsltTemplate GetProvider(string payloadTemplate, params (string, ITransformJsonService)[] services)
+
+        private static JsltTemplate GetProvider(string payloadTemplate, params (string, Type)[] services)
         {
 
             StringBuilder sb = new StringBuilder(payloadTemplate.Replace('\'', '"').Replace('§', '\''));
 
             var configuration = new TranformJsonAstConfiguration();
             foreach (var item in services)
-                configuration.AddService(item.Item1, item.Item2);
+                configuration.AddService(item.Item2, item.Item1);
 
             TemplateTransformProvider Templateprovider = new TemplateTransformProvider(configuration);
-
             JsltTemplate template = Templateprovider.GetTemplate(sb);
 
             return template;
 
         }
+
+
     }
+
+    public class DataClass : ITransformJsonService
+    {
+
+        public DataClass(double id1, string id2)
+        {
+            this.Id1 = id1;
+            this.Id2 = id2;
+        }
+
+        public double Id1 { get; set; }
+
+        public string Id2 { get; set; }
+
+        public JToken Execute(RuntimeContext ctx, JToken source)
+        {
+
+            return new JObject(
+                    new JProperty("Uuid", new JValue(Id1))
+                );
+
+        }
+
+    }
+
 }

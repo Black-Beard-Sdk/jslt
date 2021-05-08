@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using static Bb.Json.Jslt.Services.TranformJsonAstConfiguration;
 
 namespace Bb.Json.Jslt.Services
 {
@@ -8,26 +9,31 @@ namespace Bb.Json.Jslt.Services
 
         public ServiceContainer()
         {
-            this._dictionary = new Dictionary<string, Func<ITransformJsonService>>();
+            this._dictionary = new Dictionary<string, TransformJsonServiceProvider>();
         }
 
-        public ServiceContainer AddService(string typeName, Func<ITransformJsonService> provider)
+        public ServiceContainer AddService(string name, Factory<ITransformJsonService> provider)
         {
-            this._dictionary.Add(typeName.ToLower(), provider);
+
+            if (!_dictionary.TryGetValue(name.ToLower(), out TransformJsonServiceProvider serviceProvider))
+                this._dictionary.Add(name.ToLower(), (serviceProvider = new TransformJsonServiceProvider()));
+
+            serviceProvider.Add(provider);
+
             return this;
         }
 
-        public TransformJsonServiceProvider GetService(string type)
+        public Factory<ITransformJsonService> GetService(string name, Type[] parameters)
         {
 
-            if (_dictionary.TryGetValue(type.ToLower(), out Func<ITransformJsonService> serviceProvider))
-                return new TransformJsonServiceProvider(serviceProvider);
+            if (_dictionary.TryGetValue(name.ToLower(), out TransformJsonServiceProvider serviceProvider))
+                return serviceProvider.Get(parameters);
 
             return null;
 
         }
 
-        private readonly Dictionary<string, Func<ITransformJsonService>> _dictionary;
+        private readonly Dictionary<string, TransformJsonServiceProvider> _dictionary;
 
     }
 

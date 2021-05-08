@@ -160,7 +160,6 @@ namespace Bb.Json.Jslt.Parser
 
         }
 
-
         public override object VisitPair([NotNull] JsltParser.PairContext context)
         {
 
@@ -217,30 +216,13 @@ namespace Bb.Json.Jslt.Parser
             var txt = context.GetText().Substring(1);
 
             if (context.URI() != null)
-            {
-                return new JType(txt)
-                {
-                    Type = typeof(Uri),
-                };
-            }
-            
-            else if (context.TIME() != null)
-            {
-                return new JType(txt)
-                {
-                    Type = typeof(TimeSpan),
-                };
+                return new JType(txt) { Type = typeof(Uri) };
 
-            }
+            else if (context.TIME() != null)
+                return new JType(txt) { Type = typeof(TimeSpan) };
 
             else if (context.DATETIME() != null)
-            {
-                return new JType(txt)
-                {
-                    Type = typeof(DateTime),
-                };
-
-            }
+                return new JType(txt) { Type = typeof(DateTime) };
 
             throw new NotImplementedException(context.GetText());
 
@@ -370,6 +352,7 @@ namespace Bb.Json.Jslt.Parser
 
         public override object VisitJsonCtor([NotNull] JsltParser.JsonCtorContext context)
         {
+
             var name = context.ID().ToString();
             List<object> argumentsJson = new List<object>();
             var arguments = context.jsonValueList();

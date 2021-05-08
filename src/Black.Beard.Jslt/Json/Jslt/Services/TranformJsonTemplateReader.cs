@@ -202,24 +202,6 @@ namespace Bb.Json.Jslt.Services
             return new JsltConstant() { Value = n.Value, Kind = JsltKind.Integer };
         }
 
-        private JsltJson ReadConstructor(JConstructor n)
-        {
-
-            //var node = new JsltType() { Value = n.Value, Kind = JsltKind.Integer };
-
-            //var service = this._configuration.Services.GetService(t.Type);
-            //if (service == null)
-            //    throw new MissingServiceException(t.Type);
-            //t.ServiceProvider = service;
-
-
-
-            //return node;
-
-            return null;
-
-        }
-
         #endregion read values
 
         private JsltJson ReadArray(JArray n)
@@ -229,23 +211,8 @@ namespace Bb.Json.Jslt.Services
 
             foreach (var item in n)
             {
-
-                var it = /*arr.Item =*/ Read(item);
-
-                //if (it.Where != null)
-                //{
-                //    arr.Where = it.Where;
-                //    it.Where = null;
-                //}
-
-                //if (it.Source != null)
-                //{
-                //    arr.Source = it.Source;
-                //    it.Source = null;
-                //}
-
+                var it = Read(item);
                 arr.Append(it);
-
             }
 
             return arr;
@@ -255,16 +222,12 @@ namespace Bb.Json.Jslt.Services
         private JsltJson ReadChained(JChained n)
         {
 
-            var arr = new JsltArray(n.Count);
+            var result = new JsltLinkedCode();
 
             foreach (var item in n)
-            {
+                result.Append( Read(item));
 
-                var it = Read(item);
-
-            }
-
-            return arr;
+            return result;
 
         }
 
@@ -278,47 +241,35 @@ namespace Bb.Json.Jslt.Services
             foreach (var item in n.Properties())
                 result.Append(Read(item) as JsltProperty);
 
-            if (result.Source != null)
-            {
-                if (result.Source is JsltConstant c)
-                    if (c.Value is string v)
-                    {
-                        var service = this._configuration.Services.GetService(v);
-                        if (service != null)
-                            return new JsltFunction(result)
-                            {
-                                ServiceProvider = service,
-                            };
-                        else
-                            throw new MissingServiceException(v);
-                    }
-            }
-            else if (!string.IsNullOrEmpty(result.Name))
-            {
-                var service = this._configuration.Services.GetService(result.Name);
-                if (service != null)
-                    return new JsltFunction(result)
-                    {
-                        ServiceProvider = service,
-                        Type = result.Name,
-                    };
-                else
-                    throw new MissingServiceException(result.Name);
-            }
+            //if (result.Source != null)
+            //{
+            //    if (result.Source is JsltConstant c)
+            //        if (c.Value is string v)
+            //        {
+            //            var service = this._configuration.Services.GetService(v);
+            //            if (service != null)
+            //                return new JsltFunction()
+            //                {
+            //                    ServiceProvider = service,
+            //                };
+            //            else
+            //                throw new MissingServiceException(v);
+            //        }
+            //}
 
-            if (result.Where != null)
-            {
-                if (result.Where is JsltConstant c)
-                    if (c.Value is string v)
-                    {
-                        var service = this._configuration.Services.GetService(v);
-                        if (service != null)
-                            return new JsltFunction(result) { ServiceProvider = service };
-                        else
-                            throw new MissingServiceException(v);
-                    }
+            //if (result.Where != null)
+            //{
+            //    if (result.Where is JsltConstant c)
+            //        if (c.Value is string v)
+            //        {
+            //            var service = this._configuration.Services.GetService(v);
+            //            if (service != null)
+            //                return new JsltFunction(result) { ServiceProvider = service };
+            //            else
+            //                throw new MissingServiceException(v);
+            //        }
 
-            }
+            //}
 
             return result;
 
@@ -340,6 +291,134 @@ namespace Bb.Json.Jslt.Services
 
         }
 
+        private JsltJson ReadConstructor(JConstructor n)
+        {
+
+            var types = ResolveArgumentsTypes(n);
+            var service = this._FunctionFoundry.GetService(n.Name, types);
+
+            List<JsltJson> _arguments = new List<JsltJson>(10);
+            foreach (var item in n.Children())
+                _arguments.Add(Read(item));
+
+            if (service != null)
+                return new JsltFunction(_arguments)
+                {
+                    ServiceProvider = service,
+                    //Type = result.Name,
+                };
+            
+            Stop();
+
+            throw new MissingServiceException(n.Name);
+
+        }
+
+        private Type[] ResolveArgumentsTypes(JConstructor n)
+        {
+
+            var c = n.Children();
+            List<Type> _types = new List<Type>(10);
+            foreach (var item in c)
+            {
+                if (item is JConstructor ctor)
+                {
+                    Stop();
+                    var types = ResolveArgumentsTypes(ctor);
+                    var service = this._FunctionFoundry.GetService(ctor.Name, types);
+
+
+
+                }
+                else if (item is JValue v)
+                {
+                    switch (v.Type)
+                    {
+
+                        case JTokenType.Integer:
+                            if (v.Value is long l && l <= int.MaxValue)
+                                _types.Add(typeof(int));
+                            else
+                                _types.Add(typeof(long));
+                            break;
+
+                        case JTokenType.Float:
+                            if (v.Value is double d && d <= int.MaxValue)
+                                _types.Add(typeof(Single));
+                            else
+                                _types.Add(typeof(double));
+                            break;
+
+                        case JTokenType.String:
+                            _types.Add(typeof(string));
+                            break;
+
+                        case JTokenType.Boolean:
+                            _types.Add(typeof(bool));
+                            break;
+
+                        case JTokenType.Guid:
+                            _types.Add(typeof(Guid));
+                            break;
+
+                        case JTokenType.Uri:
+                            _types.Add(typeof(Uri));
+                            break;
+
+                        case JTokenType.TimeSpan:
+                            _types.Add(typeof(TimeSpan));
+                            break;
+
+                        case JTokenType.Date:
+                            _types.Add(typeof(DateTimeOffset));
+                            break;
+
+                        case JTokenType.Object:
+                            _types.Add(typeof(JObject));
+                            break;
+
+                        case JTokenType.Array:
+                            break;
+
+                        case JTokenType.Null:
+                            Stop();
+                            break;
+
+                        case JTokenType.Bytes:
+                            Stop();
+                            break;
+
+                        case JTokenType.Raw:
+                        case JTokenType.Property:
+                        case JTokenType.Constructor:
+                        case JTokenType.Undefined:
+                        case JTokenType.Comment:
+                        case JTokenType.None:
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                else if (item is JPath p)
+                {
+                    Stop();
+                    _types.Add(typeof(JToken));
+                }
+                else if (item is JRaw r)
+                {
+                    Stop();
+                }
+                else
+                {
+                    Stop();
+
+                }
+            }
+
+            return _types.ToArray();
+
+        }
+
         private JsltJson ReadProperty(JProperty n)
         {
 
@@ -357,10 +436,17 @@ namespace Bb.Json.Jslt.Services
         }
 
 
+        [System.Diagnostics.DebuggerStepThrough]
+        [System.Diagnostics.DebuggerNonUserCode]
+        private void Stop()
+        {
+            if (System.Diagnostics.Debugger.IsAttached)
+                System.Diagnostics.Debugger.Break();
+        }
+
         private readonly JToken _root;
         private readonly TranformJsonAstConfiguration _configuration;
         private readonly FunctionFoundry _FunctionFoundry;
-        //private Stack<object> _path;
 
     }
 

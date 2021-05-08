@@ -1,4 +1,5 @@
-﻿using Bb.Json.Jslt.Services;
+﻿using Bb.Json.Jslt.Parser;
+using Bb.Json.Jslt.Services;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -12,23 +13,20 @@ namespace Bb.Json.Jslt.Asts
     {
 
 
-        public JsltFunction(JsltObject o)
+        public JsltFunction(List<JsltJson> arguments)
         {
 
             this.Kind = JsltKind.Function;
             this._items = new Dictionary<string, JsltMapProperty>();
-
-            foreach (var item in o.Properties.Where(c=> c.Name.StartsWith("$")))
-                
-                if (item.Name == TransformJsonConstants.Source)
-                    this.Type = (item.Value as JsltConstant).Value.ToString();
-
-                else
-                    this._items.Add(item.Name, new JsltMapProperty() 
-                    {
-                        Name = item.Name.Substring(1), 
-                        Value = item.Value 
-                    });
+            foreach (var item in arguments)
+            {
+                var name = "arg" + this._items.Count.ToString();
+                this._items.Add(name, new JsltMapProperty()
+                {
+                    Name = name,
+                    Value = item
+                });
+            }
 
         }
 
@@ -36,11 +34,11 @@ namespace Bb.Json.Jslt.Asts
 
         public string Type { get; internal set; }
 
-        public TransformJsonServiceProvider ServiceProvider { get; internal set; }
+        public Factory<ITransformJsonService> ServiceProvider { get; internal set; }
 
         public override object Accept(IJsltJsonVisitor visitor)
         {
-            return visitor.VisitType(this);
+            return visitor.VisitFunction(this);
         }
 
         private readonly Dictionary<string, JsltMapProperty> _items;
