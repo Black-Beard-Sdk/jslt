@@ -24,6 +24,10 @@ namespace Bb.Json.Jslt.Asts
 
         object VisitLinkedCode(JsltLinkedCode node);
 
+        object VisitUnaryOperator(JsltOperator node);
+
+        object VisitBinaryOperator(JsltBinaryOperator node);
+
     }
 
 }

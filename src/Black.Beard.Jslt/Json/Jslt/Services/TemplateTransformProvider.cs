@@ -78,7 +78,7 @@ namespace Bb.Json.Jslt.Services
             if (tree != null)
             {
                 var builder = new TemplateBuilder() { Configuration = this._configuration, EmbbededFunctions = foundry };
-                fnc = builder.Compile(tree);
+                fnc = builder.GenerateLambda(tree);
             }
             else // Template empty
             {

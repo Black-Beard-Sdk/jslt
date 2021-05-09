@@ -1,5 +1,4 @@
-﻿using Bb.Json.Jslt.Parser;
-using Bb.Json.Jslt.Services;
+﻿using Bb.Json.Jslt.Services;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -24,7 +23,7 @@ namespace Bb.Json.Jslt.Asts
                 this._items.Add(name, new JsltMapProperty()
                 {
                     Name = name,
-                    Value = item
+                    Value = item,
                 });
             }
 
@@ -45,4 +44,6 @@ namespace Bb.Json.Jslt.Asts
 
     }
 
+
 }
+

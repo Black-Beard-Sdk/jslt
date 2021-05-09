@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Bb.Json.Jslt.Parser;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,9 @@ namespace Bb.Json.Jslt.Services
             //_mapPropertyService = RuntimeContext.MapPropertyService;
             _getContentByJPath = RuntimeContext.GetContentByJPath;
             _getContentFromService = RuntimeContext.GetContentFromService;
+            _evaluateUnaryOperator = RuntimeContext.EvaluateUnaryOperator;
+            _evaluateBinaryOperator = RuntimeContext.EvaluateBinaryOperator;
+
             _addProperty = typeof(RuntimeContext).GetMethod("AddProperty", new Type[] { typeof(JObject), typeof(JProperty) });
             _convertToBool = typeof(RuntimeContext).GetMethod("ConvertToBool", new Type[] { typeof(JToken) });
             _properties = new Dictionary<Type, Dictionary<string, (PropertyInfo, Action<object, object>)>>();
@@ -87,6 +91,637 @@ namespace Bb.Json.Jslt.Services
         //    return service;
 
         //}
+
+        public static JToken EvaluateUnaryOperator(RuntimeContext ctx, JToken leftToken, OperationEnum @operator)
+        {
+
+            if (leftToken is JValue v)
+            {
+                if (v.Value is bool value)
+                {
+                    switch (@operator)
+                    {
+                        case OperationEnum.Not:
+                            return new JValue(!value);
+
+                        case OperationEnum.Equal:
+                        case OperationEnum.GreaterThanOrEqual:
+                        case OperationEnum.GreaterThan:
+                        case OperationEnum.LessThanOrEqual:
+                        case OperationEnum.LessThan:
+                        case OperationEnum.NotEqual:
+                        case OperationEnum.Add:
+                        case OperationEnum.Subtract:
+                        case OperationEnum.Divide:
+                        case OperationEnum.Modulo:
+                        case OperationEnum.Multiply:
+                        case OperationEnum.Power:
+                        case OperationEnum.Chain:
+                        case OperationEnum.And:
+                        case OperationEnum.AndExclusive:
+                        case OperationEnum.Or:
+                        case OperationEnum.OrExclusive:
+
+                        default:
+                            Stop();
+                            break;
+                    }
+                }
+            }
+
+            return leftToken;
+        }
+
+        public static JToken EvaluateBinaryOperator(RuntimeContext ctx, JToken leftToken, OperationEnum @operator, JToken rightToken)
+        {
+            var l = GetValue(leftToken);
+            var r = GetValue(rightToken);
+
+            switch (@operator)
+            {
+
+                case OperationEnum.Equal:
+                    return new JValue(object.Equals(l, r));
+
+                case OperationEnum.GreaterThanOrEqual:
+                    return new JValue(GreaterThanOrEqual(l, r));
+
+                case OperationEnum.GreaterThan:
+                    return new JValue(GreaterThan(l, r));
+
+                case OperationEnum.LessThanOrEqual:
+                    return new JValue(LessThanOrEqual(l, r));
+
+                case OperationEnum.LessThan:
+                    return new JValue(LessThan(l, r));
+
+                case OperationEnum.NotEqual:
+                    return new JValue(!object.Equals(l, r));
+
+                case OperationEnum.Add:
+                    return new JValue(Add(l, r));
+
+                case OperationEnum.Subtract:
+                    return new JValue(Substract(l, r));
+
+                case OperationEnum.Divide:
+                    return new JValue(Divid(l, r));
+
+                case OperationEnum.Modulo:
+                    return new JValue(Modulo(l, r));
+
+                case OperationEnum.Multiply:
+                    return new JValue(Multiply(l, r));
+
+                case OperationEnum.Power:
+                    return new JValue(Power(l, r));
+
+                case OperationEnum.And:
+                    return new JValue(And(l, r));
+
+                case OperationEnum.AndExclusive:
+                    return new JValue(AndExclusive(l, r));
+
+                case OperationEnum.Or:
+                    return new JValue(Or(l, r));
+
+                case OperationEnum.OrExclusive:
+                    return new JValue(OrExclusive(l, r));
+
+                case OperationEnum.Chain:
+                    break;
+
+                default:
+                    break;
+            }
+
+            return leftToken;
+
+        }
+
+        private static bool GreaterThanOrEqual(object l, object r)
+        {
+
+            if (l is decimal left_deci)
+                return left_deci >= Convert.ToDecimal(r);
+
+            else if (l is float left_float)
+                return left_float >= Convert.ToSingle(r);
+
+            else if (l is double left_double)
+                return left_double >= Convert.ToDouble(r);
+
+            else if (l is Int16 left_int16)
+                return left_int16 >= Convert.ToInt64(r);
+
+            else if (l is UInt16 left_uint16)
+                return left_uint16 >= Convert.ToUInt64(r);
+
+            else if (l is UInt32 left_uint32)
+                return left_uint32 >= Convert.ToUInt64(r);
+
+            else if (l is UInt64 left_uint64)
+                return left_uint64 >= Convert.ToUInt64(r);
+
+            else if (l is int left_int)
+                return left_int >= Convert.ToInt64(r);
+
+            else if (l is long left_long)
+                return left_long >= Convert.ToInt64(r);
+
+            else if (l is DateTime dateTime)
+                return dateTime >= Convert.ToDateTime(r);
+
+            else
+            {
+                Stop();
+
+            }
+
+            return false;
+
+        }
+
+        private static object Add(object l, object r)
+        {
+
+            if (l is string left_string)
+                return string.Concat(left_string, r.ToString());
+
+            else if (l is long left_long)
+                return left_long + Convert.ToInt64(r);
+
+            else if (l is decimal left_deci)
+                return left_deci + Convert.ToDecimal(r);
+
+            else if (l is float left_float)
+                return left_float + Convert.ToSingle(r);
+
+            else if (l is double left_double)
+                return left_double + Convert.ToDouble(r);
+
+            else if (l is Int16 left_int16)
+                return left_int16 + Convert.ToInt64(r);
+
+            else if (l is UInt16 left_uint16)
+                return left_uint16 + Convert.ToUInt64(r);
+
+            else if (l is UInt32 left_uint32)
+                return left_uint32 + Convert.ToUInt64(r);
+
+            else if (l is UInt64 left_uint64)
+                return left_uint64 + Convert.ToUInt64(r);
+
+            else if (l is int left_int)
+                return left_int + Convert.ToInt64(r);
+
+            //else if (l is DateTime dateTime)
+            //    return dateTime..Add(Convert.ToDateTime(r));
+
+            else
+            {
+                Stop();
+
+            }
+
+            return false;
+
+        }
+
+        private static object Substract(object l, object r)
+        {
+
+            if (l is decimal left_deci)
+                return left_deci - Convert.ToDecimal(r);
+
+            else if (l is float left_float)
+                return left_float - Convert.ToSingle(r);
+
+            else if (l is double left_double)
+                return left_double - Convert.ToDouble(r);
+
+            else if (l is Int16 left_int16)
+                return left_int16 - Convert.ToInt64(r);
+
+            else if (l is UInt16 left_uint16)
+                return left_uint16 - Convert.ToUInt64(r);
+
+            else if (l is UInt32 left_uint32)
+                return left_uint32 - Convert.ToUInt64(r);
+
+            else if (l is UInt64 left_uint64)
+                return left_uint64 - Convert.ToUInt64(r);
+
+            else if (l is int left_int)
+                return left_int - Convert.ToInt64(r);
+
+            else if (l is long left_long)
+                return left_long - Convert.ToInt64(r);
+
+            //else if (l is DateTime dateTime)
+            //    return dateTime..Add(Convert.ToDateTime(r));
+
+            else
+            {
+                Stop();
+
+            }
+
+            return false;
+
+        }
+
+        private static object Modulo(object l, object r)
+        {
+
+            if (l is decimal left_deci)
+                return left_deci % Convert.ToDecimal(r);
+
+            else if (l is float left_float)
+                return left_float % Convert.ToSingle(r);
+
+            else if (l is double left_double)
+                return left_double % Convert.ToDouble(r);
+
+            else if (l is Int16 left_int16)
+                return left_int16 % Convert.ToInt64(r);
+
+            else if (l is UInt16 left_uint16)
+                return left_uint16 % Convert.ToUInt64(r);
+
+            else if (l is UInt32 left_uint32)
+                return left_uint32 % Convert.ToUInt64(r);
+
+            else if (l is UInt64 left_uint64)
+                return left_uint64 % Convert.ToUInt64(r);
+
+            else if (l is int left_int)
+                return left_int % Convert.ToInt64(r);
+
+            else if (l is long left_long)
+                return left_long % Convert.ToInt64(r);
+
+            //else if (l is DateTime dateTime)
+            //    return dateTime..Add(Convert.ToDateTime(r));
+
+            else
+            {
+                Stop();
+
+            }
+
+            return false;
+
+        }
+
+        private static object Multiply(object l, object r)
+        {
+
+            if (l is decimal left_deci)
+                return left_deci * Convert.ToDecimal(r);
+
+            else if (l is float left_float)
+                return left_float * Convert.ToSingle(r);
+
+            else if (l is double left_double)
+                return left_double * Convert.ToDouble(r);
+
+            else if (l is Int16 left_int16)
+                return left_int16 * Convert.ToInt64(r);
+
+            else if (l is UInt16 left_uint16)
+                return left_uint16 * Convert.ToUInt64(r);
+
+            else if (l is UInt32 left_uint32)
+                return left_uint32 * Convert.ToUInt64(r);
+
+            else if (l is UInt64 left_uint64)
+                return left_uint64 * Convert.ToUInt64(r);
+
+            else if (l is int left_int)
+                return left_int * Convert.ToInt64(r);
+
+            else if (l is long left_long)
+                return left_long * Convert.ToInt64(r);
+
+            //else if (l is DateTime dateTime)
+            //    return dateTime..Add(Convert.ToDateTime(r));
+
+            else
+            {
+                Stop();
+
+            }
+
+            return false;
+
+        }
+
+        private static object Power(object l, object r)
+        {
+
+            if (l is Int16 left_int16)
+                return left_int16 ^ Convert.ToInt64(r);
+
+            else if (l is UInt16 left_uint16)
+                return left_uint16 ^ Convert.ToUInt64(r);
+
+            else if (l is UInt32 left_uint32)
+                return left_uint32 ^ Convert.ToUInt64(r);
+
+            else if (l is UInt64 left_uint64)
+                return left_uint64 ^ Convert.ToUInt64(r);
+
+            else if (l is int left_int)
+                return left_int ^ Convert.ToInt64(r);
+
+            else if (l is long left_long)
+                return left_long ^ Convert.ToInt64(r);
+
+            else
+            {
+                Stop();
+
+            }
+
+            return false;
+
+        }
+
+        private static object And(object l, object r)
+        {
+
+            if (l is Int16 left_int16)
+                return left_int16 & Convert.ToInt64(r);
+
+            else if (l is UInt16 left_uint16)
+                return left_uint16 & Convert.ToUInt64(r);
+
+            else if (l is UInt32 left_uint32)
+                return left_uint32 & Convert.ToUInt64(r);
+
+            else if (l is UInt64 left_uint64)
+                return left_uint64 & Convert.ToUInt64(r);
+
+            else if (l is int left_int)
+                return left_int & Convert.ToInt64(r);
+
+            else if (l is long left_long)
+                return left_long & Convert.ToInt64(r);
+
+            else
+            {
+                Stop();
+
+            }
+
+            return false;
+
+        }
+
+        private static object AndExclusive(object l, object r)
+        {
+
+            if (l is bool left_int16)
+                return left_int16 && Convert.ToBoolean(r);
+
+            else
+            {
+                Stop();
+
+            }
+
+            return false;
+
+        }
+
+        private static object OrExclusive(object l, object r)
+        {
+
+            if (l is bool left_int16)
+                return left_int16 && Convert.ToBoolean(r);
+
+            else
+            {
+                Stop();
+
+            }
+
+            return false;
+
+        }
+
+        private static object Or(object l, object r)
+        {
+
+            if (l is Int16 left_int16)
+                return left_int16 | Convert.ToInt16(r);
+
+            else if (l is UInt16 left_uint16)
+                return left_uint16 | Convert.ToUInt64(r);
+
+            else if (l is UInt32 left_uint32)
+                return left_uint32 | Convert.ToUInt64(r);
+
+            else if (l is UInt64 left_uint64)
+                return left_uint64 | Convert.ToUInt64(r);
+
+            else if (l is int left_int)
+                return left_int | Convert.ToInt32(r);
+
+            else if (l is long left_long)
+                return left_long | Convert.ToInt64(r);
+
+            else
+            {
+                Stop();
+
+            }
+
+            return false;
+
+        }
+
+        private static object Divid(object l, object r)
+        {
+
+            if (l is decimal left_deci)
+                return left_deci / Convert.ToDecimal(r);
+
+            else if (l is float left_float)
+                return left_float / Convert.ToSingle(r);
+
+            else if (l is double left_double)
+                return left_double / Convert.ToDouble(r);
+
+            else if (l is Int16 left_int16)
+                return left_int16 / Convert.ToInt64(r);
+
+            else if (l is UInt16 left_uint16)
+                return left_uint16 / Convert.ToUInt64(r);
+
+            else if (l is UInt32 left_uint32)
+                return left_uint32 / Convert.ToUInt64(r);
+
+            else if (l is UInt64 left_uint64)
+                return left_uint64 / Convert.ToUInt64(r);
+
+            else if (l is int left_int)
+                return left_int / Convert.ToInt64(r);
+
+            else if (l is long left_long)
+                return left_long / Convert.ToInt64(r);
+
+            //else if (l is DateTime dateTime)
+            //    return dateTime..Add(Convert.ToDateTime(r));
+
+            else
+            {
+                Stop();
+
+            }
+
+            return false;
+
+        }
+
+        private static bool LessThanOrEqual(object l, object r)
+        {
+
+            if (l is decimal left_deci)
+                return left_deci <= Convert.ToDecimal(r);
+
+            else if (l is float left_float)
+                return left_float <= Convert.ToSingle(r);
+
+            else if (l is double left_double)
+                return left_double <= Convert.ToDouble(r);
+
+            else if (l is Int16 left_int16)
+                return left_int16 <= Convert.ToInt64(r);
+
+            else if (l is UInt16 left_uint16)
+                return left_uint16 <= Convert.ToUInt64(r);
+
+            else if (l is UInt32 left_uint32)
+                return left_uint32 <= Convert.ToUInt64(r);
+
+            else if (l is UInt64 left_uint64)
+                return left_uint64 <= Convert.ToUInt64(r);
+
+            else if (l is int left_int)
+                return left_int <= Convert.ToInt64(r);
+
+            else if (l is long left_long)
+                return left_long <= Convert.ToInt64(r);
+
+            else if (l is DateTime dateTime)
+                return dateTime <= Convert.ToDateTime(r);
+
+            else
+            {
+                Stop();
+
+            }
+
+            return false;
+
+        }
+
+        private static bool GreaterThan(object l, object r)
+        {
+
+            if (l is decimal left_deci)
+                return left_deci > Convert.ToDecimal(r);
+
+            else if (l is float left_float)
+                return left_float > Convert.ToSingle(r);
+
+            else if (l is double left_double)
+                return left_double > Convert.ToDouble(r);
+
+            else if (l is Int16 left_int16)
+                return left_int16 > Convert.ToInt64(r);
+
+            else if (l is UInt16 left_uint16)
+                return left_uint16 > Convert.ToUInt64(r);
+
+            else if (l is UInt32 left_uint32)
+                return left_uint32 > Convert.ToUInt64(r);
+
+            else if (l is UInt64 left_uint64)
+                return left_uint64 > Convert.ToUInt64(r);
+
+            else if (l is int left_int)
+                return left_int > Convert.ToInt64(r);
+
+            else if (l is long left_long)
+                return left_long > Convert.ToInt64(r);
+
+            else if (l is DateTime dateTime)
+                return dateTime > Convert.ToDateTime(r);
+
+            else
+            {
+                Stop();
+
+            }
+
+            return false;
+
+        }
+
+        private static bool LessThan(object l, object r)
+        {
+
+            if (l is decimal left_deci)
+                return left_deci < Convert.ToDecimal(r);
+
+            else if (l is float left_float)
+                return left_float < Convert.ToSingle(r);
+
+            else if (l is double left_double)
+                return left_double < Convert.ToDouble(r);
+
+            else if (l is Int16 left_int16)
+                return left_int16 < Convert.ToInt64(r);
+
+            else if (l is UInt16 left_uint16)
+                return left_uint16 < Convert.ToUInt64(r);
+
+            else if (l is UInt32 left_uint32)
+                return left_uint32 < Convert.ToUInt64(r);
+
+            else if (l is UInt64 left_uint64)
+                return left_uint64 < Convert.ToUInt64(r);
+
+            else if (l is int left_int)
+                return left_int < Convert.ToInt64(r);
+
+            else if (l is long left_long)
+                return left_long < Convert.ToInt64(r);
+
+            else if (l is DateTime dateTime)
+                return dateTime < Convert.ToDateTime(r);
+
+            else
+            {
+                Stop();
+
+            }
+
+            return false;
+
+        }
+
+        private static object GetValue(JToken token)
+        {
+            if (token is JValue v)
+                return v.Value;
+
+            return null;
+
+        }
 
         public static JToken GetContentFromService(RuntimeContext ctx, JToken token, ITransformJsonService service)
         {
@@ -164,7 +799,8 @@ namespace Bb.Json.Jslt.Services
         public static readonly Func<RuntimeContext, JToken, Func<RuntimeContext, JToken, JToken>, JToken> _getProjectionFromSource;
         public static readonly Func<RuntimeContext, JToken, string, JToken> _getContentByJPath;
         public static readonly Func<RuntimeContext, JToken, ITransformJsonService, JToken> _getContentFromService;
-        //public static readonly Func<RuntimeContext, TranformJsonAstConfiguration.Factory<ITransformJsonService>, string, JToken, ITransformJsonService> _mapPropertyService;
+        public static readonly Func<RuntimeContext, JToken, OperationEnum, JToken> _evaluateUnaryOperator;
+        public static readonly Func<RuntimeContext, JToken, OperationEnum, JToken, JToken> _evaluateBinaryOperator;
         public static readonly Func<RuntimeContext, JToken, JToken, JToken, string, JToken> _addLikeProperty;
         public static readonly MethodInfo _addProperty;
 
@@ -226,6 +862,14 @@ namespace Bb.Json.Jslt.Services
         private static readonly Dictionary<Type, Dictionary<string, (PropertyInfo, Action<object, object>)>> _properties;
 
         private static object _lock = new object();
+
+        [System.Diagnostics.DebuggerStepThrough]
+        [System.Diagnostics.DebuggerNonUserCode]
+        private static void Stop()
+        {
+            if (System.Diagnostics.Debugger.IsAttached)
+                System.Diagnostics.Debugger.Break();
+        }
 
 
         public JToken TokenSource { get; }

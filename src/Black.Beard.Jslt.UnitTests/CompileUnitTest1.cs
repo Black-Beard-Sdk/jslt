@@ -82,12 +82,11 @@ namespace Black.Beard.Jslt.UnitTests
 
         }
 
-
         [TestMethod]
         public void TestMObjectWithconstructor()
         {
 
-            var o = new JObject(new JProperty("propertyName", new JConstructor("myMethod", 6.6, "test")));
+            var o = new JObject(new JProperty("propertyName", new JFunctionCall("myMethod", 6.6, "test")));
 
             var expected = o.ToString(Newtonsoft.Json.Formatting.None);
 
@@ -98,7 +97,53 @@ namespace Black.Beard.Jslt.UnitTests
 
         }
 
-     
+        [TestMethod]
+        public void TestJPath()
+        {
+
+            var o = new JObject(new JProperty("propertyName", new JPath("$.prop1.SubPprop1")));
+
+            var expected = o.ToString(Newtonsoft.Json.Formatting.None);
+
+            var source = "{ 'prop1': { 'SubPprop1':2 }, 'prop2':3 }".Replace("'", "\"");
+
+            RuntimeContext result = Test(expected, source);
+            Assert.AreEqual(result.TokenResult["propertyName"], 2);
+
+        }
+
+        [TestMethod]
+        public void TestJPathUnary()
+        {
+
+            var o = new JObject(
+                new JProperty("propertyName",
+                    new JUnaryOperation(new JPath("$.prop1"), OperationEnum.Not)
+                    )
+                );
+
+            var expected = o.ToString(Newtonsoft.Json.Formatting.None);
+
+            var source = "{ 'prop1': false }".Replace("'", "\"");
+
+            RuntimeContext result = Test(expected, source);
+            Assert.AreEqual(result.TokenResult["propertyName"], true);
+
+        }
+
+        [TestMethod]
+        public void TestJPathBinary()
+        {
+
+            var expected = "{'propertyName':'$.prop1.SubPprop1' + '$.prop2' }".Replace("'", "\""); 
+            var source = "{ 'prop1': { 'SubPprop1':2 }, 'prop2':3 }".Replace("'", "\"");
+
+            RuntimeContext result = Test(expected, source);
+            Assert.AreEqual(result.TokenResult["propertyName"], 5);
+
+        }
+
+
         //[TestMethod]
         //public void TestMObjectWithJPath()
         //{

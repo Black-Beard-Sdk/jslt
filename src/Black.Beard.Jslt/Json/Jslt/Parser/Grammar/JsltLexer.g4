@@ -18,28 +18,38 @@
 
 lexer grammar JsltLexer;
 
-CURRENT_VALUE : '@' ;
-RECURSIVE_DESCENT : '..' ;
-ROOT_VALUE : '$' ;
 SUBSCRIPT : '.' ;
 WILDCARD_SUBSCRIPT : '*' ;
-PIPE : '|';
+CURRENT_VALUE : '@' ;
+COLON : ':';
 
 URI : 'uri';
 TIME : 'time';
 DATETIME : 'datetime';
+WHEN : 'when';
+CASE : 'case';
+DEFAULT : 'default';
 
-AND : 'and' ;
-EQ : '=' ;
-GE : '>=' ;
-GT : '>' ;
-LE : '<=' ;
-LT : '<' ;
+EQ : '==' ;
 NE : '!=' ;
-NOT : 'not' ;
-OR : 'or' ;
+GT : '>' ;
+LT : '<' ;
+LE : '<=' ;
+GE : '>=' ;
+NT : '!';
 
-NEW : 'new';
+PLUS : '+';
+MINUS : '-';
+DIVID : '/';
+MODULO : '%';
+POWER : '^';
+
+AND : '&';
+OR : '|';
+AND_EXCLUSIVE : '&&';
+OR_EXCLUSIVE : '||';
+
+CHAIN : '->';
 
 TRUE : 'true' ;
 FALSE : 'false' ;
@@ -49,28 +59,30 @@ BRACE_LEFT : '{' ;
 BRACE_RIGHT : '}' ;
 BRACKET_LEFT : '[' ;
 BRACKET_RIGHT : ']' ;
-COLON : ':' ;
+
 COMMA : ',' ;
 PAREN_LEFT : '(' ;
 PAREN_RIGHT : ')' ;
-QUESTION : '?' ;
+//QUESTION : '?' ;
+
 
 STRING
    : '"' (ESC | SAFECODEPOINT)* '"'
    ;
 
 MULTI_LINE_COMMENT : '/*' .*? '*/' ;
-CODE_STRING:  QUOTE_CODE_STRING LANGUAGE WS .*? QUOTE_CODE_STRING;
-QUOTE_CODE_STRING:  '\'\'\'';
-
+CODE_STRING :        QUOTE_CODE_STRING LANGUAGE WS .*? QUOTE_CODE_STRING;
+QUOTE_CODE_STRING :  '\'\'\'';
 
 
 fragment ESC
    : '\\' (["\\/bfnrt] | UNICODE)
    ;
+
 fragment UNICODE
    : 'u' HEX HEX HEX HEX
    ;
+
 fragment HEX
    : [0-9a-fA-F]
    ;
@@ -81,7 +93,6 @@ fragment SAFECODEPOINT
 NUMBER
    : '-'? INT ('.' [0-9] +)? EXP?
    ;
-
 
 INT
    : '0' | [1-9] [0-9]*
@@ -103,6 +114,10 @@ ID
    : [_A-Za-z] [_A-Za-z0-9]*
    ;
 
-LANGUAGE
+fragment DOT_ID
+   : '.' [_A-Za-z] [_A-Za-z0-9]*
+   ;
+
+fragment LANGUAGE
    : SUBSCRIPT [_A-Za-z] [_A-Za-z0-9]*
    ;

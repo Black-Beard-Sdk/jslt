@@ -53,14 +53,13 @@ array :
 jsonValue :
      obj
    | array
-   | jsonValueBoolean
-   | jsonValueString
-   | jsonValueInteger
-   | jsonValueNumber
-   | jsonValueNull
-   | jsonLt
+   // | jsonValueBoolean
+   // | jsonValueString
+   // | jsonValueInteger
+   // | jsonValueNumber
+   // | jsonValueNull
+   | jsonLtOperation
    | jsonValueCodeString
-   | jsonType
    ;
 
 jsonValueString : STRING;
@@ -69,79 +68,64 @@ jsonValueNumber : NUMBER;
 jsonValueInteger : INT;
 jsonValueBoolean : TRUE | FALSE;
 jsonValueNull : NULL;
+jsonType : CURRENT_VALUE (URI | TIME | DATETIME);
+
+// ---------------------------- jslt ----------------------------
+
+jsonLtOperation :
+     NT? jsonLtItem  (operation jsonLtOperation)?
+   | PAREN_LEFT jsonLtOperation PAREN_RIGHT
+   ;
+
+jsonLtItem : 
+     jsonfunctionCall 
+   | jsonWhen
+   | jsonValueBoolean
+   | jsonValueString
+   | jsonValueInteger
+   | jsonValueNumber
+   | jsonValueNull
+   | jsonType
+   ;
+
+operation : 
+     EQ | GE | GT | LE | LT | NE 
+   | PLUS | MINUS | DIVID | MODULO | WILDCARD_SUBSCRIPT | POWER
+   | CHAIN
+   | AND | OR | AND_EXCLUSIVE | OR_EXCLUSIVE
+   ;
 
 // ---------------------------- extended json ----------------------------
-jsonCtor :
-   NEW ID PAREN_LEFT jsonValueList? PAREN_RIGHT
+
+jsonfunctionCall :
+   SUBSCRIPT ID PAREN_LEFT jsonValueList? PAREN_RIGHT
    ;
 
 jsonValueList : 
    jsonValue (COMMA jsonValue)*
    ;
 
-jsonType : 
-   CURRENT_VALUE (URI | TIME | DATETIME)
+
+
+jsonWhen : 
+   SUBSCRIPT WHEN jsonWhenExpression jsonCase+ jsonDefaultCase?
+   ;
+
+jsonCase : 
+   CASE jsonWhenExpression COLON BRACE_LEFT jsonValue BRACE_RIGHT jsonDefaultCase?
+   ;
+
+jsonDefaultCase : 
+   DEFAULT COLON BRACE_LEFT jsonValue BRACE_RIGHT
+   ;
+
+jsonWhenExpression : 
+     jsonValueBoolean
+   | jsonValueString
+   | jsonValueInteger
+   | jsonValueNumber
+   | jsonValueNull
+   | jsonLtOperation
    ;
 
 
-// ---------------------------- jslt ----------------------------
-
-jsonLt : 
-     jsonLtItem (PIPE jsonLtItem)*
-   ;
-
-jsonLtItem : 
-     jsonpath
-   | jsonCtor
-   ;
-
-// ---------------------------- json path ----------------------------
-
-jsonpath : 
-   ROOT_VALUE subscript?
-   ;
-
-subscript :
-     RECURSIVE_DESCENT ( subscriptableBareword | subscriptables ) subscript?
-   | SUBSCRIPT subscriptableBareword subscript?
-   | subscriptables subscript?
-   ;
-
-subscriptables :
-   BRACKET_LEFT subscriptable ( COMMA subscriptable )* BRACKET_RIGHT
-   ;
-
-subscriptableBareword :
-     ID
-   | WILDCARD_SUBSCRIPT
-   ;
-
-subscriptable :
-     STRING
-   | NUMBER? sliceable?
-   | sliceable
-   | WILDCARD_SUBSCRIPT
-   | QUESTION PAREN_LEFT expression PAREN_RIGHT
-   ;
-
-sliceable :
-   COLON NUMBER? (COLON NUMBER? )?
-   ;
-
-expression :
-   andExpression
-   ;
-
-andExpression :
-   orExpression ( AND andExpression )?
-   ;
-
-orExpression :
-   notExpression ( OR orExpression )?
-   ;
-
-notExpression : 
-     NOT notExpression
-   | PAREN_LEFT expression PAREN_RIGHT
-   | ( ROOT_VALUE | CURRENT_VALUE ) subscript? ( ( EQ | NE | LT | LE | GT | GE ) jsonValue )?
-   ;

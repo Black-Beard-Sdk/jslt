@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace Bb.Json.Jslt.Parser
@@ -164,6 +165,7 @@ namespace Bb.Json.Jslt.Parser
         {
 
             var name = context.STRING().GetText().Trim().Trim('\"');
+
             var value = context.jsonValue().Accept(this);
 
             if (value is JfunctionBodyDefinition body)
@@ -206,8 +208,12 @@ namespace Bb.Json.Jslt.Parser
         public override object VisitJsonValueString([NotNull] JsltParser.JsonValueStringContext context)
         {
             var txt = context.GetText().Trim().Trim('\"');
-            var data = new JValue(txt);
-            return AddPosition(data, context.Start, context.Stop);
+
+            if (txt.StartsWith("$"))
+                return AddPosition(new JPath(txt), context.Start, context.Stop);
+
+            return AddPosition(new JValue(txt), context.Start, context.Stop);
+
         }
 
         public override object VisitJsonType([NotNull] JsltParser.JsonTypeContext context)
@@ -257,100 +263,165 @@ namespace Bb.Json.Jslt.Parser
 
         #region Jsonlt
 
-        public override object VisitJsonLt([NotNull] JsltParser.JsonLtContext context)
+        public override object VisitJsonLtOperation([NotNull] JsltParser.JsonLtOperationContext context)
         {
-            var result = new JChained();
-            AddPosition(result, context.Start, context.Stop);
 
-            var items = context.jsonLtItem();
-            foreach (var item in items)
-                result.Add((JToken)item.Accept(this));
-            return result;
+            JToken left = null;
+
+            var ltItem = context.jsonLtItem();
+            if (ltItem != null)
+            {
+                var item = (JToken)ltItem.Accept(this);
+                if (context.NT() == null)
+                    left = item;
+                else
+                    left = AddPosition(new JUnaryOperation(item, OperationEnum.Not), context.Start, context.Stop);
+            }
+
+            var right_operation = context.jsonLtOperation();
+
+            if (right_operation != null)
+            {
+
+                var operationRight = (JToken)right_operation.Accept(this);
+
+                if (context.PAREN_LEFT() == null)
+                {
+                    var operation = (OperationEnum)context.operation().Accept(this);
+                    return AddPosition(new JBinaryOperation(left, operation, operationRight), context.Start, context.Stop);
+                }
+
+                return AddPosition(new JSubExpression(left), context.Start, context.Stop);
+
+            }
+
+            return left;
+        }
+
+        public override object VisitOperation([NotNull] JsltParser.OperationContext context)
+        {
+
+            if (context.EQ() != null)
+                return OperationEnum.Equal;
+
+            else if (context.GE() != null)
+                return OperationEnum.GreaterThanOrEqual;
+
+            else if (context.GT() != null)
+                return OperationEnum.GreaterThan;
+
+            else if (context.LE() != null)
+                return OperationEnum.LessThanOrEqual;
+
+            else if (context.LT() != null)
+                return OperationEnum.LessThan;
+
+            else if (context.NE() != null)
+                return OperationEnum.NotEqual;
+
+            else if (context.PLUS() != null)
+                return OperationEnum.Add;
+
+            else if (context.MINUS() != null)
+                return OperationEnum.Subtract;
+
+            else if (context.DIVID() != null)
+                return OperationEnum.Divide;
+
+            else if (context.MODULO() != null)
+                return OperationEnum.Modulo;
+
+            else if (context.WILDCARD_SUBSCRIPT() != null)
+                return OperationEnum.Multiply;
+
+            else if (context.POWER() != null)
+                return OperationEnum.Power;
+
+            else if (context.CHAIN() != null)
+                return OperationEnum.Chain;
+
+            else if (context.AND() != null)
+                return OperationEnum.And;
+
+            else if (context.AND_EXCLUSIVE() != null)
+                return OperationEnum.AndExclusive;
+
+            else if (context.OR() != null)
+                return OperationEnum.Or;
+
+            else if (context.OR_EXCLUSIVE() != null)
+                return OperationEnum.OrExclusive;
+
+            throw new NotImplementedException(context.GetText());
+
         }
 
         public override object VisitJsonLtItem([NotNull] JsltParser.JsonLtItemContext context)
         {
-            object result = null;
-            var path = context.jsonpath();
-            if (path != null)
-                result = path.Accept(this);
 
-            else
-            {
+            var ctor = context.jsonfunctionCall();
+            if (ctor != null)
+                return ctor.Accept(this);
 
-                var ctor = context.jsonCtor();
-                if (ctor != null)
-                    result = ctor.Accept(this);
+            var jsonWhen = context.jsonWhen();
+            if (jsonWhen != null)
+                return jsonWhen.Accept(this);
 
-                else
-                {
+            var jsonBool = context.jsonValueBoolean();
+            if (jsonBool != null)
+                return jsonBool.Accept(this);
 
-                    //var jsonLtItemFunction = context.jsonLtItemFunction();
-                    //if (jsonLtItemFunction != null)
-                    //    result = jsonLtItemFunction.Accept(this);
+            var jsonString = context.jsonValueString();
+            if (jsonString != null)
+                return jsonString.Accept(this);
 
-                    //else
-                    //{
+            var jsonInteger = context.jsonValueInteger();
+            if (jsonInteger != null)
+                return jsonInteger.Accept(this);
 
-                    Stop();
+            var jsonNumber = context.jsonValueNumber();
+            if (jsonNumber != null)
+                return jsonNumber.Accept(this);
 
-                    //}
+            Stop();
 
-                }
-            }
+            return null;
+        }
 
-            return result;
+        public override object VisitJsonWhen([NotNull] JsltParser.JsonWhenContext context)
+        {
+
+            var expression = (JToken)context.jsonWhenExpression().Accept(this);
+
+            var cases = context.jsonCase();
+
+            List<JCaseExpression> _caseList = new List<JCaseExpression>(cases.Length);
+            foreach (var @case in cases)
+                _caseList.Add((JCaseExpression)@case.Accept(this));
+
+            JDefaultCaseExpression d = null;
+            var defaultCase = context.jsonDefaultCase();
+            if (defaultCase != null)
+                d = (JDefaultCaseExpression)defaultCase.Accept(this);
+
+            return AddPosition(new JWhenExpression(expression, _caseList, d), context.Start, context.Stop);
 
         }
 
-        //public override object VisitJsonLtItemFunction([NotNull] JsltParser.JsonLtItemFunctionContext context)
-        //{
+        public override object VisitJsonCase([NotNull] JsltParser.JsonCaseContext context)
+        {
+            var expression = (JToken)context.jsonWhenExpression().Accept(this);
+            var content = (JToken)context.jsonValue().Accept(this);
+            return AddPosition(new JCaseExpression(expression, content), context.Start, context.Stop);
+        }
 
-        //    var jsonArgumentList = context.jsonArgumentList();
-        //    var parameters = (List<string>)jsonArgumentList.Accept(this);
-        //    var js_block = context.js_block().GetText();
+        public override object VisitJsonDefaultCase([NotNull] JsltParser.JsonDefaultCaseContext context)
+        {
+            var content = (JToken)context.jsonValue().Accept(this);
+            return AddPosition(new JDefaultCaseExpression(content), context.Start, context.Stop);
+        }
 
-        //    var lenght = context.Stop.StopIndex - context.Start.StartIndex;
-        //    StringBuilder sb = new StringBuilder(lenght);
-
-        //    string functionName = string.Empty;
-        //    var id = context.ID();
-        //    if (id != null)
-        //        functionName = id.GetText();
-        //    else
-        //        functionName = "anonymus_" + Crc32.Calculate(js_block).ToString();
-        //    sb.Append(functionName);
-
-
-        //    sb.Append("(");
-        //    string comma = string.Empty;
-        //    foreach (var item in parameters)
-        //    {
-        //        sb.Append(comma);
-        //        sb.Append(item);
-        //        comma = ", ";
-        //    }
-
-        //    sb.Append(") ");
-
-        //    sb.Append(js_block);
-
-        //    return new JfunctionDefinition(functionName, parameters, sb.ToString());
-
-        //}
-
-        //public override object VisitJsonArgumentList([NotNull] JsltParser.JsonArgumentListContext context)
-        //{
-        //    var ids = context.ID();
-        //    List<string> result = new List<string>(ids.Length);
-        //    foreach (var item in ids)
-        //        result.Add(item.GetText());
-        //    return result;
-        //}
-
-        #region Extended json
-
-        public override object VisitJsonCtor([NotNull] JsltParser.JsonCtorContext context)
+        public override object VisitJsonfunctionCall([NotNull] JsltParser.JsonfunctionCallContext context)
         {
 
             var name = context.ID().ToString();
@@ -363,6 +434,7 @@ namespace Bb.Json.Jslt.Parser
             }
 
             return AddPosition(new JConstructor(name, argumentsJson.ToArray()), context.Start, context.Stop);
+
 
         }
 
@@ -378,63 +450,6 @@ namespace Bb.Json.Jslt.Parser
             return result;
 
         }
-
-        #endregion
-
-        #region Jpath
-
-        public override object VisitJsonpath([NotNull] JsltParser.JsonpathContext context)
-        {
-            var txt = context.GetText();
-            return AddPosition(new JPath(txt), context.Start, context.Stop);
-        }
-
-        public override object VisitSliceable([NotNull] JsltParser.SliceableContext context)
-        {
-            return base.VisitSliceable(context);
-        }
-
-        public override object VisitAndExpression([NotNull] JsltParser.AndExpressionContext context)
-        {
-            return base.VisitAndExpression(context);
-        }
-
-        public override object VisitExpression([NotNull] JsltParser.ExpressionContext context)
-        {
-            return base.VisitExpression(context);
-        }
-
-        public override object VisitNotExpression([NotNull] JsltParser.NotExpressionContext context)
-        {
-            return base.VisitNotExpression(context);
-        }
-
-        public override object VisitOrExpression([NotNull] JsltParser.OrExpressionContext context)
-        {
-            return base.VisitOrExpression(context);
-        }
-
-        public override object VisitSubscript([NotNull] JsltParser.SubscriptContext context)
-        {
-            return base.VisitSubscript(context);
-        }
-
-        public override object VisitSubscriptable([NotNull] JsltParser.SubscriptableContext context)
-        {
-            return base.VisitSubscriptable(context);
-        }
-
-        public override object VisitSubscriptableBareword([NotNull] JsltParser.SubscriptableBarewordContext context)
-        {
-            return base.VisitSubscriptableBareword(context);
-        }
-
-        public override object VisitSubscriptables([NotNull] JsltParser.SubscriptablesContext context)
-        {
-            return base.VisitSubscriptables(context);
-        }
-
-        #endregion Jpath
 
         #endregion Jsonlt
 
@@ -690,6 +705,29 @@ namespace Bb.Json.Jslt.Parser
         private Dictionary<string, JfunctionDefinition> _definitionFunction;
         private readonly CultureInfo _currentCulture;
 
+    }
+
+
+    public enum OperationEnum
+    {
+        Equal,
+        GreaterThanOrEqual,
+        GreaterThan,
+        LessThanOrEqual,
+        LessThan,
+        NotEqual,
+        Add,
+        Subtract,
+        Divide,
+        Modulo,
+        Multiply,
+        Power,
+        Not,
+        Chain,
+        And,
+        AndExclusive,
+        Or,
+        OrExclusive,
     }
 
 }

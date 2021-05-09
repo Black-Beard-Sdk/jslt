@@ -142,7 +142,7 @@ namespace Bb.Json.Jslt.Services
 
         }
 
-        internal Func<RuntimeContext, JToken, JToken> Compile(JsltJson tree)
+        internal Func<RuntimeContext, JToken, JToken> GenerateLambda(JsltJson tree)
         {
             Expression e;
 
@@ -290,12 +290,10 @@ namespace Bb.Json.Jslt.Services
             {
 
                 ctx.Current.IsCtor = true;
+
                 List<Expression> args = new List<Expression>();
                 foreach (var property in node.Properties)
-                {
-                    var value = (Expression)property.Value.Accept(this);
-                    args.Add(value);
-                }
+                    args.Add((Expression)property.Value.Accept(this));
 
                 var arguments = typeof(object).NewArray(args.ToArray());
 
@@ -309,15 +307,32 @@ namespace Bb.Json.Jslt.Services
 
         }
 
+        public object VisitUnaryOperator(JsltOperator node)
+        {
+            using (CurrentContext ctx = NewContext())
+            {
+                var left = (Expression)node.Left.Accept(this);
+                var result = Expression.Call(RuntimeContext._evaluateUnaryOperator.Method, ctx.Current.Context, left, Expression.Constant(node.Operator));
+                return result;
+            }
+        }
+
+        public object VisitBinaryOperator(JsltBinaryOperator node)
+        {
+            using (CurrentContext ctx = NewContext())
+            {
+                var left = (Expression)node.Left.Accept(this);
+                var right = (Expression)node.Right.Accept(this);
+                var result = Expression.Call(RuntimeContext._evaluateBinaryOperator.Method, ctx.Current.Context, left, Expression.Constant(node.Operator), right);
+                return result;
+            }
+        }
+
         public object VisitMapProperty(JsltMapProperty node)
         {
-
             var ctx = BuildCtx;
-
             var value = (Expression)node.Value.Accept(this);
-
             return Expression.Call(ctx.Context, null, Expression.Constant(node.Name), value);
-
         }
 
         public object VisitLinkedCode(JsltLinkedCode node)
@@ -334,29 +349,19 @@ namespace Bb.Json.Jslt.Services
 
             }
 
-           
+
 
             return result;
 
         }
+        
         public object VisitJPath(JsltPath node)
         {
 
             using (CurrentContext ctx = NewContext())
             {
 
-
-                if (node.Type == "jpath")
-                    ctx.Current.RootSource = Expression.Call(RuntimeContext._getContentByJPath.Method, ctx.Current.Context, ctx.Current.RootSource, Expression.Constant(node.Value));
-
-                else
-                {
-
-                }
-
-                if (node.Child != null)
-                    ctx.Current.RootSource = (Expression)node.Child.Accept(this);
-
+                ctx.Current.RootSource = Expression.Call(RuntimeContext._getContentByJPath.Method, ctx.Current.Context, ctx.Current.RootSource, Expression.Constant(node.Value));
                 return ctx.Current.RootSource;
 
             }
@@ -364,13 +369,6 @@ namespace Bb.Json.Jslt.Services
         }
 
         public TranformJsonAstConfiguration Configuration { get; set; }
-
-        //public ParameterExpression Argument { get; }
-        //public ParameterExpression Context { get; }
-
-
-
-        //private readonly MethodInfo _AddJObject;
 
 
         private BuildContext BuildCtx

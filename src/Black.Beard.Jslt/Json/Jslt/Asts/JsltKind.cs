@@ -23,6 +23,7 @@
         Jpath,
         PathIndice,
         Type,
+        Operator,
     }
 
 }

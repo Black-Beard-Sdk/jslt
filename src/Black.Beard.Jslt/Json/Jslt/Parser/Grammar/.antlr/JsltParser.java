@@ -16,50 +16,51 @@ public class JsltParser extends Parser {
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	public static final int
-		CURRENT_VALUE=1, RECURSIVE_DESCENT=2, ROOT_VALUE=3, SUBSCRIPT=4, WILDCARD_SUBSCRIPT=5, 
-		PIPE=6, URI=7, TIME=8, DATETIME=9, AND=10, EQ=11, GE=12, GT=13, LE=14, 
-		LT=15, NE=16, NOT=17, OR=18, NEW=19, TRUE=20, FALSE=21, NULL=22, BRACE_LEFT=23, 
-		BRACE_RIGHT=24, BRACKET_LEFT=25, BRACKET_RIGHT=26, COLON=27, COMMA=28, 
-		PAREN_LEFT=29, PAREN_RIGHT=30, QUESTION=31, STRING=32, MULTI_LINE_COMMENT=33, 
-		CODE_STRING=34, QUOTE_CODE_STRING=35, NUMBER=36, INT=37, WS=38, ID=39, 
-		LANGUAGE=40;
+		SUBSCRIPT=1, WILDCARD_SUBSCRIPT=2, CURRENT_VALUE=3, COLON=4, URI=5, TIME=6, 
+		DATETIME=7, WHEN=8, CASE=9, DEFAULT=10, EQ=11, NE=12, GT=13, LT=14, LE=15, 
+		GE=16, NT=17, PLUS=18, MINUS=19, DIVID=20, MODULO=21, POWER=22, AND=23, 
+		OR=24, AND_EXCLUSIVE=25, OR_EXCLUSIVE=26, CHAIN=27, TRUE=28, FALSE=29, 
+		NULL=30, BRACE_LEFT=31, BRACE_RIGHT=32, BRACKET_LEFT=33, BRACKET_RIGHT=34, 
+		COMMA=35, PAREN_LEFT=36, PAREN_RIGHT=37, STRING=38, MULTI_LINE_COMMENT=39, 
+		CODE_STRING=40, QUOTE_CODE_STRING=41, NUMBER=42, INT=43, WS=44, ID=45;
 	public static final int
 		RULE_script = 0, RULE_json = 1, RULE_obj = 2, RULE_pair = 3, RULE_array = 4, 
 		RULE_jsonValue = 5, RULE_jsonValueString = 6, RULE_jsonValueCodeString = 7, 
 		RULE_jsonValueNumber = 8, RULE_jsonValueInteger = 9, RULE_jsonValueBoolean = 10, 
-		RULE_jsonValueNull = 11, RULE_jsonCtor = 12, RULE_jsonValueList = 13, 
-		RULE_jsonType = 14, RULE_jsonLt = 15, RULE_jsonLtItem = 16, RULE_jsonpath = 17, 
-		RULE_subscript = 18, RULE_subscriptables = 19, RULE_subscriptableBareword = 20, 
-		RULE_subscriptable = 21, RULE_sliceable = 22, RULE_expression = 23, RULE_andExpression = 24, 
-		RULE_orExpression = 25, RULE_notExpression = 26;
+		RULE_jsonValueNull = 11, RULE_jsonType = 12, RULE_jsonLtOperation = 13, 
+		RULE_jsonLtItem = 14, RULE_operation = 15, RULE_jsonfunctionCall = 16, 
+		RULE_jsonValueList = 17, RULE_jsonWhen = 18, RULE_jsonCase = 19, RULE_jsonDefaultCase = 20, 
+		RULE_jsonWhenExpression = 21;
 	private static String[] makeRuleNames() {
 		return new String[] {
 			"script", "json", "obj", "pair", "array", "jsonValue", "jsonValueString", 
 			"jsonValueCodeString", "jsonValueNumber", "jsonValueInteger", "jsonValueBoolean", 
-			"jsonValueNull", "jsonCtor", "jsonValueList", "jsonType", "jsonLt", "jsonLtItem", 
-			"jsonpath", "subscript", "subscriptables", "subscriptableBareword", "subscriptable", 
-			"sliceable", "expression", "andExpression", "orExpression", "notExpression"
+			"jsonValueNull", "jsonType", "jsonLtOperation", "jsonLtItem", "operation", 
+			"jsonfunctionCall", "jsonValueList", "jsonWhen", "jsonCase", "jsonDefaultCase", 
+			"jsonWhenExpression"
 		};
 	}
 	public static final String[] ruleNames = makeRuleNames();
 
 	private static String[] makeLiteralNames() {
 		return new String[] {
-			null, "'@'", "'..'", "'$'", "'.'", "'*'", "'|'", "'uri'", "'time'", "'datetime'", 
-			"'and'", "'='", "'>='", "'>'", "'<='", "'<'", "'!='", "'not'", "'or'", 
-			"'new'", "'true'", "'false'", "'null'", "'{'", "'}'", "'['", "']'", "':'", 
-			"','", "'('", "')'", "'?'", null, null, null, "'''''"
+			null, "'.'", "'*'", "'@'", "':'", "'uri'", "'time'", "'datetime'", "'when'", 
+			"'case'", "'default'", "'=='", "'!='", "'>'", "'<'", "'<='", "'>='", 
+			"'!'", "'+'", "'-'", "'/'", "'%'", "'^'", "'&'", "'|'", "'&&'", "'||'", 
+			"'->'", "'true'", "'false'", "'null'", "'{'", "'}'", "'['", "']'", "','", 
+			"'('", "')'", null, null, null, "'''''"
 		};
 	}
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
 	private static String[] makeSymbolicNames() {
 		return new String[] {
-			null, "CURRENT_VALUE", "RECURSIVE_DESCENT", "ROOT_VALUE", "SUBSCRIPT", 
-			"WILDCARD_SUBSCRIPT", "PIPE", "URI", "TIME", "DATETIME", "AND", "EQ", 
-			"GE", "GT", "LE", "LT", "NE", "NOT", "OR", "NEW", "TRUE", "FALSE", "NULL", 
-			"BRACE_LEFT", "BRACE_RIGHT", "BRACKET_LEFT", "BRACKET_RIGHT", "COLON", 
-			"COMMA", "PAREN_LEFT", "PAREN_RIGHT", "QUESTION", "STRING", "MULTI_LINE_COMMENT", 
-			"CODE_STRING", "QUOTE_CODE_STRING", "NUMBER", "INT", "WS", "ID", "LANGUAGE"
+			null, "SUBSCRIPT", "WILDCARD_SUBSCRIPT", "CURRENT_VALUE", "COLON", "URI", 
+			"TIME", "DATETIME", "WHEN", "CASE", "DEFAULT", "EQ", "NE", "GT", "LT", 
+			"LE", "GE", "NT", "PLUS", "MINUS", "DIVID", "MODULO", "POWER", "AND", 
+			"OR", "AND_EXCLUSIVE", "OR_EXCLUSIVE", "CHAIN", "TRUE", "FALSE", "NULL", 
+			"BRACE_LEFT", "BRACE_RIGHT", "BRACKET_LEFT", "BRACKET_RIGHT", "COMMA", 
+			"PAREN_LEFT", "PAREN_RIGHT", "STRING", "MULTI_LINE_COMMENT", "CODE_STRING", 
+			"QUOTE_CODE_STRING", "NUMBER", "INT", "WS", "ID"
 		};
 	}
 	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
@@ -130,9 +131,9 @@ public class JsltParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(54);
+			setState(44);
 			json();
-			setState(55);
+			setState(45);
 			match(EOF);
 			}
 		}
@@ -163,7 +164,7 @@ public class JsltParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(57);
+			setState(47);
 			jsonValue();
 			}
 		}
@@ -202,42 +203,42 @@ public class JsltParser extends Parser {
 		enterRule(_localctx, 4, RULE_obj);
 		int _la;
 		try {
-			setState(72);
+			setState(62);
 			_errHandler.sync(this);
 			switch ( getInterpreter().adaptivePredict(_input,1,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(59);
+				setState(49);
 				match(BRACE_LEFT);
-				setState(60);
+				setState(50);
 				pair();
-				setState(65);
+				setState(55);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				while (_la==COMMA) {
 					{
 					{
-					setState(61);
+					setState(51);
 					match(COMMA);
-					setState(62);
+					setState(52);
 					pair();
 					}
 					}
-					setState(67);
+					setState(57);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
-				setState(68);
+				setState(58);
 				match(BRACE_RIGHT);
 				}
 				break;
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(70);
+				setState(60);
 				match(BRACE_LEFT);
-				setState(71);
+				setState(61);
 				match(BRACE_RIGHT);
 				}
 				break;
@@ -272,11 +273,11 @@ public class JsltParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(74);
+			setState(64);
 			match(STRING);
-			setState(75);
+			setState(65);
 			match(COLON);
-			setState(76);
+			setState(66);
 			jsonValue();
 			}
 		}
@@ -315,42 +316,42 @@ public class JsltParser extends Parser {
 		enterRule(_localctx, 8, RULE_array);
 		int _la;
 		try {
-			setState(91);
+			setState(81);
 			_errHandler.sync(this);
 			switch ( getInterpreter().adaptivePredict(_input,3,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(78);
+				setState(68);
 				match(BRACKET_LEFT);
-				setState(79);
+				setState(69);
 				jsonValue();
-				setState(84);
+				setState(74);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				while (_la==COMMA) {
 					{
 					{
-					setState(80);
+					setState(70);
 					match(COMMA);
-					setState(81);
+					setState(71);
 					jsonValue();
 					}
 					}
-					setState(86);
+					setState(76);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
-				setState(87);
+				setState(77);
 				match(BRACKET_RIGHT);
 				}
 				break;
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(89);
+				setState(79);
 				match(BRACKET_LEFT);
-				setState(90);
+				setState(80);
 				match(BRACKET_RIGHT);
 				}
 				break;
@@ -374,29 +375,11 @@ public class JsltParser extends Parser {
 		public ArrayContext array() {
 			return getRuleContext(ArrayContext.class,0);
 		}
-		public JsonValueBooleanContext jsonValueBoolean() {
-			return getRuleContext(JsonValueBooleanContext.class,0);
-		}
-		public JsonValueStringContext jsonValueString() {
-			return getRuleContext(JsonValueStringContext.class,0);
-		}
-		public JsonValueIntegerContext jsonValueInteger() {
-			return getRuleContext(JsonValueIntegerContext.class,0);
-		}
-		public JsonValueNumberContext jsonValueNumber() {
-			return getRuleContext(JsonValueNumberContext.class,0);
-		}
-		public JsonValueNullContext jsonValueNull() {
-			return getRuleContext(JsonValueNullContext.class,0);
-		}
-		public JsonLtContext jsonLt() {
-			return getRuleContext(JsonLtContext.class,0);
+		public JsonLtOperationContext jsonLtOperation() {
+			return getRuleContext(JsonLtOperationContext.class,0);
 		}
 		public JsonValueCodeStringContext jsonValueCodeString() {
 			return getRuleContext(JsonValueCodeStringContext.class,0);
-		}
-		public JsonTypeContext jsonType() {
-			return getRuleContext(JsonTypeContext.class,0);
 		}
 		public JsonValueContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -408,79 +391,44 @@ public class JsltParser extends Parser {
 		JsonValueContext _localctx = new JsonValueContext(_ctx, getState());
 		enterRule(_localctx, 10, RULE_jsonValue);
 		try {
-			setState(103);
+			setState(87);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case BRACE_LEFT:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(93);
+				setState(83);
 				obj();
 				}
 				break;
 			case BRACKET_LEFT:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(94);
+				setState(84);
 				array();
 				}
 				break;
+			case SUBSCRIPT:
+			case CURRENT_VALUE:
+			case NT:
 			case TRUE:
 			case FALSE:
+			case NULL:
+			case PAREN_LEFT:
+			case STRING:
+			case NUMBER:
+			case INT:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(95);
-				jsonValueBoolean();
-				}
-				break;
-			case STRING:
-				enterOuterAlt(_localctx, 4);
-				{
-				setState(96);
-				jsonValueString();
-				}
-				break;
-			case INT:
-				enterOuterAlt(_localctx, 5);
-				{
-				setState(97);
-				jsonValueInteger();
-				}
-				break;
-			case NUMBER:
-				enterOuterAlt(_localctx, 6);
-				{
-				setState(98);
-				jsonValueNumber();
-				}
-				break;
-			case NULL:
-				enterOuterAlt(_localctx, 7);
-				{
-				setState(99);
-				jsonValueNull();
-				}
-				break;
-			case ROOT_VALUE:
-			case NEW:
-				enterOuterAlt(_localctx, 8);
-				{
-				setState(100);
-				jsonLt();
+				setState(85);
+				jsonLtOperation();
 				}
 				break;
 			case CODE_STRING:
-				enterOuterAlt(_localctx, 9);
+				enterOuterAlt(_localctx, 4);
 				{
-				setState(101);
+				setState(86);
 				jsonValueCodeString();
-				}
-				break;
-			case CURRENT_VALUE:
-				enterOuterAlt(_localctx, 10);
-				{
-				setState(102);
-				jsonType();
 				}
 				break;
 			default:
@@ -512,7 +460,7 @@ public class JsltParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(105);
+			setState(89);
 			match(STRING);
 			}
 		}
@@ -541,7 +489,7 @@ public class JsltParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(107);
+			setState(91);
 			match(CODE_STRING);
 			}
 		}
@@ -570,7 +518,7 @@ public class JsltParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(109);
+			setState(93);
 			match(NUMBER);
 			}
 		}
@@ -599,7 +547,7 @@ public class JsltParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(111);
+			setState(95);
 			match(INT);
 			}
 		}
@@ -630,7 +578,7 @@ public class JsltParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(113);
+			setState(97);
 			_la = _input.LA(1);
 			if ( !(_la==TRUE || _la==FALSE) ) {
 			_errHandler.recoverInline(this);
@@ -667,7 +615,7 @@ public class JsltParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(115);
+			setState(99);
 			match(NULL);
 			}
 		}
@@ -682,44 +630,338 @@ public class JsltParser extends Parser {
 		return _localctx;
 	}
 
-	public static class JsonCtorContext extends ParserRuleContext {
-		public TerminalNode NEW() { return getToken(JsltParser.NEW, 0); }
+	public static class JsonTypeContext extends ParserRuleContext {
+		public TerminalNode CURRENT_VALUE() { return getToken(JsltParser.CURRENT_VALUE, 0); }
+		public TerminalNode URI() { return getToken(JsltParser.URI, 0); }
+		public TerminalNode TIME() { return getToken(JsltParser.TIME, 0); }
+		public TerminalNode DATETIME() { return getToken(JsltParser.DATETIME, 0); }
+		public JsonTypeContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_jsonType; }
+	}
+
+	public final JsonTypeContext jsonType() throws RecognitionException {
+		JsonTypeContext _localctx = new JsonTypeContext(_ctx, getState());
+		enterRule(_localctx, 24, RULE_jsonType);
+		int _la;
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(101);
+			match(CURRENT_VALUE);
+			setState(102);
+			_la = _input.LA(1);
+			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << URI) | (1L << TIME) | (1L << DATETIME))) != 0)) ) {
+			_errHandler.recoverInline(this);
+			}
+			else {
+				if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
+				_errHandler.reportMatch(this);
+				consume();
+			}
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class JsonLtOperationContext extends ParserRuleContext {
+		public JsonLtItemContext jsonLtItem() {
+			return getRuleContext(JsonLtItemContext.class,0);
+		}
+		public TerminalNode NT() { return getToken(JsltParser.NT, 0); }
+		public OperationContext operation() {
+			return getRuleContext(OperationContext.class,0);
+		}
+		public JsonLtOperationContext jsonLtOperation() {
+			return getRuleContext(JsonLtOperationContext.class,0);
+		}
+		public TerminalNode PAREN_LEFT() { return getToken(JsltParser.PAREN_LEFT, 0); }
+		public TerminalNode PAREN_RIGHT() { return getToken(JsltParser.PAREN_RIGHT, 0); }
+		public JsonLtOperationContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_jsonLtOperation; }
+	}
+
+	public final JsonLtOperationContext jsonLtOperation() throws RecognitionException {
+		JsonLtOperationContext _localctx = new JsonLtOperationContext(_ctx, getState());
+		enterRule(_localctx, 26, RULE_jsonLtOperation);
+		int _la;
+		try {
+			setState(117);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case SUBSCRIPT:
+			case CURRENT_VALUE:
+			case NT:
+			case TRUE:
+			case FALSE:
+			case NULL:
+			case STRING:
+			case NUMBER:
+			case INT:
+				enterOuterAlt(_localctx, 1);
+				{
+				setState(105);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				if (_la==NT) {
+					{
+					setState(104);
+					match(NT);
+					}
+				}
+
+				setState(107);
+				jsonLtItem();
+				setState(111);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << WILDCARD_SUBSCRIPT) | (1L << EQ) | (1L << NE) | (1L << GT) | (1L << LT) | (1L << LE) | (1L << GE) | (1L << PLUS) | (1L << MINUS) | (1L << DIVID) | (1L << MODULO) | (1L << POWER) | (1L << AND) | (1L << OR) | (1L << AND_EXCLUSIVE) | (1L << OR_EXCLUSIVE) | (1L << CHAIN))) != 0)) {
+					{
+					setState(108);
+					operation();
+					setState(109);
+					jsonLtOperation();
+					}
+				}
+
+				}
+				break;
+			case PAREN_LEFT:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(113);
+				match(PAREN_LEFT);
+				setState(114);
+				jsonLtOperation();
+				setState(115);
+				match(PAREN_RIGHT);
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class JsonLtItemContext extends ParserRuleContext {
+		public JsonfunctionCallContext jsonfunctionCall() {
+			return getRuleContext(JsonfunctionCallContext.class,0);
+		}
+		public JsonWhenContext jsonWhen() {
+			return getRuleContext(JsonWhenContext.class,0);
+		}
+		public JsonValueBooleanContext jsonValueBoolean() {
+			return getRuleContext(JsonValueBooleanContext.class,0);
+		}
+		public JsonValueStringContext jsonValueString() {
+			return getRuleContext(JsonValueStringContext.class,0);
+		}
+		public JsonValueIntegerContext jsonValueInteger() {
+			return getRuleContext(JsonValueIntegerContext.class,0);
+		}
+		public JsonValueNumberContext jsonValueNumber() {
+			return getRuleContext(JsonValueNumberContext.class,0);
+		}
+		public JsonValueNullContext jsonValueNull() {
+			return getRuleContext(JsonValueNullContext.class,0);
+		}
+		public JsonTypeContext jsonType() {
+			return getRuleContext(JsonTypeContext.class,0);
+		}
+		public JsonLtItemContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_jsonLtItem; }
+	}
+
+	public final JsonLtItemContext jsonLtItem() throws RecognitionException {
+		JsonLtItemContext _localctx = new JsonLtItemContext(_ctx, getState());
+		enterRule(_localctx, 28, RULE_jsonLtItem);
+		try {
+			setState(127);
+			_errHandler.sync(this);
+			switch ( getInterpreter().adaptivePredict(_input,8,_ctx) ) {
+			case 1:
+				enterOuterAlt(_localctx, 1);
+				{
+				setState(119);
+				jsonfunctionCall();
+				}
+				break;
+			case 2:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(120);
+				jsonWhen();
+				}
+				break;
+			case 3:
+				enterOuterAlt(_localctx, 3);
+				{
+				setState(121);
+				jsonValueBoolean();
+				}
+				break;
+			case 4:
+				enterOuterAlt(_localctx, 4);
+				{
+				setState(122);
+				jsonValueString();
+				}
+				break;
+			case 5:
+				enterOuterAlt(_localctx, 5);
+				{
+				setState(123);
+				jsonValueInteger();
+				}
+				break;
+			case 6:
+				enterOuterAlt(_localctx, 6);
+				{
+				setState(124);
+				jsonValueNumber();
+				}
+				break;
+			case 7:
+				enterOuterAlt(_localctx, 7);
+				{
+				setState(125);
+				jsonValueNull();
+				}
+				break;
+			case 8:
+				enterOuterAlt(_localctx, 8);
+				{
+				setState(126);
+				jsonType();
+				}
+				break;
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class OperationContext extends ParserRuleContext {
+		public TerminalNode EQ() { return getToken(JsltParser.EQ, 0); }
+		public TerminalNode GE() { return getToken(JsltParser.GE, 0); }
+		public TerminalNode GT() { return getToken(JsltParser.GT, 0); }
+		public TerminalNode LE() { return getToken(JsltParser.LE, 0); }
+		public TerminalNode LT() { return getToken(JsltParser.LT, 0); }
+		public TerminalNode NE() { return getToken(JsltParser.NE, 0); }
+		public TerminalNode PLUS() { return getToken(JsltParser.PLUS, 0); }
+		public TerminalNode MINUS() { return getToken(JsltParser.MINUS, 0); }
+		public TerminalNode DIVID() { return getToken(JsltParser.DIVID, 0); }
+		public TerminalNode MODULO() { return getToken(JsltParser.MODULO, 0); }
+		public TerminalNode WILDCARD_SUBSCRIPT() { return getToken(JsltParser.WILDCARD_SUBSCRIPT, 0); }
+		public TerminalNode POWER() { return getToken(JsltParser.POWER, 0); }
+		public TerminalNode CHAIN() { return getToken(JsltParser.CHAIN, 0); }
+		public TerminalNode AND() { return getToken(JsltParser.AND, 0); }
+		public TerminalNode OR() { return getToken(JsltParser.OR, 0); }
+		public TerminalNode AND_EXCLUSIVE() { return getToken(JsltParser.AND_EXCLUSIVE, 0); }
+		public TerminalNode OR_EXCLUSIVE() { return getToken(JsltParser.OR_EXCLUSIVE, 0); }
+		public OperationContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_operation; }
+	}
+
+	public final OperationContext operation() throws RecognitionException {
+		OperationContext _localctx = new OperationContext(_ctx, getState());
+		enterRule(_localctx, 30, RULE_operation);
+		int _la;
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(129);
+			_la = _input.LA(1);
+			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << WILDCARD_SUBSCRIPT) | (1L << EQ) | (1L << NE) | (1L << GT) | (1L << LT) | (1L << LE) | (1L << GE) | (1L << PLUS) | (1L << MINUS) | (1L << DIVID) | (1L << MODULO) | (1L << POWER) | (1L << AND) | (1L << OR) | (1L << AND_EXCLUSIVE) | (1L << OR_EXCLUSIVE) | (1L << CHAIN))) != 0)) ) {
+			_errHandler.recoverInline(this);
+			}
+			else {
+				if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
+				_errHandler.reportMatch(this);
+				consume();
+			}
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class JsonfunctionCallContext extends ParserRuleContext {
+		public TerminalNode SUBSCRIPT() { return getToken(JsltParser.SUBSCRIPT, 0); }
 		public TerminalNode ID() { return getToken(JsltParser.ID, 0); }
 		public TerminalNode PAREN_LEFT() { return getToken(JsltParser.PAREN_LEFT, 0); }
 		public TerminalNode PAREN_RIGHT() { return getToken(JsltParser.PAREN_RIGHT, 0); }
 		public JsonValueListContext jsonValueList() {
 			return getRuleContext(JsonValueListContext.class,0);
 		}
-		public JsonCtorContext(ParserRuleContext parent, int invokingState) {
+		public JsonfunctionCallContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_jsonCtor; }
+		@Override public int getRuleIndex() { return RULE_jsonfunctionCall; }
 	}
 
-	public final JsonCtorContext jsonCtor() throws RecognitionException {
-		JsonCtorContext _localctx = new JsonCtorContext(_ctx, getState());
-		enterRule(_localctx, 24, RULE_jsonCtor);
+	public final JsonfunctionCallContext jsonfunctionCall() throws RecognitionException {
+		JsonfunctionCallContext _localctx = new JsonfunctionCallContext(_ctx, getState());
+		enterRule(_localctx, 32, RULE_jsonfunctionCall);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(117);
-			match(NEW);
-			setState(118);
+			setState(131);
+			match(SUBSCRIPT);
+			setState(132);
 			match(ID);
-			setState(119);
+			setState(133);
 			match(PAREN_LEFT);
-			setState(121);
+			setState(135);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << CURRENT_VALUE) | (1L << ROOT_VALUE) | (1L << NEW) | (1L << TRUE) | (1L << FALSE) | (1L << NULL) | (1L << BRACE_LEFT) | (1L << BRACKET_LEFT) | (1L << STRING) | (1L << CODE_STRING) | (1L << NUMBER) | (1L << INT))) != 0)) {
+			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << SUBSCRIPT) | (1L << CURRENT_VALUE) | (1L << NT) | (1L << TRUE) | (1L << FALSE) | (1L << NULL) | (1L << BRACE_LEFT) | (1L << BRACKET_LEFT) | (1L << PAREN_LEFT) | (1L << STRING) | (1L << CODE_STRING) | (1L << NUMBER) | (1L << INT))) != 0)) {
 				{
-				setState(120);
+				setState(134);
 				jsonValueList();
 				}
 			}
 
-			setState(123);
+			setState(137);
 			match(PAREN_RIGHT);
 			}
 		}
@@ -753,26 +995,26 @@ public class JsltParser extends Parser {
 
 	public final JsonValueListContext jsonValueList() throws RecognitionException {
 		JsonValueListContext _localctx = new JsonValueListContext(_ctx, getState());
-		enterRule(_localctx, 26, RULE_jsonValueList);
+		enterRule(_localctx, 34, RULE_jsonValueList);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(125);
+			setState(139);
 			jsonValue();
-			setState(130);
+			setState(144);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==COMMA) {
 				{
 				{
-				setState(126);
+				setState(140);
 				match(COMMA);
-				setState(127);
+				setState(141);
 				jsonValue();
 				}
 				}
-				setState(132);
+				setState(146);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
@@ -789,296 +1031,71 @@ public class JsltParser extends Parser {
 		return _localctx;
 	}
 
-	public static class JsonTypeContext extends ParserRuleContext {
-		public TerminalNode CURRENT_VALUE() { return getToken(JsltParser.CURRENT_VALUE, 0); }
-		public TerminalNode URI() { return getToken(JsltParser.URI, 0); }
-		public TerminalNode TIME() { return getToken(JsltParser.TIME, 0); }
-		public TerminalNode DATETIME() { return getToken(JsltParser.DATETIME, 0); }
-		public JsonTypeContext(ParserRuleContext parent, int invokingState) {
-			super(parent, invokingState);
-		}
-		@Override public int getRuleIndex() { return RULE_jsonType; }
-	}
-
-	public final JsonTypeContext jsonType() throws RecognitionException {
-		JsonTypeContext _localctx = new JsonTypeContext(_ctx, getState());
-		enterRule(_localctx, 28, RULE_jsonType);
-		int _la;
-		try {
-			enterOuterAlt(_localctx, 1);
-			{
-			setState(133);
-			match(CURRENT_VALUE);
-			setState(134);
-			_la = _input.LA(1);
-			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << URI) | (1L << TIME) | (1L << DATETIME))) != 0)) ) {
-			_errHandler.recoverInline(this);
-			}
-			else {
-				if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
-				_errHandler.reportMatch(this);
-				consume();
-			}
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			_errHandler.reportError(this, re);
-			_errHandler.recover(this, re);
-		}
-		finally {
-			exitRule();
-		}
-		return _localctx;
-	}
-
-	public static class JsonLtContext extends ParserRuleContext {
-		public List<JsonLtItemContext> jsonLtItem() {
-			return getRuleContexts(JsonLtItemContext.class);
-		}
-		public JsonLtItemContext jsonLtItem(int i) {
-			return getRuleContext(JsonLtItemContext.class,i);
-		}
-		public List<TerminalNode> PIPE() { return getTokens(JsltParser.PIPE); }
-		public TerminalNode PIPE(int i) {
-			return getToken(JsltParser.PIPE, i);
-		}
-		public JsonLtContext(ParserRuleContext parent, int invokingState) {
-			super(parent, invokingState);
-		}
-		@Override public int getRuleIndex() { return RULE_jsonLt; }
-	}
-
-	public final JsonLtContext jsonLt() throws RecognitionException {
-		JsonLtContext _localctx = new JsonLtContext(_ctx, getState());
-		enterRule(_localctx, 30, RULE_jsonLt);
-		int _la;
-		try {
-			enterOuterAlt(_localctx, 1);
-			{
-			setState(136);
-			jsonLtItem();
-			setState(141);
-			_errHandler.sync(this);
-			_la = _input.LA(1);
-			while (_la==PIPE) {
-				{
-				{
-				setState(137);
-				match(PIPE);
-				setState(138);
-				jsonLtItem();
-				}
-				}
-				setState(143);
-				_errHandler.sync(this);
-				_la = _input.LA(1);
-			}
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			_errHandler.reportError(this, re);
-			_errHandler.recover(this, re);
-		}
-		finally {
-			exitRule();
-		}
-		return _localctx;
-	}
-
-	public static class JsonLtItemContext extends ParserRuleContext {
-		public JsonpathContext jsonpath() {
-			return getRuleContext(JsonpathContext.class,0);
-		}
-		public JsonCtorContext jsonCtor() {
-			return getRuleContext(JsonCtorContext.class,0);
-		}
-		public JsonLtItemContext(ParserRuleContext parent, int invokingState) {
-			super(parent, invokingState);
-		}
-		@Override public int getRuleIndex() { return RULE_jsonLtItem; }
-	}
-
-	public final JsonLtItemContext jsonLtItem() throws RecognitionException {
-		JsonLtItemContext _localctx = new JsonLtItemContext(_ctx, getState());
-		enterRule(_localctx, 32, RULE_jsonLtItem);
-		try {
-			setState(146);
-			_errHandler.sync(this);
-			switch (_input.LA(1)) {
-			case ROOT_VALUE:
-				enterOuterAlt(_localctx, 1);
-				{
-				setState(144);
-				jsonpath();
-				}
-				break;
-			case NEW:
-				enterOuterAlt(_localctx, 2);
-				{
-				setState(145);
-				jsonCtor();
-				}
-				break;
-			default:
-				throw new NoViableAltException(this);
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			_errHandler.reportError(this, re);
-			_errHandler.recover(this, re);
-		}
-		finally {
-			exitRule();
-		}
-		return _localctx;
-	}
-
-	public static class JsonpathContext extends ParserRuleContext {
-		public TerminalNode ROOT_VALUE() { return getToken(JsltParser.ROOT_VALUE, 0); }
-		public SubscriptContext subscript() {
-			return getRuleContext(SubscriptContext.class,0);
-		}
-		public JsonpathContext(ParserRuleContext parent, int invokingState) {
-			super(parent, invokingState);
-		}
-		@Override public int getRuleIndex() { return RULE_jsonpath; }
-	}
-
-	public final JsonpathContext jsonpath() throws RecognitionException {
-		JsonpathContext _localctx = new JsonpathContext(_ctx, getState());
-		enterRule(_localctx, 34, RULE_jsonpath);
-		int _la;
-		try {
-			enterOuterAlt(_localctx, 1);
-			{
-			setState(148);
-			match(ROOT_VALUE);
-			setState(150);
-			_errHandler.sync(this);
-			_la = _input.LA(1);
-			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << RECURSIVE_DESCENT) | (1L << SUBSCRIPT) | (1L << BRACKET_LEFT))) != 0)) {
-				{
-				setState(149);
-				subscript();
-				}
-			}
-
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			_errHandler.reportError(this, re);
-			_errHandler.recover(this, re);
-		}
-		finally {
-			exitRule();
-		}
-		return _localctx;
-	}
-
-	public static class SubscriptContext extends ParserRuleContext {
-		public TerminalNode RECURSIVE_DESCENT() { return getToken(JsltParser.RECURSIVE_DESCENT, 0); }
-		public SubscriptableBarewordContext subscriptableBareword() {
-			return getRuleContext(SubscriptableBarewordContext.class,0);
-		}
-		public SubscriptablesContext subscriptables() {
-			return getRuleContext(SubscriptablesContext.class,0);
-		}
-		public SubscriptContext subscript() {
-			return getRuleContext(SubscriptContext.class,0);
-		}
+	public static class JsonWhenContext extends ParserRuleContext {
 		public TerminalNode SUBSCRIPT() { return getToken(JsltParser.SUBSCRIPT, 0); }
-		public SubscriptContext(ParserRuleContext parent, int invokingState) {
+		public TerminalNode WHEN() { return getToken(JsltParser.WHEN, 0); }
+		public JsonWhenExpressionContext jsonWhenExpression() {
+			return getRuleContext(JsonWhenExpressionContext.class,0);
+		}
+		public List<JsonCaseContext> jsonCase() {
+			return getRuleContexts(JsonCaseContext.class);
+		}
+		public JsonCaseContext jsonCase(int i) {
+			return getRuleContext(JsonCaseContext.class,i);
+		}
+		public JsonDefaultCaseContext jsonDefaultCase() {
+			return getRuleContext(JsonDefaultCaseContext.class,0);
+		}
+		public JsonWhenContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_subscript; }
+		@Override public int getRuleIndex() { return RULE_jsonWhen; }
 	}
 
-	public final SubscriptContext subscript() throws RecognitionException {
-		SubscriptContext _localctx = new SubscriptContext(_ctx, getState());
-		enterRule(_localctx, 36, RULE_subscript);
+	public final JsonWhenContext jsonWhen() throws RecognitionException {
+		JsonWhenContext _localctx = new JsonWhenContext(_ctx, getState());
+		enterRule(_localctx, 36, RULE_jsonWhen);
 		int _la;
 		try {
-			setState(169);
+			int _alt;
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(147);
+			match(SUBSCRIPT);
+			setState(148);
+			match(WHEN);
+			setState(149);
+			jsonWhenExpression();
+			setState(151); 
 			_errHandler.sync(this);
-			switch (_input.LA(1)) {
-			case RECURSIVE_DESCENT:
-				enterOuterAlt(_localctx, 1);
-				{
-				setState(152);
-				match(RECURSIVE_DESCENT);
-				setState(155);
-				_errHandler.sync(this);
-				switch (_input.LA(1)) {
-				case WILDCARD_SUBSCRIPT:
-				case ID:
+			_alt = 1;
+			do {
+				switch (_alt) {
+				case 1:
 					{
-					setState(153);
-					subscriptableBareword();
+					{
+					setState(150);
+					jsonCase();
 					}
-					break;
-				case BRACKET_LEFT:
-					{
-					setState(154);
-					subscriptables();
 					}
 					break;
 				default:
 					throw new NoViableAltException(this);
 				}
-				setState(158);
+				setState(153); 
 				_errHandler.sync(this);
-				_la = _input.LA(1);
-				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << RECURSIVE_DESCENT) | (1L << SUBSCRIPT) | (1L << BRACKET_LEFT))) != 0)) {
-					{
-					setState(157);
-					subscript();
-					}
-				}
-
-				}
-				break;
-			case SUBSCRIPT:
-				enterOuterAlt(_localctx, 2);
+				_alt = getInterpreter().adaptivePredict(_input,11,_ctx);
+			} while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER );
+			setState(156);
+			_errHandler.sync(this);
+			_la = _input.LA(1);
+			if (_la==DEFAULT) {
 				{
-				setState(160);
-				match(SUBSCRIPT);
-				setState(161);
-				subscriptableBareword();
-				setState(163);
-				_errHandler.sync(this);
-				_la = _input.LA(1);
-				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << RECURSIVE_DESCENT) | (1L << SUBSCRIPT) | (1L << BRACKET_LEFT))) != 0)) {
-					{
-					setState(162);
-					subscript();
-					}
+				setState(155);
+				jsonDefaultCase();
 				}
+			}
 
-				}
-				break;
-			case BRACKET_LEFT:
-				enterOuterAlt(_localctx, 3);
-				{
-				setState(165);
-				subscriptables();
-				setState(167);
-				_errHandler.sync(this);
-				_la = _input.LA(1);
-				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << RECURSIVE_DESCENT) | (1L << SUBSCRIPT) | (1L << BRACKET_LEFT))) != 0)) {
-					{
-					setState(166);
-					subscript();
-					}
-				}
-
-				}
-				break;
-			default:
-				throw new NoViableAltException(this);
 			}
 		}
 		catch (RecognitionException re) {
@@ -1092,54 +1109,97 @@ public class JsltParser extends Parser {
 		return _localctx;
 	}
 
-	public static class SubscriptablesContext extends ParserRuleContext {
-		public TerminalNode BRACKET_LEFT() { return getToken(JsltParser.BRACKET_LEFT, 0); }
-		public List<SubscriptableContext> subscriptable() {
-			return getRuleContexts(SubscriptableContext.class);
+	public static class JsonCaseContext extends ParserRuleContext {
+		public TerminalNode CASE() { return getToken(JsltParser.CASE, 0); }
+		public JsonWhenExpressionContext jsonWhenExpression() {
+			return getRuleContext(JsonWhenExpressionContext.class,0);
 		}
-		public SubscriptableContext subscriptable(int i) {
-			return getRuleContext(SubscriptableContext.class,i);
+		public TerminalNode COLON() { return getToken(JsltParser.COLON, 0); }
+		public TerminalNode BRACE_LEFT() { return getToken(JsltParser.BRACE_LEFT, 0); }
+		public JsonValueContext jsonValue() {
+			return getRuleContext(JsonValueContext.class,0);
 		}
-		public TerminalNode BRACKET_RIGHT() { return getToken(JsltParser.BRACKET_RIGHT, 0); }
-		public List<TerminalNode> COMMA() { return getTokens(JsltParser.COMMA); }
-		public TerminalNode COMMA(int i) {
-			return getToken(JsltParser.COMMA, i);
+		public TerminalNode BRACE_RIGHT() { return getToken(JsltParser.BRACE_RIGHT, 0); }
+		public JsonDefaultCaseContext jsonDefaultCase() {
+			return getRuleContext(JsonDefaultCaseContext.class,0);
 		}
-		public SubscriptablesContext(ParserRuleContext parent, int invokingState) {
+		public JsonCaseContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_subscriptables; }
+		@Override public int getRuleIndex() { return RULE_jsonCase; }
 	}
 
-	public final SubscriptablesContext subscriptables() throws RecognitionException {
-		SubscriptablesContext _localctx = new SubscriptablesContext(_ctx, getState());
-		enterRule(_localctx, 38, RULE_subscriptables);
-		int _la;
+	public final JsonCaseContext jsonCase() throws RecognitionException {
+		JsonCaseContext _localctx = new JsonCaseContext(_ctx, getState());
+		enterRule(_localctx, 38, RULE_jsonCase);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
+			setState(158);
+			match(CASE);
+			setState(159);
+			jsonWhenExpression();
+			setState(160);
+			match(COLON);
+			setState(161);
+			match(BRACE_LEFT);
+			setState(162);
+			jsonValue();
+			setState(163);
+			match(BRACE_RIGHT);
+			setState(165);
+			_errHandler.sync(this);
+			switch ( getInterpreter().adaptivePredict(_input,13,_ctx) ) {
+			case 1:
+				{
+				setState(164);
+				jsonDefaultCase();
+				}
+				break;
+			}
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class JsonDefaultCaseContext extends ParserRuleContext {
+		public TerminalNode DEFAULT() { return getToken(JsltParser.DEFAULT, 0); }
+		public TerminalNode COLON() { return getToken(JsltParser.COLON, 0); }
+		public TerminalNode BRACE_LEFT() { return getToken(JsltParser.BRACE_LEFT, 0); }
+		public JsonValueContext jsonValue() {
+			return getRuleContext(JsonValueContext.class,0);
+		}
+		public TerminalNode BRACE_RIGHT() { return getToken(JsltParser.BRACE_RIGHT, 0); }
+		public JsonDefaultCaseContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_jsonDefaultCase; }
+	}
+
+	public final JsonDefaultCaseContext jsonDefaultCase() throws RecognitionException {
+		JsonDefaultCaseContext _localctx = new JsonDefaultCaseContext(_ctx, getState());
+		enterRule(_localctx, 40, RULE_jsonDefaultCase);
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(167);
+			match(DEFAULT);
+			setState(168);
+			match(COLON);
+			setState(169);
+			match(BRACE_LEFT);
+			setState(170);
+			jsonValue();
 			setState(171);
-			match(BRACKET_LEFT);
-			setState(172);
-			subscriptable();
-			setState(177);
-			_errHandler.sync(this);
-			_la = _input.LA(1);
-			while (_la==COMMA) {
-				{
-				{
-				setState(173);
-				match(COMMA);
-				setState(174);
-				subscriptable();
-				}
-				}
-				setState(179);
-				_errHandler.sync(this);
-				_la = _input.LA(1);
-			}
-			setState(180);
-			match(BRACKET_RIGHT);
+			match(BRACE_RIGHT);
 			}
 		}
 		catch (RecognitionException re) {
@@ -1153,444 +1213,80 @@ public class JsltParser extends Parser {
 		return _localctx;
 	}
 
-	public static class SubscriptableBarewordContext extends ParserRuleContext {
-		public TerminalNode ID() { return getToken(JsltParser.ID, 0); }
-		public TerminalNode WILDCARD_SUBSCRIPT() { return getToken(JsltParser.WILDCARD_SUBSCRIPT, 0); }
-		public SubscriptableBarewordContext(ParserRuleContext parent, int invokingState) {
+	public static class JsonWhenExpressionContext extends ParserRuleContext {
+		public JsonValueBooleanContext jsonValueBoolean() {
+			return getRuleContext(JsonValueBooleanContext.class,0);
+		}
+		public JsonValueStringContext jsonValueString() {
+			return getRuleContext(JsonValueStringContext.class,0);
+		}
+		public JsonValueIntegerContext jsonValueInteger() {
+			return getRuleContext(JsonValueIntegerContext.class,0);
+		}
+		public JsonValueNumberContext jsonValueNumber() {
+			return getRuleContext(JsonValueNumberContext.class,0);
+		}
+		public JsonValueNullContext jsonValueNull() {
+			return getRuleContext(JsonValueNullContext.class,0);
+		}
+		public JsonLtOperationContext jsonLtOperation() {
+			return getRuleContext(JsonLtOperationContext.class,0);
+		}
+		public JsonWhenExpressionContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_subscriptableBareword; }
+		@Override public int getRuleIndex() { return RULE_jsonWhenExpression; }
 	}
 
-	public final SubscriptableBarewordContext subscriptableBareword() throws RecognitionException {
-		SubscriptableBarewordContext _localctx = new SubscriptableBarewordContext(_ctx, getState());
-		enterRule(_localctx, 40, RULE_subscriptableBareword);
-		int _la;
+	public final JsonWhenExpressionContext jsonWhenExpression() throws RecognitionException {
+		JsonWhenExpressionContext _localctx = new JsonWhenExpressionContext(_ctx, getState());
+		enterRule(_localctx, 42, RULE_jsonWhenExpression);
 		try {
-			enterOuterAlt(_localctx, 1);
-			{
-			setState(182);
-			_la = _input.LA(1);
-			if ( !(_la==WILDCARD_SUBSCRIPT || _la==ID) ) {
-			_errHandler.recoverInline(this);
-			}
-			else {
-				if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
-				_errHandler.reportMatch(this);
-				consume();
-			}
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			_errHandler.reportError(this, re);
-			_errHandler.recover(this, re);
-		}
-		finally {
-			exitRule();
-		}
-		return _localctx;
-	}
-
-	public static class SubscriptableContext extends ParserRuleContext {
-		public TerminalNode STRING() { return getToken(JsltParser.STRING, 0); }
-		public TerminalNode NUMBER() { return getToken(JsltParser.NUMBER, 0); }
-		public SliceableContext sliceable() {
-			return getRuleContext(SliceableContext.class,0);
-		}
-		public TerminalNode WILDCARD_SUBSCRIPT() { return getToken(JsltParser.WILDCARD_SUBSCRIPT, 0); }
-		public TerminalNode QUESTION() { return getToken(JsltParser.QUESTION, 0); }
-		public TerminalNode PAREN_LEFT() { return getToken(JsltParser.PAREN_LEFT, 0); }
-		public ExpressionContext expression() {
-			return getRuleContext(ExpressionContext.class,0);
-		}
-		public TerminalNode PAREN_RIGHT() { return getToken(JsltParser.PAREN_RIGHT, 0); }
-		public SubscriptableContext(ParserRuleContext parent, int invokingState) {
-			super(parent, invokingState);
-		}
-		@Override public int getRuleIndex() { return RULE_subscriptable; }
-	}
-
-	public final SubscriptableContext subscriptable() throws RecognitionException {
-		SubscriptableContext _localctx = new SubscriptableContext(_ctx, getState());
-		enterRule(_localctx, 42, RULE_subscriptable);
-		int _la;
-		try {
-			setState(198);
+			setState(179);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,18,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,14,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(184);
-				match(STRING);
+				setState(173);
+				jsonValueBoolean();
 				}
 				break;
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(186);
-				_errHandler.sync(this);
-				_la = _input.LA(1);
-				if (_la==NUMBER) {
-					{
-					setState(185);
-					match(NUMBER);
-					}
-				}
-
-				setState(189);
-				_errHandler.sync(this);
-				_la = _input.LA(1);
-				if (_la==COLON) {
-					{
-					setState(188);
-					sliceable();
-					}
-				}
-
+				setState(174);
+				jsonValueString();
 				}
 				break;
 			case 3:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(191);
-				sliceable();
+				setState(175);
+				jsonValueInteger();
 				}
 				break;
 			case 4:
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(192);
-				match(WILDCARD_SUBSCRIPT);
+				setState(176);
+				jsonValueNumber();
 				}
 				break;
 			case 5:
 				enterOuterAlt(_localctx, 5);
 				{
-				setState(193);
-				match(QUESTION);
-				setState(194);
-				match(PAREN_LEFT);
-				setState(195);
-				expression();
-				setState(196);
-				match(PAREN_RIGHT);
+				setState(177);
+				jsonValueNull();
 				}
 				break;
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			_errHandler.reportError(this, re);
-			_errHandler.recover(this, re);
-		}
-		finally {
-			exitRule();
-		}
-		return _localctx;
-	}
-
-	public static class SliceableContext extends ParserRuleContext {
-		public List<TerminalNode> COLON() { return getTokens(JsltParser.COLON); }
-		public TerminalNode COLON(int i) {
-			return getToken(JsltParser.COLON, i);
-		}
-		public List<TerminalNode> NUMBER() { return getTokens(JsltParser.NUMBER); }
-		public TerminalNode NUMBER(int i) {
-			return getToken(JsltParser.NUMBER, i);
-		}
-		public SliceableContext(ParserRuleContext parent, int invokingState) {
-			super(parent, invokingState);
-		}
-		@Override public int getRuleIndex() { return RULE_sliceable; }
-	}
-
-	public final SliceableContext sliceable() throws RecognitionException {
-		SliceableContext _localctx = new SliceableContext(_ctx, getState());
-		enterRule(_localctx, 44, RULE_sliceable);
-		int _la;
-		try {
-			enterOuterAlt(_localctx, 1);
-			{
-			setState(200);
-			match(COLON);
-			setState(202);
-			_errHandler.sync(this);
-			_la = _input.LA(1);
-			if (_la==NUMBER) {
+			case 6:
+				enterOuterAlt(_localctx, 6);
 				{
-				setState(201);
-				match(NUMBER);
-				}
-			}
-
-			setState(208);
-			_errHandler.sync(this);
-			_la = _input.LA(1);
-			if (_la==COLON) {
-				{
-				setState(204);
-				match(COLON);
-				setState(206);
-				_errHandler.sync(this);
-				_la = _input.LA(1);
-				if (_la==NUMBER) {
-					{
-					setState(205);
-					match(NUMBER);
-					}
-				}
-
-				}
-			}
-
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			_errHandler.reportError(this, re);
-			_errHandler.recover(this, re);
-		}
-		finally {
-			exitRule();
-		}
-		return _localctx;
-	}
-
-	public static class ExpressionContext extends ParserRuleContext {
-		public AndExpressionContext andExpression() {
-			return getRuleContext(AndExpressionContext.class,0);
-		}
-		public ExpressionContext(ParserRuleContext parent, int invokingState) {
-			super(parent, invokingState);
-		}
-		@Override public int getRuleIndex() { return RULE_expression; }
-	}
-
-	public final ExpressionContext expression() throws RecognitionException {
-		ExpressionContext _localctx = new ExpressionContext(_ctx, getState());
-		enterRule(_localctx, 46, RULE_expression);
-		try {
-			enterOuterAlt(_localctx, 1);
-			{
-			setState(210);
-			andExpression();
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			_errHandler.reportError(this, re);
-			_errHandler.recover(this, re);
-		}
-		finally {
-			exitRule();
-		}
-		return _localctx;
-	}
-
-	public static class AndExpressionContext extends ParserRuleContext {
-		public OrExpressionContext orExpression() {
-			return getRuleContext(OrExpressionContext.class,0);
-		}
-		public TerminalNode AND() { return getToken(JsltParser.AND, 0); }
-		public AndExpressionContext andExpression() {
-			return getRuleContext(AndExpressionContext.class,0);
-		}
-		public AndExpressionContext(ParserRuleContext parent, int invokingState) {
-			super(parent, invokingState);
-		}
-		@Override public int getRuleIndex() { return RULE_andExpression; }
-	}
-
-	public final AndExpressionContext andExpression() throws RecognitionException {
-		AndExpressionContext _localctx = new AndExpressionContext(_ctx, getState());
-		enterRule(_localctx, 48, RULE_andExpression);
-		int _la;
-		try {
-			enterOuterAlt(_localctx, 1);
-			{
-			setState(212);
-			orExpression();
-			setState(215);
-			_errHandler.sync(this);
-			_la = _input.LA(1);
-			if (_la==AND) {
-				{
-				setState(213);
-				match(AND);
-				setState(214);
-				andExpression();
-				}
-			}
-
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			_errHandler.reportError(this, re);
-			_errHandler.recover(this, re);
-		}
-		finally {
-			exitRule();
-		}
-		return _localctx;
-	}
-
-	public static class OrExpressionContext extends ParserRuleContext {
-		public NotExpressionContext notExpression() {
-			return getRuleContext(NotExpressionContext.class,0);
-		}
-		public TerminalNode OR() { return getToken(JsltParser.OR, 0); }
-		public OrExpressionContext orExpression() {
-			return getRuleContext(OrExpressionContext.class,0);
-		}
-		public OrExpressionContext(ParserRuleContext parent, int invokingState) {
-			super(parent, invokingState);
-		}
-		@Override public int getRuleIndex() { return RULE_orExpression; }
-	}
-
-	public final OrExpressionContext orExpression() throws RecognitionException {
-		OrExpressionContext _localctx = new OrExpressionContext(_ctx, getState());
-		enterRule(_localctx, 50, RULE_orExpression);
-		int _la;
-		try {
-			enterOuterAlt(_localctx, 1);
-			{
-			setState(217);
-			notExpression();
-			setState(220);
-			_errHandler.sync(this);
-			_la = _input.LA(1);
-			if (_la==OR) {
-				{
-				setState(218);
-				match(OR);
-				setState(219);
-				orExpression();
-				}
-			}
-
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			_errHandler.reportError(this, re);
-			_errHandler.recover(this, re);
-		}
-		finally {
-			exitRule();
-		}
-		return _localctx;
-	}
-
-	public static class NotExpressionContext extends ParserRuleContext {
-		public TerminalNode NOT() { return getToken(JsltParser.NOT, 0); }
-		public NotExpressionContext notExpression() {
-			return getRuleContext(NotExpressionContext.class,0);
-		}
-		public TerminalNode PAREN_LEFT() { return getToken(JsltParser.PAREN_LEFT, 0); }
-		public ExpressionContext expression() {
-			return getRuleContext(ExpressionContext.class,0);
-		}
-		public TerminalNode PAREN_RIGHT() { return getToken(JsltParser.PAREN_RIGHT, 0); }
-		public TerminalNode ROOT_VALUE() { return getToken(JsltParser.ROOT_VALUE, 0); }
-		public TerminalNode CURRENT_VALUE() { return getToken(JsltParser.CURRENT_VALUE, 0); }
-		public SubscriptContext subscript() {
-			return getRuleContext(SubscriptContext.class,0);
-		}
-		public JsonValueContext jsonValue() {
-			return getRuleContext(JsonValueContext.class,0);
-		}
-		public TerminalNode EQ() { return getToken(JsltParser.EQ, 0); }
-		public TerminalNode NE() { return getToken(JsltParser.NE, 0); }
-		public TerminalNode LT() { return getToken(JsltParser.LT, 0); }
-		public TerminalNode LE() { return getToken(JsltParser.LE, 0); }
-		public TerminalNode GT() { return getToken(JsltParser.GT, 0); }
-		public TerminalNode GE() { return getToken(JsltParser.GE, 0); }
-		public NotExpressionContext(ParserRuleContext parent, int invokingState) {
-			super(parent, invokingState);
-		}
-		@Override public int getRuleIndex() { return RULE_notExpression; }
-	}
-
-	public final NotExpressionContext notExpression() throws RecognitionException {
-		NotExpressionContext _localctx = new NotExpressionContext(_ctx, getState());
-		enterRule(_localctx, 52, RULE_notExpression);
-		int _la;
-		try {
-			setState(236);
-			_errHandler.sync(this);
-			switch (_input.LA(1)) {
-			case NOT:
-				enterOuterAlt(_localctx, 1);
-				{
-				setState(222);
-				match(NOT);
-				setState(223);
-				notExpression();
+				setState(178);
+				jsonLtOperation();
 				}
 				break;
-			case PAREN_LEFT:
-				enterOuterAlt(_localctx, 2);
-				{
-				setState(224);
-				match(PAREN_LEFT);
-				setState(225);
-				expression();
-				setState(226);
-				match(PAREN_RIGHT);
-				}
-				break;
-			case CURRENT_VALUE:
-			case ROOT_VALUE:
-				enterOuterAlt(_localctx, 3);
-				{
-				setState(228);
-				_la = _input.LA(1);
-				if ( !(_la==CURRENT_VALUE || _la==ROOT_VALUE) ) {
-				_errHandler.recoverInline(this);
-				}
-				else {
-					if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
-					_errHandler.reportMatch(this);
-					consume();
-				}
-				setState(230);
-				_errHandler.sync(this);
-				_la = _input.LA(1);
-				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << RECURSIVE_DESCENT) | (1L << SUBSCRIPT) | (1L << BRACKET_LEFT))) != 0)) {
-					{
-					setState(229);
-					subscript();
-					}
-				}
-
-				setState(234);
-				_errHandler.sync(this);
-				_la = _input.LA(1);
-				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << EQ) | (1L << GE) | (1L << GT) | (1L << LE) | (1L << LT) | (1L << NE))) != 0)) {
-					{
-					setState(232);
-					_la = _input.LA(1);
-					if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << EQ) | (1L << GE) | (1L << GT) | (1L << LE) | (1L << LT) | (1L << NE))) != 0)) ) {
-					_errHandler.recoverInline(this);
-					}
-					else {
-						if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
-						_errHandler.reportMatch(this);
-						consume();
-					}
-					setState(233);
-					jsonValue();
-					}
-				}
-
-				}
-				break;
-			default:
-				throw new NoViableAltException(this);
 			}
 		}
 		catch (RecognitionException re) {
@@ -1605,86 +1301,61 @@ public class JsltParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3*\u00f1\4\2\t\2\4"+
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3/\u00b8\4\2\t\2\4"+
 		"\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t"+
 		"\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22\t\22"+
-		"\4\23\t\23\4\24\t\24\4\25\t\25\4\26\t\26\4\27\t\27\4\30\t\30\4\31\t\31"+
-		"\4\32\t\32\4\33\t\33\4\34\t\34\3\2\3\2\3\2\3\3\3\3\3\4\3\4\3\4\3\4\7\4"+
-		"B\n\4\f\4\16\4E\13\4\3\4\3\4\3\4\3\4\5\4K\n\4\3\5\3\5\3\5\3\5\3\6\3\6"+
-		"\3\6\3\6\7\6U\n\6\f\6\16\6X\13\6\3\6\3\6\3\6\3\6\5\6^\n\6\3\7\3\7\3\7"+
-		"\3\7\3\7\3\7\3\7\3\7\3\7\3\7\5\7j\n\7\3\b\3\b\3\t\3\t\3\n\3\n\3\13\3\13"+
-		"\3\f\3\f\3\r\3\r\3\16\3\16\3\16\3\16\5\16|\n\16\3\16\3\16\3\17\3\17\3"+
-		"\17\7\17\u0083\n\17\f\17\16\17\u0086\13\17\3\20\3\20\3\20\3\21\3\21\3"+
-		"\21\7\21\u008e\n\21\f\21\16\21\u0091\13\21\3\22\3\22\5\22\u0095\n\22\3"+
-		"\23\3\23\5\23\u0099\n\23\3\24\3\24\3\24\5\24\u009e\n\24\3\24\5\24\u00a1"+
-		"\n\24\3\24\3\24\3\24\5\24\u00a6\n\24\3\24\3\24\5\24\u00aa\n\24\5\24\u00ac"+
-		"\n\24\3\25\3\25\3\25\3\25\7\25\u00b2\n\25\f\25\16\25\u00b5\13\25\3\25"+
-		"\3\25\3\26\3\26\3\27\3\27\5\27\u00bd\n\27\3\27\5\27\u00c0\n\27\3\27\3"+
-		"\27\3\27\3\27\3\27\3\27\3\27\5\27\u00c9\n\27\3\30\3\30\5\30\u00cd\n\30"+
-		"\3\30\3\30\5\30\u00d1\n\30\5\30\u00d3\n\30\3\31\3\31\3\32\3\32\3\32\5"+
-		"\32\u00da\n\32\3\33\3\33\3\33\5\33\u00df\n\33\3\34\3\34\3\34\3\34\3\34"+
-		"\3\34\3\34\3\34\5\34\u00e9\n\34\3\34\3\34\5\34\u00ed\n\34\5\34\u00ef\n"+
-		"\34\3\34\2\2\35\2\4\6\b\n\f\16\20\22\24\26\30\32\34\36 \"$&(*,.\60\62"+
-		"\64\66\2\7\3\2\26\27\3\2\t\13\4\2\7\7))\4\2\3\3\5\5\3\2\r\22\2\u00fd\2"+
-		"8\3\2\2\2\4;\3\2\2\2\6J\3\2\2\2\bL\3\2\2\2\n]\3\2\2\2\fi\3\2\2\2\16k\3"+
-		"\2\2\2\20m\3\2\2\2\22o\3\2\2\2\24q\3\2\2\2\26s\3\2\2\2\30u\3\2\2\2\32"+
-		"w\3\2\2\2\34\177\3\2\2\2\36\u0087\3\2\2\2 \u008a\3\2\2\2\"\u0094\3\2\2"+
-		"\2$\u0096\3\2\2\2&\u00ab\3\2\2\2(\u00ad\3\2\2\2*\u00b8\3\2\2\2,\u00c8"+
-		"\3\2\2\2.\u00ca\3\2\2\2\60\u00d4\3\2\2\2\62\u00d6\3\2\2\2\64\u00db\3\2"+
-		"\2\2\66\u00ee\3\2\2\289\5\4\3\29:\7\2\2\3:\3\3\2\2\2;<\5\f\7\2<\5\3\2"+
-		"\2\2=>\7\31\2\2>C\5\b\5\2?@\7\36\2\2@B\5\b\5\2A?\3\2\2\2BE\3\2\2\2CA\3"+
-		"\2\2\2CD\3\2\2\2DF\3\2\2\2EC\3\2\2\2FG\7\32\2\2GK\3\2\2\2HI\7\31\2\2I"+
-		"K\7\32\2\2J=\3\2\2\2JH\3\2\2\2K\7\3\2\2\2LM\7\"\2\2MN\7\35\2\2NO\5\f\7"+
-		"\2O\t\3\2\2\2PQ\7\33\2\2QV\5\f\7\2RS\7\36\2\2SU\5\f\7\2TR\3\2\2\2UX\3"+
-		"\2\2\2VT\3\2\2\2VW\3\2\2\2WY\3\2\2\2XV\3\2\2\2YZ\7\34\2\2Z^\3\2\2\2[\\"+
-		"\7\33\2\2\\^\7\34\2\2]P\3\2\2\2][\3\2\2\2^\13\3\2\2\2_j\5\6\4\2`j\5\n"+
-		"\6\2aj\5\26\f\2bj\5\16\b\2cj\5\24\13\2dj\5\22\n\2ej\5\30\r\2fj\5 \21\2"+
-		"gj\5\20\t\2hj\5\36\20\2i_\3\2\2\2i`\3\2\2\2ia\3\2\2\2ib\3\2\2\2ic\3\2"+
-		"\2\2id\3\2\2\2ie\3\2\2\2if\3\2\2\2ig\3\2\2\2ih\3\2\2\2j\r\3\2\2\2kl\7"+
-		"\"\2\2l\17\3\2\2\2mn\7$\2\2n\21\3\2\2\2op\7&\2\2p\23\3\2\2\2qr\7\'\2\2"+
-		"r\25\3\2\2\2st\t\2\2\2t\27\3\2\2\2uv\7\30\2\2v\31\3\2\2\2wx\7\25\2\2x"+
-		"y\7)\2\2y{\7\37\2\2z|\5\34\17\2{z\3\2\2\2{|\3\2\2\2|}\3\2\2\2}~\7 \2\2"+
-		"~\33\3\2\2\2\177\u0084\5\f\7\2\u0080\u0081\7\36\2\2\u0081\u0083\5\f\7"+
-		"\2\u0082\u0080\3\2\2\2\u0083\u0086\3\2\2\2\u0084\u0082\3\2\2\2\u0084\u0085"+
-		"\3\2\2\2\u0085\35\3\2\2\2\u0086\u0084\3\2\2\2\u0087\u0088\7\3\2\2\u0088"+
-		"\u0089\t\3\2\2\u0089\37\3\2\2\2\u008a\u008f\5\"\22\2\u008b\u008c\7\b\2"+
-		"\2\u008c\u008e\5\"\22\2\u008d\u008b\3\2\2\2\u008e\u0091\3\2\2\2\u008f"+
-		"\u008d\3\2\2\2\u008f\u0090\3\2\2\2\u0090!\3\2\2\2\u0091\u008f\3\2\2\2"+
-		"\u0092\u0095\5$\23\2\u0093\u0095\5\32\16\2\u0094\u0092\3\2\2\2\u0094\u0093"+
-		"\3\2\2\2\u0095#\3\2\2\2\u0096\u0098\7\5\2\2\u0097\u0099\5&\24\2\u0098"+
-		"\u0097\3\2\2\2\u0098\u0099\3\2\2\2\u0099%\3\2\2\2\u009a\u009d\7\4\2\2"+
-		"\u009b\u009e\5*\26\2\u009c\u009e\5(\25\2\u009d\u009b\3\2\2\2\u009d\u009c"+
-		"\3\2\2\2\u009e\u00a0\3\2\2\2\u009f\u00a1\5&\24\2\u00a0\u009f\3\2\2\2\u00a0"+
-		"\u00a1\3\2\2\2\u00a1\u00ac\3\2\2\2\u00a2\u00a3\7\6\2\2\u00a3\u00a5\5*"+
-		"\26\2\u00a4\u00a6\5&\24\2\u00a5\u00a4\3\2\2\2\u00a5\u00a6\3\2\2\2\u00a6"+
-		"\u00ac\3\2\2\2\u00a7\u00a9\5(\25\2\u00a8\u00aa\5&\24\2\u00a9\u00a8\3\2"+
-		"\2\2\u00a9\u00aa\3\2\2\2\u00aa\u00ac\3\2\2\2\u00ab\u009a\3\2\2\2\u00ab"+
-		"\u00a2\3\2\2\2\u00ab\u00a7\3\2\2\2\u00ac\'\3\2\2\2\u00ad\u00ae\7\33\2"+
-		"\2\u00ae\u00b3\5,\27\2\u00af\u00b0\7\36\2\2\u00b0\u00b2\5,\27\2\u00b1"+
-		"\u00af\3\2\2\2\u00b2\u00b5\3\2\2\2\u00b3\u00b1\3\2\2\2\u00b3\u00b4\3\2"+
-		"\2\2\u00b4\u00b6\3\2\2\2\u00b5\u00b3\3\2\2\2\u00b6\u00b7\7\34\2\2\u00b7"+
-		")\3\2\2\2\u00b8\u00b9\t\4\2\2\u00b9+\3\2\2\2\u00ba\u00c9\7\"\2\2\u00bb"+
-		"\u00bd\7&\2\2\u00bc\u00bb\3\2\2\2\u00bc\u00bd\3\2\2\2\u00bd\u00bf\3\2"+
-		"\2\2\u00be\u00c0\5.\30\2\u00bf\u00be\3\2\2\2\u00bf\u00c0\3\2\2\2\u00c0"+
-		"\u00c9\3\2\2\2\u00c1\u00c9\5.\30\2\u00c2\u00c9\7\7\2\2\u00c3\u00c4\7!"+
-		"\2\2\u00c4\u00c5\7\37\2\2\u00c5\u00c6\5\60\31\2\u00c6\u00c7\7 \2\2\u00c7"+
-		"\u00c9\3\2\2\2\u00c8\u00ba\3\2\2\2\u00c8\u00bc\3\2\2\2\u00c8\u00c1\3\2"+
-		"\2\2\u00c8\u00c2\3\2\2\2\u00c8\u00c3\3\2\2\2\u00c9-\3\2\2\2\u00ca\u00cc"+
-		"\7\35\2\2\u00cb\u00cd\7&\2\2\u00cc\u00cb\3\2\2\2\u00cc\u00cd\3\2\2\2\u00cd"+
-		"\u00d2\3\2\2\2\u00ce\u00d0\7\35\2\2\u00cf\u00d1\7&\2\2\u00d0\u00cf\3\2"+
-		"\2\2\u00d0\u00d1\3\2\2\2\u00d1\u00d3\3\2\2\2\u00d2\u00ce\3\2\2\2\u00d2"+
-		"\u00d3\3\2\2\2\u00d3/\3\2\2\2\u00d4\u00d5\5\62\32\2\u00d5\61\3\2\2\2\u00d6"+
-		"\u00d9\5\64\33\2\u00d7\u00d8\7\f\2\2\u00d8\u00da\5\62\32\2\u00d9\u00d7"+
-		"\3\2\2\2\u00d9\u00da\3\2\2\2\u00da\63\3\2\2\2\u00db\u00de\5\66\34\2\u00dc"+
-		"\u00dd\7\24\2\2\u00dd\u00df\5\64\33\2\u00de\u00dc\3\2\2\2\u00de\u00df"+
-		"\3\2\2\2\u00df\65\3\2\2\2\u00e0\u00e1\7\23\2\2\u00e1\u00ef\5\66\34\2\u00e2"+
-		"\u00e3\7\37\2\2\u00e3\u00e4\5\60\31\2\u00e4\u00e5\7 \2\2\u00e5\u00ef\3"+
-		"\2\2\2\u00e6\u00e8\t\5\2\2\u00e7\u00e9\5&\24\2\u00e8\u00e7\3\2\2\2\u00e8"+
-		"\u00e9\3\2\2\2\u00e9\u00ec\3\2\2\2\u00ea\u00eb\t\6\2\2\u00eb\u00ed\5\f"+
-		"\7\2\u00ec\u00ea\3\2\2\2\u00ec\u00ed\3\2\2\2\u00ed\u00ef\3\2\2\2\u00ee"+
-		"\u00e0\3\2\2\2\u00ee\u00e2\3\2\2\2\u00ee\u00e6\3\2\2\2\u00ef\67\3\2\2"+
-		"\2\35CJV]i{\u0084\u008f\u0094\u0098\u009d\u00a0\u00a5\u00a9\u00ab\u00b3"+
-		"\u00bc\u00bf\u00c8\u00cc\u00d0\u00d2\u00d9\u00de\u00e8\u00ec\u00ee";
+		"\4\23\t\23\4\24\t\24\4\25\t\25\4\26\t\26\4\27\t\27\3\2\3\2\3\2\3\3\3\3"+
+		"\3\4\3\4\3\4\3\4\7\48\n\4\f\4\16\4;\13\4\3\4\3\4\3\4\3\4\5\4A\n\4\3\5"+
+		"\3\5\3\5\3\5\3\6\3\6\3\6\3\6\7\6K\n\6\f\6\16\6N\13\6\3\6\3\6\3\6\3\6\5"+
+		"\6T\n\6\3\7\3\7\3\7\3\7\5\7Z\n\7\3\b\3\b\3\t\3\t\3\n\3\n\3\13\3\13\3\f"+
+		"\3\f\3\r\3\r\3\16\3\16\3\16\3\17\5\17l\n\17\3\17\3\17\3\17\3\17\5\17r"+
+		"\n\17\3\17\3\17\3\17\3\17\5\17x\n\17\3\20\3\20\3\20\3\20\3\20\3\20\3\20"+
+		"\3\20\5\20\u0082\n\20\3\21\3\21\3\22\3\22\3\22\3\22\5\22\u008a\n\22\3"+
+		"\22\3\22\3\23\3\23\3\23\7\23\u0091\n\23\f\23\16\23\u0094\13\23\3\24\3"+
+		"\24\3\24\3\24\6\24\u009a\n\24\r\24\16\24\u009b\3\24\5\24\u009f\n\24\3"+
+		"\25\3\25\3\25\3\25\3\25\3\25\3\25\5\25\u00a8\n\25\3\26\3\26\3\26\3\26"+
+		"\3\26\3\26\3\27\3\27\3\27\3\27\3\27\3\27\5\27\u00b6\n\27\3\27\2\2\30\2"+
+		"\4\6\b\n\f\16\20\22\24\26\30\32\34\36 \"$&(*,\2\5\3\2\36\37\3\2\7\t\5"+
+		"\2\4\4\r\22\24\35\2\u00bc\2.\3\2\2\2\4\61\3\2\2\2\6@\3\2\2\2\bB\3\2\2"+
+		"\2\nS\3\2\2\2\fY\3\2\2\2\16[\3\2\2\2\20]\3\2\2\2\22_\3\2\2\2\24a\3\2\2"+
+		"\2\26c\3\2\2\2\30e\3\2\2\2\32g\3\2\2\2\34w\3\2\2\2\36\u0081\3\2\2\2 \u0083"+
+		"\3\2\2\2\"\u0085\3\2\2\2$\u008d\3\2\2\2&\u0095\3\2\2\2(\u00a0\3\2\2\2"+
+		"*\u00a9\3\2\2\2,\u00b5\3\2\2\2./\5\4\3\2/\60\7\2\2\3\60\3\3\2\2\2\61\62"+
+		"\5\f\7\2\62\5\3\2\2\2\63\64\7!\2\2\649\5\b\5\2\65\66\7%\2\2\668\5\b\5"+
+		"\2\67\65\3\2\2\28;\3\2\2\29\67\3\2\2\29:\3\2\2\2:<\3\2\2\2;9\3\2\2\2<"+
+		"=\7\"\2\2=A\3\2\2\2>?\7!\2\2?A\7\"\2\2@\63\3\2\2\2@>\3\2\2\2A\7\3\2\2"+
+		"\2BC\7(\2\2CD\7\6\2\2DE\5\f\7\2E\t\3\2\2\2FG\7#\2\2GL\5\f\7\2HI\7%\2\2"+
+		"IK\5\f\7\2JH\3\2\2\2KN\3\2\2\2LJ\3\2\2\2LM\3\2\2\2MO\3\2\2\2NL\3\2\2\2"+
+		"OP\7$\2\2PT\3\2\2\2QR\7#\2\2RT\7$\2\2SF\3\2\2\2SQ\3\2\2\2T\13\3\2\2\2"+
+		"UZ\5\6\4\2VZ\5\n\6\2WZ\5\34\17\2XZ\5\20\t\2YU\3\2\2\2YV\3\2\2\2YW\3\2"+
+		"\2\2YX\3\2\2\2Z\r\3\2\2\2[\\\7(\2\2\\\17\3\2\2\2]^\7*\2\2^\21\3\2\2\2"+
+		"_`\7,\2\2`\23\3\2\2\2ab\7-\2\2b\25\3\2\2\2cd\t\2\2\2d\27\3\2\2\2ef\7 "+
+		"\2\2f\31\3\2\2\2gh\7\5\2\2hi\t\3\2\2i\33\3\2\2\2jl\7\23\2\2kj\3\2\2\2"+
+		"kl\3\2\2\2lm\3\2\2\2mq\5\36\20\2no\5 \21\2op\5\34\17\2pr\3\2\2\2qn\3\2"+
+		"\2\2qr\3\2\2\2rx\3\2\2\2st\7&\2\2tu\5\34\17\2uv\7\'\2\2vx\3\2\2\2wk\3"+
+		"\2\2\2ws\3\2\2\2x\35\3\2\2\2y\u0082\5\"\22\2z\u0082\5&\24\2{\u0082\5\26"+
+		"\f\2|\u0082\5\16\b\2}\u0082\5\24\13\2~\u0082\5\22\n\2\177\u0082\5\30\r"+
+		"\2\u0080\u0082\5\32\16\2\u0081y\3\2\2\2\u0081z\3\2\2\2\u0081{\3\2\2\2"+
+		"\u0081|\3\2\2\2\u0081}\3\2\2\2\u0081~\3\2\2\2\u0081\177\3\2\2\2\u0081"+
+		"\u0080\3\2\2\2\u0082\37\3\2\2\2\u0083\u0084\t\4\2\2\u0084!\3\2\2\2\u0085"+
+		"\u0086\7\3\2\2\u0086\u0087\7/\2\2\u0087\u0089\7&\2\2\u0088\u008a\5$\23"+
+		"\2\u0089\u0088\3\2\2\2\u0089\u008a\3\2\2\2\u008a\u008b\3\2\2\2\u008b\u008c"+
+		"\7\'\2\2\u008c#\3\2\2\2\u008d\u0092\5\f\7\2\u008e\u008f\7%\2\2\u008f\u0091"+
+		"\5\f\7\2\u0090\u008e\3\2\2\2\u0091\u0094\3\2\2\2\u0092\u0090\3\2\2\2\u0092"+
+		"\u0093\3\2\2\2\u0093%\3\2\2\2\u0094\u0092\3\2\2\2\u0095\u0096\7\3\2\2"+
+		"\u0096\u0097\7\n\2\2\u0097\u0099\5,\27\2\u0098\u009a\5(\25\2\u0099\u0098"+
+		"\3\2\2\2\u009a\u009b\3\2\2\2\u009b\u0099\3\2\2\2\u009b\u009c\3\2\2\2\u009c"+
+		"\u009e\3\2\2\2\u009d\u009f\5*\26\2\u009e\u009d\3\2\2\2\u009e\u009f\3\2"+
+		"\2\2\u009f\'\3\2\2\2\u00a0\u00a1\7\13\2\2\u00a1\u00a2\5,\27\2\u00a2\u00a3"+
+		"\7\6\2\2\u00a3\u00a4\7!\2\2\u00a4\u00a5\5\f\7\2\u00a5\u00a7\7\"\2\2\u00a6"+
+		"\u00a8\5*\26\2\u00a7\u00a6\3\2\2\2\u00a7\u00a8\3\2\2\2\u00a8)\3\2\2\2"+
+		"\u00a9\u00aa\7\f\2\2\u00aa\u00ab\7\6\2\2\u00ab\u00ac\7!\2\2\u00ac\u00ad"+
+		"\5\f\7\2\u00ad\u00ae\7\"\2\2\u00ae+\3\2\2\2\u00af\u00b6\5\26\f\2\u00b0"+
+		"\u00b6\5\16\b\2\u00b1\u00b6\5\24\13\2\u00b2\u00b6\5\22\n\2\u00b3\u00b6"+
+		"\5\30\r\2\u00b4\u00b6\5\34\17\2\u00b5\u00af\3\2\2\2\u00b5\u00b0\3\2\2"+
+		"\2\u00b5\u00b1\3\2\2\2\u00b5\u00b2\3\2\2\2\u00b5\u00b3\3\2\2\2\u00b5\u00b4"+
+		"\3\2\2\2\u00b6-\3\2\2\2\219@LSYkqw\u0081\u0089\u0092\u009b\u009e\u00a7"+
+		"\u00b5";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

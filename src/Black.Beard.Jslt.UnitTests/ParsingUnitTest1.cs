@@ -87,7 +87,7 @@ namespace Black.Beard.Jslt.UnitTests
         public void TestMObjectWithconstructor()
         {
 
-            var o = new JObject(new JProperty("propertyName", new JConstructor("myMethod",  6.6, "test", new JObject() { new JProperty("test2", 6) }) ));
+            var o = new JObject(new JProperty("propertyName", new JFunctionCall("myMethod",  6.6, "test", new JObject() { new JProperty("test2", 6) }) ));
 
             var expected = o.ToString(Newtonsoft.Json.Formatting.None);
             var parser = ScriptParser.ParseString(new System.Text.StringBuilder(expected));

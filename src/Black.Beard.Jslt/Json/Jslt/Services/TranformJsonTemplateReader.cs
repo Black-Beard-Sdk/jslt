@@ -26,8 +26,6 @@ namespace Bb.Json.Jslt.Services
             return null;
         }
 
-        #region read values
-
         private JsltJson Read(JToken n)
         {
 
@@ -38,13 +36,7 @@ namespace Bb.Json.Jslt.Services
                     return ReadObject(n as JObject);
 
                 case JTokenType.Array:
-                    if (n is JChained c)
-                        return ReadChained(c);
-                    else
-                        return ReadArray(n as JArray);
-
-                case JTokenType.Constructor:
-                    return ReadConstructor(n as JConstructor);
+                    return ReadArray(n as JArray);
 
                 case JTokenType.Property:
                     if (n is JfunctionDefinition f)
@@ -83,14 +75,43 @@ namespace Bb.Json.Jslt.Services
                     return ReadTimeSpan(n as JValue);
 
                 case JTokenType.Raw:
-                    if (n is JPath p)
+
+                    if (n is JFunctionCall fu)
+                        return ReadFunctionCall(fu);
+
+                    else if (n is JPath p)
                         return ReadPath(p);
+
                     else if (n is JType t)
                         return ReadType(t);
+
+                    else if (n is JBinaryOperation binaryOperation)
+                        return ReadBinaryOperation(binaryOperation);
+
+                    else if (n is JUnaryOperation unaryOperation)
+                        return ReadUnaryOperation(unaryOperation);
+
+                    else if (n is JSubExpression subOperation)
+                        return ReadSubOperation(subOperation);
+
+                    else if (n is JWhenExpression when)
+                        return ReadWhenOperation(when);
+
+                    else if (n is JCaseExpression @case)
+                        return ReadCaseOperation(@case);
+
+                    else if (n is JDefaultCaseExpression defaultCase)
+                        return ReadDefaultCaseOperation(defaultCase);
+
                     else if (n is JfunctionDefinition fb)
                         return ReadFunction(fb);
+
+                    else
+                        Stop();
+
                     break;
 
+                case JTokenType.Constructor:
                 case JTokenType.Comment:
                 case JTokenType.None:
                 case JTokenType.Undefined:
@@ -101,6 +122,8 @@ namespace Bb.Json.Jslt.Services
             throw new System.NotImplementedException();
 
         }
+
+        #region read values
 
         private JsltJson ReadTimeSpan(JValue n)
         {
@@ -154,44 +177,6 @@ namespace Bb.Json.Jslt.Services
             return new JsltPath() { Value = value, Kind = JsltKind.Jpath };
         }
 
-        private JsltJson ReadfunctionBodyDefinition(JfunctionBodyDefinition n)
-        {
-            var value = n.Value?.ToString();
-            return new JsltPath() { Value = value, Kind = JsltKind.Jpath };
-        }
-
-        //private JsltJson ConvertChildToType(JsltJson node)
-        //{
-
-        //    if (node is JsltPath jp)
-        //    {
-        //        if (jp.Type != "jpath")
-        //        {
-
-        //            var service = this._configuration.Services.GetService(jp.Type);
-        //            if (service == null)
-        //                throw new MissingServiceException(jp.Type);
-
-        //            return new JsltType(jp.TypeObject) { Type = jp.Type, ServiceProvider = service };
-
-        //        }
-
-        //        if (jp.Child != null)
-        //            jp.Child = ConvertChildToType(jp.Child);
-        //    }
-        //    else if (node is JsltType t)
-        //    {
-
-        //        var service = this._configuration.Services.GetService(t.Type);
-        //        if (service == null)
-        //            throw new MissingServiceException(t.Type);
-        //        t.ServiceProvider = service;
-
-        //    }
-        //    return node;
-
-        //}
-
         private JsltJson ReadFloat(JValue n)
         {
             return new JsltConstant() { Value = n.Value, Kind = JsltKind.Float };
@@ -216,18 +201,6 @@ namespace Bb.Json.Jslt.Services
             }
 
             return arr;
-
-        }
-
-        private JsltJson ReadChained(JChained n)
-        {
-
-            var result = new JsltLinkedCode();
-
-            foreach (var item in n)
-                result.Append( Read(item));
-
-            return result;
 
         }
 
@@ -291,7 +264,7 @@ namespace Bb.Json.Jslt.Services
 
         }
 
-        private JsltJson ReadConstructor(JConstructor n)
+        private JsltJson ReadFunctionCall(JFunctionCall n)
         {
 
             var types = ResolveArgumentsTypes(n);
@@ -299,7 +272,10 @@ namespace Bb.Json.Jslt.Services
 
             List<JsltJson> _arguments = new List<JsltJson>(10);
             foreach (var item in n.Children())
-                _arguments.Add(Read(item));
+            {
+                JsltJson arg = Read(item);
+                _arguments.Add(arg);
+            }
 
             if (service != null)
                 return new JsltFunction(_arguments)
@@ -307,26 +283,78 @@ namespace Bb.Json.Jslt.Services
                     ServiceProvider = service,
                     //Type = result.Name,
                 };
-            
+
             Stop();
 
             throw new MissingServiceException(n.Name);
 
         }
 
-        private Type[] ResolveArgumentsTypes(JConstructor n)
+
+        private JsltJson ReadWhenOperation(JWhenExpression n)
+        {
+            
+            Stop();
+
+            var expression = Read(n.Expression);
+            List<JsltJson> cases = new List<JsltJson>();
+            foreach (var @case in n.Cases)
+                cases.Add(Read(@case));
+
+            throw new NotImplementedException();
+        }
+
+        private JsltJson ReadCaseOperation(JCaseExpression n)
+        {
+
+            Stop();
+
+            var expression = Read(n.Expression);
+            var content = Read(n.Content);
+
+            throw new NotImplementedException();
+        }
+
+        private JsltJson ReadDefaultCaseOperation(JDefaultCaseExpression n)
+        {
+            Stop();
+            var content = Read(n.Content);
+            throw new NotImplementedException();
+        }
+
+
+        private JsltJson ReadSubOperation(JSubExpression n)
+        {
+            Stop();
+            var sub = Read(n.Sub);
+            throw new NotImplementedException();
+        }
+
+        private JsltJson ReadBinaryOperation(JBinaryOperation n)
+        {
+            var left = Read(n.Left);
+            var right = Read(n.Right);
+            return new JsltBinaryOperator(left, n.Operator, right);
+        }
+
+        private JsltJson ReadUnaryOperation(JUnaryOperation n)
+        {
+            var left = Read(n.Left);
+            return new JsltOperator(left, n.Operator);
+        }
+
+        private Type[] ResolveArgumentsTypes(JFunctionCall n)
         {
 
             var c = n.Children();
             List<Type> _types = new List<Type>(10);
             foreach (var item in c)
             {
-                if (item is JConstructor ctor)
+                if (item is JFunctionCall ctor)
                 {
                     Stop();
                     var types = ResolveArgumentsTypes(ctor);
                     var service = this._FunctionFoundry.GetService(ctor.Name, types);
-
 
 
                 }
@@ -434,6 +462,7 @@ namespace Bb.Json.Jslt.Services
             return result;
 
         }
+
 
 
         [System.Diagnostics.DebuggerStepThrough]
