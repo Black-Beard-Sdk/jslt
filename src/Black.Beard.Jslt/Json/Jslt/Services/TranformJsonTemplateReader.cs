@@ -271,7 +271,7 @@ namespace Bb.Json.Jslt.Services
             var service = this._FunctionFoundry.GetService(n.Name, types);
 
             List<JsltJson> _arguments = new List<JsltJson>(10);
-            foreach (var item in n.Children())
+            foreach (var item in n.Arguments)
             {
                 JsltJson arg = Read(item);
                 _arguments.Add(arg);
@@ -294,40 +294,38 @@ namespace Bb.Json.Jslt.Services
         private JsltJson ReadWhenOperation(JWhenExpression n)
         {
             
-            Stop();
-
             var expression = Read(n.Expression);
-            List<JsltJson> cases = new List<JsltJson>();
-            foreach (var @case in n.Cases)
-                cases.Add(Read(@case));
+            var result = new JslSwitch() { Expression = expression };
 
-            throw new NotImplementedException();
+            foreach (var @case in n.Cases)
+            {
+                var c = (JsltCase)Read(@case);
+                result.Cases.Add(c);
+            }
+
+            if (n.DefaultCase != null)
+                result.Default = (JsltJson)Read(n.DefaultCase.Content);
+
+            return result;
+
         }
 
         private JsltJson ReadCaseOperation(JCaseExpression n)
         {
-
-            Stop();
-
             var expression = Read(n.Expression);
             var content = Read(n.Content);
-
-            throw new NotImplementedException();
+            return new JsltCase() { RightExpression = expression, Block = content };
         }
 
         private JsltJson ReadDefaultCaseOperation(JDefaultCaseExpression n)
         {
-            Stop();
-            var content = Read(n.Content);
-            throw new NotImplementedException();
+            return Read(n.Content);
         }
-
 
         private JsltJson ReadSubOperation(JSubExpression n)
         {
-            Stop();
             var sub = Read(n.Sub);
-            throw new NotImplementedException();
+            return sub;
         }
 
         private JsltJson ReadBinaryOperation(JBinaryOperation n)
@@ -346,7 +344,7 @@ namespace Bb.Json.Jslt.Services
         private Type[] ResolveArgumentsTypes(JFunctionCall n)
         {
 
-            var c = n.Children();
+            var c = n.Arguments;
             List<Type> _types = new List<Type>(10);
             foreach (var item in c)
             {

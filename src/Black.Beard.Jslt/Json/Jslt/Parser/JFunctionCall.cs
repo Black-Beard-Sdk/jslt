@@ -11,8 +11,8 @@ namespace Bb.Json.Jslt.Parser
     public class JFunctionCall : JExpression
     {
 
-        public JFunctionCall(string name, params object[] arguments)
-            : this(name, arguments.Select(c => Convert(c) ))
+        public JFunctionCall(string text, string name, params object[] arguments)
+            : this(text, name, arguments.Select(c => Convert(c) ))
         {
 
         }
@@ -26,8 +26,8 @@ namespace Bb.Json.Jslt.Parser
         /// Initializes a new instance of the <see cref="T:Newtonsoft.Json.Linq.JRaw" /> class.
         /// </summary>
         /// <param name="rawJson">The raw json.</param>
-        public JFunctionCall(string name, IEnumerable<JToken> arguments) 
-            : base()
+        public JFunctionCall(string text, string name, IEnumerable<JToken> arguments) 
+            : base(text)
         {
             this.Name = name;
             this.Arguments = new List<JToken>(arguments);

@@ -12,8 +12,8 @@ namespace Bb.Json.Jslt.Parser
         /// Initializes a new instance of the <see cref="T:Newtonsoft.Json.Linq.JExpression" /> class.
         /// </summary>
         /// <param name="rawJson">The raw json.</param>
-        public JCaseExpression(JToken expression, JToken content)
-            : base()
+        public JCaseExpression(string text, JToken expression, JToken content)
+            : base(text)
         {
             this.Expression = expression;
             this.Content = content;

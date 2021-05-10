@@ -14,8 +14,8 @@ namespace Bb.Json.Jslt.Parser
         /// Initializes a new instance of the <see cref="T:Newtonsoft.Json.Linq.JRaw" /> class.
         /// </summary>
         /// <param name="rawJson">The raw json.</param>
-        public JBinaryOperation(JToken leftToken, OperationEnum operation, JToken rightToken)
-            : base(leftToken, operation)
+        public JBinaryOperation(string text, JToken leftToken, OperationEnum operation, JToken rightToken)
+            : base(text, leftToken, operation)
         {
             this.Right = rightToken;
         }

@@ -134,6 +134,7 @@ namespace Bb.Json.Jslt.Services
 
         public static JToken EvaluateBinaryOperator(RuntimeContext ctx, JToken leftToken, OperationEnum @operator, JToken rightToken)
         {
+
             var l = GetValue(leftToken);
             var r = GetValue(rightToken);
 

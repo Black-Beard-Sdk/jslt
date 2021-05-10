@@ -19,29 +19,24 @@ namespace Black.Beard.Jslt.UnitTests
         public void TestMObjectWithPropertyString()
         {
 
-            var o = new JObject(new JProperty("propertyName", "toto")).ToString();
-            var template = o.ToString();
-
+            var expected = "{ 'propertyName': 'toto' }".Replace("'", "\"");
             var source = "{ }";
 
-            RuntimeContext result = Test(template, source);
+            RuntimeContext result = Test(expected, source);
             var o2 = result.TokenResult as JObject;
 
             Assert.AreEqual(o2["propertyName"], "toto");
 
         }
 
-
         [TestMethod]
         public void TestMObjectWithPropertyNumber()
         {
 
-            var o = new JObject(new JProperty("propertyName", 6)).ToString();
-
-            var template = o.ToString();
+            var expected = "{ 'propertyName': 6 }".Replace("'", "\"");
             var source = "{ }";
 
-            RuntimeContext result = Test(template, source);
+            RuntimeContext result = Test(expected, source);
             var o2 = result.TokenResult as JObject;
 
             Assert.AreEqual(o2["propertyName"], 6L);
@@ -52,33 +47,25 @@ namespace Black.Beard.Jslt.UnitTests
         public void TestMObjectWithPropertyNumber2()
         {
 
-            var o = new JObject(new JProperty("propertyName", 6.7)).ToString();
-
-            var template = o.ToString();
+            var expected = "{ 'propertyName': 6.7 }".Replace("'", "\"");
             var source = "{ }";
 
-            RuntimeContext result = Test(template, source);
+            RuntimeContext result = Test(expected, source);
             var o2 = result.TokenResult as JObject;
 
             Assert.AreEqual(o2["propertyName"], 6.7D);
 
         }
 
-
         [TestMethod]
         public void TestMObjectWithPropertyArray()
         {
 
-            var o = new JObject(new JProperty("propertyName", new JArray() { 6.6, "test", new JObject() { new JProperty("test2", 6) } }));
-
-            var expected = o.ToString(Newtonsoft.Json.Formatting.None);
-
+            var expected = "{ 'propertyName': [6.6, 'test'] }".Replace("'", "\"");
             var source = "{ }";
 
             RuntimeContext result = Test(expected, source);
-
-            var r = result.TokenResult.ToString(Newtonsoft.Json.Formatting.None);
-            Assert.AreEqual(expected, r);
+            Assert.AreEqual(result.TokenResult["propertyName"][0], 6.6);
 
         }
 
@@ -86,10 +73,7 @@ namespace Black.Beard.Jslt.UnitTests
         public void TestMObjectWithconstructor()
         {
 
-            var o = new JObject(new JProperty("propertyName", new JFunctionCall("myMethod", 6.6, "test")));
-
-            var expected = o.ToString(Newtonsoft.Json.Formatting.None);
-
+            var expected = "{ 'propertyName': .myMethod(6.6, 'test') }".Replace("'", "\"");
             var source = "{ }";
 
             RuntimeContext result = Test(expected, source, ("myMethod", typeof(DataClass)));
@@ -101,10 +85,7 @@ namespace Black.Beard.Jslt.UnitTests
         public void TestJPath()
         {
 
-            var o = new JObject(new JProperty("propertyName", new JPath("$.prop1.SubPprop1")));
-
-            var expected = o.ToString(Newtonsoft.Json.Formatting.None);
-
+            var expected = "{ 'propertyName': '$.prop1.SubPprop1' }".Replace("'", "\"");
             var source = "{ 'prop1': { 'SubPprop1':2 }, 'prop2':3 }".Replace("'", "\"");
 
             RuntimeContext result = Test(expected, source);
@@ -116,32 +97,139 @@ namespace Black.Beard.Jslt.UnitTests
         public void TestJPathUnary()
         {
 
-            var o = new JObject(
-                new JProperty("propertyName",
-                    new JUnaryOperation(new JPath("$.prop1"), OperationEnum.Not)
-                    )
-                );
-
-            var expected = o.ToString(Newtonsoft.Json.Formatting.None);
-
+            var expected = "{ 'propertyName': '$.prop1' }".Replace("'", "\"");
             var source = "{ 'prop1': false }".Replace("'", "\"");
 
             RuntimeContext result = Test(expected, source);
-            Assert.AreEqual(result.TokenResult["propertyName"], true);
+            Assert.AreEqual(result.TokenResult["propertyName"], false);
 
         }
 
         [TestMethod]
-        public void TestJPathBinary()
+        public void TestJPathBinaryAddDecimal()
         {
 
-            var expected = "{'propertyName':'$.prop1.SubPprop1' + '$.prop2' }".Replace("'", "\""); 
+            var expected = "{'propertyName':'$.prop1.SubPprop1' + '$.prop2' }".Replace("'", "\"");
+            var source = "{ 'prop1': { 'SubPprop1':2.5 }, 'prop2':3 }".Replace("'", "\"");
+
+            RuntimeContext result = Test(expected, source);
+            Assert.AreEqual(result.TokenResult["propertyName"], 5.5);
+
+        }
+
+        [TestMethod]
+        public void TestJPathBinaryAdd()
+        {
+
+            var expected = "{'propertyName':'$.prop1.SubPprop1' + '$.prop2' }".Replace("'", "\"");
             var source = "{ 'prop1': { 'SubPprop1':2 }, 'prop2':3 }".Replace("'", "\"");
 
             RuntimeContext result = Test(expected, source);
             Assert.AreEqual(result.TokenResult["propertyName"], 5);
 
         }
+
+        [TestMethod]
+        public void TestJPathconcat()
+        {
+
+            var expected = "{'propertyName':'$.prop1' + '$.prop2' }".Replace("'", "\"");
+            var source = "{ 'prop1': 'hello', 'prop2':' world' }".Replace("'", "\"");
+
+            RuntimeContext result = Test(expected, source);
+            Assert.AreEqual(result.TokenResult["propertyName"], "hello world");
+
+
+        }
+        
+        [TestMethod]
+        public void TestJPathBinarySubstractDecimal()
+        {
+            var expected = "{'propertyName':'$.prop1' - '$.prop2' }".Replace("'", "\"");
+            var source = "{ 'prop1':2.5, 'prop2':1 }".Replace("'", "\"");
+            RuntimeContext result = Test(expected, source);
+            Assert.AreEqual(result.TokenResult["propertyName"], 1.5);
+        }
+
+        [TestMethod]
+        public void TestJPathBinarySubstractInt()
+        {
+            var expected = "{'propertyName':'$.prop1.SubPprop1' - '$.prop2' }".Replace("'", "\"");
+            var source = "{ 'prop1': { 'SubPprop1':2 }, 'prop2':3 }".Replace("'", "\"");
+            RuntimeContext result = Test(expected, source);
+            Assert.AreEqual(result.TokenResult["propertyName"], -1);
+        }
+
+        [TestMethod]
+        public void TestJPathBinaryMultiplyInt()
+        {
+            var expected = "{'propertyName':'$.prop1.SubPprop1' * '$.prop2' }".Replace("'", "\"");
+            var source = "{ 'prop1': { 'SubPprop1':2 }, 'prop2':3 }".Replace("'", "\"");
+            RuntimeContext result = Test(expected, source);
+            Assert.AreEqual(result.TokenResult["propertyName"], 6);
+        }
+
+        [TestMethod]
+        public void TestJPathBinaryModuloInt()
+        {
+            var expected = "{'propertyName':'$.prop1.SubPprop1' % '$.prop2' }".Replace("'", "\"");
+            var source = "{ 'prop1': { 'SubPprop1':7 }, 'prop2':3 }".Replace("'", "\"");
+            RuntimeContext result = Test(expected, source);
+            Assert.AreEqual(result.TokenResult["propertyName"], 1);
+        }
+
+        [TestMethod]
+        public void TestEmbeddedCSharp()
+        {
+            var expected = @"
+{ 
+
+    'propertyName': .when '$.prop1'
+                    case 1 : 
+                    {
+                        { 'sub1' : 11 }
+                    } 
+                    case 3 : 
+                    {
+                        { 'sub1' : 22 }
+                    } 
+
+}".Replace("'", "\"")
+ .Replace("`", "'")
+;
+            var source = "{ 'prop1':3 }".Replace("'", "\"");
+            RuntimeContext result = Test(expected, source);
+            Assert.AreEqual(result.TokenResult["propertyName"]["sub1"], 22);
+        }
+
+
+
+        //        [TestMethod]
+        //        public void TestEmbeddedCSharp()
+        //        {
+        //            var expected = @"
+        //{
+        //    '$funcs':
+        //    {
+        //        'myMethod': ```.cs
+
+        //        EmbeddedMethod(JToken self) 
+        //        {
+        //            return self;
+        //        }
+
+        //```
+        //    },
+        //    'propertyName': .myMethod('$.prop1')
+        //}
+        //".Replace("'", "\"")
+        // .Replace("`", "'")
+        //;
+        //            var source = "{ 'prop1':3 }".Replace("'", "\"");
+        //            RuntimeContext result = Test(expected, source);
+        //            Assert.AreEqual(result.TokenResult["propertyName"], 1);
+        //        }
+
 
 
         //[TestMethod]

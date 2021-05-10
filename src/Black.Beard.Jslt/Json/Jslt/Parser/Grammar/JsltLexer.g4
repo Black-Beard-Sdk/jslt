@@ -71,7 +71,7 @@ STRING
    ;
 
 MULTI_LINE_COMMENT : '/*' .*? '*/' ;
-CODE_STRING :        QUOTE_CODE_STRING LANGUAGE WS .*? QUOTE_CODE_STRING;
+CODE_STRING :        QUOTE_CODE_STRING .*? QUOTE_CODE_STRING;
 QUOTE_CODE_STRING :  '\'\'\'';
 
 
@@ -107,7 +107,7 @@ fragment EXP
 // \- since - means "range" inside [...]
 
 WS
-   : [ \t\n\r] + -> skip
+   : [ \t\n\r]+ -> skip
    ;
 
 ID

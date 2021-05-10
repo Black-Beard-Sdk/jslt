@@ -16,21 +16,21 @@
         */
     }
 
-    "v1" : $..toto | new method1($.key1),
+    "v1" : $..toto | .method1($.key1),
 
     "v2" : new unique($..toto),
 
-    "v3" : new get($.id, "sourceName", $..toto),
+    "v3" : .get($.id, "sourceName", $..toto),
 
-    "v4" : new mymethod($.id, "sourceName", $..toto),
+    "v4" : .mymethod($.id, "sourceName", $..toto),
 
 
 
     // test
-    "$where" : new unique($.uniqueKey),
+    "$where" : .unique($.uniqueKey),
 
     // reposition la source d'info sur le bloque
-    "$source" : new unique($.uniqueKey),
+    "$source" : .unique($.uniqueKey),
 
 
 }

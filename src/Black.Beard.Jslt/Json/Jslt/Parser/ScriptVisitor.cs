@@ -275,7 +275,7 @@ namespace Bb.Json.Jslt.Parser
                 if (context.NT() == null)
                     left = item;
                 else
-                    left = AddPosition(new JUnaryOperation(item, OperationEnum.Not), context.Start, context.Stop);
+                    left = AddPosition(new JUnaryOperation(context.GetText(), item, OperationEnum.Not), context.Start, context.Stop);
             }
 
             var right_operation = context.jsonLtOperation();
@@ -288,10 +288,10 @@ namespace Bb.Json.Jslt.Parser
                 if (context.PAREN_LEFT() == null)
                 {
                     var operation = (OperationEnum)context.operation().Accept(this);
-                    return AddPosition(new JBinaryOperation(left, operation, operationRight), context.Start, context.Stop);
+                    return AddPosition(new JBinaryOperation(context.GetText(), left, operation, operationRight), context.Start, context.Stop);
                 }
 
-                return AddPosition(new JSubExpression(left), context.Start, context.Stop);
+                return AddPosition(new JSubExpression(context.GetText(), left), context.Start, context.Stop);
 
             }
 
@@ -404,7 +404,7 @@ namespace Bb.Json.Jslt.Parser
             if (defaultCase != null)
                 d = (JDefaultCaseExpression)defaultCase.Accept(this);
 
-            return AddPosition(new JWhenExpression(expression, _caseList, d), context.Start, context.Stop);
+            return AddPosition(new JWhenExpression(context.GetText(), expression, _caseList, d), context.Start, context.Stop);
 
         }
 
@@ -412,13 +412,13 @@ namespace Bb.Json.Jslt.Parser
         {
             var expression = (JToken)context.jsonWhenExpression().Accept(this);
             var content = (JToken)context.jsonValue().Accept(this);
-            return AddPosition(new JCaseExpression(expression, content), context.Start, context.Stop);
+            return AddPosition(new JCaseExpression(context.GetText(), expression, content), context.Start, context.Stop);
         }
 
         public override object VisitJsonDefaultCase([NotNull] JsltParser.JsonDefaultCaseContext context)
         {
             var content = (JToken)context.jsonValue().Accept(this);
-            return AddPosition(new JDefaultCaseExpression(content), context.Start, context.Stop);
+            return AddPosition(new JDefaultCaseExpression(context.GetText(), content), context.Start, context.Stop);
         }
 
         public override object VisitJsonfunctionCall([NotNull] JsltParser.JsonfunctionCallContext context)
@@ -433,7 +433,7 @@ namespace Bb.Json.Jslt.Parser
                 argumentsJson.AddRange(o);
             }
 
-            return AddPosition(new JConstructor(name, argumentsJson.ToArray()), context.Start, context.Stop);
+            return AddPosition(new JFunctionCall(context.GetText(), name, argumentsJson.ToArray()), context.Start, context.Stop);
 
 
         }

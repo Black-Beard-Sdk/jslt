@@ -7,8 +7,8 @@ namespace Bb.Json.Jslt.Parser
     {
 
 
-        public JUnaryOperation(JToken leftToken, OperationEnum operation)
-            : base()
+        public JUnaryOperation(string text, JToken leftToken, OperationEnum operation)
+            : base(text)
         {
             this.Left = leftToken;
             this.Operator = operation;

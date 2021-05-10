@@ -1,4 +1,5 @@
 ﻿using Bb.Expresssions;
+using Bb.Expresssions.Statements;
 using Bb.Json.Jslt.Asts;
 using Bb.Json.Jslt.Parser;
 using Newtonsoft.Json.Linq;
@@ -354,7 +355,7 @@ namespace Bb.Json.Jslt.Services
             return result;
 
         }
-        
+
         public object VisitJPath(JsltPath node)
         {
 
@@ -367,6 +368,51 @@ namespace Bb.Json.Jslt.Services
             }
 
         }
+
+        public object VisitSwitch(JslSwitch node)
+        {
+
+            SourceCode nextBlock;
+
+            using (CurrentContext ctx = NewContext())
+            {
+
+                nextBlock = ctx.Current.Source;
+
+                var resultVar = nextBlock.AddVar(typeof(object), null, Expression.Constant(null));
+                var left = (Expression)node.Expression.Accept(this);
+
+                foreach (var _case in node.Cases)
+                {
+                    var right = (Expression)_case.RightExpression.Accept(this);
+
+                    var evaluation = Expression.Call(RuntimeContext._evaluateBinaryOperator.Method, ctx.Current.Context, left, Expression.Constant(OperationEnum.Equal), right);
+
+                    ConditionalStatement condition = nextBlock.If(Expression.MakeBinary(ExpressionType.Equal, evaluation.ConvertIfDifferent(typeof(JValue)).Property("Value").ConvertIfDifferent(typeof(bool)), Expression.Constant(true)));
+                    ctx.Current.Source = condition.Then;
+                    condition.Then.Assign(resultVar, (Expression)_case.Accept(this));
+                    nextBlock = condition.Else;
+                }
+
+                return resultVar;
+
+            }
+
+        }
+
+        public object VisitCase(JsltCase node)
+        {
+
+            using (CurrentContext ctx = NewContext())
+            {
+
+                return node.Block.Accept(this);
+
+            }
+
+        }
+
+
 
         public TranformJsonAstConfiguration Configuration { get; set; }
 

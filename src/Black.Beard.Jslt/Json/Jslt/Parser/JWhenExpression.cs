@@ -13,8 +13,8 @@ namespace Bb.Json.Jslt.Parser
         /// Initializes a new instance of the <see cref="T:Newtonsoft.Json.Linq.JExpression" /> class.
         /// </summary>
         /// <param name="rawJson">The raw json.</param>
-        public JWhenExpression(JToken expression, IEnumerable<JCaseExpression> cases, JDefaultCaseExpression defaultCase)
-            : base()
+        public JWhenExpression(string text, JToken expression, IEnumerable<JCaseExpression> cases, JDefaultCaseExpression defaultCase)
+            : base(text)
         {
 
             this.Expression = expression;
@@ -25,7 +25,7 @@ namespace Bb.Json.Jslt.Parser
         
         public List<JCaseExpression> Cases { get; }
 
-        public List<JDefaultCaseExpression> DefaultCase { get; }
+        public JDefaultCaseExpression DefaultCase { get; }
 
     }
 

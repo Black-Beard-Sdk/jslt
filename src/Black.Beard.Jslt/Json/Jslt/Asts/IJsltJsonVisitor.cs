@@ -8,6 +8,7 @@ namespace Bb.Json.Jslt.Asts
 
         TranformJsonAstConfiguration Configuration { get; set; }
 
+
         object VisitArray(JsltArray node);
 
         object VisitConstant(JsltConstant node);
@@ -27,6 +28,10 @@ namespace Bb.Json.Jslt.Asts
         object VisitUnaryOperator(JsltOperator node);
 
         object VisitBinaryOperator(JsltBinaryOperator node);
+        
+        object VisitCase(JsltCase node);
+
+        object VisitSwitch(JslSwitch node);
 
     }
 

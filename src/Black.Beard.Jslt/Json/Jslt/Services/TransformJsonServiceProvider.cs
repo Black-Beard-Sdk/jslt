@@ -27,7 +27,6 @@ namespace Bb.Json.Jslt.Services
         public Factory<ITransformJsonService> Get(Type[] parameters)
         {
 
-
             List<(int[], Factory)> result = new List<(int[], Factory)>(_instances.Count);
             foreach (var item in _instances.Where(c => c.Parameters.Length == parameters.Length))
             {
