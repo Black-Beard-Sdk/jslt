@@ -3,17 +3,17 @@
 namespace Bb.Json.Jslt.Asts
 {
 
-    public class JsltArray : JsltJson
+    public class JsltArray : JsltBase
     {
 
         public JsltArray(int count)
         {
             this.Kind = JsltKind.Array;
-            _items = new List<JsltJson>();
+            _items = new List<JsltBase>();
         }
 
 
-        internal JsltJson Append(JsltJson item)
+        internal JsltBase Append(JsltBase item)
         {
             _items.Add(item);
             return item;
@@ -25,23 +25,23 @@ namespace Bb.Json.Jslt.Asts
         }
 
         //public JsltJson Item { get; internal set; }
-        public List<JsltJson> Items { get => _items; }
+        public List<JsltBase> Items { get => _items; }
 
-        private readonly List<JsltJson> _items;
+        private readonly List<JsltBase> _items;
 
 
     }
 
-    public class JsltLinkedCode : JsltJson
+    public class JsltLinkedCode : JsltBase
     {
 
         public JsltLinkedCode()
         {
             this.Kind = JsltKind.Array;
-            this._items = new List<JsltJson>(10);
+            this._items = new List<JsltBase>(10);
         }
 
-        public void Append(JsltJson item)
+        public void Append(JsltBase item)
         {
             this._items.Add(item);
         }
@@ -51,10 +51,10 @@ namespace Bb.Json.Jslt.Asts
             return visitor.VisitLinkedCode(this);
         }
 
-        public IEnumerable<JsltJson> Items { get => _items; }
+        public IEnumerable<JsltBase> Items { get => _items; }
 
 
-        private readonly List<JsltJson> _items;
+        private readonly List<JsltBase> _items;
 
 
     }

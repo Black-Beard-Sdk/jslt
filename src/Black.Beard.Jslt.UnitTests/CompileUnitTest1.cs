@@ -179,7 +179,7 @@ namespace Black.Beard.Jslt.UnitTests
         }
 
         [TestMethod]
-        public void TestEmbeddedCSharp()
+        public void TestCaseWhen()
         {
             var expected = @"
 { 
@@ -201,34 +201,6 @@ namespace Black.Beard.Jslt.UnitTests
             RuntimeContext result = Test(expected, source);
             Assert.AreEqual(result.TokenResult["propertyName"]["sub1"], 22);
         }
-
-
-
-        //        [TestMethod]
-        //        public void TestEmbeddedCSharp()
-        //        {
-        //            var expected = @"
-        //{
-        //    '$funcs':
-        //    {
-        //        'myMethod': ```.cs
-
-        //        EmbeddedMethod(JToken self) 
-        //        {
-        //            return self;
-        //        }
-
-        //```
-        //    },
-        //    'propertyName': .myMethod('$.prop1')
-        //}
-        //".Replace("'", "\"")
-        // .Replace("`", "'")
-        //;
-        //            var source = "{ 'prop1':3 }".Replace("'", "\"");
-        //            RuntimeContext result = Test(expected, source);
-        //            Assert.AreEqual(result.TokenResult["propertyName"], 1);
-        //        }
 
 
 
@@ -291,12 +263,15 @@ namespace Black.Beard.Jslt.UnitTests
 
             StringBuilder sb = new StringBuilder(payloadTemplate.Replace('\'', '"').Replace('§', '\''));
 
-            var configuration = new TranformJsonAstConfiguration();
+            var configuration = new TranformJsonAstConfiguration()
+            {
+                Path = "",
+            };
             foreach (var item in services)
                 configuration.AddService(item.Item2, item.Item1);
 
             TemplateTransformProvider Templateprovider = new TemplateTransformProvider(configuration);
-            JsltTemplate template = Templateprovider.GetTemplate(sb);
+            JsltTemplate template = Templateprovider.GetTemplate(sb, string.Empty);
 
             return template;
 

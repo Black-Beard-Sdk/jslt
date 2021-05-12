@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Bb.ComponentModel;
+using System;
 using System.ComponentModel;
 using System.ComponentModel.Design;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
@@ -9,30 +11,18 @@ namespace Bb.Json.Jslt.Services
     public partial class TranformJsonAstConfiguration
     {
 
-        public TranformJsonAstConfiguration()
+        public TranformJsonAstConfiguration(CultureInfo culture = null)
         {
 
+            this.Culture = culture ?? CultureInfo.InvariantCulture;
+
             this.Services = new ServiceContainer();
+            var assembly = typeof(TranformJsonAstConfiguration).Assembly;
+            var types = TypeDiscovery.Instance.GetTypesWithAttributes<DisplayNameAttribute>(typeof(ITransformJsonService), c => true)
+                .Where(c => c.Assembly == assembly);
 
-            //this.AddService(typeof(ServiceAdd))
-            //    .AddService(typeof(ServiceConcat))
-            //    .AddService(typeof(ServiceConcatAll))
-            //    .AddService(typeof(ServiceCrc32))
-            //    .AddService(typeof(ServiceDistinct))
-            //    .AddService(typeof(ServiceNotNull))
-            //    .AddService(typeof(ServiceDiv))
-            //    .AddService(typeof(ServiceFrombase64))
-            //    .AddService(typeof(ServiceModulo))
-            //    .AddService(typeof(ServiceSha256))
-            //    .AddService(typeof(ServiceSha512))
-            //    .AddService(typeof(ServiceSubStr))
-            //    .AddService(typeof(ServiceUniquekey))
-            //    .AddService(typeof(ServiceSubstract))
-            //    .AddService(typeof(ServiceSum))
-            //    .AddService(typeof(ServiceTime))
-            //    .AddService(typeof(ServiceTobase64))
-
-            ;
+            foreach (var item in types)
+                AddService(item, null);
 
         }
 
@@ -67,6 +57,8 @@ namespace Bb.Json.Jslt.Services
 
         public ServiceContainer Services { get; }
 
+        public string Path { get; set; }
+        public CultureInfo Culture { get; set; }
 
     }
 

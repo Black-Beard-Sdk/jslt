@@ -1,7 +1,7 @@
 ﻿namespace Bb.Json.Jslt.Asts
 {
 
-    public class JsltProperty : JsltJson
+    public class JsltProperty : JsltBase
     {
 
         public JsltProperty()
@@ -11,7 +11,7 @@
 
         public string Name{ get; set; }
 
-        public JsltJson Value { get; set; }
+        public JsltBase Value { get; set; }
 
         public override object Accept(IJsltJsonVisitor visitor)
         {

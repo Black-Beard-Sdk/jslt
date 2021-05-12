@@ -1,6 +1,8 @@
-﻿namespace Bb.Json.Jslt.Parser
+﻿using Antlr4.Runtime;
+
+namespace Bb.Json.Jslt.Parser
 {
-    internal class TokenLocation
+    public class TokenLocation
     {
 
         public TokenLocation(Antlr4.Runtime.IToken token)
@@ -17,6 +19,16 @@
         int StartIndex { get; }
 
         int StopIndex { get; }
+
+    }
+
+    public static class TokenLocationExtension
+    {
+
+        public static TokenLocation ToLocation(this IToken self)
+        {
+            return new TokenLocation(self);
+        }
 
     }
 

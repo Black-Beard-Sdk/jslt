@@ -59,16 +59,16 @@ jsonValue :
    // | jsonValueNumber
    // | jsonValueNull
    | jsonLtOperation
-   | jsonValueCodeString
+   //| jsonValueCodeString
    ;
 
-jsonValueString : STRING;
-jsonValueCodeString : CODE_STRING;
+jsonValueString : STRING jsonType?;
+//jsonValueCodeString : CODE_STRING;
 jsonValueNumber : NUMBER;
 jsonValueInteger : INT;
 jsonValueBoolean : TRUE | FALSE;
 jsonValueNull : NULL;
-jsonType : CURRENT_VALUE (URI | TIME | DATETIME);
+jsonType : CURRENT_VALUE (URI | TIME | DATETIME | STRING_ | GUID);
 
 // ---------------------------- jslt ----------------------------
 

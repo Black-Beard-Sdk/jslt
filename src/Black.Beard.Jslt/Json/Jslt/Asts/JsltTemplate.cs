@@ -19,7 +19,7 @@ namespace Bb.Json.Jslt.Asts
 
         public RuntimeContext LastExecutionContext { get; private set; }
 
-        public JsltJson Template { get; internal set; }
+        public JsltBase Template { get; internal set; }
 
         public TranformJsonAstConfiguration Configuration { get; internal set; }
 

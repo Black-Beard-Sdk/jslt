@@ -1,16 +1,20 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
+using Bb.Json.Jslt.Asts;
+using Bb.Json.Jslt.Builds;
+using Bb.Json.Jslt.Services;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Text;
 
 namespace Bb.Json.Jslt.Parser
 {
+
     public class ScriptVisitor : JsltParserBaseVisitor<object>
     {
 
@@ -18,19 +22,37 @@ namespace Bb.Json.Jslt.Parser
         /// 
         /// </summary>
         /// <param name="culture"></param>
-        public ScriptVisitor(CultureInfo culture = null)
+        public ScriptVisitor(TranformJsonAstConfiguration configuration, string path = null)
         {
-            this._currentCulture = culture ?? CultureInfo.InvariantCulture;
+
+            this._scriptPath = path;
+            this._configuration = configuration;
+            this._currentCulture = _configuration.Culture;
             this._dictionaryPosition = new Dictionary<JToken, Position>();
-            this._definitionFunction = new Dictionary<string, JfunctionDefinition>();
+            this._functions = new List<JsltFunctionCall>();
+            this._foundry = new FunctionFoundry(this._configuration);
         }
 
-        public Dictionary<string, JfunctionDefinition> EmbeddedFunctions { get => this._definitionFunction; }
+        public FunctionFoundry Foundry { get => this._foundry; }
 
         public override object VisitScript([NotNull] JsltParser.ScriptContext context)
         {
+
             this._initialSource = new StringBuilder(context.Start.InputStream.ToString());
             var result = context.json().Accept(this);
+
+            foreach (var item in this._functions)
+            {
+                var types = ResolveArgumentsTypes(item);
+                var service = this._foundry.GetService(item.Name, types);
+                if (service == null)
+                {
+
+                }
+                else
+                    item.ServiceProvider = service;
+            }
+
             return result;
         }
 
@@ -45,7 +67,6 @@ namespace Bb.Json.Jslt.Parser
             return result;
         }
 
-
         /// <summary>
         /// obj : 
         ///       BRACE_LEFT pair(COMMA pair)* BRACE_RIGHT
@@ -58,23 +79,31 @@ namespace Bb.Json.Jslt.Parser
         {
 
 
-            var result = new JObject();
-            AddPosition(result, context.Start, context.Stop);
+            var result = new JsltObject() { Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
 
             var items = context.pair();
 
             foreach (var item in items)
             {
 
-                var prop = (JProperty)item.Accept(this);
+                var prop = (JsltProperty)item.Accept(this);
                 if (prop.Name.StartsWith("$"))
                 {
 
                     if (prop.Name.ToLower() == "$funcs")
                     {
-                        if (prop.Value is JObject f)
-                            foreach (JfunctionDefinition fu in f.Properties())
-                                this._definitionFunction.Add(fu.Name, fu);
+                        var cs = new List<FileInfo>();
+                        var dll = new List<FileInfo>();
+
+                        if (prop.Value is JsltArray ar)
+                            foreach (JsltBase fu in ar.Items)
+                                if (fu is JsltConstant v)
+                                    if (v.Value is Uri u)
+                                        Collect(u, cs, dll);
+
+                        LoadAssemblyFromCs(cs);
+                        LoadAssembly(dll);
+
                     }
 
                     else if (prop.Name.ToLower() == "$source")
@@ -89,7 +118,7 @@ namespace Bb.Json.Jslt.Parser
 
                 }
                 else
-                    result.Add(prop);
+                    result.Append(prop);
 
             }
 
@@ -107,31 +136,30 @@ namespace Bb.Json.Jslt.Parser
         public override object VisitArray([NotNull] JsltParser.ArrayContext context)
         {
 
-            var result = new JArray();
-            AddPosition(result, context.Start, context.Stop);
-
             var items = context.jsonValue();
+            var result = new JsltArray(items.Length) { Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
 
             foreach (var item in items)
             {
                 var itemResult = item.Accept(this);
-                if (itemResult is JToken t)
-                    result.Add(t);
+
+                if (itemResult is JsltBase t)
+                    result.Items.Add(t);
 
                 else if (itemResult is string s)
-                    result.Add((JValue)s);
+                    result.Items.Add(new JsltConstant() { Value = s, Start = item.Start.ToLocation(), Stop = item.Start.ToLocation() });
 
                 else if (itemResult is float f)
-                    result.Add((JValue)f);
+                    result.Items.Add(new JsltConstant() { Value = f, Start = item.Start.ToLocation(), Stop = item.Start.ToLocation() });
 
                 else if (itemResult is double d)
-                    result.Add((JValue)d);
+                    result.Items.Add(new JsltConstant() { Value = d, Start = item.Start.ToLocation(), Stop = item.Start.ToLocation() });
 
                 else if (itemResult is int i)
-                    result.Add((JValue)i);
+                    result.Items.Add(new JsltConstant() { Value = i, Start = item.Start.ToLocation(), Stop = item.Start.ToLocation() });
 
                 else if (itemResult is long l)
-                    result.Add((JValue)l);
+                    result.Items.Add(new JsltConstant() { Value = l, Start = item.Start.ToLocation(), Stop = item.Start.ToLocation() });
 
                 else
                 {
@@ -146,40 +174,24 @@ namespace Bb.Json.Jslt.Parser
         public override object VisitJsonValueInteger([NotNull] JsltParser.JsonValueIntegerContext context)
         {
 
-
             string value = context.GetText();
 
             if (!string.IsNullOrEmpty(value))
             {
                 var o = Int64.Parse(value);
                 if (o <= Int32.MaxValue)
-                    return AddPosition(new JValue((Int32)o), context.Start, context.Stop);
-                return AddPosition(new JValue(o), context.Start, context.Stop);
+                    return new JsltConstant() { Value = (Int32)0, Kind = JsltKind.Integer, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
+
+                return new JsltConstant() { Value = o, Kind = JsltKind.Integer, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
             }
 
-            return AddPosition(new JValue(0), context.Start, context.Stop);
-
-        }
-
-        public override object VisitPair([NotNull] JsltParser.PairContext context)
-        {
-
-            var name = context.STRING().GetText().Trim().Trim('\"');
-
-            var value = context.jsonValue().Accept(this);
-
-            if (value is JfunctionBodyDefinition body)
-                return AddPosition(new JfunctionDefinition(name, body), context.Start, context.Stop);
-
-            return AddPosition(new JProperty(name, value), context.Start, context.Stop);
+            return new JsltConstant() { Value = 0, Kind = JsltKind.Integer, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
 
         }
 
         public override object VisitJsonValueBoolean([NotNull] JsltParser.JsonValueBooleanContext context)
         {
-            var result = new JValue(context.GetText() == "TRUE");
-            AddPosition(result, context.Start, context.Stop);
-            return result;
+            return new JsltConstant() { Value = context.GetText().ToUpper() == "TRUE", Kind = JsltKind.Boolean, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
         }
 
         public override object VisitJsonValueNumber([NotNull] JsltParser.JsonValueNumberContext context)
@@ -193,26 +205,64 @@ namespace Bb.Json.Jslt.Parser
                 if (value.Contains(this._currentCulture.NumberFormat.NumberDecimalSeparator))
                 {
                     var p = double.Parse(value, this._currentCulture);
-                    return AddPosition(new JValue(p), context.Start, context.Stop);
+                    return new JsltConstant() { Value = p, Kind = JsltKind.Float, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
                 }
 
                 var o = Int64.Parse(value);
-                return AddPosition(new JValue(o), context.Start, context.Stop);
+                return new JsltConstant() { Value = o, Kind = JsltKind.Integer, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
 
             }
 
-            return AddPosition(new JValue(0), context.Start, context.Stop);
+            return new JsltConstant() { Value = 0, Kind = JsltKind.Integer, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
 
         }
 
         public override object VisitJsonValueString([NotNull] JsltParser.JsonValueStringContext context)
         {
+
             var txt = context.GetText().Trim().Trim('\"');
 
-            if (txt.StartsWith("$"))
-                return AddPosition(new JPath(txt), context.Start, context.Stop);
+            Type type = typeof(string);
 
-            return AddPosition(new JValue(txt), context.Start, context.Stop);
+            var jsonType = context.jsonType();
+            if (jsonType != null)
+                type = (Type)jsonType.Accept(this);
+
+            if (txt.StartsWith("$"))
+            {
+
+                if (type != typeof(string))
+                {
+                    var args = new List<JsltBase>()
+                    {
+                        new JsltPath() { Value = txt, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() },
+                        new JsltConstant() { Value = type, Kind = JsltKind.Type, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() },
+                    };
+                    return new JsltFunctionCall("convert", args);
+                }
+                return new JsltPath() { Value = txt, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
+
+            }
+
+            else if (txt.StartsWith("\\$"))
+                txt = txt.Substring(2);
+
+            if (type == typeof(string))
+                return new JsltConstant() { Value = txt, Kind = JsltKind.String, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
+
+            else if (type == typeof(Uri))
+                return new JsltConstant() { Value = new Uri(txt), Kind = JsltKind.Uri, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
+
+            else if (type == typeof(TimeSpan))
+                return new JsltConstant() { Value = TimeSpan.Parse(txt, this._currentCulture), Kind = JsltKind.TimeSpan, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
+
+            else if (type == typeof(DateTime))
+                return new JsltConstant() { Value = DateTime.Parse(txt, this._currentCulture), Kind = JsltKind.Date, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
+
+            else if (type == typeof(DateTime))
+                return new JsltConstant() { Value = Guid.Parse(txt), Kind = JsltKind.Guid, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
+
+            return new JsltConstant() { Value = txt, Kind = JsltKind.String, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
 
         }
 
@@ -222,13 +272,19 @@ namespace Bb.Json.Jslt.Parser
             var txt = context.GetText().Substring(1);
 
             if (context.URI() != null)
-                return new JType(txt) { Type = typeof(Uri) };
+                return new JsltConstant() { Value = typeof(Uri), Kind = JsltKind.Type, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
 
             else if (context.TIME() != null)
-                return new JType(txt) { Type = typeof(TimeSpan) };
+                return new JsltConstant() { Value = typeof(TimeSpan), Kind = JsltKind.Type, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
 
             else if (context.DATETIME() != null)
-                return new JType(txt) { Type = typeof(DateTime) };
+                return new JsltConstant() { Value = typeof(DateTime), Kind = JsltKind.Type, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
+
+            else if (context.STRING_() != null)
+                return new JsltConstant() { Value = typeof(string), Kind = JsltKind.Type, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
+
+            else if (context.GUID() != null)
+                return new JsltConstant() { Value = typeof(Guid), Kind = JsltKind.Type, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
 
             throw new NotImplementedException(context.GetText());
 
@@ -236,46 +292,70 @@ namespace Bb.Json.Jslt.Parser
 
         public override object VisitJsonValueNull([NotNull] JsltParser.JsonValueNullContext context)
         {
-            return AddPosition(JValue.CreateNull(), context.Start, context.Stop);
+            return new JsltConstant() { Value = null, Kind = JsltKind.Null, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
         }
 
-        public override object VisitJsonValueCodeString([NotNull] JsltParser.JsonValueCodeStringContext context)
+        public override object VisitPair([NotNull] JsltParser.PairContext context)
         {
 
-            var code = context.CODE_STRING().GetText().Trim('\'');
+            var name = context.STRING().GetText().Trim().Trim('\"');
 
-            List<int> lst = new List<int>()
+            JsltBase value = (JsltBase)context.jsonValue().Accept(this);
+
+            if (name.ToLower() == "$culture" && value is JsltConstant culture)
             {
-                code.IndexOf(' '),
-                code.IndexOf('\t'),
-                code.IndexOf('\r'),
-                code.IndexOf('\n'),
-            };
+                if (culture.Value is string t)
+                    this._currentCulture = CultureInfo.GetCultureInfo(t);
+                else if (culture.Value is int i)
+                    this._currentCulture = CultureInfo.GetCultureInfo(i);
 
-            var index = lst.Where(c => c != -1).Min();
+            }
 
-            var l = code.Substring(0, index);
-            var c = code.Substring(index).Trim();
+            //if (value is JsltFunction JfunctionBodyDefinition body)
+            //    return AddPosition(new JfunctionDefinition(name, body), context.Start, context.Stop);
 
-            return AddPosition(new JfunctionBodyDefinition(l, c), context.Start, context.Stop);
+            return new JsltProperty() { Name = name, Value = value, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
 
         }
+
+        //public override object VisitJsonValueCodeString([NotNull] JsltParser.JsonValueCodeStringContext context)
+        //{
+
+        //    var code = context.CODE_STRING().GetText().Trim('\'');
+
+        //    List<int> lst = new List<int>()
+        //    {
+        //        code.IndexOf(' '),
+        //        code.IndexOf('\t'),
+        //        code.IndexOf('\r'),
+        //        code.IndexOf('\n'),
+        //    };
+
+        //    var index = lst.Where(c => c != -1).Min();
+
+        //    var l = code.Substring(0, index);
+        //    var c = code.Substring(index).Trim();
+
+        //    return AddPosition(new JfunctionBodyDefinition(l, c), context.Start, context.Stop);
+
+        //}
 
         #region Jsonlt
 
         public override object VisitJsonLtOperation([NotNull] JsltParser.JsonLtOperationContext context)
         {
 
-            JToken left = null;
+            JsltBase left = null;
 
             var ltItem = context.jsonLtItem();
             if (ltItem != null)
             {
-                var item = (JToken)ltItem.Accept(this);
+                var item = (JsltBase)ltItem.Accept(this);
                 if (context.NT() == null)
                     left = item;
                 else
-                    left = AddPosition(new JUnaryOperation(context.GetText(), item, OperationEnum.Not), context.Start, context.Stop);
+                    left = new JsltOperator(item, OperationEnum.Not) { Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
+
             }
 
             var right_operation = context.jsonLtOperation();
@@ -283,20 +363,24 @@ namespace Bb.Json.Jslt.Parser
             if (right_operation != null)
             {
 
-                var operationRight = (JToken)right_operation.Accept(this);
+                var operationRight = (JsltBase)right_operation.Accept(this);
 
                 if (context.PAREN_LEFT() == null)
                 {
                     var operation = (OperationEnum)context.operation().Accept(this);
-                    return AddPosition(new JBinaryOperation(context.GetText(), left, operation, operationRight), context.Start, context.Stop);
+                    return new JsltBinaryOperator(left, operation, operationRight) { Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
                 }
 
-                return AddPosition(new JSubExpression(context.GetText(), left), context.Start, context.Stop);
+                //return AddPosition(new JSubExpression(context.GetText(), left), context.Start, context.Stop);
+                //return new JsltConstant() { Value = typeof(string), Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
+
+                return left;
 
             }
 
             return left;
         }
+              
 
         public override object VisitOperation([NotNull] JsltParser.OperationContext context)
         {
@@ -391,61 +475,96 @@ namespace Bb.Json.Jslt.Parser
         public override object VisitJsonWhen([NotNull] JsltParser.JsonWhenContext context)
         {
 
-            var expression = (JToken)context.jsonWhenExpression().Accept(this);
+            var expression = (JsltBase)context.jsonWhenExpression().Accept(this);
+
+            JsltBase d = null;
+            var defaultCase = context.jsonDefaultCase();
+            if (defaultCase != null)
+                d = (JsltBase)defaultCase.Accept(this);
+
+            var result = new JsltSwitch() { Expression = expression, Default = d, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
 
             var cases = context.jsonCase();
 
-            List<JCaseExpression> _caseList = new List<JCaseExpression>(cases.Length);
             foreach (var @case in cases)
-                _caseList.Add((JCaseExpression)@case.Accept(this));
+                result.Cases.Add((JsltCase)@case.Accept(this));
 
-            JDefaultCaseExpression d = null;
-            var defaultCase = context.jsonDefaultCase();
-            if (defaultCase != null)
-                d = (JDefaultCaseExpression)defaultCase.Accept(this);
-
-            return AddPosition(new JWhenExpression(context.GetText(), expression, _caseList, d), context.Start, context.Stop);
+            return result;
 
         }
 
         public override object VisitJsonCase([NotNull] JsltParser.JsonCaseContext context)
         {
-            var expression = (JToken)context.jsonWhenExpression().Accept(this);
-            var content = (JToken)context.jsonValue().Accept(this);
-            return AddPosition(new JCaseExpression(context.GetText(), expression, content), context.Start, context.Stop);
+            var expression = (JsltBase)context.jsonWhenExpression().Accept(this);
+            var content = (JsltBase)context.jsonValue().Accept(this);
+            return new JsltCase() { RightExpression = expression, Block = content, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
         }
 
         public override object VisitJsonDefaultCase([NotNull] JsltParser.JsonDefaultCaseContext context)
         {
-            var content = (JToken)context.jsonValue().Accept(this);
-            return AddPosition(new JDefaultCaseExpression(context.GetText(), content), context.Start, context.Stop);
+            var content = (JsltBase)context.jsonValue().Accept(this);
+            return content;
         }
 
         public override object VisitJsonfunctionCall([NotNull] JsltParser.JsonfunctionCallContext context)
         {
 
             var name = context.ID().ToString();
-            List<object> argumentsJson = new List<object>();
+            List<JsltBase> argumentsJson = new List<JsltBase>();
             var arguments = context.jsonValueList();
             if (arguments != null)
+                argumentsJson.AddRange((List<JsltBase>)arguments.Accept(this));
+
+            var result = new JsltFunctionCall(name, argumentsJson) { Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
+
+            this._functions.Add(result);
+
+            return result;
+
+        }
+
+        private Type[] ResolveArgumentsTypes(JsltFunctionCall n)
+        {
+
+            var c = n.Arguments;
+            List<Type> _types = new List<Type>(10);
+            foreach (var item in c)
             {
-                var o = (List<object>)arguments.Accept(this);
-                argumentsJson.AddRange(o);
+                if (item.Value is JsltFunctionCall ctor)
+                {
+                    Stop();
+                    var types = ResolveArgumentsTypes(ctor);
+                    var service = this._foundry.GetService(ctor.Name, types);
+
+
+                }
+                else if (item.Value is JsltConstant v)
+                    _types.Add(v.Type);
+
+                else if (item.Value is JsltPath p)
+                {
+                    Stop();
+                    _types.Add(typeof(JToken));
+                }
+                else
+                {
+                    Stop();
+
+                }
             }
 
-            return AddPosition(new JFunctionCall(context.GetText(), name, argumentsJson.ToArray()), context.Start, context.Stop);
-
+            return _types.ToArray();
 
         }
 
         public override object VisitJsonValueList([NotNull] JsltParser.JsonValueListContext context)
         {
 
-            List<object> result = new List<object>();
+            List<JsltBase> result = new List<JsltBase>();
             var items = context.jsonValue();
 
             foreach (var item in items)
-                result.Add(item.Accept(this));
+                result.Add((JsltBase)item.Accept(this));
 
             return result;
 
@@ -520,39 +639,12 @@ namespace Bb.Json.Jslt.Parser
 
         }
 
-        ///// <summary>
-        ///// script_fragment | script_full
-        ///// </summary>
-        ///// <param name="context"></param>
-        ///// <returns></returns>
-        //public override object VisitScript([NotNull] WorkflowParser.ScriptContext context)
-        //{
-
-        //    this._initialSource = new StringBuilder(context.Start.InputStream.ToString());
-
-        //    if (this._workflow == null)
-        //        this._workflow = new WorkflowConfig()
-        //        {
-        //            Crc = this.Crc,
-        //        };
-        //    else
-        //        this._workflow.Crc ^= this._workflow.Crc;
-
-        //    base.VisitScript(context);
-
-        //    this._workflow.BuildWorkflow();
-
-        //    return this._workflow;
-
-        //}
-
-
-
         public IEnumerable<ErrorModel> Errors { get => this._errors; }
 
         public string Filename { get; set; }
 
         public uint Crc { get; set; }
+        public CultureInfo Culture { get => _currentCulture; }
 
         [System.Diagnostics.DebuggerStepThrough]
         [System.Diagnostics.DebuggerNonUserCode]
@@ -562,129 +654,58 @@ namespace Bb.Json.Jslt.Parser
                 System.Diagnostics.Debugger.Break();
         }
 
-        //private StringBuilder GetText(RuleContext context)
-        //{
+        #region load files
 
-        //    if (context is ParserRuleContext s)
-        //        return GetText(s.Start.StartIndex, s.Stop.StopIndex + 1);
-        //    return new StringBuilder();
-        //}
+        private void LoadAssemblyFromCs(List<FileInfo> sources)
+        {
+            Stop();
+            var assembly = CSharp.GetAssembly(sources.Select(c => c.FullName).ToArray());
+            this._foundry.AddAssembly(assembly.AssemblyFile);
+        }
 
-        //private StringBuilder GetText(int startIndex, int stopIndex)
-        //{
+        private void LoadAssembly(List<FileInfo> sources)
+        {
+            Stop();
+            foreach (var file in sources)
+                this._foundry.AddAssembly(file.FullName);
 
-        //    int length = stopIndex - startIndex;
+        }
 
-        //    length++;
+        private void Collect(Uri u, List<FileInfo> cs, List<FileInfo> dll)
+        {
+            var file = ResolveFile(u);
+            if (file.Exists)
+            {
+                if (file.Extension == ".dll")
+                    dll.Add(file);
+                else if (file.Extension == ".cs")
+                    cs.Add(file);
+            }
+        }
 
-        //    StringBuilder sb2 = new StringBuilder(length);
-        //    char[] ar = new char[length];
-        //    _initialSource.CopyTo(startIndex, ar, 0, length);
-        //    sb2.Append(ar);
+        private FileInfo ResolveFile(Uri u)
+        {
+            var file = new FileInfo(u.AbsoluteUri);
 
-        //    return sb2;
+            if (!file.Exists)
+            {
+                if (!string.IsNullOrEmpty(this._scriptPath))
+                    file = new FileInfo(Path.Combine(this._configuration.Path, this._scriptPath));
 
-        //}
+                if (!file.Exists)
+                {
+                    if (!string.IsNullOrEmpty(this._configuration.Path))
+                        file = new FileInfo(Path.Combine(this._configuration.Path, u.AbsoluteUri));
+                }
+            }
 
-        //public WorkflowConfigVisitor AddRule(string name, Func<RunContext, bool> function)
-        //{
-        //    AddRule(name, function.Method);
-        //    return this;
-        //}
+            return file;
 
-        //public WorkflowConfigVisitor AddRule(string name, MethodInfo method)
-        //{
-        //    var r = new RuleDefinitionModel()
-        //    {
-        //        Key = name,
-        //        Comment = string.Empty,
-        //        Method = method,
-        //    };
-        //    _rules.Add(r.Key, r);
-        //    return this;
-        //}
+        }
 
-        //private Type ResolveTypeOfArgument(string key, MethodReference method)
-        //{
-
-        //    if (!method.Arguments.TryGetValue(key, out Type type))
-        //        throw new InvalidArgumentNameMethodReferenceException(key);
-
-        //    return type;
-
-        //}
-
-        //private Func<RunContext, object> GetLambda(string key, string value, Type type)
-        //{
-
-        //    Func<RunContext, object> func = null;
-
-        //    if (value.StartsWith("'") && value.EndsWith("'"))
-        //    {
-        //        value = value.Trim('\'');
-        //        var v = Convert.ChangeType(value, type);
-        //        func = GetConstant<object>(v);
-        //    }
-        //    else if (value.StartsWith("'@"))
-        //        func = ExpressionDynobjectExtension.GetAccessors<RunContext>(value.Substring(1));
-
-        //    else
-        //    {
-
-        //        if (this._constants.TryGetValue(value, out ConstantExpressionModel m))
-        //        {
-        //            var v = Convert.ChangeType(m.Value, type);
-        //            func = GetConstant<object>(v);
-        //        }
-        //        else
-        //        {
-        //            var v = Convert.ChangeType(value, type);
-        //            func = GetConstant<object>(v);
-        //        }
-        //    }
-
-        //    return func;
-
-        //}
-
-        //public static Func<object, T> GetConstant<T>(object value)
-        //{
-        //    Expression cc = Expression.Constant(value);
-        //    if (cc.Type != typeof(T))
-        //        cc = Expression.Convert(cc, typeof(T));
-        //    ParameterExpression arg0 = Expression.Parameter(typeof(object), "arg0");
-        //    var lbd = Expression.Lambda<Func<object, T>>(cc, arg0);
-        //    return lbd.Compile();
-        //}
-
-        //private RuleDefinitionModel ResolveRule(string key)
-        //{
-
-        //    RuleDefinitionModel rule = ResolveRule_impl(key);
-        //    if (rule == null)
-        //        throw new Exceptions.InvalidMethodReferenceException(key);
-
-        //    return rule;
-
-        //}
-
-        //protected virtual RuleDefinitionModel ResolveRule_impl(string key)
-        //{
-        //    this._rules.TryGetValue(key, out RuleDefinitionModel rule);
-        //    return rule;
-        //}
-
-        //private (Func<RunContext, bool>, string) Compile(ExpressionModel expressionModel)
-        //{
-        //    StateConverterVisitor<RunContext> visitor = new StateConverterVisitor<RunContext>(_constants);
-        //    (Func<RunContext, bool>, string) result = visitor.Visit(expressionModel);
-        //    return result;
-        //}
+        #endregion load files
 
 
-        //private readonly Dictionary<string, ConstantExpressionModel> _constants = new Dictionary<string, ConstantExpressionModel>();
-        //private readonly Dictionary<string, RuleDefinitionModel> _rules = new Dictionary<string, RuleDefinitionModel>();
-        //private readonly Dictionary<string, MethodReference> _actions = new Dictionary<string, MethodReference>();
 
 
         private T AddPosition<T>(T result, IToken start, IToken stop, JValue comment = null)
@@ -702,32 +723,11 @@ namespace Bb.Json.Jslt.Parser
         private StringBuilder _initialSource;
         private List<ErrorModel> _errors;
         private Dictionary<JToken, Position> _dictionaryPosition;
-        private Dictionary<string, JfunctionDefinition> _definitionFunction;
-        private readonly CultureInfo _currentCulture;
-
-    }
-
-
-    public enum OperationEnum
-    {
-        Equal,
-        GreaterThanOrEqual,
-        GreaterThan,
-        LessThanOrEqual,
-        LessThan,
-        NotEqual,
-        Add,
-        Subtract,
-        Divide,
-        Modulo,
-        Multiply,
-        Power,
-        Not,
-        Chain,
-        And,
-        AndExclusive,
-        Or,
-        OrExclusive,
+        private readonly FunctionFoundry _foundry;
+        private readonly string _scriptPath;
+        private TranformJsonAstConfiguration _configuration;
+        private CultureInfo _currentCulture;
+        private List<JsltFunctionCall> _functions;
     }
 
 }

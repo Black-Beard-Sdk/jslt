@@ -6,7 +6,7 @@ namespace Bb.Json.Jslt.Asts
     {
 
 
-        public JsltBinaryOperator(JsltJson left, OperationEnum @operator, JsltJson right)
+        public JsltBinaryOperator(JsltBase left, OperationEnum @operator, JsltBase right)
             : base (left, @operator)
         {
 
@@ -14,7 +14,7 @@ namespace Bb.Json.Jslt.Asts
         }
 
 
-        public JsltJson Right { get; }
+        public JsltBase Right { get; }
 
         public override object Accept(IJsltJsonVisitor visitor)
         {

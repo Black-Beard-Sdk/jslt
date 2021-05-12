@@ -1,5 +1,7 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Bb.Json.Jslt.Asts;
+using Newtonsoft.Json.Linq;
 using System;
+using System.Globalization;
 using System.Text;
 
 namespace Bb.Json.Jslt.Services
@@ -18,7 +20,9 @@ namespace Bb.Json.Jslt.Services
         public RuntimeContext LastExecutionContext { get; private set; }
 
         public TranformJsonAstConfiguration Configuration { get; internal set; }
-
+        public CultureInfo Culture { get; internal set; }
+        public string Filename { get; internal set; }
+        public JsltBase Tree { get; internal set; }
         internal StringBuilder Rule { get; set; }
 
         public RuntimeContext Transform(Sources sources)

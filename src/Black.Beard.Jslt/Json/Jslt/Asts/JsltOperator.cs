@@ -2,11 +2,11 @@
 
 namespace Bb.Json.Jslt.Asts
 {
-    public class JsltOperator : JsltJson
+    public class JsltOperator : JsltBase
     {
 
 
-        public JsltOperator(JsltJson left, OperationEnum @operator)
+        public JsltOperator(JsltBase left, OperationEnum @operator)
         {
             this.Left = left;
             this.Kind = JsltKind.Operator;
@@ -15,7 +15,7 @@ namespace Bb.Json.Jslt.Asts
 
         public OperationEnum Operator { get; }
 
-        public JsltJson Left { get; }
+        public JsltBase Left { get; }
 
         public override object Accept(IJsltJsonVisitor visitor)
         {

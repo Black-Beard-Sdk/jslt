@@ -143,7 +143,7 @@ namespace Bb.Json.Jslt.Services
 
         }
 
-        internal Func<RuntimeContext, JToken, JToken> GenerateLambda(JsltJson tree)
+        internal Func<RuntimeContext, JToken, JToken> GenerateLambda(JsltBase tree)
         {
             Expression e;
 
@@ -239,7 +239,6 @@ namespace Bb.Json.Jslt.Services
         public object VisitObject(JsltObject node)
         {
 
-
             using (CurrentContext ctx = this.NewContext())
             {
 
@@ -269,6 +268,7 @@ namespace Bb.Json.Jslt.Services
                         var prop = (Expression)item.Accept(this);
                         ctx.Current.Source.Add(RuntimeContext._addProperty.Call(v1, prop));
                     }
+
                 }
 
                 return v1;
@@ -284,7 +284,7 @@ namespace Bb.Json.Jslt.Services
             return this._ctorJProperty.CreateObject(name, getValue);
         }
 
-        public object VisitFunction(JsltFunction node)
+        public object VisitFunction(JsltFunctionCall node)
         {
 
             using (CurrentContext ctx = NewContext())
@@ -293,7 +293,7 @@ namespace Bb.Json.Jslt.Services
                 ctx.Current.IsCtor = true;
 
                 List<Expression> args = new List<Expression>();
-                foreach (var property in node.Properties)
+                foreach (var property in node.Arguments)
                     args.Add((Expression)property.Value.Accept(this));
 
                 var arguments = typeof(object).NewArray(args.ToArray());
@@ -329,7 +329,7 @@ namespace Bb.Json.Jslt.Services
             }
         }
 
-        public object VisitMapProperty(JsltMapProperty node)
+        public object VisitArgument(JsltArgument node)
         {
             var ctx = BuildCtx;
             var value = (Expression)node.Value.Accept(this);
@@ -369,7 +369,7 @@ namespace Bb.Json.Jslt.Services
 
         }
 
-        public object VisitSwitch(JslSwitch node)
+        public object VisitSwitch(JsltSwitch node)
         {
 
             SourceCode nextBlock;
@@ -378,7 +378,7 @@ namespace Bb.Json.Jslt.Services
             {
 
                 nextBlock = ctx.Current.Source;
-
+                ConditionalStatement condition = null;
                 var resultVar = nextBlock.AddVar(typeof(object), null, Expression.Constant(null));
                 var left = (Expression)node.Expression.Accept(this);
 
@@ -388,10 +388,16 @@ namespace Bb.Json.Jslt.Services
 
                     var evaluation = Expression.Call(RuntimeContext._evaluateBinaryOperator.Method, ctx.Current.Context, left, Expression.Constant(OperationEnum.Equal), right);
 
-                    ConditionalStatement condition = nextBlock.If(Expression.MakeBinary(ExpressionType.Equal, evaluation.ConvertIfDifferent(typeof(JValue)).Property("Value").ConvertIfDifferent(typeof(bool)), Expression.Constant(true)));
+                    condition = nextBlock.If(Expression.MakeBinary(ExpressionType.Equal, evaluation.ConvertIfDifferent(typeof(JValue)).Property("Value").ConvertIfDifferent(typeof(bool)), Expression.Constant(true)));
                     ctx.Current.Source = condition.Then;
                     condition.Then.Assign(resultVar, (Expression)_case.Accept(this));
                     nextBlock = condition.Else;
+                }
+
+                if (node.Default != null)
+                {
+                    ctx.Current.Source = nextBlock;
+                    var o = (Expression)node.Default.Accept(this);
                 }
 
                 return resultVar;

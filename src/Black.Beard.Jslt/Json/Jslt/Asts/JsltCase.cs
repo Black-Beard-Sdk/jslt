@@ -1,6 +1,6 @@
 ﻿namespace Bb.Json.Jslt.Asts
 {
-    public class JsltCase : JsltJson
+    public class JsltCase : JsltBase
     {
 
         public JsltCase()
@@ -9,9 +9,9 @@
         }
 
 
-        public JsltJson RightExpression { get; set; }
+        public JsltBase RightExpression { get; set; }
 
-        public JsltJson Block { get; set; }
+        public JsltBase Block { get; set; }
 
         public override object Accept(IJsltJsonVisitor visitor)
         {

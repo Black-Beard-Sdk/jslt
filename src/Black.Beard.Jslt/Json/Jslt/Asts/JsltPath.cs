@@ -6,7 +6,7 @@ using System.Xml;
 namespace Bb.Json.Jslt.Asts
 {
 
-    public class JsltPath : JsltJson
+    public class JsltPath : JsltBase
     {
 
         public JsltPath()
@@ -18,7 +18,7 @@ namespace Bb.Json.Jslt.Asts
 
         public string Value { get; internal set; }
 
-        public JsltJson Child { get; internal set; }
+        public JsltBase Child { get; internal set; }
 
         public string Type { get; internal set; }
 

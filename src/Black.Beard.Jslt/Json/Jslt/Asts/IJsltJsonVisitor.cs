@@ -17,11 +17,11 @@ namespace Bb.Json.Jslt.Asts
 
         object VisitProperty(JsltProperty node);
 
-        object VisitFunction(JsltFunction node);
+        object VisitFunction(JsltFunctionCall node);
 
         object VisitJPath(JsltPath node);
 
-        object VisitMapProperty(JsltMapProperty node);
+        object VisitArgument(JsltArgument node);
 
         object VisitLinkedCode(JsltLinkedCode node);
 
@@ -31,7 +31,7 @@ namespace Bb.Json.Jslt.Asts
         
         object VisitCase(JsltCase node);
 
-        object VisitSwitch(JslSwitch node);
+        object VisitSwitch(JsltSwitch node);
 
     }
 

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace Bb.Json.Jslt.Asts
 {
 
-    public class JsltObject : JsltJson
+    public class JsltObject : JsltBase
     {
 
 

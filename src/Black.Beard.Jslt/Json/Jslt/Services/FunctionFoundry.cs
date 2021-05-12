@@ -1,56 +1,76 @@
-﻿using Bb.Json.Jslt.Parser;
+﻿using Bb.ComponentModel;
+using Bb.Json.Jslt.Parser;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Reflection;
 
 namespace Bb.Json.Jslt.Services
 {
-    internal class FunctionFoundry
+
+    public class FunctionFoundry
     {
 
-
-        public FunctionFoundry(TranformJsonAstConfiguration configuration, Dictionary<string, JfunctionDefinition> functions)
+        public FunctionFoundry(TranformJsonAstConfiguration configuration)
         {
             this.configuration = configuration;
-            this.functions = functions;
             this.Services = new ServiceContainer();
         }
 
         internal Factory<ITransformJsonService> GetService(string name, Type[] types)
         {
 
-            //TransformJsonServiceProvider result = GetServiceImpl(name);
-            //if (result != null)
-            //    return result;
+            var result = this.Services.GetService(name, types);
+            if (result != null)
+                return result;
 
-            var result = this.configuration.Services.GetService(name, types);
+            result = this.configuration.Services.GetService(name, types);
             if (result != null)
                 return result;
 
             throw new MissingMethodException(name);
-        }
 
-        //private ObjectActivator<ITransformJsonService> GetServiceImpl(string name)
-        //{
-        //    ObjectActivator<ITransformJsonService> srv = Services.GetService(name);
-        //    if (srv == null)
-        //        if (this.functions.TryGetValue(name, out JfunctionDefinition function))
-        //        {
-        //            var f = Compile(function);
-        //            this.Services.AddService(name, f);
-        //            srv = Services.GetService(name);
-        //        }
-
-        //    return srv;
-
-        //}
-
-        private Factory<ITransformJsonService> Compile(JfunctionDefinition function)
-        {
-            throw new NotImplementedException();
         }
 
         private TranformJsonAstConfiguration configuration;
-        private Dictionary<string, JfunctionDefinition> functions;
         private ServiceContainer Services;
+
+        internal void AddAssembly(string assemblyFilename)
+        {
+            Assembly assembly = TypeDiscovery.Instance.AddAssemblyFile(assemblyFilename, System.Diagnostics.Debugger.IsAttached);
+            AddAssembly(assembly);
+        }
+
+        internal void AddAssembly(Assembly assembly)
+        {
+            var types = TypeDiscovery.Instance.GetTypesWithAttributes<DisplayNameAttribute>(typeof(ITransformJsonService), c => true);
+            foreach (var item in types)
+                AddService(item, null);
+        }
+
+        public FunctionFoundry AddService(Type service, string name = null)
+        {
+
+            if (string.IsNullOrEmpty(name))
+            {
+                var n = service.GetCustomAttributes(typeof(DisplayNameAttribute), true).OfType<DisplayNameAttribute>().FirstOrDefault();
+                if (n == null)
+                    throw new ArgumentNullException($"service {service}, can't be added by type. missing {typeof(DisplayNameAttribute)} ");
+
+                name = n.DisplayName;
+
+            }
+
+            var ctors = service.GetConstructors();
+            foreach (var ctor in ctors)
+            {
+                Factory<ITransformJsonService> factory = ObjectCreator.GetActivator<ITransformJsonService>(ctor);
+                Services.AddService(name, factory);
+            }
+
+            return this;
+        }
+
     }
 }

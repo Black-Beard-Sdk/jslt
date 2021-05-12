@@ -1,28 +1,18 @@
 {
 
-    "$funcs" : {
+    "$culture" : "fr-fr",
 
-        "nameFunction1": '''.js
-    (arg1) => 
-    {
-        return null;  
-    }       
-''',
-        "nameFunction2": new cast("", @type, null)
-        /*
-            @type
-            date:{}
-        
-        */
+    "$funcs" : {
+        "nameFunction1": "" @uri
     }
 
-    "v1" : $..toto | .method1($.key1),
+    "v1" : "$..toto" | .method1($.key1),
 
-    "v2" : new unique($..toto),
+    "v2" : new unique("$..toto"),
 
-    "v3" : .get($.id, "sourceName", $..toto),
+    "v3" : .get("$.id", "sourceName", "$..toto"),
 
-    "v4" : .mymethod($.id, "sourceName", $..toto),
+    "v4" : .mymethod($.id, "sourceName", "$..toto"),
 
 
 

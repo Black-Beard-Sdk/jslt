@@ -26,6 +26,8 @@ COLON : ':';
 URI : 'uri';
 TIME : 'time';
 DATETIME : 'datetime';
+STRING_ : 'string';
+GUID : 'uuid';
 WHEN : 'when';
 CASE : 'case';
 DEFAULT : 'default';
@@ -63,17 +65,14 @@ BRACKET_RIGHT : ']' ;
 COMMA : ',' ;
 PAREN_LEFT : '(' ;
 PAREN_RIGHT : ')' ;
-//QUESTION : '?' ;
-
 
 STRING
    : '"' (ESC | SAFECODEPOINT)* '"'
    ;
 
 MULTI_LINE_COMMENT : '/*' .*? '*/' ;
-CODE_STRING :        QUOTE_CODE_STRING .*? QUOTE_CODE_STRING;
-QUOTE_CODE_STRING :  '\'\'\'';
-
+//CODE_STRING :        QUOTE_CODE_STRING .*? QUOTE_CODE_STRING;
+//QUOTE_CODE_STRING :  '\'\'\'';
 
 fragment ESC
    : '\\' (["\\/bfnrt] | UNICODE)

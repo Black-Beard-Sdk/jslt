@@ -23,9 +23,10 @@ namespace Bb.Json.Jslt.Services
 
         }
 
-        public JsltTemplate GetTemplate(StringBuilder sb)
+        public JsltTemplate GetTemplate(StringBuilder sb, string filename)
         {
 
+            CultureInfo culture = this._configuration.Culture;
             JToken obj = null;
 
             for (int i = 0; i < sb.Length; i++)
@@ -38,15 +39,19 @@ namespace Bb.Json.Jslt.Services
                 }
             }
 
-            Dictionary<string, JfunctionDefinition> functions = null;
+            FunctionFoundry _foundry = null;
+            JsltBase tree = null;
+
             try
             {
                 if (sb.Length > 0)
                 {
                     var parser = ScriptParser.ParseString(sb);
-                    var visitor = new ScriptVisitor(CultureInfo.InvariantCulture);
-                    obj = (JObject)parser.Visit(visitor);
-                    functions = visitor.EmbeddedFunctions;
+                    var visitor = new ScriptVisitor(this._configuration, filename);
+                    tree = (JsltBase)parser.Visit(visitor);
+                    _foundry = visitor.Foundry;
+                    culture = visitor.Culture;
+
                 }
             }
             catch (Exception e)
@@ -54,23 +59,24 @@ namespace Bb.Json.Jslt.Services
                 throw new ParsingJsonException("Failed to parse Json. " + e.Message, e);
             }
 
-            var foundry = new FunctionFoundry(this._configuration, functions);
-
-            TranformJsonTemplateReader reader = new TranformJsonTemplateReader(obj, this._configuration, foundry);
-            var tree = reader.Tree();
+            //TranformJsonTemplateReader reader = new TranformJsonTemplateReader(obj, this._configuration, foundry);
+            //var tree = reader.Tree();
 
             JsltTemplate result = new JsltTemplate()
             {
                 Rule = sb,
                 Configuration = this._configuration,
-                Rules = Get(tree, foundry)
+                Rules = Get(tree, _foundry),
+                Tree = tree,
+                Culture = culture,
+                Filename = filename,
             };
 
             return result;
 
         }
 
-        private Func<RuntimeContext, JToken, JToken> Get(JsltJson tree, FunctionFoundry foundry)
+        private Func<RuntimeContext, JToken, JToken> Get(JsltBase tree, FunctionFoundry foundry)
         {
 
             Func<RuntimeContext, JToken, JToken> fnc;
