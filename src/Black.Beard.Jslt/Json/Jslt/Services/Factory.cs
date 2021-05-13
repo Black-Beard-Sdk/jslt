@@ -1,4 +1,7 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace Bb.Json.Jslt.Services
 {
@@ -28,6 +31,9 @@ namespace Bb.Json.Jslt.Services
         {
             this._creator = objectActivator;
             base.Method = typeof(Factory<T>).GetMethod(nameof(Get));
+            this.ctor = ctor;
+            this.MethodParameters = ctor.GetParameters();
+            Types = this.MethodParameters.Select(c => c.ParameterType).ToArray();
         }
 
 
@@ -37,7 +43,10 @@ namespace Bb.Json.Jslt.Services
         }
 
         private ObjectActivator<T> _creator { get; }
+        private readonly ConstructorInfo ctor;
 
+        public ParameterInfo[] MethodParameters { get; }
+        public Type[] Types { get; }
     }
 
 

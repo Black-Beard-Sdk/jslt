@@ -1,6 +1,7 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
+using Bb.Compilers;
 using Bb.Json.Jslt.Asts;
 using Bb.Json.Jslt.Builds;
 using Bb.Json.Jslt.Services;
@@ -28,7 +29,6 @@ namespace Bb.Json.Jslt.Parser
             this._scriptPath = path;
             this._configuration = configuration;
             this._currentCulture = _configuration.Culture;
-            this._dictionaryPosition = new Dictionary<JToken, Position>();
             this._functions = new List<JsltFunctionCall>();
             this._foundry = new FunctionFoundry(this._configuration);
         }
@@ -44,13 +44,16 @@ namespace Bb.Json.Jslt.Parser
             foreach (var item in this._functions)
             {
                 var types = ResolveArgumentsTypes(item);
-                var service = this._foundry.GetService(item.Name, types);
+                Factory<ITransformJsonService> service = this._foundry.GetService(item.Name, types);
                 if (service == null)
                 {
 
                 }
                 else
+                {
                     item.ServiceProvider = service;
+                    item.ParameterTypes = service.Types;
+                }
             }
 
             return result;
@@ -99,7 +102,9 @@ namespace Bb.Json.Jslt.Parser
                             foreach (JsltBase fu in ar.Items)
                                 if (fu is JsltConstant v)
                                     if (v.Value is Uri u)
-                                        Collect(u, cs, dll);
+                                        Collect(u.AbsoluteUri, cs, dll, fu);
+                                    else if (v.Value is string str)
+                                        Collect(str, cs, dll, fu);
 
                         LoadAssemblyFromCs(cs);
                         LoadAssembly(dll);
@@ -380,7 +385,7 @@ namespace Bb.Json.Jslt.Parser
 
             return left;
         }
-              
+
 
         public override object VisitOperation([NotNull] JsltParser.OperationContext context)
         {
@@ -542,10 +547,8 @@ namespace Bb.Json.Jslt.Parser
                     _types.Add(v.Type);
 
                 else if (item.Value is JsltPath p)
-                {
-                    Stop();
                     _types.Add(typeof(JToken));
-                }
+                
                 else
                 {
                     Stop();
@@ -606,15 +609,7 @@ namespace Bb.Json.Jslt.Parser
             {
 
                 if (item is ErrorNodeImpl e)
-                    this._errors.Add(new ErrorModel()
-                    {
-                        Filename = Filename,
-                        Line = e.Symbol.Line,
-                        StartIndex = e.Symbol.StartIndex,
-                        Column = e.Symbol.Column,
-                        Text = e.Symbol.Text,
-                        Message = $"Failed to parse script at position {e.Symbol.StartIndex}, line {e.Symbol.Line}, col {e.Symbol.Column} ' {e.Symbol.Text}'"
-                    });
+                    AddError(e);
 
                 int c = item.ChildCount;
                 for (int i = 0; i < c; i++)
@@ -658,20 +653,33 @@ namespace Bb.Json.Jslt.Parser
 
         private void LoadAssemblyFromCs(List<FileInfo> sources)
         {
-            Stop();
+
             var assembly = CSharp.GetAssembly(sources.Select(c => c.FullName).ToArray());
+
+            if (!assembly.Success)
+            {
+
+                foreach (DiagnosticResult diagnostic in assembly.Disgnostics)
+                {
+                    var location = new TokenLocation(diagnostic.Locations.FirstOrDefault()) { };
+                    AddError(location, diagnostic.Message, diagnostic.Message);
+                }
+
+                Stop();
+
+            }
+
             this._foundry.AddAssembly(assembly.AssemblyFile);
+
         }
 
         private void LoadAssembly(List<FileInfo> sources)
         {
-            Stop();
             foreach (var file in sources)
                 this._foundry.AddAssembly(file.FullName);
-
         }
 
-        private void Collect(Uri u, List<FileInfo> cs, List<FileInfo> dll)
+        private void Collect(string u, List<FileInfo> cs, List<FileInfo> dll, JsltBase item)
         {
             var file = ResolveFile(u);
             if (file.Exists)
@@ -681,11 +689,18 @@ namespace Bb.Json.Jslt.Parser
                 else if (file.Extension == ".cs")
                     cs.Add(file);
             }
+            else
+                AddError(item.Start, u, $"Failed to local file at position {item.Start.StartIndex}, line {item.Start.Line}, col {item.Start.Column} '{u}'");
+        
         }
 
-        private FileInfo ResolveFile(Uri u)
+
+
+
+     
+        private FileInfo ResolveFile(string u)
         {
-            var file = new FileInfo(u.AbsoluteUri);
+            var file = new FileInfo(u);
 
             if (!file.Exists)
             {
@@ -695,7 +710,7 @@ namespace Bb.Json.Jslt.Parser
                 if (!file.Exists)
                 {
                     if (!string.IsNullOrEmpty(this._configuration.Path))
-                        file = new FileInfo(Path.Combine(this._configuration.Path, u.AbsoluteUri));
+                        file = new FileInfo(Path.Combine(this._configuration.Path, u));
                 }
             }
 
@@ -706,28 +721,40 @@ namespace Bb.Json.Jslt.Parser
         #endregion load files
 
 
-
-
-        private T AddPosition<T>(T result, IToken start, IToken stop, JValue comment = null)
-            where T : JToken
+        void AddError(TokenLocation start, string txt, string message, string path = null)
         {
-            this._dictionaryPosition.Add(result, new Position(new TokenLocation(start), new TokenLocation(stop), comment));
-            return result;
+            this._errors.Add(new ErrorModel()
+            {
+                Filename = path ?? Filename,
+                Line = start.Line,
+                StartIndex = start.StartIndex,
+                Column = start.Column,
+                Text = txt,
+                Message = message,
+            });
         }
 
-        private Position Get(JToken token)
+        void AddError(ErrorNodeImpl e)
         {
-            return this._dictionaryPosition[token];
+            this._errors.Add(new ErrorModel()
+            {
+                Filename = Filename,
+                Line = e.Symbol.Line,
+                StartIndex = e.Symbol.StartIndex,
+                Column = e.Symbol.Column,
+                Text = e.Symbol.Text,
+                Message = $"Failed to parse script at position {e.Symbol.StartIndex}, line {e.Symbol.Line}, col {e.Symbol.Column} '{e.Symbol.Text}'"
+            });
         }
 
         private StringBuilder _initialSource;
         private List<ErrorModel> _errors;
-        private Dictionary<JToken, Position> _dictionaryPosition;
         private readonly FunctionFoundry _foundry;
         private readonly string _scriptPath;
         private TranformJsonAstConfiguration _configuration;
         private CultureInfo _currentCulture;
         private List<JsltFunctionCall> _functions;
+
     }
 
 }

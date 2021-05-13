@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -24,6 +25,8 @@ namespace Bb.Json.Jslt.Services
             _addProperty = typeof(RuntimeContext).GetMethod("AddProperty", new Type[] { typeof(JObject), typeof(JProperty) });
             _convertToBool = typeof(RuntimeContext).GetMethod("ConvertToBool", new Type[] { typeof(JToken) });
             _properties = new Dictionary<Type, Dictionary<string, (PropertyInfo, Action<object, object>)>>();
+            _convertToken = RuntimeContext.ConvertTo;
+
         }
 
         internal RuntimeContext(Sources sources)
@@ -735,9 +738,8 @@ namespace Bb.Json.Jslt.Services
             JToken result = null;
 
             if (token == null)
-            {
-                //Trace.WriteLine($"the token is null. the filter '{path}' can't be apply");
-            }
+                Trace.WriteLine($"the token is null. the filter '{path}' can't be apply");
+            
             else
             {
 
@@ -794,9 +796,26 @@ namespace Bb.Json.Jslt.Services
             return false;
 
         }
+        public static object ConvertTo(JToken token, Type targetType)
+        {
+            object result = token;
+
+            if (token is JValue v)
+                result = Convert.ChangeType(v.Value, targetType);
+
+            else
+            {
+                Stop();
+            }
+
+            return result;
+
+        }
+
 
         #endregion methods called in the expressions
 
+        public static readonly Func<JToken, Type, object> _convertToken;
         public static readonly Func<RuntimeContext, JToken, Func<RuntimeContext, JToken, JToken>, JToken> _getProjectionFromSource;
         public static readonly Func<RuntimeContext, JToken, string, JToken> _getContentByJPath;
         public static readonly Func<RuntimeContext, JToken, ITransformJsonService, JToken> _getContentFromService;

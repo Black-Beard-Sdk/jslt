@@ -103,6 +103,45 @@ namespace Bb.ComponentModel
             }
         }
 
+        internal IEnumerable<Assembly> GetAssemblies(IEnumerable<string> namespaces)
+        {
+
+            HashSet<Assembly> assemblies = new HashSet<Assembly>(10);
+            HashSet<string> n = namespaces as HashSet<string>;
+
+            if (n == null)
+                n = new HashSet<string>(namespaces);
+
+            foreach (var assembly in this.Assemblies())
+            {
+
+                Type[] types = null;
+                if (assembly.IsDynamic)
+                    types = assembly.GetTypes();
+                else
+                    types = assembly.GetExportedTypes();
+
+                try
+                {
+                    foreach (var item in types)
+                        if (n.Contains(item.Namespace))
+                        {
+                            assemblies.Add(assembly);
+                            break;
+                        }
+
+                }
+                catch (Exception e)
+                {
+
+                    throw;
+                }
+            }
+            return assemblies;
+
+        }
+
+
         #endregion Initialize
 
         #region Resolve methods

@@ -1,5 +1,7 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using Bb.ComponentModel;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CSharp;
 using System;
 using System.CodeDom;
@@ -90,6 +92,12 @@ namespace Bb.Compilers
             ResetFilesIfExists(result);
 
             var parsedSyntaxTree = Parse();
+            CSharpVisitor visitor = new CSharpVisitor();
+            foreach (var item in parsedSyntaxTree)
+                visitor.Visit(item.GetRoot());
+            var usings = visitor.GetUsings();
+
+            var _references = ResolveAsemblies(usings);
 
             CSharpCompilationOptions DefaultCompilationOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
                     .WithOverflowChecks(true)
@@ -103,13 +111,14 @@ namespace Bb.Compilers
                     .WithModuleName($"{_assemblyName}.dll")
 
                     //.WithUsings(repository.Usings)
+
                     ;
 
             var compilation = CSharpCompilation.Create
                 (
                     result.AssemblyName,
                      parsedSyntaxTree,
-                    _defaultReferences,
+                    _references,
                     DefaultCompilationOptions
                 );
 
@@ -123,8 +132,10 @@ namespace Bb.Compilers
                 using (var peStream = File.Create(result.AssemblyFile))
                 using (var pdbStream = File.Create(result.AssemblyFilePdb))
                 {
-                    Microsoft.CodeAnalysis.Emit.EmitResult resultEmit = compilation.Emit(peStream, pdbStream);
+
+                    EmitResult resultEmit = compilation.Emit(peStream, pdbStream);
                     var diags = resultEmit.Diagnostics.ToList().Select(c => c.ToString()).ToArray();
+                    
                     Trace.WriteLine(
                         new
                         {
@@ -140,7 +151,7 @@ namespace Bb.Compilers
 
                     if (!resultEmit.Success && System.Diagnostics.Debugger.IsAttached)
                         System.Diagnostics.Debugger.Break();
-
+                    
                 }
 
             }
@@ -157,6 +168,27 @@ namespace Bb.Compilers
             }
 
             return result;
+
+        }
+
+        private List<MetadataReference> ResolveAsemblies(HashSet<string> usings)
+        {
+
+            var references = _defaultReferences.ToList();
+            IEnumerable<Assembly> ass = TypeDiscovery.Instance.GetAssemblies(usings);
+
+            HashSet<string> _distinct = new HashSet<string>();
+            foreach (var assembly in ass)
+            {
+
+                if (!_assemblies.Contains(assembly.Location) & _distinct.Add(assembly.Location))
+                {
+                    var newReference = AssemblyMetadata.CreateFromFile(assembly.Location).GetReference();
+                    references.Add(newReference);
+                }
+            }
+
+            return references;
 
         }
 
@@ -220,5 +252,6 @@ namespace Bb.Compilers
         private string _outputPah;
         private uint _hash;
     }
+
 
 }

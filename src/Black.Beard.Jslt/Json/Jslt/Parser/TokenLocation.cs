@@ -1,9 +1,15 @@
 ﻿using Antlr4.Runtime;
+using Bb.Compilers;
 
 namespace Bb.Json.Jslt.Parser
 {
     public class TokenLocation
     {
+
+        public TokenLocation()
+        {
+
+        }
 
         public TokenLocation(Antlr4.Runtime.IToken token)
         {
@@ -12,13 +18,22 @@ namespace Bb.Json.Jslt.Parser
             this.StartIndex = token.StartIndex;
             this.StopIndex = token.StopIndex;
         }
-        int Line { get; }
 
-        int Column { get; }
+        public TokenLocation(LocationResult location)
+        {
+            this.Line = location.StartLine;
+            this.Column = location.StartColumn;
+            this.StartIndex = location.StartCharacter;
+            this.StopIndex = location.EndCharacter;
+        }
 
-        int StartIndex { get; }
+        public int Line { get; }
 
-        int StopIndex { get; }
+        public int Column { get; }
+
+        public int StartIndex { get; }
+
+        public int StopIndex { get; }
 
     }
 

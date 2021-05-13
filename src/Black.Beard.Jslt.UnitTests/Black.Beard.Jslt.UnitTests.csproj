@@ -20,4 +20,10 @@
     <ProjectReference Include="..\Black.Beard.Jslt\Black.Beard.Jslt.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="DataClass2.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+  </ItemGroup>
+
 </Project>

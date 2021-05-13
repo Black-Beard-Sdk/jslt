@@ -14,7 +14,12 @@ namespace Bb.Json.Jslt.Builds
         static CSharp()
         {
             Sources = new SourceCodes();
-            References = new HashSet<Assembly>();
+            References = new HashSet<Assembly>()
+            {
+                typeof(CSharp).Assembly,
+                typeof(Uri).Assembly,
+            };
+
             _compiledAssemblies = new Dictionary<uint, List<AssemblyResult>>();
             OutputPath = System.IO.Path.GetTempPath();
             if (!System.IO.Directory.Exists(OutputPath))
@@ -38,7 +43,7 @@ namespace Bb.Json.Jslt.Builds
             foreach (var filename in filenames)
             {
                 var src = Sources.Get(filename);
-                if (src.HasUpdated()) 
+                if (src.HasUpdated())
                     changed = true;
                 list.Add(src);
                 key ^= filename.Calculate();
@@ -59,7 +64,8 @@ namespace Bb.Json.Jslt.Builds
                        .Generate()
                    ;
 
-                result.Add(result1);
+                if (result1.Success)
+                    result.Add(result1);
 
                 return result1;
 

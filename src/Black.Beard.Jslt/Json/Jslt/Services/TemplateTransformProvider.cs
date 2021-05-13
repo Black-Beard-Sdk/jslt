@@ -27,7 +27,6 @@ namespace Bb.Json.Jslt.Services
         {
 
             CultureInfo culture = this._configuration.Culture;
-            JToken obj = null;
 
             for (int i = 0; i < sb.Length; i++)
             {
@@ -58,9 +57,6 @@ namespace Bb.Json.Jslt.Services
             {
                 throw new ParsingJsonException("Failed to parse Json. " + e.Message, e);
             }
-
-            //TranformJsonTemplateReader reader = new TranformJsonTemplateReader(obj, this._configuration, foundry);
-            //var tree = reader.Tree();
 
             JsltTemplate result = new JsltTemplate()
             {

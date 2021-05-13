@@ -294,8 +294,18 @@ namespace Bb.Json.Jslt.Services
 
                 List<Expression> args = new List<Expression>();
                 foreach (var property in node.Arguments)
-                    args.Add((Expression)property.Value.Accept(this));
+                {
 
+                    Type type = node.ParameterTypes[args.Count];
+                    var value = (Expression)property.Value.Accept(this);
+
+                    if (typeof(JToken).IsAssignableFrom(value.Type) && !typeof(JToken).IsAssignableFrom(type))
+                        args.Add(RuntimeContext._convertToken.Method.Call(value, Expression.Constant(type)));
+                    
+                    else
+                        args.Add(value.ConvertIfDifferent(type));
+
+                }
                 var arguments = typeof(object).NewArray(args.ToArray());
 
                 var expressionCreateService = Expression.Constant(node.ServiceProvider).Call(node.ServiceProvider.Method, arguments);

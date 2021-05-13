@@ -32,9 +32,12 @@ namespace Bb.Json.Jslt.Asts
 
         public IEnumerable<JsltArgument> Arguments { get => _items.Values; }
 
+        public Type[] ParameterTypes { get; internal set; }
+
         public string Type { get; internal set; }
 
         public Factory<ITransformJsonService> ServiceProvider { get; internal set; }
+
         public string Name { get; }
 
         public override object Accept(IJsltJsonVisitor visitor)
