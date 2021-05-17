@@ -2,11 +2,8 @@
 
     "$culture" : "fr-fr",
 
-    "$funcs" : {
-        "nameFunction1": "" @uri
-    }
-
-    "v1" : "$..toto" | .method1($.key1),
+    "$funcs" : [ "file.cs" ],
+    "$imports" : [ "file.dll" ],
 
     "v2" : .unique("$..toto"),
 
@@ -14,6 +11,8 @@
 
     "v4" : .mymethod("$.id", "sourceName", "$..toto"),
 
+    '@var1' : '$.prop1', 
+    'v4': .get("src2", "$[?(@.Id == @@var1)]" @string),
 
 
     // test

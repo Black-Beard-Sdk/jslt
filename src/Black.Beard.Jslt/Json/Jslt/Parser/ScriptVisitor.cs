@@ -97,17 +97,32 @@ namespace Bb.Json.Jslt.Parser
                     if (prop.Name.ToLower() == "$funcs")
                     {
                         var cs = new List<FileInfo>();
+
+                        if (prop.Value is JsltArray ar)
+                            foreach (JsltBase fu in ar.Items)
+                                if (fu is JsltConstant v)
+                                    if (v.Value is Uri u)
+                                        CollectCs(u.AbsoluteUri, cs, fu);
+                                    else if (v.Value is string str)
+                                        CollectCs(str, cs, fu);
+
+                        LoadAssemblyFromCs(cs);
+
+                    }
+
+                    if (prop.Name.ToLower() == "$imports")
+                    {
+
                         var dll = new List<FileInfo>();
 
                         if (prop.Value is JsltArray ar)
                             foreach (JsltBase fu in ar.Items)
                                 if (fu is JsltConstant v)
                                     if (v.Value is Uri u)
-                                        Collect(u.AbsoluteUri, cs, dll, fu);
+                                        CollectCs(u.AbsoluteUri, dll, fu);
                                     else if (v.Value is string str)
-                                        Collect(str, cs, dll, fu);
+                                        CollectCs(str, dll, fu);
 
-                        LoadAssemblyFromCs(cs);
                         LoadAssembly(dll);
 
                     }
@@ -115,11 +130,13 @@ namespace Bb.Json.Jslt.Parser
                     else if (prop.Name.ToLower() == "$source")
                     {
                         Stop();
+                        result.Source = prop.Value;
                     }
 
                     else if (prop.Name.ToLower() == "$where")
                     {
                         Stop();
+                        result.Where = prop.Value;
                     }
 
                 }
@@ -740,14 +757,30 @@ namespace Bb.Json.Jslt.Parser
                 this._foundry.AddAssembly(file.FullName);
         }
 
-        private void Collect(string u, List<FileInfo> cs, List<FileInfo> dll, JsltBase item)
+        private void CollectLib(string u, List<FileInfo> dll, JsltBase item)
         {
             var file = ResolveFile(u);
             if (file.Exists)
             {
+
                 if (file.Extension == ".dll")
                     dll.Add(file);
-                else if (file.Extension == ".cs")
+
+                else if (file.Extension == ".exe")
+                    dll.Add(file);
+
+            }
+            else
+                AddError(item.Start, u, $"Failed to local file at position {item.Start.StartIndex}, line {item.Start.Line}, col {item.Start.Column} '{u}'");
+
+        }
+
+        private void CollectCs(string u, List<FileInfo> cs, JsltBase item)
+        {
+            var file = ResolveFile(u);
+            if (file.Exists)
+            {
+                if (file.Extension == ".cs")
                     cs.Add(file);
             }
             else

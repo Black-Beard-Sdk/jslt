@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Black.Beard.Json": {
+      "commandName": "Project",
+      "commandLineArgs": "csv --source:\"C:\\_perso\\Pickup\\Cartographie\\Src\\Pickup\\Imports\\applications.csv\" --out:\"C:\\_perso\\Pickup\\Cartographie\\Src\\Pickup\\Imports\\Temp\\applications.json\" --separator:\",\" --escape:'\\'"
+    }
+  }
+}
