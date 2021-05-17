@@ -1,7 +1,7 @@
-﻿using Bb.Json.Jslt.Services;
+﻿using Bb.Json.Attributes;
+using Bb.Json.Jslt.Services;
 using Newtonsoft.Json.Linq;
 using System;
-using System.ComponentModel;
 
 namespace Bb.Json.Jslt.CustomServices
 {
@@ -11,7 +11,7 @@ namespace Bb.Json.Jslt.CustomServices
     /// return the crc32 of the value
     /// if one of the term is not a number
     /// </summary>
-    [DisplayName("convert")]
+    [JsltExtensionMethod("convert")]
     public class ServiceConvert : ITransformJsonService
     {
 

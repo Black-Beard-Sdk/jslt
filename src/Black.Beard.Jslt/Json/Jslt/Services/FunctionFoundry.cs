@@ -1,4 +1,6 @@
 ﻿using Bb.ComponentModel;
+using Bb.ComponentModel.Factories;
+using Bb.Json.Attributes;
 using Bb.Json.Jslt.Parser;
 using System;
 using System.Collections.Generic;
@@ -18,7 +20,7 @@ namespace Bb.Json.Jslt.Services
             this.Services = new ServiceContainer();
         }
 
-        internal Factory<ITransformJsonService> GetService(string name, Type[] types)
+        internal Factory GetService(string name, Type[] types)
         {
 
             var result = this.Services.GetService(name, types);
@@ -44,7 +46,7 @@ namespace Bb.Json.Jslt.Services
 
         internal void AddAssembly(Assembly assembly)
         {
-            var types = TypeDiscovery.Instance.GetTypesWithAttributes<DisplayNameAttribute>(typeof(ITransformJsonService), c => true);
+            var types = TypeDiscovery.Instance.GetTypesWithAttributes<JsltExtensionMethodAttribute>(typeof(ITransformJsonService), c => true);
             foreach (var item in types)
                 AddService(item, null);
         }
@@ -54,11 +56,11 @@ namespace Bb.Json.Jslt.Services
 
             if (string.IsNullOrEmpty(name))
             {
-                var n = service.GetCustomAttributes(typeof(DisplayNameAttribute), true).OfType<DisplayNameAttribute>().FirstOrDefault();
+                var n = service.GetCustomAttributes(typeof(JsltExtensionMethodAttribute), true).OfType<JsltExtensionMethodAttribute>().FirstOrDefault();
                 if (n == null)
-                    throw new ArgumentNullException($"service {service}, can't be added by type. missing {typeof(DisplayNameAttribute)} ");
+                    throw new ArgumentNullException($"service {service}, can't be added by type. missing {typeof(JsltExtensionMethodAttribute)} ");
 
-                name = n.DisplayName;
+                name = n.Name;
 
             }
 

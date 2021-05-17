@@ -6,7 +6,7 @@ using System.Xml;
 namespace Bb.Json.Jslt.Asts
 {
 
-    public class JsltPath : JsltBase
+    public class JsltPath : JsltConstant
     {
 
         public JsltPath()
@@ -14,15 +14,7 @@ namespace Bb.Json.Jslt.Asts
             Kind = JsltKind.Jpath;
         }
 
-        //public XsltJson Child { get; internal set; }
-
-        public string Value { get; internal set; }
-
-        public JsltBase Child { get; internal set; }
-
-        public string Type { get; internal set; }
-
-        public JsltObject TypeObject { get; internal set; }
+        public new string Value { get; internal set; }
 
         public override object Accept(IJsltJsonVisitor visitor)
         {
@@ -30,5 +22,6 @@ namespace Bb.Json.Jslt.Asts
         }
 
     }
+
 
 }

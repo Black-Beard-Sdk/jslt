@@ -1,10 +1,9 @@
-﻿using Bb.Json.Jslt.Services;
+﻿using Bb.Json.Attributes;
+using Bb.Json.Jslt.Services;
 using Newtonsoft.Json.Linq;
-using System;
-using System.ComponentModel;
 using System.IO;
 using System.Security.Cryptography;
-using System.Text;
+
 
 namespace Bb.Json.Jslt.CustomServices
 {
@@ -13,7 +12,7 @@ namespace Bb.Json.Jslt.CustomServices
     /// <summary>
     /// return the Sha256 of the value
     /// </summary>
-    [DisplayName("sha256")]
+    [JsltExtensionMethod("sha256")]
     public class ServiceSha256 : ITransformJsonService
     {
 

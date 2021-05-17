@@ -12,7 +12,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="ComponentModel\Factories\Factory.cs" />
+    <Compile Include="ComponentModel\Factories\ObjectActivator.cs" />
     <Compile Include="ComponentModel\FolderBinResolver.cs" />
+    <Compile Include="ComponentModel\MethodDiscovery.cs" />
     <Compile Include="ComponentModel\TypeDiscovery.cs" />
   </ItemGroup>
 

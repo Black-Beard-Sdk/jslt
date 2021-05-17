@@ -1,15 +1,15 @@
-﻿using Bb.Json.Jslt.Services;
+﻿using Bb.Json.Attributes;
+using Bb.Json.Jslt.Services;
 using Newtonsoft.Json.Linq;
-using System;
-using System.ComponentModel;
 using System.Text;
 
 namespace Bb.Json.Jslt.CustomServices
 {
+
     /// <summary>
     /// return the cancatenated text of all the the terms.
     /// </summary>
-    [DisplayName("concatall")]
+    [JsltExtensionMethod("concatall")]
     public class ServiceConcatAll : ITransformJsonService
     {
 

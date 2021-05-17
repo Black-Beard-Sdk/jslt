@@ -15,7 +15,6 @@ namespace Bb.Json.Jslt.Services
 
         static RuntimeContext()
         {
-            _addLikeProperty = RuntimeContext.AddLikeProperty;
             //_mapPropertyService = RuntimeContext.MapPropertyService;
             _getContentByJPath = RuntimeContext.GetContentByJPath;
             _getContentFromService = RuntimeContext.GetContentFromService;
@@ -26,6 +25,11 @@ namespace Bb.Json.Jslt.Services
             _convertToBool = typeof(RuntimeContext).GetMethod("ConvertToBool", new Type[] { typeof(JToken) });
             _properties = new Dictionary<Type, Dictionary<string, (PropertyInfo, Action<object, object>)>>();
             _convertToken = RuntimeContext.ConvertTo;
+            _translateVariable = RuntimeContext.Translate;
+                
+            _setVariable = typeof(RuntimeContext).GetMethod(nameof(RuntimeContext.SetVariable), new Type[] { typeof(RuntimeContext), typeof(string), typeof(object) });
+            _DelVariable = typeof(RuntimeContext).GetMethod(nameof(RuntimeContext.DelVariable), new Type[] { typeof(RuntimeContext), typeof(string) });
+
 
         }
 
@@ -37,32 +41,7 @@ namespace Bb.Json.Jslt.Services
 
         #region methods called in the expressions
 
-        public static JToken AddLikeProperty(
-            RuntimeContext ctx,
-            JToken tokenSource,
-            JToken value,
-            JToken tokenTarget,
-            string propertyName
-            )
-        {
 
-            if (tokenSource != null)
-            {
-
-                if (tokenTarget is JObject o)
-                    AddProperty(o, new JProperty(propertyName, value));
-
-                else if (tokenTarget is JArray a)
-                {
-
-
-                }
-
-            }
-
-            return tokenTarget;
-
-        }
 
         //public static ITransformJsonService MapPropertyService(RuntimeContext ctx, TranformJsonAstConfiguration.Factory<ITransformJsonService> factory, string propertyName, JToken value)
         //{
@@ -135,11 +114,25 @@ namespace Bb.Json.Jslt.Services
             return leftToken;
         }
 
-        public static JToken EvaluateBinaryOperator(RuntimeContext ctx, JToken leftToken, OperationEnum @operator, JToken rightToken)
+        public static JToken EvaluateBinaryOperator(RuntimeContext ctx, object leftToken, OperationEnum @operator, object rightToken)
         {
 
-            var l = GetValue(leftToken);
-            var r = GetValue(rightToken);
+            object l = null;
+            object r = null;
+
+            if (leftToken is JToken tokenLeft)
+                l = GetValue(tokenLeft);
+            else
+            {
+                Stop();
+            }
+
+            if (rightToken is JToken tokenRight)
+                r = GetValue(tokenRight);
+            else
+            {
+                Stop();
+            }
 
             switch (@operator)
             {
@@ -199,7 +192,7 @@ namespace Bb.Json.Jslt.Services
                     break;
             }
 
-            return leftToken;
+            return JValue.CreateNull();
 
         }
 
@@ -732,6 +725,39 @@ namespace Bb.Json.Jslt.Services
             return service.Execute(ctx, token);
         }
 
+        public static void SetVariable(RuntimeContext ctx, string name, object value)
+        {
+
+
+
+            ctx.SubSources.Variables.Add(name, value);
+        }
+
+        public static void DelVariable(RuntimeContext ctx, string name)
+        {
+            ctx.SubSources.Variables.Del(name);
+        }
+
+        public static string Translate(RuntimeContext ctx, string text, string[] keys)
+        {
+
+            var d = text;
+            foreach (var item in keys)
+            {
+
+                var r = ctx.SubSources.Variables.Get(item.Substring(2));
+
+                if (r != null)
+                    d = d.Replace(item, r.ToString());
+
+            }
+
+            return d;
+
+        }
+
+      
+
         public static JToken GetContentByJPath(RuntimeContext ctx, JToken token, string path)
         {
 
@@ -739,7 +765,7 @@ namespace Bb.Json.Jslt.Services
 
             if (token == null)
                 Trace.WriteLine($"the token is null. the filter '{path}' can't be apply");
-            
+
             else
             {
 
@@ -796,8 +822,10 @@ namespace Bb.Json.Jslt.Services
             return false;
 
         }
+
         public static object ConvertTo(JToken token, Type targetType)
         {
+
             object result = token;
 
             if (token is JValue v)
@@ -820,9 +848,15 @@ namespace Bb.Json.Jslt.Services
         public static readonly Func<RuntimeContext, JToken, string, JToken> _getContentByJPath;
         public static readonly Func<RuntimeContext, JToken, ITransformJsonService, JToken> _getContentFromService;
         public static readonly Func<RuntimeContext, JToken, OperationEnum, JToken> _evaluateUnaryOperator;
-        public static readonly Func<RuntimeContext, JToken, OperationEnum, JToken, JToken> _evaluateBinaryOperator;
-        public static readonly Func<RuntimeContext, JToken, JToken, JToken, string, JToken> _addLikeProperty;
+        public static readonly Func<RuntimeContext, object, OperationEnum, object, JToken> _evaluateBinaryOperator;
+        public static readonly Func<RuntimeContext, string, string[], string> _translateVariable;
+
+       
         public static readonly MethodInfo _addProperty;
+
+        public static readonly MethodInfo _setVariable;
+        public static readonly MethodInfo _getVariable;
+        public static readonly MethodInfo _DelVariable;
 
         public static readonly MethodInfo _convertToBool;
 

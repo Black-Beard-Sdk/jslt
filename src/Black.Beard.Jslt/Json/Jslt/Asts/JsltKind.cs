@@ -24,6 +24,8 @@
         PathIndice,
         Type,
         Operator,
+        JVariable,
+        JTranslateVariable,
     }
 
 }

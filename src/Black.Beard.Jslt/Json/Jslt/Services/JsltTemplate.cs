@@ -21,8 +21,11 @@ namespace Bb.Json.Jslt.Services
 
         public TranformJsonAstConfiguration Configuration { get; internal set; }
         public CultureInfo Culture { get; internal set; }
+        
         public string Filename { get; internal set; }
+        
         public JsltBase Tree { get; internal set; }
+        
         internal StringBuilder Rule { get; set; }
 
         public RuntimeContext Transform(Sources sources)

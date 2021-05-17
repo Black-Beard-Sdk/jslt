@@ -12,6 +12,7 @@ namespace Bb.ComponentModel
     public static class MethodDiscovery
     {
 
+
         /// <summary>
         /// Return the list of method from list of types
         /// </summary>
@@ -19,13 +20,12 @@ namespace Bb.ComponentModel
         /// <param name="returnType">Not evaluated if null. method return type</param>
         /// <param name="parameters">Not evaluated if null. method arguments type</param>
         /// <returns></returns>
-        public static IEnumerable<MethodInfo> GetMethods(IEnumerable<Type> types, BindingFlags bindings, Type returnType, List<Type> parameters)
+        public static IEnumerable<MethodInfo> GetMethods(IEnumerable<Type> types, BindingFlags bindings, Type returnType, List<Type> parameters = null)
         {
             List<MethodInfo> _methods = new List<MethodInfo>();
             foreach (var type in types)
             {
-                var methods = type.GetMethods(bindings).ToList()
-                    .Where(c => (returnType == null || c.ReturnType == returnType) && (parameters == null || EvaluateMethodParameters(c, parameters))).ToList();
+                var methods = GetMethods(type, bindings, returnType, parameters);
                 _methods.AddRange(methods);
             }
             return _methods;
@@ -38,11 +38,14 @@ namespace Bb.ComponentModel
         /// <param name="returnType">Not evaluated if null. method return type</param>
         /// <param name="parameters">Not evaluated if null. method arguments type</param>
         /// <returns></returns>
-        public static IEnumerable<MethodInfo> GetMethods(Type type, BindingFlags bindings, Type returnType, List<Type> parameters)
+        public static IEnumerable<MethodInfo> GetMethods(Type type, BindingFlags bindings, Type returnType, List<Type> parameters = null)
         {
-            var methods = type.GetMethods(bindings).ToList()
-                .Where(c => (returnType == null || c.ReturnType == returnType) && (parameters == null || EvaluateMethodParameters(c, parameters))).ToList();
-            return methods;
+            var methods = type.GetMethods(bindings);
+            foreach (var c in methods)
+                if (returnType == null || c.ReturnType == returnType)
+                    if (parameters == null || EvaluateMethodParameters(c, parameters))
+                        yield return c;
+
         }
 
         private static bool EvaluateMethodParameters(MethodInfo item, List<Type> parameters)

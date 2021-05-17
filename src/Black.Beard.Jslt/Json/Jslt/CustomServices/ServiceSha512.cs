@@ -1,4 +1,5 @@
-﻿using Bb.Json.Jslt.Services;
+﻿using Bb.Json.Attributes;
+using Bb.Json.Jslt.Services;
 using Newtonsoft.Json.Linq;
 using System.ComponentModel;
 using System.Security.Cryptography;
@@ -10,7 +11,7 @@ namespace Bb.Json.Jslt.CustomServices
     /// <summary>
     /// return the Sha512 of the value
     /// </summary>
-    [DisplayName("sha512")]
+    [JsltExtensionMethod("sha512")]
     public class ServiceSha512 : ITransformJsonService
     {
 

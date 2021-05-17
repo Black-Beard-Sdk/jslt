@@ -1,11 +1,11 @@
 ﻿using Bb.Json.Jslt.Services;
 using Newtonsoft.Json.Linq;
-using System.ComponentModel;
+using Bb.Json.Attributes;
 
 namespace Black.Beard.Jslt.UnitTests
 {
 
-    [DisplayName("mult")]
+    [JsltExtensionMethod("mult")]
     public class DataClass2 : ITransformJsonService
     {
 

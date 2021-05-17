@@ -1,4 +1,5 @@
-﻿using Bb.Json.Jslt.Services;
+﻿using Bb.Json.Attributes;
+using Bb.Json.Jslt.Services;
 using Newtonsoft.Json.Linq;
 using System;
 using System.ComponentModel;
@@ -6,10 +7,11 @@ using System.Globalization;
 
 namespace Bb.Json.Jslt.CustomServices
 {
+
     /// <summary>
     /// return a formated value
     /// </summary>
-    [DisplayName("format")]
+    [JsltExtensionMethod("format")]
     public class ServiceFormat : ITransformJsonService
     {
 

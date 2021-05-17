@@ -6,6 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Json\Jslt\Services\Factory.cs" />
+    <Compile Remove="Json\Jslt\Services\ObjectCreator.cs" />
     <Compile Remove="Json\Jslt\Services\TranformJsonTemplateReader.cs" />
   </ItemGroup>
 

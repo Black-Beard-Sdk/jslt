@@ -1,5 +1,6 @@
 ﻿namespace Bb.Json.Services
 {
+
     [System.Serializable]
     public class MissingServiceException : System.Exception
     {

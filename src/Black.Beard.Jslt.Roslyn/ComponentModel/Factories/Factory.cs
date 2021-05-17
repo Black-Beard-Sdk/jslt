@@ -1,53 +1,77 @@
 ﻿using System;
+using System.Linq;
+using System.Reflection;
 
 namespace Bb.ComponentModel.Factories
 {
 
-    /// <summary>
-    /// Factory of T
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class Factory<T> : IFactory<T>
-        where T : class
+    public abstract class Factory
     {
 
-        private readonly ObjectActivator<T> factory;
-
-        /// <summary>
-        /// Initializes a new instance of the type <see cref="Factory{T}" /> class. The real type instance is the specified type
-        /// </summary>
-        /// <param name="type">The type.</param>
-        /// <param name="types">The types.</param>
-        public Factory(Type type, Type[] types)
+        public Factory(MethodBase method, ParameterInfo[] paramsInfo)
         {
-            var ctor = type.GetConstructor(types);
-            if (ctor != null)
-                factory = ObjectCreator.GetActivator<T>(ctor);
+            this.MethodSource = method;
+            IsStatic = method.IsStatic;
+            IsCtor = method is ConstructorInfo;
+            this.Parameters = paramsInfo;
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Factory{T}"/> class.
-        /// </summary>
-        /// <param name="types">The types.</param>
-        public Factory(params Type[] types)
-        {
-            var ctor = typeof(T).GetConstructor(types);
-            if (ctor != null)
-                factory = ObjectCreator.GetActivator<T>(ctor);
+        public MethodBase MethodSource { get; }
 
-        }
+        public ParameterInfo[] MethodParameters { get; protected set; }
+
+        public bool IsStatic { get; }
+
+        public bool IsCtor { get; }
+
+        public Type[] Types { get; protected set; }
+
+        public ParameterInfo[] Parameters { get; }
+
+        public MethodInfo Method { get; internal set; }
 
         /// <summary>
         /// Creates a new instance of T with the specified arguments.
         /// </summary>
         /// <param name="args">The arguments.</param>
         /// <returns></returns>
-        public T Create(params dynamic[] args)
+        //public abstract object Create(params dynamic[] args);
+
+        public abstract bool IsEmpty { get; }
+
+    }
+
+    /// <summary>
+    /// Factory of T
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class Factory<T> : Factory //: IFactory<T> 
+        where T : class
+    {
+
+        public Factory(ObjectActivator<T> objectActivator, MethodBase methodSource, ParameterInfo[] paramsInfo)
+          : base(methodSource, paramsInfo)
         {
-            return factory(args);
+            this._delegate = objectActivator;
+            base.Method = typeof(Factory<T>).GetMethod(nameof(Call));
+            base.MethodParameters = methodSource.GetParameters();
+            Types = this.MethodParameters.Select(c => c.ParameterType).ToArray();
         }
 
-        public bool IsEmpty => factory == null;
+
+        /// <summary>
+        /// Creates a new instance of T with the specified arguments.
+        /// </summary>
+        /// <param name="args">The arguments.</param>
+        /// <returns></returns>
+        public T Call(params dynamic[] args)
+        {
+            return _delegate(args);
+        }
+
+        public override bool IsEmpty => _delegate == null;
+
+        private ObjectActivator<T> _delegate { get; }
 
     }
 

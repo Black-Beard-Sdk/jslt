@@ -2,6 +2,7 @@
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
 using Bb.Compilers;
+using Bb.ComponentModel.Factories;
 using Bb.Json.Jslt.Asts;
 using Bb.Json.Jslt.Builds;
 using Bb.Json.Jslt.Services;
@@ -44,7 +45,7 @@ namespace Bb.Json.Jslt.Parser
             foreach (var item in this._functions)
             {
                 var types = ResolveArgumentsTypes(item);
-                Factory<ITransformJsonService> service = this._foundry.GetService(item.Name, types);
+                Factory service = this._foundry.GetService(item.Name, types);
                 if (service == null)
                 {
 
@@ -122,6 +123,10 @@ namespace Bb.Json.Jslt.Parser
                     }
 
                 }
+                //else if (prop.Name.StartsWith("@"))
+                //{
+
+                //}
                 else
                     result.Append(prop);
 
@@ -225,49 +230,100 @@ namespace Bb.Json.Jslt.Parser
         public override object VisitJsonValueString([NotNull] JsltParser.JsonValueStringContext context)
         {
 
-            var txt = context.GetText().Trim().Trim('\"');
+            JsltBase result = null;
+            Type type = null;
 
-            Type type = typeof(string);
+            var txt = context.STRING().GetText().Trim().Trim('\"');
+            var containsVariable = txt.Contains("@@");
 
             var jsonType = context.jsonType();
             if (jsonType != null)
-                type = (Type)jsonType.Accept(this);
+                type = ((JsltConstant)jsonType.Accept(this)).Value as Type;
 
             if (txt.StartsWith("$"))
             {
 
-                if (type != typeof(string))
+                if (type != null)
                 {
-                    var args = new List<JsltBase>()
+                    if (type == typeof(string))
                     {
-                        new JsltPath() { Value = txt, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() },
-                        new JsltConstant() { Value = type, Kind = JsltKind.Type, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() },
-                    };
-                    return new JsltFunctionCall("convert", args);
+                        if (containsVariable)
+                            result = new JsltTranslateVariable(GetConstant(txt, type, context));
+                        else
+                            result = GetConstant(txt, type, context);
+                    }
+                    else
+                    {
+
+                        List<JsltBase> args = null;
+                        var c = new JsltConstant() { Value = type, Kind = JsltKind.Type, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
+                        if (containsVariable)
+                        {
+                            var d = new JsltTranslateVariable(c);
+                            args = new List<JsltBase>() { new JsltPath() { Value = txt, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() }, d };
+
+                        }
+                        else
+                            args = new List<JsltBase>() { new JsltPath() { Value = txt, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() }, c };
+
+                        result = new JsltFunctionCall("convert", args);
+
+                    }
                 }
-                return new JsltPath() { Value = txt, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
+                else
+                {
+                    if (containsVariable)
+                        result = new JsltTranslateVariable(new JsltPath() { Value = txt, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() });
+                    else
+                        result = new JsltPath() { Value = txt, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
+
+                }
 
             }
 
-            else if (txt.StartsWith("\\$"))
-                txt = txt.Substring(2);
+            else if (type != null)
+            {
+                if (containsVariable)
+                    result = new JsltTranslateVariable(GetConstant(txt, type, context));
+                else
+                    result = GetConstant(txt, type, context);
+            }
+            else
+            {
+                if (containsVariable)
+                    result = new JsltTranslateVariable(new JsltConstant() { Value = txt, Kind = JsltKind.String, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() });
+                else
+                    result = new JsltConstant() { Value = txt, Kind = JsltKind.String, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
+            }
+
+            return result;
+
+        }
+
+        private JsltConstant GetConstant(string txt, Type type, JsltParser.JsonValueStringContext context)
+        {
+
+            JsltConstant result;
 
             if (type == typeof(string))
-                return new JsltConstant() { Value = txt, Kind = JsltKind.String, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
+                result = new JsltConstant() { Value = txt, Kind = JsltKind.String, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
 
             else if (type == typeof(Uri))
-                return new JsltConstant() { Value = new Uri(txt), Kind = JsltKind.Uri, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
+                result = new JsltConstant() { Value = new Uri(txt), Kind = JsltKind.Uri, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
 
             else if (type == typeof(TimeSpan))
-                return new JsltConstant() { Value = TimeSpan.Parse(txt, this._currentCulture), Kind = JsltKind.TimeSpan, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
+                result = new JsltConstant() { Value = TimeSpan.Parse(txt, this._currentCulture), Kind = JsltKind.TimeSpan, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
 
             else if (type == typeof(DateTime))
-                return new JsltConstant() { Value = DateTime.Parse(txt, this._currentCulture), Kind = JsltKind.Date, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
+                result = new JsltConstant() { Value = DateTime.Parse(txt, this._currentCulture), Kind = JsltKind.Date, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
 
             else if (type == typeof(DateTime))
-                return new JsltConstant() { Value = Guid.Parse(txt), Kind = JsltKind.Guid, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
+                result = new JsltConstant() { Value = Guid.Parse(txt), Kind = JsltKind.Guid, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
 
-            return new JsltConstant() { Value = txt, Kind = JsltKind.String, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
+            else
+                result = new JsltConstant() { Value = txt, Kind = JsltKind.String, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
+
+            return result;
 
         }
 
@@ -307,17 +363,19 @@ namespace Bb.Json.Jslt.Parser
 
             JsltBase value = (JsltBase)context.jsonValue().Accept(this);
 
-            if (name.ToLower() == "$culture" && value is JsltConstant culture)
+            if (name.StartsWith("@"))
+                return new JsltVariable() { Name = name.Substring(1), Value = value, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
+
+            else if (name.ToLower() == "$culture" && value is JsltConstant culture)
             {
+
                 if (culture.Value is string t)
                     this._currentCulture = CultureInfo.GetCultureInfo(t);
+
                 else if (culture.Value is int i)
                     this._currentCulture = CultureInfo.GetCultureInfo(i);
 
             }
-
-            //if (value is JsltFunction JfunctionBodyDefinition body)
-            //    return AddPosition(new JfunctionDefinition(name, body), context.Start, context.Stop);
 
             return new JsltProperty() { Name = name, Value = value, Start = context.Start.ToLocation(), Stop = context.Start.ToLocation() };
 
@@ -548,7 +606,10 @@ namespace Bb.Json.Jslt.Parser
 
                 else if (item.Value is JsltPath p)
                     _types.Add(typeof(JToken));
-                
+
+                else if (item.Value is JsltTranslateVariable t)
+                    _types.Add(typeof(JToken));
+
                 else
                 {
                     Stop();
@@ -691,13 +752,13 @@ namespace Bb.Json.Jslt.Parser
             }
             else
                 AddError(item.Start, u, $"Failed to local file at position {item.Start.StartIndex}, line {item.Start.Line}, col {item.Start.Column} '{u}'");
-        
+
         }
 
 
 
 
-     
+
         private FileInfo ResolveFile(string u)
         {
             var file = new FileInfo(u);

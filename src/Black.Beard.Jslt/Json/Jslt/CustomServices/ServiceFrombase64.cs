@@ -1,4 +1,5 @@
-﻿using Bb.Json.Jslt.Services;
+﻿using Bb.Json.Attributes;
+using Bb.Json.Jslt.Services;
 using Newtonsoft.Json.Linq;
 using System;
 using System.ComponentModel;
@@ -9,7 +10,7 @@ namespace Bb.Json.Jslt.CustomServices
     /// <summary>
     /// return the string from value
     /// </summary>
-    [DisplayName("frombase64")]
+    [JsltExtensionMethod("frombase64")]
     public class ServiceFrombase64 : ITransformJsonService
     {
 

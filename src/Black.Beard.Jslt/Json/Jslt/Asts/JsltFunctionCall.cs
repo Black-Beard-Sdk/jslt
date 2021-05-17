@@ -1,4 +1,5 @@
-﻿using Bb.Json.Jslt.Services;
+﻿using Bb.ComponentModel.Factories;
+using Bb.Json.Jslt.Services;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -36,7 +37,7 @@ namespace Bb.Json.Jslt.Asts
 
         public string Type { get; internal set; }
 
-        public Factory<ITransformJsonService> ServiceProvider { get; internal set; }
+        public Factory ServiceProvider { get; internal set; }
 
         public string Name { get; }
 

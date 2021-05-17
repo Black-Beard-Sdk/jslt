@@ -14,13 +14,16 @@ namespace Bb.Json.Jslt.Asts
         {
             this.Kind = JsltKind.Object;
             this._items = new Dictionary<string, JsltProperty>();
+            this._varItems = new Dictionary<string, JsltVariable>();
         }
-
 
         internal void Append(JsltProperty property)
         {
 
-            if (property.Name == TransformJsonConstants.Source)
+            if (property is JsltVariable v)
+                _varItems.Add(v.Name, v);
+            
+            else if (property.Name == TransformJsonConstants.Source)
                 this.Source = property.Value;
 
             else if (property.Name == TransformJsonConstants.Where)
@@ -35,6 +38,8 @@ namespace Bb.Json.Jslt.Asts
 
         public IEnumerable<JsltProperty> Properties { get => _items.Values; }
 
+        public IEnumerable<JsltVariable> Variables { get => _varItems.Values; }
+
         public string Name { get; set; }
 
         public override object Accept(IJsltJsonVisitor visitor)
@@ -43,6 +48,7 @@ namespace Bb.Json.Jslt.Asts
         }
 
         private readonly Dictionary<string, JsltProperty> _items;
+        private readonly Dictionary<string, JsltVariable> _varItems;
 
         internal void AddProperty(JsltProperty prop)
         {

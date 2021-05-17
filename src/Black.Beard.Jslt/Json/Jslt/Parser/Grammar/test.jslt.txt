@@ -8,11 +8,11 @@
 
     "v1" : "$..toto" | .method1($.key1),
 
-    "v2" : new unique("$..toto"),
+    "v2" : .unique("$..toto"),
 
-    "v3" : .get("$.id", "sourceName", "$..toto"),
+    "v3" : .get("doc source name", "$.id", "$.toto"),
 
-    "v4" : .mymethod($.id, "sourceName", "$..toto"),
+    "v4" : .mymethod("$.id", "sourceName", "$..toto"),
 
 
 

@@ -1,13 +1,14 @@
-﻿using Bb.Json.Jslt.Services;
+﻿using Bb.Json.Attributes;
+using Bb.Json.Jslt.Services;
 using Newtonsoft.Json.Linq;
-using System.ComponentModel;
 
 namespace Bb.Json.Jslt.CustomServices
 {
+
     /// <summary>
     /// return the Left value substracted from Right value
     /// </summary>
-    [DisplayName("substract")]
+    [JsltExtensionMethod("substract")]
     public class ServiceSubstract : ITransformJsonService
     {
 

@@ -18,41 +18,26 @@ namespace Bb.Json.Jslt.Services
 
         public void Add(string key, object value)
         {
-            this._datas.Add(key, _datas);
+            this._datas.Add(key, value);
         }
 
-        public string Translate(string key)
+        public void Del(string key)
+        {
+            if (this._datas.ContainsKey(key))
+                this._datas.Remove(key);
+        }
+
+        public object Get(string key)
         {
 
-            var d = key;
-            var matchs = VariableManagerExtension.Match(key);
-            while (matchs.Success)
-            {
+            if (!this._datas.TryGetValue(key, out object value))
+                value = Environment.GetEnvironmentVariable(key, _target);
 
-                var transform = false;
-                if (!this._datas.TryGetValue(key, out object value))
-                {
-                    value = Environment.GetEnvironmentVariable(key, _target);
-                    if (value != null)
-                    {
-                        this._datas.Add(key, value);
-                        transform = true;
-                    }
-                }
-                else
-                    transform = true;
+            return value;
 
-                if (transform)
-                    d.Replace(matchs.Value, value.ToString());
-
-                matchs = matchs.NextMatch();
-
-            }
-
-
-            return d;
         }
 
+  
         private readonly EnvironmentVariableTarget _target;
         private readonly Sources sources;
         private Dictionary<string, object> _datas;

@@ -158,82 +158,7 @@ namespace Bb.Json.Jslt.Services
 
         public object VisitConstant(JsltConstant node)
         {
-
-            var isCtor = this.CurrentCtx().IsCtor;
-
-            switch (node.Kind)
-            {
-
-                case JsltKind.Null:
-                    return Expression.Call(null, _jValueGetNull);
-
-                case JsltKind.Integer:
-                    if (isCtor)
-                        return Expression.Constant(node.Value);
-                    return Expression.New(_ctorJValueLong, Expression.Constant(node.Value));
-
-                case JsltKind.TimeSpan:
-                    if (isCtor)
-                        return Expression.Constant(node.Value);
-                    return Expression.New(_ctorJValueTimeSpan, Expression.Constant(node.Value));
-
-                case JsltKind.Uri:
-                    if (isCtor)
-                        return Expression.Constant(node.Value);
-                    return Expression.New(_ctorJValueUri, Expression.Constant(node.Value));
-
-                case JsltKind.Guid:
-                    if (isCtor)
-                        return Expression.Constant(node.Value);
-                    return Expression.New(_ctorJValueGuid, Expression.Constant(node.Value));
-
-                case JsltKind.Date:
-                    if (isCtor)
-                        return Expression.Constant(node.Value);
-                    return Expression.New(_ctorJValueDateTime, Expression.Constant(node.Value));
-
-                case JsltKind.Float:
-                    if (isCtor)
-                        return Expression.Constant(node.Value);
-                    return Expression.New(_ctorJValueDouble, Expression.Constant(node.Value));
-
-                case JsltKind.Boolean:
-                    if (isCtor)
-                        return Expression.Constant(node.Value);
-                    return Expression.New(_ctorJValueBool, Expression.Constant(node.Value));
-
-                case JsltKind.String:
-                    if (isCtor)
-                        return Expression.Constant(node.Value);
-                    return Expression.New(_ctorJValueObject, Expression.Constant(node.Value));
-
-                case JsltKind.Bytes:
-                case JsltKind.Object:
-                    return Expression.New(_ctorJValueObject, Expression.Constant(node.Value));
-
-                case JsltKind.Type:
-                    break;
-
-                case JsltKind.Array:
-                    break;
-                case JsltKind.Path:
-                    break;
-                case JsltKind.PathParent:
-                    break;
-                case JsltKind.PathKey:
-                    break;
-                case JsltKind.PathCoalesce:
-                    break;
-                case JsltKind.PathIndice:
-                    break;
-                case JsltKind.Jpath:
-                default:
-                    break;
-
-            }
-
-            throw new NotImplementedException(node.Kind.ToString());
-
+            return Expression.Constant(node.Value);
         }
 
         public object VisitObject(JsltObject node)
@@ -241,6 +166,15 @@ namespace Bb.Json.Jslt.Services
 
             using (CurrentContext ctx = this.NewContext())
             {
+
+                var srcRoot = ctx.Current.Source;
+
+                foreach (var item in node.Variables)
+                {
+                    item.ToDesctruct = false;
+                    var i = (Expression)item.Accept(this);
+                    srcRoot.Add(i);
+                }
 
                 var v1 = ctx.Current.Source.AddVar(typeof(JObject), null, _ctorJObject.CreateObject());
                 ctx.Current.RootTarget = v1;
@@ -271,6 +205,13 @@ namespace Bb.Json.Jslt.Services
 
                 }
 
+                foreach (var item in node.Variables)
+                {
+                    item.ToDesctruct = true;
+                    var i = (Expression)item.Accept(this);
+                    srcRoot.Add(i);
+                }
+
                 return v1;
 
             }
@@ -279,9 +220,75 @@ namespace Bb.Json.Jslt.Services
 
         public object VisitProperty(JsltProperty node)
         {
+
             var name = Expression.Constant(node.Name);
             var getValue = (Expression)node.Value.Accept(this);
+
+            if (!typeof(JToken).IsAssignableFrom(getValue.Type))
+                getValue = getValue.ConvertIfDifferent(typeof(JToken));
+
             return this._ctorJProperty.CreateObject(name, getValue);
+
+        }
+
+        public object VisitJVariable(JsltVariable node)
+        {
+
+            using (CurrentContext ctx = NewContext())
+            {
+                var name = Expression.Constant(node.Name);
+
+                if (node.ToDesctruct)
+                    return RuntimeContext._DelVariable.Call(ctx.Current.Context, name);
+
+                else
+                {
+                    var getValue = (Expression)node.Value.Accept(this);
+                    return RuntimeContext._setVariable.Call(ctx.Current.Context, name, getValue);
+                }
+
+            }
+
+        }
+
+        public object VisitTranslateVariable(JsltTranslateVariable node)
+        {
+
+            using (CurrentContext ctx = NewContext())
+            {
+
+                if (node.Value is JsltPath p)
+                {
+
+                    var txt = RuntimeContext._translateVariable.Method.Call
+                    (
+                        ctx.Current.Context,
+                        Expression.Constant(p.Value),
+                        Expression.Constant(node.VariableNames.ToArray())
+                    );
+
+                    ctx.Current.RootSource = RuntimeContext._getContentByJPath.Method.Call
+                    (
+                        ctx.Current.Context, 
+                        ctx.Current.RootSource, 
+                        txt
+                    );
+
+                }
+                else
+                {
+                    ctx.Current.RootSource = RuntimeContext._translateVariable.Method.Call
+                    (
+                        ctx.Current.Context, 
+                        Expression.Constant(node.Value.Value), 
+                        Expression.Constant(node.VariableNames.ToArray())
+                    );
+                }
+
+                return ctx.Current.RootSource;
+
+            }
+
         }
 
         public object VisitFunction(JsltFunctionCall node)
@@ -290,31 +297,76 @@ namespace Bb.Json.Jslt.Services
             using (CurrentContext ctx = NewContext())
             {
 
-                ctx.Current.IsCtor = true;
-
                 List<Expression> args = new List<Expression>();
+
+                if (!node.ServiceProvider.IsCtor)
+                    args.Add(ctx.Current.Context);
+
                 foreach (var property in node.Arguments)
                 {
 
-                    Type type = node.ParameterTypes[args.Count];
-                    var value = (Expression)property.Value.Accept(this);
+                    Type targetType = node.ParameterTypes[args.Count];
+                    var argSourceValue = ((Expression)property.Value.Accept(this))
+                        .ConvertIfDifferent(targetType);
 
-                    if (typeof(JToken).IsAssignableFrom(value.Type) && !typeof(JToken).IsAssignableFrom(type))
-                        args.Add(RuntimeContext._convertToken.Method.Call(value, Expression.Constant(type)));
-                    
-                    else
-                        args.Add(value.ConvertIfDifferent(type));
+                    args.Add(argSourceValue);
 
                 }
                 var arguments = typeof(object).NewArray(args.ToArray());
+                Expression result = Expression.Constant(node.ServiceProvider).Call(node.ServiceProvider.Method, arguments);
 
-                var expressionCreateService = Expression.Constant(node.ServiceProvider).Call(node.ServiceProvider.Method, arguments);
-
-                var result = Expression.Call(RuntimeContext._getContentFromService.Method, ctx.Current.Context, ctx.Current.RootSource, expressionCreateService);
+                if (node.ServiceProvider.IsCtor)
+                    result = Expression.Call(RuntimeContext._getContentFromService.Method, ctx.Current.Context, ctx.Current.RootSource, result);
 
                 return result;
 
             }
+
+        }
+
+        public Expression ConvertInJValue(JsltKind kind, Expression e)
+        {
+
+            switch (kind)
+            {
+
+                case JsltKind.Null:
+                    return Expression.Call(null, _jValueGetNull);
+
+                case JsltKind.Integer:
+                    return Expression.New(_ctorJValueLong, e);
+
+                case JsltKind.TimeSpan:
+                    return Expression.New(_ctorJValueTimeSpan, e);
+
+                case JsltKind.Uri:
+                    return Expression.New(_ctorJValueUri, e);
+
+                case JsltKind.Guid:
+                    return Expression.New(_ctorJValueGuid, e);
+
+                case JsltKind.Date:
+                    return Expression.New(_ctorJValueDateTime, e);
+
+                case JsltKind.Float:
+                    return Expression.New(_ctorJValueDouble, e);
+
+                case JsltKind.Boolean:
+                    return Expression.New(_ctorJValueBool, e);
+
+                case JsltKind.String:
+                    return Expression.New(_ctorJValueObject, e);
+
+                case JsltKind.Bytes:
+                case JsltKind.Object:
+                    return Expression.New(_ctorJValueObject, e);
+
+                default:
+                    break;
+
+            }
+
+            throw new NotImplementedException(kind.ToString());
 
         }
 
@@ -323,7 +375,8 @@ namespace Bb.Json.Jslt.Services
             using (CurrentContext ctx = NewContext())
             {
                 var left = (Expression)node.Left.Accept(this);
-                var result = Expression.Call(RuntimeContext._evaluateUnaryOperator.Method, ctx.Current.Context, left, Expression.Constant(node.Operator));
+
+                var result = RuntimeContext._evaluateUnaryOperator.Method.Call(ctx.Current.Context, left, Expression.Constant(node.Operator));
                 return result;
             }
         }
@@ -332,9 +385,12 @@ namespace Bb.Json.Jslt.Services
         {
             using (CurrentContext ctx = NewContext())
             {
+
                 var left = (Expression)node.Left.Accept(this);
                 var right = (Expression)node.Right.Accept(this);
-                var result = Expression.Call(RuntimeContext._evaluateBinaryOperator.Method, ctx.Current.Context, left, Expression.Constant(node.Operator), right);
+
+                var result = RuntimeContext._evaluateBinaryOperator.Method.Call(ctx.Current.Context, left, Expression.Constant(node.Operator), right);
+
                 return result;
             }
         }
@@ -390,11 +446,14 @@ namespace Bb.Json.Jslt.Services
                 nextBlock = ctx.Current.Source;
                 ConditionalStatement condition = null;
                 var resultVar = nextBlock.AddVar(typeof(object), null, Expression.Constant(null));
-                var left = (Expression)node.Expression.Accept(this);
+                var left = ((Expression)node.Expression.Accept(this))
+                    .ConvertIfDifferent(typeof(JToken));
 
                 foreach (var _case in node.Cases)
                 {
-                    var right = (Expression)_case.RightExpression.Accept(this);
+
+                    var right = ((Expression)_case.RightExpression.Accept(this))
+                        .ConvertIfDifferent(typeof(JToken));
 
                     var evaluation = Expression.Call(RuntimeContext._evaluateBinaryOperator.Method, ctx.Current.Context, left, Expression.Constant(OperationEnum.Equal), right);
 
@@ -430,8 +489,10 @@ namespace Bb.Json.Jslt.Services
 
 
 
+
         public TranformJsonAstConfiguration Configuration { get; set; }
 
+        #region Context
 
         private BuildContext BuildCtx
         {
@@ -506,10 +567,17 @@ namespace Bb.Json.Jslt.Services
 
             public SourceCode Source;
 
-            public bool IsCtor { get; internal set; }
+            public KindGenerating IsKindGenerating { get; internal set; }
         }
 
+        private enum KindGenerating
+        {
+            Undefined,
+            Constructor,
+            Method,
+        }
 
+        #endregion Context
 
         private ConstructorInfo _ctorJArray;
         private readonly MethodInfo _AddJArray;

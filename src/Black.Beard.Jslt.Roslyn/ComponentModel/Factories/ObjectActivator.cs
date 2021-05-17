@@ -26,7 +26,8 @@ namespace Bb.ComponentModel.Factories
         /// <typeparam name="T"></typeparam>
         /// <param name="ctor">The ctor.</param>
         /// <returns></returns>
-        public static ObjectActivator<T> GetActivator<T>(ConstructorInfo ctor)
+        public static Factory<T> GetActivator<T>(ConstructorInfo ctor)
+            where T : class
         {
 
             Type type = ctor.DeclaringType;
@@ -58,10 +59,56 @@ namespace Bb.ComponentModel.Factories
 
             //compile it
             ObjectActivator<T> compiled = (ObjectActivator<T>)lambda.Compile();
-            
-            return compiled;
+
+            return new Factory<T>(compiled, ctor, paramsInfo);
 
         }
+
+        /// <summary>
+        /// Gets an customed activator factory for the specified ctor.
+        /// Note if the the generic is diferent of the declaring type of the ctor a cast is injected in the method.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="ctor">The ctor.</param>
+        /// <returns></returns>
+        public static Factory<T> GetActivator<T>(MethodInfo ctor)
+            where T : class
+        {
+
+            Type type = ctor.DeclaringType;
+            ParameterInfo[] paramsInfo = ctor.GetParameters();
+
+            //create a single param of type object[]
+            ParameterExpression param = Expression.Parameter(typeof(object[]), "args");
+
+            Expression[] argsExp = new Expression[paramsInfo.Length];
+
+            //pick each arg from the params array and create a typed expression of them
+            for (int i = 0; i < paramsInfo.Length; i++)
+            {
+                Expression index = Expression.Constant(i);
+                Type paramType = paramsInfo[i].ParameterType;
+                Expression paramAccessorExp = Expression.ArrayIndex(param, index);
+                Expression paramCastExp = Expression.Convert(paramAccessorExp, paramType);
+                argsExp[i] = paramCastExp;
+            }
+
+            //make a NewExpression that calls the ctor with the args we just created
+            Expression newExp = Expression.Call(null, ctor, argsExp);
+
+            if (ctor.DeclaringType != typeof(T))
+                newExp = Expression.Convert(newExp, typeof(T));
+
+            //create a lambda with the New expression as body and our param object[] as arg
+            LambdaExpression lambda = Expression.Lambda(typeof(ObjectActivator<T>), newExp, param);
+
+            //compile it
+            ObjectActivator<T> compiled = (ObjectActivator<T>)lambda.Compile();
+
+            return new Factory<T>(compiled, ctor, paramsInfo);
+
+        }
+
     }
 
 

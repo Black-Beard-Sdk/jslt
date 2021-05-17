@@ -32,6 +32,10 @@ namespace Bb.Json.Jslt.Asts
         object VisitCase(JsltCase node);
 
         object VisitSwitch(JsltSwitch node);
+        
+        object VisitTranslateVariable(JsltTranslateVariable node);
+
+        object VisitJVariable(JsltVariable node);
 
     }
 

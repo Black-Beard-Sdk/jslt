@@ -146,6 +146,22 @@ namespace Bb.ComponentModel
 
         #region Resolve methods
 
+
+        ///// <summary>
+        /////     Return a list of type that match with the specified filter
+        ///// </summary>
+        ///// <param name="typeFilter"></param>
+        ///// <returns></returns>
+        //public IEnumerable<Type> ParseTypes()
+        //{
+        //    Func<Type, bool> typeFilter = c => true;
+        //    var assemblies = Assemblies().ToArray();
+        //    var items = Collect(typeFilter, assemblies);
+        //    foreach (var item in items)
+        //        yield return item;
+        //}
+
+
         /// <summary>
         ///     Return a list of type that match with the specified filter
         /// </summary>
@@ -549,22 +565,24 @@ namespace Bb.ComponentModel
         ///     Registers the specified assemblies.
         /// </summary>
         /// <param name="assemblies">The assemblies.</param>
-        private List<Type> Collect(Func<Type, bool> typeFilter, params Assembly[] assemblies)
+        private IEnumerable<Type> Collect(Func<Type, bool> typeFilter, params Assembly[] assemblies)
         {
-            var result = new List<Type>();
 
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
             try
             {
                 foreach (var item in assemblies)
-                    result.AddRange(Resolve(item, typeFilter));
+                {
+                    var list = Resolve(item, typeFilter);
+                    foreach (var type in list)
+                        yield return type;
+                }
             }
             finally
             {
                 AppDomain.CurrentDomain.AssemblyResolve -= CurrentDomain_AssemblyResolve;
             }
 
-            return result;
         }
 
         /// <summary>

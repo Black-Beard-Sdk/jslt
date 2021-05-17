@@ -1,4 +1,5 @@
-﻿using Bb.Json.Jslt.Services;
+﻿using Bb.Json.Attributes;
+using Bb.Json.Jslt.Services;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -11,7 +12,7 @@ namespace Bb.Json.Jslt.CustomServices
     /// return a list of key with no duplicated values
     /// Display name is the key used in the template
     /// </summary>
-    [DisplayName("distinct")]
+    [JsltExtensionMethod("distinct")]
     public class ServiceDistinct : ITransformJsonService
     {
 

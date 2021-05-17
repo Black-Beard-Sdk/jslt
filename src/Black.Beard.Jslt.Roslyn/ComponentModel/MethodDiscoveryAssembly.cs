@@ -8,12 +8,11 @@ using System.Reflection;
 namespace Bb.ComponentModel
 {
 
-    public class MethodDiscoveryAssembly : IMethodDiscovery
+    public class MethodDiscoveryAssembly //: IMethodDiscovery
     {
 
-        public MethodDiscoveryAssembly(ITypeReferential typeReferential, string startWith, Type inheritFrom)
+        public MethodDiscoveryAssembly(string startWith, Type inheritFrom)
         {
-            _typeReferential = typeReferential;
             _startWith = startWith;
             _inheritFrom = inheritFrom;
         }
@@ -110,7 +109,6 @@ namespace Bb.ComponentModel
 
         private Type returnType;
         private List<Type> methodSign;
-        private readonly ITypeReferential _typeReferential;
         private readonly string _startWith;
         private readonly Type _inheritFrom;
     }
