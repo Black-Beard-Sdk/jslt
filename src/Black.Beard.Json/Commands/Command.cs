@@ -14,6 +14,11 @@ namespace Bb.Json.Commands
 
             /// Command._access = "('" + string.Join("','", Enum.GetNames(typeof(AccessModuleEnum))) + "')";
 
+            /// By default, ExcelDataReader throws a NotSupportedException "No data is available for encoding 1252." on.NET Core.
+            /// To fix, add a dependency to the package System.Text.Encoding.CodePages and then add code to register the code page provider during application initialization(f.ex in Startup.cs):
+            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+
+
         }
 
 

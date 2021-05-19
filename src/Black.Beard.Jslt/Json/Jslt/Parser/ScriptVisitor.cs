@@ -94,7 +94,7 @@ namespace Bb.Json.Jslt.Parser
                 if (prop.Name.StartsWith("$"))
                 {
 
-                    if (prop.Name.ToLower() == "$funcs")
+                    if (prop.Name.ToLower() == "$functions")
                     {
                         var cs = new List<FileInfo>();
 

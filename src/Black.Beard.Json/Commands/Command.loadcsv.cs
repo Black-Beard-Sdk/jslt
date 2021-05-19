@@ -235,7 +235,7 @@ namespace Bb.Json.Commands
 
         private static void Add(Dictionary<char, char> dic, int s, int e)
         {
-            for (int i = s; i < e; i++)
+            for (int i = s; i <= e; i++)
                 dic.Add((char)i, (char)i);
         }
 

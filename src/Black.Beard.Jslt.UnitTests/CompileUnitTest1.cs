@@ -235,7 +235,7 @@ namespace Black.Beard.Jslt.UnitTests
             var expected = @"
 { 
 
-    '$funcs': ['DataClass2.cs'],
+    '$functions': ['DataClass2.cs'],
 
     'propertyName': .mult('$.prop1', 2)
 

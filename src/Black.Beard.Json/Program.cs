@@ -25,6 +25,7 @@ namespace Bb.Json
                     // .CommandImport()
                     .CommandExport()
                     .CommandLoadCsv()
+                    .CommandLoadExcel()
                 ;
 
                 int result = app.Execute(args);
