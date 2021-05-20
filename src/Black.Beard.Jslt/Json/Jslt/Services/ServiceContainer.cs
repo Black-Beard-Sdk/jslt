@@ -19,7 +19,7 @@ namespace Bb.Json.Jslt.Services
 
         public ServiceContainer()
         {
-            
+
             this._dictionary = new Dictionary<string, TransformJsonServiceProvider>();
             this.ServiceDiscovery = new ServiceDiscovery(this);
 
@@ -30,7 +30,7 @@ namespace Bb.Json.Jslt.Services
 
         private void Replicate(ServiceContainer common)
         {
-            
+
             foreach (var item in common._dictionary)
                 this._dictionary.Add(item.Key, item.Value);
 
@@ -55,6 +55,16 @@ namespace Bb.Json.Jslt.Services
 
             if (_dictionary.TryGetValue(name.ToLower(), out TransformJsonServiceProvider serviceProvider))
                 return serviceProvider.Get(parameters);
+
+            return null;
+
+        }
+
+        public TransformJsonServiceProvider GetService(string name)
+        {
+
+            if (_dictionary.TryGetValue(name.ToLower(), out TransformJsonServiceProvider serviceProvider))
+                return serviceProvider;
 
             return null;
 

@@ -15,25 +15,34 @@ namespace Bb.Json.Jslt.Services
     internal class TemplateBuilder : IJsltJsonVisitor
     {
 
-        public TemplateBuilder()
+
+        static TemplateBuilder()
+        {
+            _ctorJProperty = typeof(JProperty).GetConstructor(new Type[] { typeof(string), typeof(object) });
+            _ctorJObject = typeof(JObject).GetConstructor(new Type[] { });
+            //this._AddJObject = typeof(JObject).GetMethod("Add", new Type[] { typeof(object) });
+            _ctorJArray = typeof(JArray).GetConstructor(new Type[] { typeof(object[]) });
+            _AddJArray = typeof(JArray).GetMethod("Add", new Type[] { typeof(object) });
+            _propJArray_Item = typeof(JArray).GetProperty("Item", new Type[] { typeof(Int32) });
+
+            _ctorJValueObject = typeof(JValue).GetConstructor(new Type[] { typeof(object) });
+            _ctorJValueLong = typeof(JValue).GetConstructor(new Type[] { typeof(long) });
+            _ctorJValueDateTime = typeof(JValue).GetConstructor(new Type[] { typeof(DateTimeOffset) });
+            _ctorJValueDouble = typeof(JValue).GetConstructor(new Type[] { typeof(double) });
+            _ctorJValueBool = typeof(JValue).GetConstructor(new Type[] { typeof(bool) });
+            _ctorJValueGuid = typeof(JValue).GetConstructor(new Type[] { typeof(Guid) });
+            _ctorJValueUri = typeof(JValue).GetConstructor(new Type[] { typeof(Uri) });
+            _ctorJValueTimeSpan = typeof(JValue).GetConstructor(new Type[] { typeof(TimeSpan) });
+            _jValueGetNull = typeof(JValue).GetMethod("CreateNull");
+        }
+
+
+        public TemplateBuilder(Diagnostics diagnostics)
         {
 
-            this._ctorJProperty = typeof(JProperty).GetConstructor(new Type[] { typeof(string), typeof(object) });
-            this._ctorJObject = typeof(JObject).GetConstructor(new Type[] { });
-            //this._AddJObject = typeof(JObject).GetMethod("Add", new Type[] { typeof(object) });
-            this._ctorJArray = typeof(JArray).GetConstructor(new Type[] { typeof(object[]) });
-            this._AddJArray = typeof(JArray).GetMethod("Add", new Type[] { typeof(object) });
-            this._propJArray_Item = typeof(JArray).GetProperty("Item", new Type[] { typeof(Int32) });
+            this._diagnostics = diagnostics;
 
-            this._ctorJValueObject = typeof(JValue).GetConstructor(new Type[] { typeof(object) });
-            this._ctorJValueLong = typeof(JValue).GetConstructor(new Type[] { typeof(long) });
-            this._ctorJValueDateTime = typeof(JValue).GetConstructor(new Type[] { typeof(DateTimeOffset) });
-            this._ctorJValueDouble = typeof(JValue).GetConstructor(new Type[] { typeof(double) });
-            this._ctorJValueBool = typeof(JValue).GetConstructor(new Type[] { typeof(bool) });
-            this._ctorJValueGuid = typeof(JValue).GetConstructor(new Type[] { typeof(Guid) });
-            this._ctorJValueUri = typeof(JValue).GetConstructor(new Type[] { typeof(Uri) });
-            this._ctorJValueTimeSpan = typeof(JValue).GetConstructor(new Type[] { typeof(TimeSpan) });
-            this._jValueGetNull = typeof(JValue).GetMethod("CreateNull");
+            
 
             this.source = new MethodCompiler();
 
@@ -95,12 +104,12 @@ namespace Bb.Json.Jslt.Services
 
                             ctx.Current.Source = _if2.Then;
                             b = (Expression)node.Accept(this);
-                            _if2.Then.Add(targetArray.Call(this._AddJArray, b));
+                            _if2.Then.Add(targetArray.Call(_AddJArray, b));
                         }
                         else
                         {
                             b = (Expression)node.Accept(this);
-                            _if.Body.Add(targetArray.Call(this._AddJArray, b));
+                            _if.Body.Add(targetArray.Call(_AddJArray, b));
                         }
 
                         //// Case when else
@@ -124,12 +133,12 @@ namespace Bb.Json.Jslt.Services
                             var _if = src.If(whereToken.IsTrue());
                             ctx.Current.Source = _if.Then;
                             var b = (Expression)node.Accept(this);
-                            _if.Then.Add(targetArray.Call(this._AddJArray, b));
+                            _if.Then.Add(targetArray.Call(_AddJArray, b));
                         }
                         else
                         {
                             var b = (Expression)node.Accept(this);
-                            src.Add(targetArray.Call(this._AddJArray, b));
+                            src.Add(targetArray.Call(_AddJArray, b));
                         }
 
                     }
@@ -227,7 +236,7 @@ namespace Bb.Json.Jslt.Services
             if (!typeof(JToken).IsAssignableFrom(getValue.Type))
                 getValue = getValue.ConvertIfDifferent(typeof(JToken));
 
-            return this._ctorJProperty.CreateObject(name, getValue);
+            return _ctorJProperty.CreateObject(name, getValue);
 
         }
 
@@ -579,22 +588,23 @@ namespace Bb.Json.Jslt.Services
 
         #endregion Context
 
-        private ConstructorInfo _ctorJArray;
-        private readonly MethodInfo _AddJArray;
-        private readonly MethodInfo _jValueGetNull;
-        private readonly PropertyInfo _propJArray_Item;
         private readonly MethodCompiler source;
-        private readonly ConstructorInfo _ctorJProperty;
+        private readonly Diagnostics _diagnostics;
 
-        private readonly ConstructorInfo _ctorJValueObject;
-        private readonly ConstructorInfo _ctorJValueLong;
-        private readonly ConstructorInfo _ctorJObject;
-        private readonly ConstructorInfo _ctorJValueDouble;
-        private readonly ConstructorInfo _ctorJValueBool;
-        private readonly ConstructorInfo _ctorJValueUri;
-        private readonly ConstructorInfo _ctorJValueGuid;
-        private readonly ConstructorInfo _ctorJValueTimeSpan;
-        private readonly ConstructorInfo _ctorJValueDateTime;
+        private static readonly ConstructorInfo _ctorJArray;
+        private static readonly MethodInfo _AddJArray;
+        private static readonly MethodInfo _jValueGetNull;
+        private static readonly PropertyInfo _propJArray_Item;
+        private static readonly ConstructorInfo _ctorJProperty;
+        private static readonly ConstructorInfo _ctorJValueObject;
+        private static readonly ConstructorInfo _ctorJValueLong;
+        private static readonly ConstructorInfo _ctorJObject;
+        private static readonly ConstructorInfo _ctorJValueDouble;
+        private static readonly ConstructorInfo _ctorJValueBool;
+        private static readonly ConstructorInfo _ctorJValueUri;
+        private static readonly ConstructorInfo _ctorJValueGuid;
+        private static readonly ConstructorInfo _ctorJValueTimeSpan;
+        private static readonly ConstructorInfo _ctorJValueDateTime;
 
 
 

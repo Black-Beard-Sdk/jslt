@@ -26,6 +26,7 @@ namespace Bb.Json.Jslt.Services
         public JsltTemplate GetTemplate(StringBuilder sb, string filename)
         {
 
+            var _errors = new Diagnostics();
             CultureInfo culture = this._configuration.Culture;
 
             for (int i = 0; i < sb.Length; i++)
@@ -46,7 +47,7 @@ namespace Bb.Json.Jslt.Services
                 if (sb.Length > 0)
                 {
                     var parser = ScriptParser.ParseString(sb);
-                    var visitor = new ScriptVisitor(this._configuration, filename);
+                    var visitor = new ScriptVisitor(this._configuration, _errors, filename);
                     tree = (JsltBase)parser.Visit(visitor);
                     _foundry = visitor.Foundry;
                     culture = visitor.Culture;
@@ -58,28 +59,33 @@ namespace Bb.Json.Jslt.Services
                 throw new ParsingJsonException("Failed to parse Json. " + e.Message, e);
             }
 
+            Func<RuntimeContext, JToken, JToken> rules = null;
+            if (_errors.Success)
+                rules = Get(tree, _foundry, _errors);
+
             JsltTemplate result = new JsltTemplate()
             {
                 Rule = sb,
                 Configuration = this._configuration,
-                Rules = Get(tree, _foundry),
+                Rules = rules,
                 Tree = tree,
                 Culture = culture,
                 Filename = filename,
+                Diagnostics = _errors,
             };
 
             return result;
 
         }
 
-        private Func<RuntimeContext, JToken, JToken> Get(JsltBase tree, FunctionFoundry foundry)
+        private Func<RuntimeContext, JToken, JToken> Get(JsltBase tree, FunctionFoundry foundry, Diagnostics _errors)
         {
 
             Func<RuntimeContext, JToken, JToken> fnc;
 
             if (tree != null)
             {
-                var builder = new TemplateBuilder() { Configuration = this._configuration, EmbbededFunctions = foundry };
+                var builder = new TemplateBuilder(_errors) { Configuration = this._configuration, EmbbededFunctions = foundry };
                 fnc = builder.GenerateLambda(tree);
             }
             else // Template empty

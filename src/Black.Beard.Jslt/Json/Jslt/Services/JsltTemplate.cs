@@ -1,4 +1,5 @@
 ﻿using Bb.Json.Jslt.Asts;
+using Bb.Json.Jslt.Parser;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Globalization;
@@ -27,6 +28,8 @@ namespace Bb.Json.Jslt.Services
         public JsltBase Tree { get; internal set; }
         
         internal StringBuilder Rule { get; set; }
+
+        public Diagnostics Diagnostics { get; internal set; }
 
         public RuntimeContext Transform(Sources sources)
         {

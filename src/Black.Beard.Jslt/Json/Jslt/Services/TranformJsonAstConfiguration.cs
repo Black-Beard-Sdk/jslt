@@ -18,13 +18,10 @@ namespace Bb.Json.Jslt.Services
     public partial class TranformJsonAstConfiguration
     {
 
-
         public TranformJsonAstConfiguration(CultureInfo culture = null)
         {
-
             this.Culture = culture ?? CultureInfo.InvariantCulture;
             this.Services = new ServiceContainer();
-
         }
 
         public ServiceContainer Services { get; }

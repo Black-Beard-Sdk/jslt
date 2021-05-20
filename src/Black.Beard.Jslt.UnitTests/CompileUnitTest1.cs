@@ -267,7 +267,167 @@ namespace Black.Beard.Jslt.UnitTests
         }
 
 
+        [TestMethod]
+        public void TestSum()
+        {
+            var expected = @"
+{ 'prices': .sum('$..n') } 
+".Replace("'", "\"")
+ .Replace("`", "'")
+;
+            var source1 = "{ 'prices': [{'n' : 1}, {'n' : 2}, {'n' : 3}] }".Replace("'", "\"");
 
+            var src = new SourceJson[] { SourceJson.GetFromText(source1) };
+            RuntimeContext result = Test(expected, src);
+            Assert.AreEqual(result.TokenResult["prices"], 6);
+        }
+
+
+        [TestMethod]
+        public void Testconcat()
+        {
+            var expected = @"
+{ 'result': .concat('$..n', null, null) } 
+".Replace("'", "\"")
+ .Replace("`", "'")
+;
+            var source1 = "{ 'prices': [{'n' : 1}, {'n' : 2}, {'n' : 3}] }".Replace("'", "\"");
+
+            var src = new SourceJson[] { SourceJson.GetFromText(source1) };
+            RuntimeContext result = Test(expected, src);
+            Assert.AreEqual(result.TokenResult["result"], "123");
+        }
+
+        [TestMethod]
+        public void TestCrc32()
+        {
+            var expected = @"
+{ 'result': .crc32('toto') } 
+".Replace("'", "\"")
+ .Replace("`", "'")
+;
+            var source1 = "{ }".Replace("'", "\"");
+
+            var src = new SourceJson[] { SourceJson.GetFromText(source1) };
+            RuntimeContext result = Test(expected, src);
+            Assert.AreEqual(result.TokenResult["result"], 281847025);
+        }
+
+        [TestMethod]
+        public void TestId()
+        {
+            var expected = @"
+{ 'result': .uuid() } 
+".Replace("'", "\"")
+ .Replace("`", "'")
+;
+            var source1 = "{ }".Replace("'", "\"");
+
+            var src = new SourceJson[] { SourceJson.GetFromText(source1) };
+            RuntimeContext result = Test(expected, src);
+            var g = (Guid)result.TokenResult["result"];
+            Assert.AreNotEqual(g, null);
+        }
+
+        [TestMethod]
+        public void TestFormatInteger()
+        {
+
+            var expected = @"
+{ 'result': .format(103254895, 'C', 'fr-FR') } 
+".Replace("'", "\"")
+ .Replace("`", "'")
+;
+            var source1 = "{ }".Replace("'", "\"");
+
+            var src = new SourceJson[] { SourceJson.GetFromText(source1) };
+            RuntimeContext result = Test(expected, src);
+            Assert.AreEqual(result.TokenResult["result"], "103 254 895,00 €");
+        }
+
+        [TestMethod]
+        public void TestParsedate()
+        {
+
+            var expected = @"
+{ 'result': .parsedate('Freitag, 31. Oktober 2008', 'de-DE') } 
+".Replace("'", "\"")
+ .Replace("`", "'")
+;
+            var source1 = "{ }".Replace("'", "\"");
+
+            var src = new SourceJson[] { SourceJson.GetFromText(source1) };
+            RuntimeContext result = Test(expected, src);
+            Assert.AreEqual(result.TokenResult["result"], new DateTime(2008, 10, 31));
+        }
+
+        [TestMethod]
+        public void TestTobase64()
+        {
+
+            var expected = @"
+{ 'result': .tobase64('test') } 
+".Replace("'", "\"")
+ .Replace("`", "'")
+;
+            var source1 = "{ }".Replace("'", "\"");
+
+            var src = new SourceJson[] { SourceJson.GetFromText(source1) };
+            RuntimeContext result = Test(expected, src);
+            Assert.AreEqual(result.TokenResult["result"], "dGVzdA==");
+        }
+
+        [TestMethod]
+        public void TestFrombase64()
+        {
+
+            var expected = @"
+{ 'result': .Frombase64('dGVzdA==') } 
+".Replace("'", "\"")
+ .Replace("`", "'")
+;
+            var source1 = "{ }".Replace("'", "\"");
+
+            var src = new SourceJson[] { SourceJson.GetFromText(source1) };
+            RuntimeContext result = Test(expected, src);
+            Assert.AreEqual(result.TokenResult["result"], "test");
+        }
+
+        [TestMethod]
+        public void TestGetNow()
+        {
+
+            var expected = @"
+{ 'result': .now(false) } 
+".Replace("'", "\"")
+ .Replace("`", "'")
+;
+            var source1 = "{ }".Replace("'", "\"");
+
+            var dte1 = DateTime.Now;
+            var src = new SourceJson[] { SourceJson.GetFromText(source1) };
+            RuntimeContext result = Test(expected, src);
+
+            var dte = ((JValue)result.TokenResult["result"]).Value<DateTime>();
+
+            Assert.AreEqual(dte>dte1, true);
+        }
+
+        [TestMethod]
+        public void TestDistinct()
+        {
+
+            var expected = @"
+{ 'result': .distinct('$') } 
+".Replace("'", "\"")
+ .Replace("`", "'")
+;
+            var source1 = "[1,2,1,3]".Replace("'", "\"");
+
+            var src = new SourceJson[] { SourceJson.GetFromText(source1) };
+            RuntimeContext result = Test(expected, src);
+            Assert.AreEqual(result.TokenResult["result"], "test");
+        }
 
 
         private static RuntimeContext Test(string templatePayload, SourceJson[] sources, params (string, Type)[] services)
@@ -278,6 +438,12 @@ namespace Black.Beard.Jslt.UnitTests
                 src.Add(sources[i]);
 
             var template = GetProvider(templatePayload, services);
+
+            if (!template.Diagnostics.Success)
+            {
+                var error = template.Diagnostics.Errors.First();
+                throw new Exception(error.Message);
+            }
 
             var result = template.Transform(src);
 

@@ -1,6 +1,7 @@
 ﻿using Bb.ComponentModel;
 using Bb.ComponentModel.Factories;
 using Bb.Json.Attributes;
+using Bb.Json.Jslt.Asts;
 using Bb.Json.Jslt.Parser;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,7 @@ namespace Bb.Json.Jslt.Services
             this.Services = new ServiceContainer();
         }
 
-        internal Factory GetService(string name, Type[] types)
+        internal Factory GetService(string name, Type[] types, Diagnostics diagnostics, TokenLocation location)
         {
 
             var result = this.Services.GetService(name, types);
@@ -31,7 +32,22 @@ namespace Bb.Json.Jslt.Services
             if (result != null)
                 return result;
 
-            throw new MissingMethodException(name);
+            var result2 = this.Services.GetService(name);
+            if (result2 != null)
+                diagnostics.AddError(null, location, name, $"Service {name} exists but bad arguments calling");
+
+            else
+            {
+                result2 = this.configuration.Services.GetService(name);
+                if (result2 != null)
+                    diagnostics.AddError(null, location, name, $"Service {name} exists but bad arguments calling");
+             
+                else
+                    diagnostics.AddError(null, location, name, $"Service {name} not found");
+
+            }
+
+            return null;
 
         }
 

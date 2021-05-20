@@ -112,11 +112,6 @@ WS
 ID
    : [_A-Za-z] [_A-Za-z0-9]*
    ;
-
-fragment DOT_ID
-   : '.' [_A-Za-z] [_A-Za-z0-9]*
-   ;
-
-fragment LANGUAGE
-   : SUBSCRIPT [_A-Za-z] [_A-Za-z0-9]*
+DOT_ID
+   : '.' [_A-Za-z]+ [_A-Za-z0-9]*
    ;

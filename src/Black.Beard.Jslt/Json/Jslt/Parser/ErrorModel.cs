@@ -16,11 +16,22 @@
         public int Line { get; internal set; }
         public string Filename { get; internal set; }
 
+        public SeverityEnum Severity { get; set; }
+
         public override string ToString()
         {
             return Message.ToString();
         }
 
     }
+
+
+    public enum SeverityEnum
+    {
+        Information = 0,
+        Warning = 1,
+        Error = 2,
+    }
+
 
 }

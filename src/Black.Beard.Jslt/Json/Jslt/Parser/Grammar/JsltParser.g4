@@ -98,7 +98,7 @@ operation :
 // ---------------------------- extended json ----------------------------
 
 jsonfunctionCall :
-   SUBSCRIPT ID PAREN_LEFT jsonValueList? PAREN_RIGHT
+   DOT_ID PAREN_LEFT jsonValueList? PAREN_RIGHT
    ;
 
 jsonValueList : 
