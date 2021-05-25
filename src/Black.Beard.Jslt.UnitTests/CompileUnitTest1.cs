@@ -208,17 +208,13 @@ namespace Black.Beard.Jslt.UnitTests
         public void TestCaseWhen()
         {
             var expected = @"
-{ 
+{
 
-    'propertyName': .when '$.prop1'
-                    case 1 : 
+    'propertyName': .when('$.prop1') 
                     {
-                        { 'sub1' : 11 }
-                    } 
-                    case 3 : 
-                    {
-                        { 'sub1' : 22 }
-                    } 
+                        '1' : { 'sub1' : 11 },
+                        '3' : { 'sub1' : 22 }
+                    }
 
 }".Replace("'", "\"")
  .Replace("`", "'")
@@ -458,7 +454,7 @@ namespace Black.Beard.Jslt.UnitTests
 
             var configuration = new TranformJsonAstConfiguration()
             {
-                Path = "",
+                
             };
             foreach (var item in services)
                 configuration.Services.ServiceDiscovery.AddService(item.Item2, item.Item1);

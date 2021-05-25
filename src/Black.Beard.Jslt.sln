@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Jslt.Roslyn", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Json", "Black.Beard.Json\Black.Beard.Json.csproj", "{AE3F64C5-BD49-4925-91C0-304734C92EB6}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.JsltEvaluator", "Black.Beard.JsltEvaluator\Black.Beard.JsltEvaluator.csproj", "{AD2F2F62-55DF-468B-B8AC-EA44A5D64702}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{AE3F64C5-BD49-4925-91C0-304734C92EB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AE3F64C5-BD49-4925-91C0-304734C92EB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AE3F64C5-BD49-4925-91C0-304734C92EB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD2F2F62-55DF-468B-B8AC-EA44A5D64702}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD2F2F62-55DF-468B-B8AC-EA44A5D64702}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD2F2F62-55DF-468B-B8AC-EA44A5D64702}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD2F2F62-55DF-468B-B8AC-EA44A5D64702}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

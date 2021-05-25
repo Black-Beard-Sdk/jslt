@@ -134,29 +134,5 @@ public interface IJsltParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitJsonValueList([NotNull] JsltParser.JsonValueListContext context);
-	/// <summary>
-	/// Visit a parse tree produced by <see cref="JsltParser.jsonWhen"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitJsonWhen([NotNull] JsltParser.JsonWhenContext context);
-	/// <summary>
-	/// Visit a parse tree produced by <see cref="JsltParser.jsonCase"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitJsonCase([NotNull] JsltParser.JsonCaseContext context);
-	/// <summary>
-	/// Visit a parse tree produced by <see cref="JsltParser.jsonDefaultCase"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitJsonDefaultCase([NotNull] JsltParser.JsonDefaultCaseContext context);
-	/// <summary>
-	/// Visit a parse tree produced by <see cref="JsltParser.jsonWhenExpression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitJsonWhenExpression([NotNull] JsltParser.JsonWhenExpressionContext context);
 }
 } // namespace Bb.Json.Jslt.Parser

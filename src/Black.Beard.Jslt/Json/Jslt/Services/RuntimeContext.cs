@@ -105,7 +105,7 @@ namespace Bb.Json.Jslt.Services
                         case OperationEnum.OrExclusive:
 
                         default:
-                            Stop();
+                            LocalDebug.Stop();
                             break;
                     }
                 }
@@ -124,21 +124,21 @@ namespace Bb.Json.Jslt.Services
                 l = GetValue(tokenLeft);
             else
             {
-                Stop();
+                LocalDebug.Stop();
             }
 
             if (rightToken is JToken tokenRight)
                 r = GetValue(tokenRight);
             else
             {
-                Stop();
+                LocalDebug.Stop();
             }
 
             switch (@operator)
             {
 
                 case OperationEnum.Equal:
-                    return new JValue(object.Equals(l, r));
+                    return new JValue(Equal(l, r));
 
                 case OperationEnum.GreaterThanOrEqual:
                     return new JValue(GreaterThanOrEqual(l, r));
@@ -196,6 +196,49 @@ namespace Bb.Json.Jslt.Services
 
         }
 
+        private static bool Equal(object l, object r)
+        {
+
+            if (l is decimal left_deci)
+                return left_deci == Convert.ToDecimal(r);
+
+            else if (l is float left_float)
+                return left_float == Convert.ToSingle(r);
+
+            else if (l is double left_double)
+                return left_double == Convert.ToDouble(r);
+
+            else if (l is Int16 left_int16)
+                return left_int16 == Convert.ToInt64(r);
+
+            else if (l is UInt16 left_uint16)
+                return left_uint16 == Convert.ToUInt64(r);
+
+            else if (l is UInt32 left_uint32)
+                return left_uint32 == Convert.ToUInt64(r);
+
+            else if (l is UInt64 left_uint64)
+                return left_uint64 == Convert.ToUInt64(r);
+
+            else if (l is int left_int)
+                return left_int == Convert.ToInt64(r);
+
+            else if (l is long left_long)
+                return left_long == Convert.ToInt64(r);
+
+            else if (l is DateTime dateTime)
+                return dateTime == Convert.ToDateTime(r);
+
+            else
+            {
+                LocalDebug.Stop();
+
+            }
+
+            return false;
+
+        }
+
         private static bool GreaterThanOrEqual(object l, object r)
         {
 
@@ -231,7 +274,7 @@ namespace Bb.Json.Jslt.Services
 
             else
             {
-                Stop();
+                LocalDebug.Stop();
 
             }
 
@@ -277,7 +320,7 @@ namespace Bb.Json.Jslt.Services
 
             else
             {
-                Stop();
+                LocalDebug.Stop();
 
             }
 
@@ -320,7 +363,7 @@ namespace Bb.Json.Jslt.Services
 
             else
             {
-                Stop();
+                LocalDebug.Stop();
 
             }
 
@@ -363,7 +406,7 @@ namespace Bb.Json.Jslt.Services
 
             else
             {
-                Stop();
+                LocalDebug.Stop();
 
             }
 
@@ -406,7 +449,7 @@ namespace Bb.Json.Jslt.Services
 
             else
             {
-                Stop();
+                LocalDebug.Stop();
 
             }
 
@@ -437,7 +480,7 @@ namespace Bb.Json.Jslt.Services
 
             else
             {
-                Stop();
+                LocalDebug.Stop();
 
             }
 
@@ -468,7 +511,7 @@ namespace Bb.Json.Jslt.Services
 
             else
             {
-                Stop();
+                LocalDebug.Stop();
 
             }
 
@@ -484,7 +527,7 @@ namespace Bb.Json.Jslt.Services
 
             else
             {
-                Stop();
+                LocalDebug.Stop();
 
             }
 
@@ -500,7 +543,7 @@ namespace Bb.Json.Jslt.Services
 
             else
             {
-                Stop();
+                LocalDebug.Stop();
 
             }
 
@@ -531,7 +574,7 @@ namespace Bb.Json.Jslt.Services
 
             else
             {
-                Stop();
+                LocalDebug.Stop();
 
             }
 
@@ -574,7 +617,7 @@ namespace Bb.Json.Jslt.Services
 
             else
             {
-                Stop();
+                LocalDebug.Stop();
 
             }
 
@@ -617,7 +660,7 @@ namespace Bb.Json.Jslt.Services
 
             else
             {
-                Stop();
+                LocalDebug.Stop();
 
             }
 
@@ -660,7 +703,7 @@ namespace Bb.Json.Jslt.Services
 
             else
             {
-                Stop();
+                LocalDebug.Stop();
 
             }
 
@@ -703,7 +746,7 @@ namespace Bb.Json.Jslt.Services
 
             else
             {
-                Stop();
+                LocalDebug.Stop();
 
             }
 
@@ -833,7 +876,7 @@ namespace Bb.Json.Jslt.Services
 
             else
             {
-                Stop();
+                LocalDebug.Stop();
             }
 
             return result;
@@ -917,21 +960,12 @@ namespace Bb.Json.Jslt.Services
 
         private static object _lock = new object();
 
-        [System.Diagnostics.DebuggerStepThrough]
-        [System.Diagnostics.DebuggerNonUserCode]
-        private static void Stop()
-        {
-            if (System.Diagnostics.Debugger.IsAttached)
-                System.Diagnostics.Debugger.Break();
-        }
-
-
-        public JToken TokenSource { get; }
+               public JToken TokenSource { get; }
 
         public Sources SubSources { get; }
 
         public JToken TokenResult { get; internal set; }
-
+        public TranformJsonAstConfiguration Configuration { get; internal set; }
     }
 
 

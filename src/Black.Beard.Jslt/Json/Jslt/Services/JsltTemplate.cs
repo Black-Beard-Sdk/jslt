@@ -33,9 +33,15 @@ namespace Bb.Json.Jslt.Services
 
         public RuntimeContext Transform(Sources sources)
         {
-            var ctx = new RuntimeContext(sources);
+
+            var ctx = new RuntimeContext(sources)
+            {
+                Configuration = this.Configuration,
+            };
+
             ctx.TokenResult = Rules(ctx, ctx.TokenSource);
             return ctx;
+
         }
 
     }

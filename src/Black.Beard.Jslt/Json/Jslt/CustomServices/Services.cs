@@ -13,26 +13,29 @@ namespace Bb.Json.Jslt.CustomServices
 
 
 
-    public static class Services
+    public static partial class Services
     {
 
-        /// <summary>
-        /// return the crc32 of the value
-        /// if one of the term is not a number
-        /// </summary>
-        [JsltExtensionMethod("crc32")]
-        public static JToken ExecuteCrc32(RuntimeContext ctx, JToken token)
+        [JsltExtensionMethod("load")]
+        public static JToken ExecuteLoadSource(RuntimeContext ctx, string sourcePath)
         {
 
-            if (token != null)
+            var file = ctx.Configuration.ResolveFile(sourcePath);
+
+            if( file.Exists)
             {
 
-                var r = token.ToString();
-                return new JValue(Crc32.Calculate(r));
+                return file.FullName.LoadContentFromFile().ConvertToJson();
+
+            }
+            else
+            {
+
+                
 
             }
 
-            return new JValue(0);
+            return JValue.CreateNull();
 
         }
 
@@ -137,7 +140,7 @@ namespace Bb.Json.Jslt.CustomServices
         }
 
         [JsltExtensionMethod("uuid")]
-        public static JToken Execute(RuntimeContext ctx)
+        public static JToken ExecuteUuid(RuntimeContext ctx)
         {
             return new JValue(Guid.NewGuid());
         }
@@ -209,87 +212,16 @@ namespace Bb.Json.Jslt.CustomServices
         /// <summary>
         /// return the value in base 64 format
         /// </summary>
-        [JsltExtensionMethod("tobase64")]
-        public static JToken ExecuteToBase64(RuntimeContext ctx, JToken token)
-        {
-
-            if (token != null)
-            {
-                var data = System.Text.Encoding.UTF8.GetBytes(token.ToString());
-                return new JValue(Convert.ToBase64String(data));
-            }
-
-            return new JValue(string.Empty);
-
-        }
-
-        [JsltExtensionMethod("frombase64")]
-        public static JToken ExecuteFromBase64(RuntimeContext ctx, JToken token)
-        {
-
-            if (token != null)
-            {
-                var d2 = Convert.FromBase64String(token.ToString());
-                var data = System.Text.Encoding.UTF8.GetString(d2);
-                return new JValue(data);
-
-            }
-
-            return new JValue(string.Empty);
-
-        }
-
-        [JsltExtensionMethod("sha256")]
-        public static JToken ExecuteSha256(RuntimeContext ctx, JToken token)
-        {
-
-            if (token != null)
-            {
-
-                using (SHA256 mySHA256 = SHA256.Create())
-                using (MemoryStream stream = new MemoryStream())
-                {
-
-                    var buffer = System.Text.Encoding.UTF8.GetBytes(token.ToString());
-                    stream.Write(buffer, 0, buffer.Length);
-
-                    byte[] hashValue = mySHA256.ComputeHash(stream);
-                    return new JValue(hashValue.PrintByteArray());
-                }
-
-            }
-
-            return new JValue(string.Empty);
-
-        }
-
-        [JsltExtensionMethod("sha512")]
-        public static JToken ExecuteSha512(RuntimeContext ctx, JToken token)
-        {
-
-            if (token != null)
-            {
-
-                var data = System.Text.Encoding.UTF8.GetBytes(token.ToString());
-                SHA512 shaM = new SHA512Managed();
-                var hashValue = shaM.ComputeHash(data);
-                return new JValue(hashValue.PrintByteArray());
-
-            }
-
-            return new JValue(string.Empty);
-
-        }
-
+      
         [JsltExtensionMethod("convert")]
-        public static JToken Execute(RuntimeContext ctx, JToken token, Type targetType)
+        public static JToken ExecuteConvert(RuntimeContext ctx, JToken token, Type targetType)
         {
             if (token is JValue v)
                 return new JValue(Convert.ChangeType(v.Value, targetType));
             return token;
         }
 
-        private static HashSet<char> _availables = new HashSet<char>() { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+        //private static HashSet<char> _availables = new HashSet<char>() { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 
     }
 

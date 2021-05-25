@@ -70,7 +70,7 @@ STRING
    : '"' (ESC | SAFECODEPOINT)* '"'
    ;
 
-MULTI_LINE_COMMENT : '/*' .*? '*/' ;
+MULTI_LINE_COMMENT : '/*' .*? '*/' -> skip;
 //CODE_STRING :        QUOTE_CODE_STRING .*? QUOTE_CODE_STRING;
 //QUOTE_CODE_STRING :  '\'\'\'';
 

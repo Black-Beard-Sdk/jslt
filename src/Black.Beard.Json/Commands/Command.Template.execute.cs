@@ -70,10 +70,7 @@ namespace Bb.Json.Commands
                     if (!validator.Evaluate(out int errorNum))
                         return errorNum;
 
-                    var configuration = new TranformJsonAstConfiguration()
-                    {
-                        Path = Environment.CurrentDirectory,
-                    };
+                    var configuration = new TranformJsonAstConfiguration();
 
                     TemplateTransformProvider Templateprovider = new TemplateTransformProvider(configuration);
                     

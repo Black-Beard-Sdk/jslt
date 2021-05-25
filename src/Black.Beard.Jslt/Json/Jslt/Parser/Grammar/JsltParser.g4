@@ -79,7 +79,6 @@ jsonLtOperation :
 
 jsonLtItem : 
      jsonfunctionCall 
-   | jsonWhen
    | jsonValueBoolean
    | jsonValueString
    | jsonValueInteger
@@ -98,34 +97,12 @@ operation :
 // ---------------------------- extended json ----------------------------
 
 jsonfunctionCall :
-   DOT_ID PAREN_LEFT jsonValueList? PAREN_RIGHT
+   DOT_ID PAREN_LEFT jsonValueList? PAREN_RIGHT obj?
    ;
 
 jsonValueList : 
    jsonValue (COMMA jsonValue)*
    ;
 
-
-
-jsonWhen : 
-   SUBSCRIPT WHEN jsonWhenExpression jsonCase+ jsonDefaultCase?
-   ;
-
-jsonCase : 
-   CASE jsonWhenExpression COLON BRACE_LEFT jsonValue BRACE_RIGHT jsonDefaultCase?
-   ;
-
-jsonDefaultCase : 
-   DEFAULT COLON BRACE_LEFT jsonValue BRACE_RIGHT
-   ;
-
-jsonWhenExpression : 
-     jsonValueBoolean
-   | jsonValueString
-   | jsonValueInteger
-   | jsonValueNumber
-   | jsonValueNull
-   | jsonLtOperation
-   ;
 
 

@@ -1,0 +1,110 @@
+﻿<Window x:Class="AppJsonEvaluator.MainWindow"
+        
+        xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AppJsonEvaluator"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25" />
+            <RowDefinition />
+            <RowDefinition Height="25" />
+        </Grid.RowDefinitions>
+
+        <ToolBar Height="100" Grid.Row="0" />
+
+        <Grid Grid.Row="1">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="3"/>
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition Height="3" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <Grid>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="32" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+
+                    <ToolBar Grid.Row="0" >
+                        <Button x:Name="BtnOpenTemplate" Content="Open template" Click="BtnOpenTemplate_Click"/>
+                        <Button x:Name="BtnSaveTemplate" Content="Save template" Click="BtnSaveTemplate_Click" />
+                        <Label x:Name="LabelTemplateFile" />
+                    </ToolBar>
+
+                    <avalonEdit:TextEditor x:Name="TemplateEditor" Grid.Row="1" FontFamily="Consolas" FontSize="16" TextChanged="TemplateEditorTextChanged" Drop="TemplateEditor_Drop" >
+                    
+                </avalonEdit:TextEditor>
+
+                </Grid>
+
+                <GridSplitter Background="DarkGray"  ResizeDirection="Rows" Grid.Row="1" 
+                      HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                      ResizeBehavior="PreviousAndNext" />
+
+                <Grid Grid.Row="2">
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="32" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+
+                    <ToolBar Grid.Row="0">
+                        <Button x:Name="BtnOpenSourceTest" Content="Open test source" Click="BtnOpenSourceTest_Click"/>
+                        <Button x:Name="BtnSaveSourceTest" Content="Save test source" Click="BtnSaveSourceTest_Click" />
+                        <Label x:Name="LabelSourceTestFile" />
+                    </ToolBar>
+
+                    <avalonEdit:TextEditor x:Name="SourceEditor" Grid.Row="1" FontFamily="Consolas" FontSize="16" TextChanged="SourceEditorTextChanged" VerticalAlignment="Bottom" Drop="SourceEditor_Drop"  >
+                    </avalonEdit:TextEditor>
+                    
+                </Grid>
+                
+    
+            </Grid>
+
+            <GridSplitter Background="DarkGray"  ResizeDirection="Columns" Grid.Column="1" 
+                      HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                      ResizeBehavior="PreviousAndNext" />
+
+            <Grid Grid.Column="2">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition Height="3" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                
+                <avalonEdit:TextEditor x:Name="TargetEditor" Grid.Row="0" FontFamily="Consolas" FontSize="16" TextChanged="TargetEditorTextChanged" Margin="0,4,0,-4" >
+                </avalonEdit:TextEditor>
+
+                <GridSplitter Background="DarkGray"  ResizeDirection="Rows" Grid.Row="1" 
+                      HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                      ResizeBehavior="PreviousAndNext" />
+
+                <ListBox x:Name="Errors" Grid.Row="2">
+                    
+                </ListBox>
+                
+            </Grid>
+
+        </Grid>
+
+        <StatusBar Height="20" Grid.Row="3">
+        </StatusBar>
+    </Grid>
+</Window>

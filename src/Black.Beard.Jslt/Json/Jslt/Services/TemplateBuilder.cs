@@ -42,7 +42,7 @@ namespace Bb.Json.Jslt.Services
 
             this._diagnostics = diagnostics;
 
-            
+
 
             this.source = new MethodCompiler();
 
@@ -182,7 +182,8 @@ namespace Bb.Json.Jslt.Services
                 {
                     item.ToDesctruct = false;
                     var i = (Expression)item.Accept(this);
-                    srcRoot.Add(i);
+                    if (i != null)
+                        srcRoot.Add(i);
                 }
 
                 var v1 = ctx.Current.Source.AddVar(typeof(JObject), null, _ctorJObject.CreateObject());
@@ -199,7 +200,13 @@ namespace Bb.Json.Jslt.Services
                     foreach (var item in node.Properties)
                     {
                         var prop = (Expression)item.Accept(this);
-                        ctx.Current.Source.Add(RuntimeContext._addProperty.Call(v1, prop));
+                        var call = RuntimeContext._addProperty.Call(v1, prop);
+                        if (call != null)
+                            ctx.Current.Source.Add(call);
+                        else
+                        {
+                            _diagnostics.AddError("template builder", item.Start, string.Empty, $"value missing on property {item.Name}");
+                        }
                     }
 
                 }
@@ -209,7 +216,8 @@ namespace Bb.Json.Jslt.Services
                     foreach (var item in node.Properties)
                     {
                         var prop = (Expression)item.Accept(this);
-                        ctx.Current.Source.Add(RuntimeContext._addProperty.Call(v1, prop));
+                        if (prop != null)
+                            ctx.Current.Source.Add(RuntimeContext._addProperty.Call(v1, prop));
                     }
 
                 }
@@ -218,7 +226,8 @@ namespace Bb.Json.Jslt.Services
                 {
                     item.ToDesctruct = true;
                     var i = (Expression)item.Accept(this);
-                    srcRoot.Add(i);
+                    if (i != null)
+                        srcRoot.Add(i);
                 }
 
                 return v1;
@@ -229,14 +238,24 @@ namespace Bb.Json.Jslt.Services
 
         public object VisitProperty(JsltProperty node)
         {
-
+            Expression getValue = null;
             var name = Expression.Constant(node.Name);
-            var getValue = (Expression)node.Value.Accept(this);
+            var _value = node.Value;
+            if (_value != null)
+            {
 
-            if (!typeof(JToken).IsAssignableFrom(getValue.Type))
-                getValue = getValue.ConvertIfDifferent(typeof(JToken));
+                getValue = (Expression)_value.Accept(this);
 
-            return _ctorJProperty.CreateObject(name, getValue);
+                if (!typeof(JToken).IsAssignableFrom(getValue.Type))
+                    getValue = getValue.ConvertIfDifferent(typeof(JToken));
+
+                return _ctorJProperty.CreateObject(name, getValue);
+
+            }
+
+            this._diagnostics.AddError("template building", node.Start, string.Empty, $"missing value on property {name}");
+
+            return null;
 
         }
 
@@ -278,8 +297,8 @@ namespace Bb.Json.Jslt.Services
 
                     ctx.Current.RootSource = RuntimeContext._getContentByJPath.Method.Call
                     (
-                        ctx.Current.Context, 
-                        ctx.Current.RootSource, 
+                        ctx.Current.Context,
+                        ctx.Current.RootSource,
                         txt
                     );
 
@@ -288,8 +307,8 @@ namespace Bb.Json.Jslt.Services
                 {
                     ctx.Current.RootSource = RuntimeContext._translateVariable.Method.Call
                     (
-                        ctx.Current.Context, 
-                        Expression.Constant(node.Value.Value), 
+                        ctx.Current.Context,
+                        Expression.Constant(node.Value.Value),
                         Expression.Constant(node.VariableNames.ToArray())
                     );
                 }
