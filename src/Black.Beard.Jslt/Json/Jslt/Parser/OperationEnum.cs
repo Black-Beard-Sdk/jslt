@@ -2,6 +2,9 @@
 {
     public enum OperationEnum
     {
+
+        Undefined,
+
         GreaterThan,
         GreaterThanOrEqual,
         Equal,
@@ -19,7 +22,11 @@
         AndExclusive,
         Or,
         OrExclusive,
-        Not
+
+        Coalesce,
+
+        Not,
+
     }
 
 }

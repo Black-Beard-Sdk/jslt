@@ -26,7 +26,7 @@ namespace Bb.Json.Jslt.Services
             _properties = new Dictionary<Type, Dictionary<string, (PropertyInfo, Action<object, object>)>>();
             _convertToken = RuntimeContext.ConvertTo;
             _translateVariable = RuntimeContext.Translate;
-                
+
             _setVariable = typeof(RuntimeContext).GetMethod(nameof(RuntimeContext.SetVariable), new Type[] { typeof(RuntimeContext), typeof(string), typeof(object) });
             _DelVariable = typeof(RuntimeContext).GetMethod(nameof(RuntimeContext.DelVariable), new Type[] { typeof(RuntimeContext), typeof(string) });
 
@@ -117,6 +117,8 @@ namespace Bb.Json.Jslt.Services
         public static JToken EvaluateBinaryOperator(RuntimeContext ctx, object leftToken, OperationEnum @operator, object rightToken)
         {
 
+            JToken result = null;
+
             object l = null;
             object r = null;
 
@@ -134,72 +136,106 @@ namespace Bb.Json.Jslt.Services
                 LocalDebug.Stop();
             }
 
-            switch (@operator)
+            try
             {
 
-                case OperationEnum.Equal:
-                    return new JValue(Equal(l, r));
+                switch (@operator)
+                {
 
-                case OperationEnum.GreaterThanOrEqual:
-                    return new JValue(GreaterThanOrEqual(l, r));
+                    case OperationEnum.Equal:
+                        result = new JValue(Equal(l, r));
+                        break;
 
-                case OperationEnum.GreaterThan:
-                    return new JValue(GreaterThan(l, r));
+                    case OperationEnum.GreaterThanOrEqual:
+                        result = new JValue(GreaterThanOrEqual(l, r));
+                        break;
 
-                case OperationEnum.LessThanOrEqual:
-                    return new JValue(LessThanOrEqual(l, r));
+                    case OperationEnum.GreaterThan:
+                        result = new JValue(GreaterThan(l, r));
+                        break;
 
-                case OperationEnum.LessThan:
-                    return new JValue(LessThan(l, r));
+                    case OperationEnum.LessThanOrEqual:
+                        result = new JValue(LessThanOrEqual(l, r));
+                        break;
 
-                case OperationEnum.NotEqual:
-                    return new JValue(!object.Equals(l, r));
+                    case OperationEnum.LessThan:
+                        result = new JValue(LessThan(l, r));
+                        break;
 
-                case OperationEnum.Add:
-                    return new JValue(Add(l, r));
+                    case OperationEnum.NotEqual:
+                        result = new JValue(NotEqual(l, r));
+                        break;
 
-                case OperationEnum.Subtract:
-                    return new JValue(Substract(l, r));
+                    case OperationEnum.Add:
+                        result = new JValue(Add(l, r));
+                        break;
 
-                case OperationEnum.Divide:
-                    return new JValue(Divid(l, r));
+                    case OperationEnum.Subtract:
+                        result = new JValue(Substract(l, r));
+                        break;
 
-                case OperationEnum.Modulo:
-                    return new JValue(Modulo(l, r));
+                    case OperationEnum.Divide:
+                        result = new JValue(Divid(l, r));
+                        break;
 
-                case OperationEnum.Multiply:
-                    return new JValue(Multiply(l, r));
+                    case OperationEnum.Modulo:
+                        result = new JValue(Modulo(l, r));
+                        break;
 
-                case OperationEnum.Power:
-                    return new JValue(Power(l, r));
+                    case OperationEnum.Multiply:
+                        result = new JValue(Multiply(l, r));
+                        break;
 
-                case OperationEnum.And:
-                    return new JValue(And(l, r));
+                    case OperationEnum.Power:
+                        result = new JValue(Power(l, r));
+                        break;
 
-                case OperationEnum.AndExclusive:
-                    return new JValue(AndExclusive(l, r));
+                    case OperationEnum.And:
+                        result = new JValue(And(l, r));
+                        break;
 
-                case OperationEnum.Or:
-                    return new JValue(Or(l, r));
+                    case OperationEnum.AndExclusive:
+                        result = new JValue(AndExclusive(l, r));
+                        break;
 
-                case OperationEnum.OrExclusive:
-                    return new JValue(OrExclusive(l, r));
+                    case OperationEnum.Or:
+                        result = new JValue(Or(l, r));
+                        break;
 
-                case OperationEnum.Chain:
-                    break;
+                    case OperationEnum.OrExclusive:
+                        result = new JValue(OrExclusive(l, r));
+                        break;
 
-                default:
-                    break;
+                    case OperationEnum.Chain:
+                        break;
+
+                    default:
+                        break;
+                }
+
             }
+            catch (Exception e)
+            {
 
-            return JValue.CreateNull();
+                throw;
+            }
+            return result ?? JValue.CreateNull();
 
         }
 
         private static bool Equal(object l, object r)
         {
 
-            if (l is decimal left_deci)
+            if (l == null)
+                return r == null;
+
+            else if (l is string str)
+                return str == (r?.ToString() ?? string.Empty);
+
+            else if (l is bool bo)
+                return bo == Convert.ToBoolean(r);
+
+            else if (l is decimal left_deci)
                 return left_deci == Convert.ToDecimal(r);
 
             else if (l is float left_float)
@@ -238,6 +274,59 @@ namespace Bb.Json.Jslt.Services
             return false;
 
         }
+
+        private static bool NotEqual(object l, object r)
+        {
+
+            if (l == null)
+                return r != l;
+
+            else if (l is bool bo)
+                return bo != Convert.ToBoolean(r);
+
+            else if (l is string str)
+                return str != (r?.ToString() ?? string.Empty);
+
+            else if (l is decimal left_deci)
+                return left_deci != Convert.ToDecimal(r);
+
+            else if (l is float left_float)
+                return left_float != Convert.ToSingle(r);
+
+            else if (l is double left_double)
+                return left_double != Convert.ToDouble(r);
+
+            else if (l is Int16 left_int16)
+                return left_int16 != Convert.ToInt64(r);
+
+            else if (l is UInt16 left_uint16)
+                return left_uint16 != Convert.ToUInt64(r);
+
+            else if (l is UInt32 left_uint32)
+                return left_uint32 != Convert.ToUInt64(r);
+
+            else if (l is UInt64 left_uint64)
+                return left_uint64 != Convert.ToUInt64(r);
+
+            else if (l is int left_int)
+                return left_int != Convert.ToInt64(r);
+
+            else if (l is long left_long)
+                return left_long != Convert.ToInt64(r);
+
+            else if (l is DateTime dateTime)
+                return dateTime != Convert.ToDateTime(r);
+
+            else
+            {
+                LocalDebug.Stop();
+
+            }
+
+            return false;
+
+        }
+
 
         private static bool GreaterThanOrEqual(object l, object r)
         {
@@ -770,9 +859,6 @@ namespace Bb.Json.Jslt.Services
 
         public static void SetVariable(RuntimeContext ctx, string name, object value)
         {
-
-
-
             ctx.SubSources.Variables.Add(name, value);
         }
 
@@ -781,7 +867,7 @@ namespace Bb.Json.Jslt.Services
             ctx.SubSources.Variables.Del(name);
         }
 
-        public static string Translate(RuntimeContext ctx, string text, string[] keys)
+        public static object Translate(RuntimeContext ctx, string text, string[] keys)
         {
 
             var d = text;
@@ -791,60 +877,75 @@ namespace Bb.Json.Jslt.Services
                 var r = ctx.SubSources.Variables.Get(item.Substring(2));
 
                 if (r != null)
-                    d = d.Replace(item, r.ToString());
-
+                {
+                    if (text == item)
+                    {
+                        return r;
+                    }
+                    else
+                        d = d.Replace(item, r.ToString());
+                }
             }
 
             return d;
 
         }
 
-      
+
 
         public static JToken GetContentByJPath(RuntimeContext ctx, JToken token, string path)
         {
 
             JToken result = null;
 
-            if (token == null)
-                Trace.WriteLine($"the token is null. the filter '{path}' can't be apply");
-
-            else
+            try
             {
 
-                if (token is JObject o)
-                {
-                    var h = o.SelectTokens(path).ToList();
-                    if (h.Count == 0)
-                        result = null;
-
-                    else if (h.Count == 1)
-                        result = h[0];
-
-                    else
-                        result = new JArray(h);
-
-                }
-
-                else if (token is JArray a)
-                {
-
-                    var h = a.SelectTokens(path).ToList();
-                    if (h.Count == 1)
-                        result = h[0];
-
-                    else
-                        result = new JArray(h);
-
-                }
-                else if (token is JValue v)
-                    return null;
+                if (token == null)
+                    Trace.WriteLine($"the token is null. the filter '{path}' can't be apply");
 
                 else
                 {
 
-                }
+                    if (token is JObject o)
+                    {
+                        var h = o.SelectTokens(path).ToList();
+                        if (h.Count == 0)
+                            result = null;
 
+                        else if (h.Count == 1)
+                            result = h[0];
+
+                        else
+                            result = new JArray(h);
+
+                    }
+
+                    else if (token is JArray a)
+                    {
+
+                        var h = a.SelectTokens(path).ToList();
+                        if (h.Count == 1)
+                            result = h[0];
+
+                        else
+                            result = new JArray(h);
+
+                    }
+                    else if (token is JValue v)
+                        return null;
+
+                    else
+                    {
+
+                    }
+
+                }
+                // {"Unexpected character while parsing path query: N"}
+            }
+            catch (Newtonsoft.Json.JsonException e)
+            {
+                throw new Exception($"invalid json path '{path}'." + e.Message, e);
             }
 
             return result;
@@ -892,9 +993,9 @@ namespace Bb.Json.Jslt.Services
         public static readonly Func<RuntimeContext, JToken, ITransformJsonService, JToken> _getContentFromService;
         public static readonly Func<RuntimeContext, JToken, OperationEnum, JToken> _evaluateUnaryOperator;
         public static readonly Func<RuntimeContext, object, OperationEnum, object, JToken> _evaluateBinaryOperator;
-        public static readonly Func<RuntimeContext, string, string[], string> _translateVariable;
+        public static readonly Func<RuntimeContext, string, string[], object> _translateVariable;
 
-       
+
         public static readonly MethodInfo _addProperty;
 
         public static readonly MethodInfo _setVariable;
@@ -960,7 +1061,7 @@ namespace Bb.Json.Jslt.Services
 
         private static object _lock = new object();
 
-               public JToken TokenSource { get; }
+        public JToken TokenSource { get; }
 
         public Sources SubSources { get; }
 

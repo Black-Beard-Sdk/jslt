@@ -291,7 +291,7 @@ namespace Bb.Json.Jslt.Parser
                 else
                 {
                     if (containsVariable)
-                        result = new JsltTranslateVariable(new JsltPath() { Value = txt, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() });
+                         result = new JsltTranslateVariable(new JsltPath() { Value = txt, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() });
                     else
                         result = new JsltPath() { Value = txt, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
 
@@ -476,27 +476,41 @@ namespace Bb.Json.Jslt.Parser
                     return null;
             }
 
-            var right_operation = context.jsonLtOperation();
+            OperationEnum operation = OperationEnum.Undefined;
+            var ope = context.operation();
+            if (ope != null)
+                operation = (OperationEnum)ope.Accept(this);
 
+            var right_operation = context.jsonLtOperation();
             if (right_operation != null)
             {
 
                 var operationRight = (JsltBase)right_operation.Accept(this);
-
-                if (context.PAREN_LEFT() == null)
+                if (operationRight == null)
                 {
-                    var operation = (OperationEnum)context.operation().Accept(this);
-                    return new JsltBinaryOperator(left, operation, operationRight) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+                    AddError(context.Start.ToLocation(), "", "missing binary right expression");
+                    return null;
+                }
+                else
+                {
+                    if (context.PAREN_LEFT() == null)
+                    {
+
+                        return new JsltBinaryOperator(left, operation, operationRight) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+                    }
+
+                    return left;
                 }
 
-                //return AddPosition(new JSubExpression(context.GetText(), left), context.Start, context.Stop);
-                //return new JsltConstant() { Value = typeof(string), Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
-
-                return left;
-
+            }
+            else if (operation != OperationEnum.Undefined)
+            {
+                AddError(context.Start.ToLocation(), "", "missing binary right expression");
+                return null;
             }
 
             return left;
+
         }
 
         public override object VisitOperation([NotNull] JsltParser.OperationContext context)
@@ -552,6 +566,9 @@ namespace Bb.Json.Jslt.Parser
 
             else if (context.OR_EXCLUSIVE() != null)
                 return OperationEnum.OrExclusive;
+
+            else if (context.COALESCE() != null)
+                return OperationEnum.Coalesce;
 
             throw new NotImplementedException(context.GetText());
 
@@ -656,7 +673,7 @@ namespace Bb.Json.Jslt.Parser
             {
                 if (@case.Name.ToLower() == "default")
                     result.Default = @case.Value;
-                
+
                 else
                 {
                     var expression = new JsltConstant() { Value = @case.Name, Kind = JsltKind.String, Start = @case.Start, Stop = @case.Stop };
@@ -721,7 +738,11 @@ namespace Bb.Json.Jslt.Parser
             var items = context.jsonValue();
 
             foreach (var item in items)
-                result.Add((JsltBase)item.Accept(this));
+            {
+                var r = (JsltBase)item.Accept(this);
+                if (r != null)
+                    result.Add(r);
+            }
 
             return result;
 

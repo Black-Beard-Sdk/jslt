@@ -245,6 +245,22 @@ namespace Black.Beard.Jslt.UnitTests
         }
 
         [TestMethod]
+        public void TestCoalesce()
+        {
+            var expected = @"
+{ 
+    'propertyName': '$.prop1' ?? '$.prop2' ?? '$.prop3'
+
+}".Replace("'", "\"")
+ .Replace("`", "'")
+;
+            var source = "{ 'prop3':3 }".Replace("'", "\"");
+            var src = new SourceJson[] { SourceJson.GetFromText(source) };
+            RuntimeContext result = Test(expected, src);
+            Assert.AreEqual(result.TokenResult["propertyName"], 3);
+        }
+
+        [TestMethod]
         public void TestMethodMerge()
         {
             var expected = @"

@@ -14,34 +14,48 @@ namespace Bb.Json.Jslt.CustomServices
     [JsltExtensionMethod("get")]
     public class ServiceGet : ITransformJsonService
     {
-              
 
-        public ServiceGet(string sourceName, string keySourceName)
+
+        public ServiceGet(object sourceName, string keySourceName)
         {
             this._sourceName = sourceName;
-            this._keySourceName = keySourceName;
+            this._keySourceName = "$" + keySourceName;
         }
 
 
         public JToken Execute(RuntimeContext ctx, JToken token)
         {
 
-            SourceJson src = ctx.SubSources[this._sourceName] 
-                ?? throw new SourceNotFoundException("sourceName");
+            JToken datas = null;
 
-            var datas = src.Datas.SelectToken(this._keySourceName);
+            if (this._sourceName is string s)
+            {
+                SourceJson src = ctx.SubSources[s]
+                ?? throw new SourceNotFoundException("sourceName");
+                datas = src.Datas.SelectToken(this._keySourceName);
+            }
+            else if (this._sourceName is JToken t)
+            {
+                datas = t;
+            }
+            else
+            {
+
+            }
 
             if (datas != null)
-                return datas;
+            {
+                var result = datas.SelectToken(this._keySourceName);
+                return result;
+            }
 
             return JValue.CreateNull();
 
         }
 
 
-        private readonly string _sourceName;
+        private readonly object _sourceName;
         private readonly string _keySourceName;
-        private readonly string _keyLocalName;
 
     }
 

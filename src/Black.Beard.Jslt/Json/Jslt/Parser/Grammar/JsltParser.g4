@@ -92,6 +92,7 @@ operation :
    | PLUS | MINUS | DIVID | MODULO | WILDCARD_SUBSCRIPT | POWER
    | CHAIN
    | AND | OR | AND_EXCLUSIVE | OR_EXCLUSIVE
+   | COALESCE
    ;
 
 // ---------------------------- extended json ----------------------------

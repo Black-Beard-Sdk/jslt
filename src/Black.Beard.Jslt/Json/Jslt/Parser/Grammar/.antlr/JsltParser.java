@@ -19,10 +19,10 @@ public class JsltParser extends Parser {
 		SUBSCRIPT=1, WILDCARD_SUBSCRIPT=2, CURRENT_VALUE=3, COLON=4, URI=5, TIME=6, 
 		DATETIME=7, STRING_=8, GUID=9, WHEN=10, CASE=11, DEFAULT=12, EQ=13, NE=14, 
 		GT=15, LT=16, LE=17, GE=18, NT=19, PLUS=20, MINUS=21, DIVID=22, MODULO=23, 
-		POWER=24, AND=25, OR=26, AND_EXCLUSIVE=27, OR_EXCLUSIVE=28, CHAIN=29, 
-		TRUE=30, FALSE=31, NULL=32, BRACE_LEFT=33, BRACE_RIGHT=34, BRACKET_LEFT=35, 
-		BRACKET_RIGHT=36, COMMA=37, PAREN_LEFT=38, PAREN_RIGHT=39, STRING=40, 
-		MULTI_LINE_COMMENT=41, NUMBER=42, INT=43, WS=44, ID=45, DOT_ID=46;
+		POWER=24, AND=25, OR=26, AND_EXCLUSIVE=27, OR_EXCLUSIVE=28, COALESCE=29, 
+		CHAIN=30, TRUE=31, FALSE=32, NULL=33, BRACE_LEFT=34, BRACE_RIGHT=35, BRACKET_LEFT=36, 
+		BRACKET_RIGHT=37, COMMA=38, PAREN_LEFT=39, PAREN_RIGHT=40, STRING=41, 
+		MULTI_LINE_COMMENT=42, NUMBER=43, INT=44, WS=45, ID=46, DOT_ID=47;
 	public static final int
 		RULE_script = 0, RULE_json = 1, RULE_obj = 2, RULE_pair = 3, RULE_array = 4, 
 		RULE_jsonValue = 5, RULE_jsonValueString = 6, RULE_jsonValueNumber = 7, 
@@ -44,8 +44,8 @@ public class JsltParser extends Parser {
 			null, "'.'", "'*'", "'@'", "':'", "'uri'", "'time'", "'datetime'", "'string'", 
 			"'uuid'", "'when'", "'case'", "'default'", "'=='", "'!='", "'>'", "'<'", 
 			"'<='", "'>='", "'!'", "'+'", "'-'", "'/'", "'%'", "'^'", "'&'", "'|'", 
-			"'&&'", "'||'", "'->'", "'true'", "'false'", "'null'", "'{'", "'}'", 
-			"'['", "']'", "','", "'('", "')'"
+			"'&&'", "'||'", "'??'", "'->'", "'true'", "'false'", "'null'", "'{'", 
+			"'}'", "'['", "']'", "','", "'('", "')'"
 		};
 	}
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
@@ -54,9 +54,9 @@ public class JsltParser extends Parser {
 			null, "SUBSCRIPT", "WILDCARD_SUBSCRIPT", "CURRENT_VALUE", "COLON", "URI", 
 			"TIME", "DATETIME", "STRING_", "GUID", "WHEN", "CASE", "DEFAULT", "EQ", 
 			"NE", "GT", "LT", "LE", "GE", "NT", "PLUS", "MINUS", "DIVID", "MODULO", 
-			"POWER", "AND", "OR", "AND_EXCLUSIVE", "OR_EXCLUSIVE", "CHAIN", "TRUE", 
-			"FALSE", "NULL", "BRACE_LEFT", "BRACE_RIGHT", "BRACKET_LEFT", "BRACKET_RIGHT", 
-			"COMMA", "PAREN_LEFT", "PAREN_RIGHT", "STRING", "MULTI_LINE_COMMENT", 
+			"POWER", "AND", "OR", "AND_EXCLUSIVE", "OR_EXCLUSIVE", "COALESCE", "CHAIN", 
+			"TRUE", "FALSE", "NULL", "BRACE_LEFT", "BRACE_RIGHT", "BRACKET_LEFT", 
+			"BRACKET_RIGHT", "COMMA", "PAREN_LEFT", "PAREN_RIGHT", "STRING", "MULTI_LINE_COMMENT", 
 			"NUMBER", "INT", "WS", "ID", "DOT_ID"
 		};
 	}
@@ -700,7 +700,7 @@ public class JsltParser extends Parser {
 				setState(100);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << WILDCARD_SUBSCRIPT) | (1L << EQ) | (1L << NE) | (1L << GT) | (1L << LT) | (1L << LE) | (1L << GE) | (1L << PLUS) | (1L << MINUS) | (1L << DIVID) | (1L << MODULO) | (1L << POWER) | (1L << AND) | (1L << OR) | (1L << AND_EXCLUSIVE) | (1L << OR_EXCLUSIVE) | (1L << CHAIN))) != 0)) {
+				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << WILDCARD_SUBSCRIPT) | (1L << EQ) | (1L << NE) | (1L << GT) | (1L << LT) | (1L << LE) | (1L << GE) | (1L << PLUS) | (1L << MINUS) | (1L << DIVID) | (1L << MODULO) | (1L << POWER) | (1L << AND) | (1L << OR) | (1L << AND_EXCLUSIVE) | (1L << OR_EXCLUSIVE) | (1L << COALESCE) | (1L << CHAIN))) != 0)) {
 					{
 					setState(97);
 					operation();
@@ -855,6 +855,7 @@ public class JsltParser extends Parser {
 		public TerminalNode OR() { return getToken(JsltParser.OR, 0); }
 		public TerminalNode AND_EXCLUSIVE() { return getToken(JsltParser.AND_EXCLUSIVE, 0); }
 		public TerminalNode OR_EXCLUSIVE() { return getToken(JsltParser.OR_EXCLUSIVE, 0); }
+		public TerminalNode COALESCE() { return getToken(JsltParser.COALESCE, 0); }
 		public OperationContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -870,7 +871,7 @@ public class JsltParser extends Parser {
 			{
 			setState(117);
 			_la = _input.LA(1);
-			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << WILDCARD_SUBSCRIPT) | (1L << EQ) | (1L << NE) | (1L << GT) | (1L << LT) | (1L << LE) | (1L << GE) | (1L << PLUS) | (1L << MINUS) | (1L << DIVID) | (1L << MODULO) | (1L << POWER) | (1L << AND) | (1L << OR) | (1L << AND_EXCLUSIVE) | (1L << OR_EXCLUSIVE) | (1L << CHAIN))) != 0)) ) {
+			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << WILDCARD_SUBSCRIPT) | (1L << EQ) | (1L << NE) | (1L << GT) | (1L << LT) | (1L << LE) | (1L << GE) | (1L << PLUS) | (1L << MINUS) | (1L << DIVID) | (1L << MODULO) | (1L << POWER) | (1L << AND) | (1L << OR) | (1L << AND_EXCLUSIVE) | (1L << OR_EXCLUSIVE) | (1L << COALESCE) | (1L << CHAIN))) != 0)) ) {
 			_errHandler.recoverInline(this);
 			}
 			else {
@@ -1009,7 +1010,7 @@ public class JsltParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\60\u008b\4\2\t\2"+
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\61\u008b\4\2\t\2"+
 		"\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13"+
 		"\t\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22\t\22"+
 		"\3\2\3\2\3\2\3\3\3\3\3\4\3\4\3\4\3\4\7\4.\n\4\f\4\16\4\61\13\4\3\4\3\4"+
@@ -1019,31 +1020,31 @@ public class JsltParser extends Parser {
 		"\16\3\16\3\16\5\16g\n\16\3\16\3\16\3\16\3\16\5\16m\n\16\3\17\3\17\3\17"+
 		"\3\17\3\17\3\17\3\17\5\17v\n\17\3\20\3\20\3\21\3\21\3\21\5\21}\n\21\3"+
 		"\21\3\21\5\21\u0081\n\21\3\22\3\22\3\22\7\22\u0086\n\22\f\22\16\22\u0089"+
-		"\13\22\3\22\2\2\23\2\4\6\b\n\f\16\20\22\24\26\30\32\34\36 \"\2\5\3\2 "+
-		"!\3\2\7\13\5\2\4\4\17\24\26\37\2\u008c\2$\3\2\2\2\4\'\3\2\2\2\6\66\3\2"+
+		"\13\22\3\22\2\2\23\2\4\6\b\n\f\16\20\22\24\26\30\32\34\36 \"\2\5\3\2!"+
+		"\"\3\2\7\13\5\2\4\4\17\24\26 \2\u008c\2$\3\2\2\2\4\'\3\2\2\2\6\66\3\2"+
 		"\2\2\b8\3\2\2\2\nI\3\2\2\2\fN\3\2\2\2\16P\3\2\2\2\20T\3\2\2\2\22V\3\2"+
 		"\2\2\24X\3\2\2\2\26Z\3\2\2\2\30\\\3\2\2\2\32l\3\2\2\2\34u\3\2\2\2\36w"+
 		"\3\2\2\2 y\3\2\2\2\"\u0082\3\2\2\2$%\5\4\3\2%&\7\2\2\3&\3\3\2\2\2\'(\5"+
-		"\f\7\2(\5\3\2\2\2)*\7#\2\2*/\5\b\5\2+,\7\'\2\2,.\5\b\5\2-+\3\2\2\2.\61"+
-		"\3\2\2\2/-\3\2\2\2/\60\3\2\2\2\60\62\3\2\2\2\61/\3\2\2\2\62\63\7$\2\2"+
-		"\63\67\3\2\2\2\64\65\7#\2\2\65\67\7$\2\2\66)\3\2\2\2\66\64\3\2\2\2\67"+
-		"\7\3\2\2\289\7*\2\29:\7\6\2\2:;\5\f\7\2;\t\3\2\2\2<=\7%\2\2=B\5\f\7\2"+
-		">?\7\'\2\2?A\5\f\7\2@>\3\2\2\2AD\3\2\2\2B@\3\2\2\2BC\3\2\2\2CE\3\2\2\2"+
-		"DB\3\2\2\2EF\7&\2\2FJ\3\2\2\2GH\7%\2\2HJ\7&\2\2I<\3\2\2\2IG\3\2\2\2J\13"+
-		"\3\2\2\2KO\5\6\4\2LO\5\n\6\2MO\5\32\16\2NK\3\2\2\2NL\3\2\2\2NM\3\2\2\2"+
-		"O\r\3\2\2\2PR\7*\2\2QS\5\30\r\2RQ\3\2\2\2RS\3\2\2\2S\17\3\2\2\2TU\7,\2"+
-		"\2U\21\3\2\2\2VW\7-\2\2W\23\3\2\2\2XY\t\2\2\2Y\25\3\2\2\2Z[\7\"\2\2[\27"+
-		"\3\2\2\2\\]\7\5\2\2]^\t\3\2\2^\31\3\2\2\2_a\7\25\2\2`_\3\2\2\2`a\3\2\2"+
-		"\2ab\3\2\2\2bf\5\34\17\2cd\5\36\20\2de\5\32\16\2eg\3\2\2\2fc\3\2\2\2f"+
-		"g\3\2\2\2gm\3\2\2\2hi\7(\2\2ij\5\32\16\2jk\7)\2\2km\3\2\2\2l`\3\2\2\2"+
-		"lh\3\2\2\2m\33\3\2\2\2nv\5 \21\2ov\5\24\13\2pv\5\16\b\2qv\5\22\n\2rv\5"+
-		"\20\t\2sv\5\26\f\2tv\5\30\r\2un\3\2\2\2uo\3\2\2\2up\3\2\2\2uq\3\2\2\2"+
-		"ur\3\2\2\2us\3\2\2\2ut\3\2\2\2v\35\3\2\2\2wx\t\4\2\2x\37\3\2\2\2yz\7\60"+
-		"\2\2z|\7(\2\2{}\5\"\22\2|{\3\2\2\2|}\3\2\2\2}~\3\2\2\2~\u0080\7)\2\2\177"+
-		"\u0081\5\6\4\2\u0080\177\3\2\2\2\u0080\u0081\3\2\2\2\u0081!\3\2\2\2\u0082"+
-		"\u0087\5\f\7\2\u0083\u0084\7\'\2\2\u0084\u0086\5\f\7\2\u0085\u0083\3\2"+
-		"\2\2\u0086\u0089\3\2\2\2\u0087\u0085\3\2\2\2\u0087\u0088\3\2\2\2\u0088"+
-		"#\3\2\2\2\u0089\u0087\3\2\2\2\17/\66BINR`flu|\u0080\u0087";
+		"\f\7\2(\5\3\2\2\2)*\7$\2\2*/\5\b\5\2+,\7(\2\2,.\5\b\5\2-+\3\2\2\2.\61"+
+		"\3\2\2\2/-\3\2\2\2/\60\3\2\2\2\60\62\3\2\2\2\61/\3\2\2\2\62\63\7%\2\2"+
+		"\63\67\3\2\2\2\64\65\7$\2\2\65\67\7%\2\2\66)\3\2\2\2\66\64\3\2\2\2\67"+
+		"\7\3\2\2\289\7+\2\29:\7\6\2\2:;\5\f\7\2;\t\3\2\2\2<=\7&\2\2=B\5\f\7\2"+
+		">?\7(\2\2?A\5\f\7\2@>\3\2\2\2AD\3\2\2\2B@\3\2\2\2BC\3\2\2\2CE\3\2\2\2"+
+		"DB\3\2\2\2EF\7\'\2\2FJ\3\2\2\2GH\7&\2\2HJ\7\'\2\2I<\3\2\2\2IG\3\2\2\2"+
+		"J\13\3\2\2\2KO\5\6\4\2LO\5\n\6\2MO\5\32\16\2NK\3\2\2\2NL\3\2\2\2NM\3\2"+
+		"\2\2O\r\3\2\2\2PR\7+\2\2QS\5\30\r\2RQ\3\2\2\2RS\3\2\2\2S\17\3\2\2\2TU"+
+		"\7-\2\2U\21\3\2\2\2VW\7.\2\2W\23\3\2\2\2XY\t\2\2\2Y\25\3\2\2\2Z[\7#\2"+
+		"\2[\27\3\2\2\2\\]\7\5\2\2]^\t\3\2\2^\31\3\2\2\2_a\7\25\2\2`_\3\2\2\2`"+
+		"a\3\2\2\2ab\3\2\2\2bf\5\34\17\2cd\5\36\20\2de\5\32\16\2eg\3\2\2\2fc\3"+
+		"\2\2\2fg\3\2\2\2gm\3\2\2\2hi\7)\2\2ij\5\32\16\2jk\7*\2\2km\3\2\2\2l`\3"+
+		"\2\2\2lh\3\2\2\2m\33\3\2\2\2nv\5 \21\2ov\5\24\13\2pv\5\16\b\2qv\5\22\n"+
+		"\2rv\5\20\t\2sv\5\26\f\2tv\5\30\r\2un\3\2\2\2uo\3\2\2\2up\3\2\2\2uq\3"+
+		"\2\2\2ur\3\2\2\2us\3\2\2\2ut\3\2\2\2v\35\3\2\2\2wx\t\4\2\2x\37\3\2\2\2"+
+		"yz\7\61\2\2z|\7)\2\2{}\5\"\22\2|{\3\2\2\2|}\3\2\2\2}~\3\2\2\2~\u0080\7"+
+		"*\2\2\177\u0081\5\6\4\2\u0080\177\3\2\2\2\u0080\u0081\3\2\2\2\u0081!\3"+
+		"\2\2\2\u0082\u0087\5\f\7\2\u0083\u0084\7(\2\2\u0084\u0086\5\f\7\2\u0085"+
+		"\u0083\3\2\2\2\u0086\u0089\3\2\2\2\u0087\u0085\3\2\2\2\u0087\u0088\3\2"+
+		"\2\2\u0088#\3\2\2\2\u0089\u0087\3\2\2\2\17/\66BINR`flu|\u0080\u0087";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

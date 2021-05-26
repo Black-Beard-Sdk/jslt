@@ -50,6 +50,7 @@ AND : '&';
 OR : '|';
 AND_EXCLUSIVE : '&&';
 OR_EXCLUSIVE : '||';
+COALESCE : '??';
 
 CHAIN : '->';
 

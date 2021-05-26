@@ -112,17 +112,6 @@ namespace Bb.Json.Jslt.Services
                             _if.Body.Add(targetArray.Call(_AddJArray, b));
                         }
 
-                        //// Case when else
-                        //if (node.Where != null)
-                        //{
-
-                        //    ctx.Current.Source = i.Else;
-                        //    ctx.Current.RootSource = resultToken;
-
-                        //    b = (Expression)node.Accept(this);
-                        //    i.Else.Add(targetArray.Call(this._AddJArray, b));
-
-                        //}
 
                     }
                     else
@@ -305,10 +294,21 @@ namespace Bb.Json.Jslt.Services
                 }
                 else
                 {
+
+                    object value = null;
+                    
+                    if (node.Value is JsltConstant c)
+                        value = c.Value;
+                    
+                    else
+                    {
+
+                    }
+
                     ctx.Current.RootSource = RuntimeContext._translateVariable.Method.Call
                     (
                         ctx.Current.Context,
-                        Expression.Constant(node.Value.Value),
+                        Expression.Constant(value),
                         Expression.Constant(node.VariableNames.ToArray())
                     );
                 }
@@ -414,12 +414,41 @@ namespace Bb.Json.Jslt.Services
             using (CurrentContext ctx = NewContext())
             {
 
-                var left = (Expression)node.Left.Accept(this);
-                var right = (Expression)node.Right.Accept(this);
+                var nextBlock = ctx.Current.Source;
 
-                var result = RuntimeContext._evaluateBinaryOperator.Method.Call(ctx.Current.Context, left, Expression.Constant(node.Operator), right);
+                var l = node.Left;
+                var r = node.Right;
 
-                return result;
+                if (l != null && r != null)
+                {
+
+                    var left = (Expression)l.Accept(this);
+
+
+                    if (node.Operator == OperationEnum.Coalesce)
+                    {
+
+                        ParameterExpression resultVar = nextBlock.AddVar(left.Type, null, left);
+                        var _if = nextBlock.If(resultVar.Equal(Expression.Constant(null)));
+
+                        ctx.Current.Source = _if.Then;
+
+                        var right = (Expression)r.Accept(this);
+                        _if.Then.Add(resultVar.AssignFrom(right));
+                        return resultVar;
+                    }
+                    else
+                    {
+                        var right = (Expression)r.Accept(this);
+                        var result = RuntimeContext._evaluateBinaryOperator.Method.Call(ctx.Current.Context, left, Expression.Constant(node.Operator), right);
+                        return result;
+
+                    }
+
+                }
+
+                return null;
+
             }
         }
 
@@ -473,9 +502,10 @@ namespace Bb.Json.Jslt.Services
 
                 nextBlock = ctx.Current.Source;
                 ConditionalStatement condition = null;
-                var resultVar = nextBlock.AddVar(typeof(object), null, Expression.Constant(null));
                 var left = ((Expression)node.Expression.Accept(this))
                     .ConvertIfDifferent(typeof(JToken));
+
+                ParameterExpression resultVar = nextBlock.AddVar(left.Type, null, Expression.Constant(null));
 
                 foreach (var _case in node.Cases)
                 {
@@ -487,7 +517,8 @@ namespace Bb.Json.Jslt.Services
 
                     condition = nextBlock.If(Expression.MakeBinary(ExpressionType.Equal, evaluation.ConvertIfDifferent(typeof(JValue)).Property("Value").ConvertIfDifferent(typeof(bool)), Expression.Constant(true)));
                     ctx.Current.Source = condition.Then;
-                    condition.Then.Assign(resultVar, (Expression)_case.Accept(this));
+                    var i = (Expression)_case.Accept(this);
+                    condition.Then.Assign(resultVar, i.ConvertIfDifferent(resultVar.Type));
                     nextBlock = condition.Else;
                 }
 

@@ -7,15 +7,28 @@ namespace Bb.Json.Jslt.Asts
     public class JsltTranslateVariable : JsltBase
     {
 
-        public JsltTranslateVariable(JsltConstant value)
+        public JsltTranslateVariable(JsltBase token)
         {
             Kind = JsltKind.JTranslateVariable;
-            this.Value = value;
-            this.Start = value.Start;
-            this.Stop = value.Stop;
+            this.Value = token;
+            this.Start = token.Start;
+            this.Stop = token.Stop;
             this.VariableNames = new List<string>();
 
-            var matchs = VariableManagerExtension.Match(value.Value.ToString());
+            string _value = null;
+
+            if (token is JsltConstant c)
+                _value = c.Value?.ToString();
+
+            else if (token is JsltPath p)
+                _value = p.Value?.ToString();
+
+            else
+            {
+
+            }
+
+            var matchs = VariableManagerExtension.Match(_value);
             while (matchs.Success)
             {
                 this.VariableNames.Add(matchs.Value);
@@ -24,7 +37,7 @@ namespace Bb.Json.Jslt.Asts
 
         }
 
-        public JsltConstant Value { get; }
+        public JsltBase Value { get; }
 
         public List<string> VariableNames { get; }
 
