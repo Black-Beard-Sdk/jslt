@@ -68,7 +68,7 @@ jsonValueNumber : NUMBER;
 jsonValueInteger : INT;
 jsonValueBoolean : TRUE | FALSE;
 jsonValueNull : NULL;
-jsonType : CURRENT_VALUE (URI | TIME | DATETIME | STRING_ | GUID);
+jsonType : CURRENT_VALUE (URI | TIME | DATETIME | STRING_ | GUID | INTEGER | DECIMAL);
 
 // ---------------------------- jslt ----------------------------
 

@@ -2,6 +2,8 @@
 
 namespace Bb.Json.Jslt.Asts
 {
+
+    [System.Diagnostics.DebuggerDisplay("switch {Expression}")]
     public class JsltSwitch : JsltBase
     {
 

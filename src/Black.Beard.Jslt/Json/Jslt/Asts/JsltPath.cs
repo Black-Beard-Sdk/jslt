@@ -6,6 +6,7 @@ using System.Xml;
 namespace Bb.Json.Jslt.Asts
 {
 
+    [System.Diagnostics.DebuggerDisplay("jpath {Value}")]
     public class JsltPath : JsltBase
     {
 

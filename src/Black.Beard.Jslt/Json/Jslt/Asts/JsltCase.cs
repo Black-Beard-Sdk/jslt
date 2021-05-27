@@ -1,5 +1,7 @@
 ﻿namespace Bb.Json.Jslt.Asts
 {
+
+    [System.Diagnostics.DebuggerDisplay("case {RightExpression}")]
     public class JsltCase : JsltBase
     {
 

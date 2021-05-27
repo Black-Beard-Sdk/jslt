@@ -49,6 +49,7 @@ namespace Bb.Json.Jslt.Parser
                 if (service == null)
                 {
                     LocalDebug.Stop();
+                    AddError(item.Start, string.Empty, $"the service {item.Name} can't be resolved.");
                 }
                 else
                 {
@@ -284,7 +285,9 @@ namespace Bb.Json.Jslt.Parser
                         else
                             args = new List<JsltBase>() { new JsltPath() { Value = txt, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() }, c };
 
-                        result = new JsltFunctionCall("convert", args);
+                        var call = new JsltFunctionCall("convert", args);
+                        this._functions.Add(call);
+                        result = call;
 
                     }
                 }
@@ -364,6 +367,12 @@ namespace Bb.Json.Jslt.Parser
 
             else if (context.GUID() != null)
                 return new JsltConstant() { Value = typeof(Guid), Kind = JsltKind.Type, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+
+            else if (context.INTEGER() != null)
+                return new JsltConstant() { Value = typeof(Int64), Kind = JsltKind.Type, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+
+            else if (context.DECIMAL() != null)
+                return new JsltConstant() { Value = typeof(decimal), Kind = JsltKind.Type, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
 
             throw new NotImplementedException(context.GetText());
 
@@ -552,9 +561,6 @@ namespace Bb.Json.Jslt.Parser
             else if (context.POWER() != null)
                 return OperationEnum.Power;
 
-            else if (context.CHAIN() != null)
-                return OperationEnum.Chain;
-
             else if (context.AND() != null)
                 return OperationEnum.And;
 
@@ -569,6 +575,9 @@ namespace Bb.Json.Jslt.Parser
 
             else if (context.COALESCE() != null)
                 return OperationEnum.Coalesce;
+
+            else if (context.CHAIN() != null)
+                return OperationEnum.Chain;
 
             throw new NotImplementedException(context.GetText());
 

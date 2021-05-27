@@ -31,6 +31,8 @@ GUID : 'uuid';
 WHEN : 'when';
 CASE : 'case';
 DEFAULT : 'default';
+INTEGER : 'integer';
+DECIMAL : 'decimal';
 
 EQ : '==' ;
 NE : '!=' ;

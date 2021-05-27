@@ -1,5 +1,7 @@
 ﻿namespace Bb.Json.Jslt.Asts
 {
+
+    [System.Diagnostics.DebuggerDisplay("arg {Name}={Value}")]
     public class JsltArgument : JsltBase
     {
 

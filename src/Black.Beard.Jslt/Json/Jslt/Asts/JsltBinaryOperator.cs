@@ -2,6 +2,8 @@
 
 namespace Bb.Json.Jslt.Asts
 {
+
+    [System.Diagnostics.DebuggerDisplay("{Left} {Operator} {Right}")]
     public class JsltBinaryOperator : JsltOperator
     {
 

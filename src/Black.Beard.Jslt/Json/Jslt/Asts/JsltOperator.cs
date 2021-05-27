@@ -2,6 +2,7 @@
 
 namespace Bb.Json.Jslt.Asts
 {
+    [System.Diagnostics.DebuggerDisplay("{Operator} {Operator}")]
     public class JsltOperator : JsltBase
     {
 

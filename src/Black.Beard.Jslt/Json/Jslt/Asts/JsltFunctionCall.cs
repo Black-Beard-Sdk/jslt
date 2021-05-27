@@ -8,7 +8,7 @@ using System.Linq;
 namespace Bb.Json.Jslt.Asts
 {
 
-
+   [System.Diagnostics.DebuggerDisplay("call {Name}")]
     public class JsltFunctionCall : JsltBase
     {
 

@@ -4,6 +4,7 @@ using System;
 namespace Bb.Json.Jslt.Asts
 {
 
+    [System.Diagnostics.DebuggerDisplay("const {Type.Name} {Value}")]
     public class JsltConstant : JsltBase
     {
 

@@ -437,6 +437,12 @@ namespace Bb.Json.Jslt.Services
                         _if.Then.Add(resultVar.AssignFrom(right));
                         return resultVar;
                     }
+                    //if (node.Operator == OperationEnum.Chain)
+                    //{
+                        
+                    //    //ParameterExpression resultVar = nextBlock.AddVar(left.Type, null, left);
+
+                    //}
                     else
                     {
                         var right = (Expression)r.Accept(this);

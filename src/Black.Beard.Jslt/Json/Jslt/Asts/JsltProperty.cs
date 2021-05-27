@@ -1,6 +1,7 @@
 ﻿namespace Bb.Json.Jslt.Asts
 {
 
+    [System.Diagnostics.DebuggerDisplay("property {Name} : {Value}")]
     public class JsltProperty : JsltBase
     {
 

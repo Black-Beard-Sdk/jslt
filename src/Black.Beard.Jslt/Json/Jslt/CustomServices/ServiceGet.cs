@@ -19,7 +19,7 @@ namespace Bb.Json.Jslt.CustomServices
         public ServiceGet(object sourceName, string keySourceName)
         {
             this._sourceName = sourceName;
-            this._keySourceName = "$" + keySourceName;
+            this._keySourceName = keySourceName;
         }
 
 
