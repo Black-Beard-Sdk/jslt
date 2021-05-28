@@ -7,6 +7,7 @@ using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.Design;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -33,6 +34,7 @@ namespace AppJsonEvaluator
         {
 
             InitializeComponent();
+            InitializeTextMarkerService();
 
             //// ensure all assemblies are loaded.
             //var type = typeof(Bb.Jslt.Services.Excels.Column);
@@ -64,6 +66,17 @@ namespace AppJsonEvaluator
 
         }
 
+        void InitializeTextMarkerService()
+        {
+            var textMarkerService = new TextMarkerService(TemplateEditor.Document);
+            TemplateEditor.TextArea.TextView.BackgroundRenderers.Add(textMarkerService);
+            TemplateEditor.TextArea.TextView.LineTransformers.Add(textMarkerService);
+            IServiceContainer services = (IServiceContainer)TemplateEditor.Document.ServiceProvider.GetService(typeof(IServiceContainer));
+            if (services != null)
+                services.AddService(typeof(ITextMarkerService), textMarkerService);
+            this.textMarkerService = textMarkerService;
+        }
+
         private FoldingManager UpdateTemplate(TextEditor textEditor)
         {
             textEditor.TextArea.IndentationStrategy = new ICSharpCode.AvalonEdit.Indentation.CSharp.CSharpIndentationStrategy(textEditor.Options);
@@ -73,11 +86,6 @@ namespace AppJsonEvaluator
 
             return FoldingManager.Install(textEditor.TextArea);
 
-        }
-
-        private void UpdateFolding(FoldingManager foldingManager, TextEditor textEditor)
-        {
-            _foldingStrategy.UpdateFoldings(foldingManager, textEditor.Document);
         }
 
         protected override void OnClosing(CancelEventArgs e)
@@ -94,6 +102,7 @@ namespace AppJsonEvaluator
 
             _template = null;
             Errors.Items.Clear();
+            textMarkerService.RemoveAll(m => true);
 
             try
             {
@@ -106,7 +115,24 @@ namespace AppJsonEvaluator
                 _template = TemplateEditor.Text.GetTransformProvider(_path);
 
                 foreach (var item in _template.Diagnostics)
+                {
+                    
                     Errors.Items.Add(item.Message);
+
+                    var index = item.StartIndex;
+                    if (index > 0)
+                        index--;
+
+                    int lenght = 5;
+                    var x = TemplateEditor.Document.TextLength - index;
+                    if (x < lenght)
+                        lenght = x;
+
+                    ITextMarker marker = textMarkerService.Create(index, 10);
+                    marker.MarkerTypes = TextMarkerTypes.SquigglyUnderline;
+                    marker.MarkerColor = Colors.Red;
+
+                }
 
             }
             catch (Exception e1)
@@ -157,7 +183,10 @@ namespace AppJsonEvaluator
 
         }
 
-
+        private void UpdateFolding(FoldingManager foldingManager, TextEditor textEditor)
+        {
+            _foldingStrategy.UpdateFoldings(foldingManager, textEditor.Document);
+        }
 
         private void BtnOpenTemplate_Click(object sender, RoutedEventArgs e)
         {
@@ -273,6 +302,7 @@ namespace AppJsonEvaluator
         private Parameters _parameters;
         private bool _templateUpdated;
         private bool _sourceUpdated;
+        private TextMarkerService textMarkerService;
 
         private void TemplateEditor_DragEnter(object sender, DragEventArgs e)
         {
