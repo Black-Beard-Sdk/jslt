@@ -115,6 +115,21 @@ namespace Bb.Json.Jslt.Parser
 
                     }
 
+                    else if (prop.Name.ToLower() == "$assemblies")
+                    {
+
+                        var assemblies = new List<string>();
+
+                        if (prop.Value is JsltArray ar)
+                            foreach (JsltBase fu in ar.Items)
+                                if (fu is JsltConstant v)
+                                    if (v.Value is string str)
+                                        assemblies.Add(str);
+
+                        LoadAssembly(assemblies);
+
+                    }
+
                     else if (prop.Name.ToLower() == "$imports")
                     {
 
@@ -294,7 +309,7 @@ namespace Bb.Json.Jslt.Parser
                 else
                 {
                     if (containsVariable)
-                         result = new JsltTranslateVariable(new JsltPath() { Value = txt, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() });
+                        result = new JsltTranslateVariable(new JsltPath() { Value = txt, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() });
                     else
                         result = new JsltPath() { Value = txt, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
 
@@ -868,6 +883,12 @@ namespace Bb.Json.Jslt.Parser
                 this._foundry.AddAssembly(file.FullName);
         }
 
+        private void LoadAssembly(List<string> sources)
+        {
+            foreach (var assembly in sources)
+                this._foundry.AddAssemblyName(assembly);
+
+        }
         private void CollectLib(string u, List<FileInfo> dll, JsltBase item)
         {
             var file = ResolveFile(u);

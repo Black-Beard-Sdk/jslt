@@ -9,6 +9,14 @@ namespace Bb.Json
     public partial class Program
     {
 
+        static Program()
+        {
+
+            // ensure all assemblies are loaded.
+            //var type = typeof(Bb.Jslt.Services.Excels.Column);
+
+        }
+
         public static int ExitCode { get; private set; }
 
         public static void Main(params string[] args)
@@ -23,6 +31,7 @@ namespace Bb.Json
                     .CommandExecute()
                     .CommandFormat()
                     // .CommandImport()
+                    .CommandSchemas()
                     .CommandExport()
                     .CommandLoadCsv()
                     .CommandLoadExcel()

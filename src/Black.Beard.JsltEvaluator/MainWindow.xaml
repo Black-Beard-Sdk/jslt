@@ -27,54 +27,22 @@
             </Grid.ColumnDefinitions>
 
             <Grid Grid.Column="0">
+
                 <Grid.RowDefinitions>
-                    <RowDefinition />
-                    <RowDefinition Height="3" />
+                    <RowDefinition Height="32" />
                     <RowDefinition />
                 </Grid.RowDefinitions>
 
-                <Grid>
+                <ToolBar Grid.Row="0" >
+                    <Button x:Name="BtnOpenTemplate" Content="Open template" Click="BtnOpenTemplate_Click"/>
+                    <Button x:Name="BtnSaveTemplate" Content="Save template" Click="BtnSaveTemplate_Click" />
+                    <Label x:Name="LabelTemplateFile" />
+                </ToolBar>
 
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="32" />
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
+                <avalonEdit:TextEditor x:Name="TemplateEditor" Grid.Row="1" FontFamily="Consolas" FontSize="16" TextChanged="TemplateEditorTextChanged" Drop="TemplateEditor_Drop" >
 
-                    <ToolBar Grid.Row="0" >
-                        <Button x:Name="BtnOpenTemplate" Content="Open template" Click="BtnOpenTemplate_Click"/>
-                        <Button x:Name="BtnSaveTemplate" Content="Save template" Click="BtnSaveTemplate_Click" />
-                        <Label x:Name="LabelTemplateFile" />
-                    </ToolBar>
-
-                    <avalonEdit:TextEditor x:Name="TemplateEditor" Grid.Row="1" FontFamily="Consolas" FontSize="16" TextChanged="TemplateEditorTextChanged" Drop="TemplateEditor_Drop" >
-                    
                 </avalonEdit:TextEditor>
 
-                </Grid>
-
-                <GridSplitter Background="DarkGray"  ResizeDirection="Rows" Grid.Row="1" 
-                      HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
-                      ResizeBehavior="PreviousAndNext" />
-
-                <Grid Grid.Row="2">
-
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="32" />
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
-
-                    <ToolBar Grid.Row="0">
-                        <Button x:Name="BtnOpenSourceTest" Content="Open test source" Click="BtnOpenSourceTest_Click"/>
-                        <Button x:Name="BtnSaveSourceTest" Content="Save test source" Click="BtnSaveSourceTest_Click" />
-                        <Label x:Name="LabelSourceTestFile" />
-                    </ToolBar>
-
-                    <avalonEdit:TextEditor x:Name="SourceEditor" Grid.Row="1" FontFamily="Consolas" FontSize="16" TextChanged="SourceEditorTextChanged" VerticalAlignment="Bottom" Drop="SourceEditor_Drop"  >
-                    </avalonEdit:TextEditor>
-                    
-                </Grid>
-                
-    
             </Grid>
 
             <GridSplitter Background="DarkGray"  ResizeDirection="Columns" Grid.Column="1" 
@@ -88,7 +56,7 @@
                     <RowDefinition Height="3" />
                     <RowDefinition />
                 </Grid.RowDefinitions>
-                
+
                 <avalonEdit:TextEditor x:Name="TargetEditor" Grid.Row="0" FontFamily="Consolas" FontSize="16" TextChanged="TargetEditorTextChanged" Margin="0,4,0,-4" >
                 </avalonEdit:TextEditor>
 
@@ -97,9 +65,9 @@
                       ResizeBehavior="PreviousAndNext" />
 
                 <ListBox x:Name="Errors" Grid.Row="2">
-                    
+
                 </ListBox>
-                
+
             </Grid>
 
         </Grid>

@@ -10,6 +10,15 @@ In this sample the argument "$argumentName" describe the source
 { "result" : .method(arg1, arg2, ...) }
 ``` 
 
+## **loadjson**  
+```JSON
+{ "result" : .loadjson("path document json") }
+``` 
+
+## **loadxls**  
+```JSON
+{ "result" : .loadjson("path document json", "path document excel configuration") }
+``` 
 
 ## **Concat**  
 Concat input stream of type text. 
@@ -91,14 +100,97 @@ return the hash of Sha512 algorithm
 ```
 
 ## **SubStr**  
-return a sub string of text
+Retrieves a substring from this instance. The substring starts at a specified character position and has a specified length. A string that is equivalent to the substring of length length that begins at startIndex in this instance, or System.String.Empty if startIndex is equal to the length of this instance and length is zero.
+
 ```JSON
-{ "Syntax" : .substr("<value>", "$start", "$length") }
+{ "Syntax" : .substr("<value>", "<start position>", "<length>") }
+```
+## **stringlenght**  
+return the lenght of the string
+```JSON
+{ "Syntax" : .stringlenght("<value>") }
 ```
 
-## **Distinct**  
-return false in the value is already matched in the input list
+## **stringcontains**  
+return true if the value contains the string chain
 ```JSON
-"Syntax" : { "$type" : "distinct" }
+{ "Syntax" : .stringcontains("<value>", "<char>") }
 ```
 
+## **lower**  
+Returns a copy of this string converted to lowercase.
+```JSON
+{ "Syntax" : .lower("<value>") }
+```
+
+## **upper**  
+Returns a copy of this string converted to uppercase.
+```JSON
+{ "Syntax" : .upper("<value>") }
+```
+
+## **startswith**  
+ Determines whether the beginning of this string instance matches the specified string. return true if value matches the beginning of this string; otherwise, false.
+```JSON
+{ "Syntax" : .startswith("<value>", "The string to compare") }
+```
+
+## **endswith**  
+Determines whether the end of this string instance matches the specified string.
+return true if value matches the end of this instance; otherwise, false.
+```JSON
+{ "Syntax" : .endswith("<value>", "The string to compare") }
+```
+
+## **trim**  
+The string that remains after all occurrences of the characters in the trimChars parameter are removed from the start and end of the current string. If trimChars is null or an empty array, white-space characters are removed instead. If no characters can be trimmed from the current instance, the method returns the current
+        //     instance unchanged.
+```JSON
+{ "Syntax" : .trim("<value>", "All Unicode characters to remove") }
+```
+
+## **indexof**  
+Reports the zero-based index of the first occurrence of the specified string in this instance.
+```JSON
+{ "Syntax" : .indexof("<value>", "The string to seek.") }
+```
+
+## **lastindexof**  
+ Reports the zero-based index position of the last occurrence of a specified string within this instance.
+```JSON
+{ "Syntax" : .lastindexof("<value>", "The string to seek.") }
+```
+
+## **normalize**  
+Returns a new string whose textual value is the same as this string, but whose binary representation is in Unicode normalization form C.
+```JSON
+{ "Syntax" : .normalize("<value>") }
+```
+
+## **padleft**  
+A new string that is equivalent to this instance, but right-aligned and padded on the left with as many paddingChar characters as needed to create a length of totalWidth. However, if totalWidth is less than the length of this instance, the method returns a reference to the existing instance. If totalWidth is equal to the length of this instance, the method returns a new string that is identical to this instance.
+
+Argument **totalWidth** : The number of characters in the resulting string, equal to the number of original characters plus any additional padding characters.
+        
+Argument **paddingChar** : A Unicode padding character.
+```JSON
+{ "Syntax" : .padleft("<value>", <totalWidth>, "paddingChar") }
+```
+
+## **padright**  
+A new string that is equivalent to this instance, but left-aligned and padded on the right with as many spaces as needed to create a length of totalWidth. However, if totalWidth is less than the length of this instance, the method returns a reference to the existing instance. If totalWidth is equal to the length of this instance, the method returns a new string that is identical to this instance.
+
+Argument **totalWidth** : The number of characters in the resulting string, equal to the number of original characters plus any additional padding characters.
+        
+Argument **paddingChar** : A Unicode padding character.
+
+```JSON
+{ "Syntax" : .padright("<value>", <totalWidth>, "paddingChar") }
+```
+
+## **split**  
+Splits a string into substrings based on the provided character separator.
+The result is an array
+```JSON
+{ "Syntax" : .split("<value>", "<charset for split>") }
+```

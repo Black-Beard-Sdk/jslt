@@ -407,6 +407,24 @@ namespace Bb.ComponentModel
 
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="assemblyName">name of the assembly</param>
+        /// <returns></returns>
+        public Assembly AddAssemblyname(string assemblyName)
+        {
+            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
+            try
+            {
+                return Assembly.Load(assemblyName);
+            }
+            finally
+            {
+                AppDomain.CurrentDomain.AssemblyResolve -= CurrentDomain_AssemblyResolve;
+            }
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Assembly LoadAssembly(FileInfo fileAssembly, FileInfo filePdb)
         {

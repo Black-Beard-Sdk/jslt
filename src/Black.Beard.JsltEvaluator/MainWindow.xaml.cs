@@ -33,19 +33,20 @@ namespace AppJsonEvaluator
         {
 
             InitializeComponent();
+
+            //// ensure all assemblies are loaded.
+            //var type = typeof(Bb.Jslt.Services.Excels.Column);
+
             this._foldingStrategy = new BraceFoldingStrategy();
 
-            //var o = ICSharpCode.AvalonEdit.Highlighting.HighlightingManager.Instance.HighlightingDefinitions;
-
-
             _templateFoldingManager = UpdateTemplate(TemplateEditor);
-            _sourceFoldingManager = UpdateTemplate(SourceEditor);
             _targetFoldingManager = UpdateTemplate(TargetEditor);
 
 
             this._parameterFile = System.IO.Path.Combine(Environment.CurrentDirectory, "parameters");
             if (System.IO.File.Exists(this._parameterFile))
             {
+
                 this._parameters = this._parameterFile
                     .LoadFile()
                     .Deserialize<Parameters>();
@@ -55,13 +56,6 @@ namespace AppJsonEvaluator
                     TemplateEditor.Load(this._parameters.TemplateFile);
                     this.LabelTemplateFile.Content = this._parameters.TemplateFile;
                     _templateUpdated = false;
-                }
-
-                if (System.IO.File.Exists(this._parameters.SourceTestFile))
-                {
-                    SourceEditor.Load(this._parameters.SourceTestFile);
-                    this.LabelSourceTestFile.Content = this._parameters.SourceTestFile;
-                    _sourceUpdated = false;
                 }
 
             }
@@ -90,10 +84,7 @@ namespace AppJsonEvaluator
         {
             if (_templateUpdated)
                 SaveTemplate();
-
-            if (_sourceUpdated)
-                SaveSourceTest();
-
+                    
             base.OnClosing(e);
 
         }
@@ -111,9 +102,6 @@ namespace AppJsonEvaluator
 
                 if (File.Exists(this._parameters.TemplateFile))
                     _path[0] = new FileInfo(this._parameters.TemplateFile).Directory.FullName;
-
-                if (File.Exists(this._parameters.SourceTestFile))
-                    _path[1] = new FileInfo(this._parameters.SourceTestFile).Directory.FullName;
 
                 _template = TemplateEditor.Text.GetTransformProvider(_path);
 
@@ -139,7 +127,7 @@ namespace AppJsonEvaluator
 
                 try
                 {
-                    var src = new Sources(SourceJson.GetFromText(SourceEditor.Text));
+                    var src = new Sources(SourceJson.GetFromText(""));
                     var result = _template.Transform(src);
                     var value = result.TokenResult.ToString();
                     TargetEditor.Text = value;
@@ -161,13 +149,6 @@ namespace AppJsonEvaluator
             UpdateTemplate();
             Update();
 
-        }
-
-        private void SourceEditorTextChanged(object sender, EventArgs e)
-        {
-            _sourceUpdated = true;
-            UpdateFolding(_sourceFoldingManager, SourceEditor);
-            Update();
         }
 
         private void TargetEditorTextChanged(object sender, EventArgs e)
@@ -197,25 +178,6 @@ namespace AppJsonEvaluator
             SaveTemplate();
         }
 
-        private void BtnOpenSourceTest_Click(object sender, RoutedEventArgs e)
-        {
-            SaveSourceTest();
-        }
-
-        private void BtnSaveSourceTest_Click(object sender, RoutedEventArgs e)
-        {
-
-            if (string.IsNullOrEmpty(this._parameters.SourceTestFile))
-                this._parameters.SourceTestFile = GetFileFromSaveFile("Save source test");
-
-            if (!string.IsNullOrEmpty(this._parameters.SourceTestFile))
-            {
-                SaveParameters();
-                TemplateEditor.Save(this._parameters.SourceTestFile);
-            }
-
-        }
-
         private void SaveTemplate()
         {
             if (string.IsNullOrEmpty(this._parameters.TemplateFile))
@@ -229,25 +191,10 @@ namespace AppJsonEvaluator
             }
         }
 
-        private void SaveSourceTest()
-        {
-            var file = GetFileFromOpenFile(this._parameters.SourceTestFile);
-            if (!string.IsNullOrEmpty(file))
-            {
-                SourceEditor.Load(file);
-                this._parameters.SourceTestFile = file;
-                SaveParameters();
-                _sourceUpdated = false;
-            }
-        }
-
         private void SaveParameters()
         {
             this._parameterFile.WriteInFile(this._parameters.Serialize());
-
-            this.LabelSourceTestFile.Content = this._parameters.SourceTestFile;
             this.LabelTemplateFile.Content = this._parameters.TemplateFile;
-
         }
 
         private string GetFileFromOpenFile(string file)
@@ -320,7 +267,6 @@ namespace AppJsonEvaluator
 
         private readonly BraceFoldingStrategy _foldingStrategy;
         private readonly FoldingManager _templateFoldingManager;
-        private readonly FoldingManager _sourceFoldingManager;
         private readonly FoldingManager _targetFoldingManager;
         private JsltTemplate _template;
         private string _parameterFile;
@@ -366,31 +312,6 @@ namespace AppJsonEvaluator
                 }
 
             }
-        }
-
-        private void SourceEditor_Drop(object sender, DragEventArgs e)
-        {
-
-            var d = e.Data;
-            var file = d.GetData(DataFormats.FileDrop) as string[];
-
-            foreach (var item in file)
-            {
-
-                var _file = new FileInfo(item);
-
-                if (_file.Exists)
-                {
-                    SourceEditor.Load(_file.FullName);
-                    this.LabelSourceTestFile.Content = _file.FullName;
-                    _sourceUpdated = false;
-
-                    break;
-
-                }
-
-            }
-
         }
 
         private void TemplateEditor_KeyDown(object sender, KeyEventArgs e)

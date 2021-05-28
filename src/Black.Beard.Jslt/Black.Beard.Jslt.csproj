@@ -6,6 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="ConvertToDatables\**" />
+    <EmbeddedResource Remove="ConvertToDatables\**" />
+    <None Remove="ConvertToDatables\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="Json\Jslt\Services\Factory.cs" />
     <Compile Remove="Json\Jslt\Services\ObjectCreator.cs" />
     <Compile Remove="Json\Jslt\Services\TranformJsonTemplateReader.cs" />

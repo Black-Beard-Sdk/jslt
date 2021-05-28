@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Bb.Json.Csv {
+namespace Bb.Jslt.Services.Csv {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Bb.Json.Csv {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Bb.Json.Csv.ExceptionMessage", typeof(ExceptionMessage).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Bb.Jslt.Services.Csv.ExceptionMessage", typeof(ExceptionMessage).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

@@ -83,14 +83,14 @@ namespace Bb.Json.Commands
 
                     var inPipe = Input.IsPipedInput;
 
-
                     if (argSource.HasValue())
-                        payload = new Sources(SourceJson.GetFromFile(argSource.Value()));
-
+                        payload = new Sources(SourceJson.GetFromFile(argSource.Value().TrimPath()));
+                   
                     else if (!inPipe)
                     {
-                        app.ShowHelp();
-                        return ErrorEnum.MissingSource.Error("no source specified");
+                        payload = new Sources(SourceJson.GetFromText(""));
+                        //app.ShowHelp();
+                        //return ErrorEnum.MissingSource.Error("no source specified");
                     }
                     else
                         payload = new Sources(SourceJson.GetFromText(Input.ReadInput(Encoding.UTF8)));

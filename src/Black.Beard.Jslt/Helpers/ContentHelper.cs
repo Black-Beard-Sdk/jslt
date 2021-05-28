@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Linq;
 using System;
 using System.IO;
 using System.Text;
@@ -19,11 +21,6 @@ namespace Bb
             string _path = System.IO.Path.Combine(rootSource);
             return LoadContentFromFile(_path);
         }
-
-        //public static string LoadFile(this FileInfo self)
-        //{
-        //    return LoadFile(self.FullName);
-        //}
 
         public static string LoadContentFromFile(this FileInfo self)
         {
@@ -137,11 +134,11 @@ namespace Bb
         /// </summary>
         /// <param name="_path"></param>
         /// <param name="content"></param>
-        public static void Save(string _path, string content)
+        public static void Save(this string _path, string content)
         {
 
             var file = new FileInfo(_path);
-            if (!file.Directory.Exists)
+            if (file.Directory != null && !file.Directory.Exists)
                 file.Directory.Create();
 
             File.WriteAllText(file.FullName, content);
@@ -154,7 +151,7 @@ namespace Bb
         /// </summary>
         /// <param name="_path"></param>
         /// <param name="content"></param>
-        public static void Save(string _path, StringBuilder content)
+        public static void Save(this string _path, StringBuilder content)
         {
 
             var file = new FileInfo(_path);
@@ -227,6 +224,18 @@ namespace Bb
         public static string ConvertToString(this MemoryStream self)
         {
             return self.ToArray().LoadContentFromText();
+        }
+
+        public static string Serialize(this object self, Formatting formatting = Formatting.Indented)
+        {
+            string json = JsonConvert.SerializeObject(self, Formatting.Indented, new StringEnumConverter());
+            return json;
+        }
+
+        public static TargetType Deserialize<TargetType>(this string self)
+        {
+            TargetType instance = JsonConvert.DeserializeObject<TargetType>(self);
+            return instance;
         }
 
     }

@@ -5,8 +5,6 @@
 
         public string TemplateFile { get; set; }
 
-        public string SourceTestFile { get; set; }
-
     }
 
 }

@@ -34,7 +34,7 @@ namespace Bb.Json.Jslt.Services
 
         public CultureInfo Culture { get; set; }
 
-        internal FileInfo ResolveFile(string filename)
+        public FileInfo ResolveFile(string filename)
         {
 
             var file = new FileInfo(filename);

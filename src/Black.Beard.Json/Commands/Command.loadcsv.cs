@@ -25,8 +25,8 @@ namespace Bb.Json.Commands
     public static partial class Command
     {
 
-        private static Dictionary<char, char> _accepted = build();
 
+        private static Dictionary<char, char> _accepted = build();
 
         public static CommandLineApplication CommandLoadCsv(this CommandLineApplication app)
         {
@@ -78,7 +78,7 @@ namespace Bb.Json.Commands
                     if (argTarget.HasValue())
                     {
 
-                        string o = argTarget.Value();
+                        string o = argTarget.Value().TrimPath();
                         if (File.Exists(o))
                             File.Delete(o);
 

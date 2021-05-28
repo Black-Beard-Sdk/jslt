@@ -42,11 +42,15 @@ The sdk provide another keys like sum or distinct. the list is available [here](
 
 // Result
 { "prices":  6 }
-
 ```  
 
 ## How to use
 
+### Command line
+You can use the command line json.exe.
+[Documentation of json cli](Documentation/jsonexcutable.md).  
+
+### By code 
 ```CSHARP
 // Intialization of the configuration
 var configuration = new TranformJsonAstConfiguration()

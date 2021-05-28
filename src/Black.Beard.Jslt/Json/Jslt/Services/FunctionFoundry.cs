@@ -60,6 +60,12 @@ namespace Bb.Json.Jslt.Services
             AddAssembly(assembly);
         }
 
+        internal void AddAssemblyName(string assemblyname)
+        {
+            Assembly assembly = TypeDiscovery.Instance.AddAssemblyname(assemblyname);
+            AddAssembly(assembly);
+
+        }
         internal void AddAssembly(Assembly assembly)
         {
             var types = TypeDiscovery.Instance.GetTypesWithAttributes<JsltExtensionMethodAttribute>(typeof(ITransformJsonService), c => true);

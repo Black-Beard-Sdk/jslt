@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Json", "Black.B
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.JsltEvaluator", "Black.Beard.JsltEvaluator\Black.Beard.JsltEvaluator.csproj", "{AD2F2F62-55DF-468B-B8AC-EA44A5D64702}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Jslt.Services", "Black.Beard.Jslt.Services\Black.Beard.Jslt.Services.csproj", "{95F6A45E-62D9-436B-9767-C13396659357}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{AD2F2F62-55DF-468B-B8AC-EA44A5D64702}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AD2F2F62-55DF-468B-B8AC-EA44A5D64702}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AD2F2F62-55DF-468B-B8AC-EA44A5D64702}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95F6A45E-62D9-436B-9767-C13396659357}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95F6A45E-62D9-436B-9767-C13396659357}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95F6A45E-62D9-436B-9767-C13396659357}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95F6A45E-62D9-436B-9767-C13396659357}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
