@@ -21,6 +21,7 @@ namespace Bb.Json.Jslt.CustomServices
         /// if one of the term is not a number
         /// </summary>
         [JsltExtensionMethod("crc32")]
+        [JsltExtensionMethodParameter("token", "object to hash")]
         public static JToken ExecuteCrc32(RuntimeContext ctx, JToken token)
         {
 
@@ -40,6 +41,7 @@ namespace Bb.Json.Jslt.CustomServices
         /// return the value in base 64 format
         /// </summary>
         [JsltExtensionMethod("tobase64")]
+        [JsltExtensionMethodParameter("token", "string to encode")]
         public static JToken ExecuteToBase64(RuntimeContext ctx, JToken token)
         {
 
@@ -54,6 +56,7 @@ namespace Bb.Json.Jslt.CustomServices
         }
 
         [JsltExtensionMethod("frombase64")]
+        [JsltExtensionMethodParameter("token", "string to decode")]
         public static JToken ExecuteFromBase64(RuntimeContext ctx, JToken token)
         {
 
@@ -70,6 +73,7 @@ namespace Bb.Json.Jslt.CustomServices
         }
 
         [JsltExtensionMethod("sha256")]
+        [JsltExtensionMethodParameter("token", "string to hash")]
         public static JToken ExecuteSha256(RuntimeContext ctx, JToken token)
         {
 
@@ -94,6 +98,7 @@ namespace Bb.Json.Jslt.CustomServices
         }
 
         [JsltExtensionMethod("sha512")]
+        [JsltExtensionMethodParameter("token", "string to hash")]
         public static JToken ExecuteSha512(RuntimeContext ctx, JToken token)
         {
 

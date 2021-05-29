@@ -15,11 +15,12 @@ namespace Bb.Json.Jslt.CustomServices
     public class ServiceGet : ITransformJsonService
     {
 
-
-        public ServiceGet(object sourceName, string keySourceName)
+        [JsltExtensionMethodParameter("sourceName", "source name")]
+        [JsltExtensionMethodParameter("jpathFilter", "json path")]
+        public ServiceGet(object sourceName, string jpathFilter)
         {
             this._sourceName = sourceName;
-            this._keySourceName = keySourceName;
+            this.jpathFilter = jpathFilter;
         }
 
 
@@ -32,7 +33,7 @@ namespace Bb.Json.Jslt.CustomServices
             {
                 SourceJson src = ctx.SubSources[s]
                 ?? throw new SourceNotFoundException("sourceName");
-                datas = src.Datas.SelectToken(this._keySourceName);
+                datas = src.Datas.SelectToken(this.jpathFilter);
             }
             else if (this._sourceName is JToken t)
             {
@@ -45,7 +46,7 @@ namespace Bb.Json.Jslt.CustomServices
 
             if (datas != null)
             {
-                var result = datas.SelectToken(this._keySourceName);
+                var result = datas.SelectToken(this.jpathFilter);
                 return result;
             }
 
@@ -55,7 +56,7 @@ namespace Bb.Json.Jslt.CustomServices
 
 
         private readonly object _sourceName;
-        private readonly string _keySourceName;
+        private readonly string jpathFilter;
 
     }
 

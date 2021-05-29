@@ -39,4 +39,5 @@ namespace AppJsonEvaluator
 		/// </summary>
 		CircleInScrollBar = 0x1000
 	}
+
 }

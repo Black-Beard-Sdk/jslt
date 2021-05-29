@@ -16,7 +16,7 @@ namespace Bb.Json.Jslt.Services
 
         public ServiceDiscovery(ServiceContainer parent)
         {
-            this.ServiceConainer = parent;
+            this.ServiceContainer = parent;
             this._assemblies = new HashSet<string>();
         }
 
@@ -69,21 +69,25 @@ namespace Bb.Json.Jslt.Services
         public void AddService(Type service, string name = null)
         {
 
+            string _description = string.Empty;
+
             if (string.IsNullOrEmpty(name))
             {
-                var n = service.GetCustomAttributes(typeof(JsltExtensionMethodAttribute), true).OfType<JsltExtensionMethodAttribute>().FirstOrDefault();
+                var n = JsltExtensionMethodAttribute.GetAttribute(service);
                 if (n == null)
                     throw new ArgumentNullException($"service {service}, can't be added by type. missing {typeof(JsltExtensionMethodAttribute)} ");
 
                 name = n.Name;
-
+                _description = n.Description;
             }
 
             var ctors = service.GetConstructors();
             foreach (var ctor in ctors)
             {
-                Factory<ITransformJsonService> factory = ObjectCreator.GetActivator<ITransformJsonService>(ctor);
-                ServiceConainer.AddService(name, factory);
+
+                MethodDescription description = JsltExtensionMethodParameterAttribute.Map(new MethodDescription(name, ctor) { Description = _description });
+                Factory<ITransformJsonService> factory = ObjectCreator.GetActivator<ITransformJsonService>(ctor, description);
+                ServiceContainer.AddService(name, factory);
             }
 
         }
@@ -96,23 +100,26 @@ namespace Bb.Json.Jslt.Services
         public void AddService(MethodInfo service, string name = null)
         {
 
+            string _description = string.Empty;
             if (string.IsNullOrEmpty(name))
             {
 
-                var n = service.GetCustomAttributes(typeof(JsltExtensionMethodAttribute), true).OfType<JsltExtensionMethodAttribute>().FirstOrDefault();
+                var n = JsltExtensionMethodAttribute.GetAttribute(service);
                 if (n == null)
                     throw new ArgumentNullException($"service {service}, can't be added by type. missing {typeof(JsltExtensionMethodAttribute)} ");
 
                 name = n.Name;
+                _description = n.Description;
 
             }
 
-            Factory<JToken> factory = ObjectCreator.GetActivator<JToken>(service);
-            ServiceConainer.AddService(name, factory);
+            MethodDescription description = JsltExtensionMethodParameterAttribute.Map(new MethodDescription(name, service) { Description = _description });
+            Factory<JToken> factory = ObjectCreator.GetActivator<JToken>(service, description);
+            ServiceContainer.AddService(name, factory);
 
         }
 
-        public ServiceContainer ServiceConainer { get; }
+        public ServiceContainer ServiceContainer { get; }
 
 
         internal HashSet<string> _assemblies;

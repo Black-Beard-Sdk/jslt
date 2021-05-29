@@ -12,12 +12,9 @@ namespace Bb.Json.Jslt.Services
     public class TransformJsonServiceProvider
     {
 
-        static TransformJsonServiceProvider()
-        {
-        }
-
         public TransformJsonServiceProvider()
         {
+
         }
 
         public void Add(Factory factory)
@@ -36,13 +33,14 @@ namespace Bb.Json.Jslt.Services
                 {
                     if (factory.Parameters.Length == parameters.Length)
                         TestConstructor(parameters, result, factory);
-                    else
-                    {
-                        if (factory.Parameters.Length == 0 && parameters.Length == 1)
-                        {
 
-                        }
-                    }
+                    //else
+                    //{
+                    //    if (factory.Parameters.Length == 0 && parameters.Length == 1)
+                    //    {
+                    //    }
+                    //}
+
                 }
 
                 else if (factory.Parameters.Length == parameters.Length + 1)
@@ -103,33 +101,37 @@ namespace Bb.Json.Jslt.Services
 
         }
 
-        private int Evaluate(Type parameterType, Type type)
+        public IEnumerable<Factory> GetItems()
         {
-
-            if (parameterType == type)
-                return 0;
-
-
-
-            if (parameterType == typeof(long) && type == typeof(int))
-                return 1;
-
-            if (parameterType == typeof(double) && type == typeof(float))
-                return 1;
-
-            if (parameterType == typeof(int) && type == typeof(long))
-                return 2;
-
-            if (parameterType == typeof(float) && type == typeof(double))
-                return 2;
-
-            if (parameterType.IsAssignableFrom(type))
-                return 2;
-
-            return -1;
-
-
+            return _instances;
         }
+
+
+        //private int Evaluate(Type parameterType, Type type)
+        //{
+
+        //    if (parameterType == type)
+        //        return 0;
+
+        //    if (parameterType == typeof(long) && type == typeof(int))
+        //        return 1;
+
+        //    if (parameterType == typeof(double) && type == typeof(float))
+        //        return 1;
+
+        //    if (parameterType == typeof(int) && type == typeof(long))
+        //        return 2;
+
+        //    if (parameterType == typeof(float) && type == typeof(double))
+        //        return 2;
+
+        //    if (parameterType.IsAssignableFrom(type))
+        //        return 2;
+
+        //    return -1;
+
+
+        //}
 
         private List<Factory> _instances = new List<Factory>();
 

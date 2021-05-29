@@ -70,6 +70,11 @@ namespace Bb.Json.Jslt.Services
 
         }
 
+        public IEnumerable<TransformJsonServiceProvider> GetServices()
+        {
+            return _dictionary.Values;
+        }
+
         public ServiceDiscovery ServiceDiscovery { get; }
         public static ServiceContainer Common { get; }
 

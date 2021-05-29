@@ -1,6 +1,8 @@
-﻿using Bb.Json.Jslt.Asts;
+﻿using Bb.ComponentModel.Factories;
+using Bb.Json.Jslt.Asts;
 using Bb.Json.Jslt.Services;
 using ICSharpCode.AvalonEdit;
+using ICSharpCode.AvalonEdit.CodeCompletion;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Folding;
 using Microsoft.Win32;
@@ -35,6 +37,8 @@ namespace AppJsonEvaluator
 
             InitializeComponent();
             InitializeTextMarkerService();
+            TemplateEditor.TextArea.TextEntering += textEditor_TextArea_TextEntering;
+            TemplateEditor.TextArea.TextEntered += textEditor_TextArea_TextEntered;
 
             //// ensure all assemblies are loaded.
             //var type = typeof(Bb.Jslt.Services.Excels.Column);
@@ -55,9 +59,15 @@ namespace AppJsonEvaluator
 
                 if (System.IO.File.Exists(this._parameters.TemplateFile))
                 {
+
+                    this._path = new string[1];
+                    if (File.Exists(this._parameters.TemplateFile))
+                        _path[0] = new FileInfo(this._parameters.TemplateFile).Directory.FullName;
+
                     TemplateEditor.Load(this._parameters.TemplateFile);
                     this.LabelTemplateFile.Content = this._parameters.TemplateFile;
                     _templateUpdated = false;
+
                 }
 
             }
@@ -92,7 +102,7 @@ namespace AppJsonEvaluator
         {
             if (_templateUpdated)
                 SaveTemplate();
-                    
+
             base.OnClosing(e);
 
         }
@@ -107,16 +117,11 @@ namespace AppJsonEvaluator
             try
             {
 
-                string[] _path = new string[2];
-
-                if (File.Exists(this._parameters.TemplateFile))
-                    _path[0] = new FileInfo(this._parameters.TemplateFile).Directory.FullName;
-
                 _template = TemplateEditor.Text.GetTransformProvider(_path);
 
                 foreach (var item in _template.Diagnostics)
                 {
-                    
+
                     Errors.Items.Add(item.Message);
 
                     var index = item.StartIndex;
@@ -131,6 +136,7 @@ namespace AppJsonEvaluator
                     ITextMarker marker = textMarkerService.Create(index, 10);
                     marker.MarkerTypes = TextMarkerTypes.SquigglyUnderline;
                     marker.MarkerColor = Colors.Red;
+                    
 
                 }
 
@@ -194,8 +200,13 @@ namespace AppJsonEvaluator
             var file = GetFileFromOpenFile(this._parameters.TemplateFile);
             if (!string.IsNullOrEmpty(file))
             {
-                TemplateEditor.Load(file);
+
                 this._parameters.TemplateFile = file;
+                this._path = new string[1];
+                if (File.Exists(this._parameters.TemplateFile))
+                    _path[0] = new FileInfo(this._parameters.TemplateFile).Directory.FullName;
+
+                TemplateEditor.Load(file);
                 SaveParameters();
 
             }
@@ -293,6 +304,50 @@ namespace AppJsonEvaluator
 
         }
 
+        void textEditor_TextArea_TextEntered(object sender, TextCompositionEventArgs e)
+        {
+            if (e.Text == ".")
+            {
+
+                var serviceProvider = Bb.Json.Jslt.Services.ServiceContainer.Common.GetServices();
+
+                // Open code completion after the user has pressed dot:
+                completionWindow = new CompletionWindow(TemplateEditor.TextArea);
+                IList<ICompletionData> data = completionWindow.CompletionList.CompletionData;
+
+                //data.Add(new MyCompletionData("Item1"));
+
+                foreach (TransformJsonServiceProvider provider in serviceProvider)
+                {
+                    foreach (Factory factory in provider.GetItems())
+                    {
+                        var c = new MyCompletionData(factory.MethodInfos.Name, factory.MethodInfos.Content, string.IsNullOrEmpty(factory.MethodInfos.Description) ? factory.MethodInfos.Content : factory.MethodInfos.Description);
+                        data.Add(c);
+                    }
+                }
+
+                completionWindow.Show();
+                completionWindow.Closed += delegate
+                {
+                    completionWindow = null;
+                };
+            }
+        }
+
+        void textEditor_TextArea_TextEntering(object sender, TextCompositionEventArgs e)
+        {
+            if (e.Text.Length > 0 && completionWindow != null)
+            {
+                if (!char.IsLetterOrDigit(e.Text[0]))
+                {
+                    // Whenever a non-letter is typed while the completion window is open,
+                    // insert the currently selected element.
+                    completionWindow.CompletionList.RequestInsertion(e);
+                }
+            }
+            // Do not set e.Handled=true.
+            // We still want to insert the character that was typed.
+        }
 
         private readonly BraceFoldingStrategy _foldingStrategy;
         private readonly FoldingManager _templateFoldingManager;
@@ -301,8 +356,9 @@ namespace AppJsonEvaluator
         private string _parameterFile;
         private Parameters _parameters;
         private bool _templateUpdated;
-        private bool _sourceUpdated;
+        private string[] _path;
         private TextMarkerService textMarkerService;
+        CompletionWindow completionWindow;
 
         private void TemplateEditor_DragEnter(object sender, DragEventArgs e)
         {

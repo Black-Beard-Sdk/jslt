@@ -41,7 +41,7 @@ namespace Bb.Json.Jslt.Services
                 result2 = this.configuration.Services.GetService(name);
                 if (result2 != null)
                     diagnostics.AddError(null, location, name, $"Service {name} exists but bad arguments calling");
-             
+
                 else
                     diagnostics.AddError(null, location, name, $"Service {name} not found");
 
@@ -76,20 +76,23 @@ namespace Bb.Json.Jslt.Services
         public FunctionFoundry AddService(Type service, string name = null)
         {
 
+            string _description = string.Empty;
             if (string.IsNullOrEmpty(name))
             {
-                var n = service.GetCustomAttributes(typeof(JsltExtensionMethodAttribute), true).OfType<JsltExtensionMethodAttribute>().FirstOrDefault();
+                var n = JsltExtensionMethodAttribute.GetAttribute(service);
                 if (n == null)
                     throw new ArgumentNullException($"service {service}, can't be added by type. missing {typeof(JsltExtensionMethodAttribute)} ");
 
                 name = n.Name;
-
+                _description = n.Description;
             }
 
             var ctors = service.GetConstructors();
             foreach (var ctor in ctors)
             {
-                Factory<ITransformJsonService> factory = ObjectCreator.GetActivator<ITransformJsonService>(ctor);
+
+                MethodDescription description = JsltExtensionMethodParameterAttribute.Map( new MethodDescription(name, ctor) { Description = _description });
+                Factory<ITransformJsonService> factory = ObjectCreator.GetActivator<ITransformJsonService>(ctor, description);
                 Services.AddService(name, factory);
             }
 

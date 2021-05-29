@@ -8,12 +8,14 @@ namespace Bb.ComponentModel.Factories
     public abstract class Factory
     {
 
-        public Factory(MethodBase method, ParameterInfo[] paramsInfo)
+        public Factory(MethodBase method, ParameterInfo[] paramsInfo, MethodDescription description)
         {
             this.MethodSource = method;
             IsStatic = method.IsStatic;
             IsCtor = method is ConstructorInfo;
             this.Parameters = paramsInfo;
+            this.MethodInfos = description;
+
         }
 
         public MethodBase MethodSource { get; }
@@ -39,6 +41,8 @@ namespace Bb.ComponentModel.Factories
 
         public abstract bool IsEmpty { get; }
 
+        public MethodDescription MethodInfos { get; }
+
     }
 
     /// <summary>
@@ -49,8 +53,8 @@ namespace Bb.ComponentModel.Factories
         where T : class
     {
 
-        public Factory(ObjectActivator<T> objectActivator, MethodBase methodSource, ParameterInfo[] paramsInfo)
-          : base(methodSource, paramsInfo)
+        public Factory(ObjectActivator<T> objectActivator, MethodBase methodSource, ParameterInfo[] paramsInfo, MethodDescription description)
+          : base(methodSource, paramsInfo, description)
         {
             this._delegate = objectActivator;
             base.Method = typeof(Factory<T>).GetMethod(nameof(Call));
@@ -72,7 +76,7 @@ namespace Bb.ComponentModel.Factories
         public override bool IsEmpty => _delegate == null;
 
         private ObjectActivator<T> _delegate { get; }
+        
 
     }
-
 }

@@ -65,17 +65,11 @@ namespace AppJsonEvaluator
 
         }
 
-        public static JsltTemplate GetTransformProvider(this string self, string[] paths, params Type[] services)
+        public static TemplateTransformProvider GetProvider(string[] paths, params Type[] services)
         {
 
-#if UNIT_TEST
-            StringBuilder sb = new StringBuilder(self.Replace('\'', '"').Replace('§', '\''));
-#else
-            StringBuilder sb = new StringBuilder(self);
-#endif
-
             var configuration = new TranformJsonAstConfiguration();
-            
+
             foreach (var item in paths)
                 if (!string.IsNullOrEmpty(item))
                     configuration.Paths.Add(item);
@@ -85,8 +79,21 @@ namespace AppJsonEvaluator
 
             TemplateTransformProvider Templateprovider = new TemplateTransformProvider(configuration);
 
-            JsltTemplate template = Templateprovider.GetTemplate(sb, "");
+            return Templateprovider;
 
+        }
+
+        public static JsltTemplate GetTransformProvider(this string self, string[] paths, params Type[] services)
+        {
+
+#if UNIT_TEST
+            StringBuilder sb = new StringBuilder(self.Replace('\'', '"').Replace('§', '\''));
+#else
+            StringBuilder sb = new StringBuilder(self);
+#endif
+
+            var provider = GetProvider(paths, services);
+            JsltTemplate template = provider.GetTemplate(sb, "");
             return template;
 
         }

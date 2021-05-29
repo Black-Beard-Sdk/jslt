@@ -17,6 +17,7 @@ namespace Bb.Json.Jslt.CustomServices
     {
 
         [JsltExtensionMethod("loadjson")]
+        [JsltExtensionMethodParameter("sourcePath", "directory source path")]
         public static JToken ExecuteLoadSource(RuntimeContext ctx, string sourcePath)
         {
 
@@ -35,6 +36,7 @@ namespace Bb.Json.Jslt.CustomServices
         /// <param name="utc"></param>
         /// <returns></returns>
         [JsltExtensionMethod("now")]
+        [JsltExtensionMethodParameter("utc", "specifiy the time must be utc")]
         public static JToken ExecuteNow(RuntimeContext ctx, bool utc)
         {
             var n = utc ? DateTime.UtcNow : DateTime.Now;
@@ -42,6 +44,7 @@ namespace Bb.Json.Jslt.CustomServices
         }
 
         [JsltExtensionMethod("sum")]
+        [JsltExtensionMethodParameter("token", "should be an array")]
         public static JToken ExecuteSum(RuntimeContext ctx, JToken token)
         {
 
@@ -89,18 +92,20 @@ namespace Bb.Json.Jslt.CustomServices
         }
 
         [JsltExtensionMethod("parsedate")]
-        public static JToken ExecuteParseDate(RuntimeContext ctx, JToken token, string Culture)
+        [JsltExtensionMethodParameter("token", "must be a string")]
+        [JsltExtensionMethodParameter("culture", "culture name. can be null")]
+        public static JToken ExecuteParseDate(RuntimeContext ctx, JToken token, string culture)
         {
 
             if (token is JValue v)
             {
 
-                CultureInfo culture = CultureInfo.InvariantCulture;
-                if (!string.IsNullOrEmpty(Culture))
-                    culture = CultureInfo.GetCultureInfo(Culture);
+                CultureInfo _culture = CultureInfo.InvariantCulture;
+                if (!string.IsNullOrEmpty(culture))
+                    _culture = CultureInfo.GetCultureInfo(culture);
 
                 if (v.Type == JTokenType.String)
-                    return new JValue(DateTime.Parse(v.Value.ToString(), culture) );
+                    return new JValue(DateTime.Parse(v.Value.ToString(), _culture) );
 
             }
 
@@ -109,6 +114,8 @@ namespace Bb.Json.Jslt.CustomServices
         }
      
         [JsltExtensionMethod("convert")]
+        [JsltExtensionMethodParameter("token", "item to convert")]
+        [JsltExtensionMethodParameter("targetType", "target type")]
         public static JToken ExecuteConvert(RuntimeContext ctx, JToken token, Type targetType)
         {
             if (token is JValue v)
