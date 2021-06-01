@@ -1,5 +1,9 @@
 # jslt (json Stylesheet Language Transformations)
+
+[![Build status](https://ci.appveyor.com/api/projects/status/9uj618usw1xuqt8r?svg=true)](https://ci.appveyor.com/project/gaelgael5/jslt)
+
 Implementation of jslt language in DOTNET. Use a template for transform Json To another json. Consider the following template. note this template is a json that describe the structure of the target json. If the template is empty, the process return the initial source json.
+
 
 ## Case 1 ##  
 For the template document
@@ -96,26 +100,5 @@ The implementation is provided by newtonsoft.
 [Documentation of json path](Documentation/jsonpath.md)  
 
 
-
-
 ## Custom services embedded in the Sdk
-## **Add**  
-Add the arguments. Note the values must be numeric (integer or float)
-```JSON
-"Syntax" : { "$type" : "add", "$left":"<value>", "$right":"$value" }
-```
-
-
-
-* Consume the flow of data.  
-Jpath select a value and the function distinct return false if the value is already matched.
-```JSON
-{ "$where" : "jpath:{$.property_Path} | distinct:{}" }
-```
-
-* Consume the flow of data.  
-Jpath select a value and the function notnul return false if the value is null.
-```JSON
-{ "$where" : "jpath:{$.property_Path} | notnull:{}" }
-```
-
+To write
