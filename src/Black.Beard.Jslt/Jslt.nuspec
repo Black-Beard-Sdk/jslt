@@ -11,17 +11,22 @@
     <description>core lib for execute jslt template</description>
     <releaseNotes>.</releaseNotes>
     <copyright>Copyright 2019</copyright>
-    <tags>bank holiday</tags>
+    <tags>jslt json transform</tags>
 
     <dependencies>
       <group targetFramework="netcoreapp3.1">
-		<dependency id="Antlr4.Runtime.Standard" Version="4.9.2" />
-		<dependency id="Newtonsoft.Json" Version="13.0.1" />
-		<dependency id="Ude.NetStandard" Version="1.2.0" />
-		<dependency id="Microsoft.CodeAnalysis.CSharp" Version="3.9.0" />
+		    <dependency id="Antlr4.Runtime.Standard" Version="4.9.2" />
+		    <dependency id="Newtonsoft.Json" Version="13.0.1" />
+		    <dependency id="Ude.NetStandard" Version="1.2.0" />
+		    <dependency id="Microsoft.CodeAnalysis.CSharp" Version="3.9.0" />
       </group>
     </dependencies>
-    
+  
   </metadata>
-    
+
+  <files>
+    <file src="*.dll" target="lib\netcoreapp3.1" />
+    <file src="*.pdb" target="lib\netcoreapp3.1" />
+  </files>
+  
 </package>
