@@ -24,11 +24,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="git.Expressions\Expressions\Statements\" />
     <Folder Include="Json\Jslt\Parser\Grammar\.antlr\" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Black.Beard.Expressions\Src\Black.Beard.Expressions\Black.Beard.Expressions.csproj" />
     <ProjectReference Include="..\Black.Beard.Jslt.Roslyn\Black.Beard.Jslt.Roslyn.csproj" />
   </ItemGroup>
 

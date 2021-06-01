@@ -22,7 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Black.Beard.Expressions\Src\Black.Beard.Expressions\Black.Beard.Expressions.csproj" />
     <ProjectReference Include="..\Black.Beard.Jslt.Roslyn\Black.Beard.Jslt.Roslyn.csproj" />
     <ProjectReference Include="..\Black.Beard.Jslt.Services\Black.Beard.Jslt.Services.csproj" />
     <ProjectReference Include="..\Black.Beard.Jslt\Black.Beard.Jslt.csproj" />

@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootNamespace>Bb.Elasticsearch</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="SqlParser\Grammar\.antlr\ElasticLexer.interp" />
+    <None Include="SqlParser\Grammar\.antlr\ElasticLexer.java" />
+    <None Include="SqlParser\Grammar\.antlr\ElasticLexer.tokens" />
+    <None Include="SqlParser\Grammar\.antlr\ElasticParser.interp" />
+    <None Include="SqlParser\Grammar\.antlr\ElasticParser.java" />
+    <None Include="SqlParser\Grammar\.antlr\ElasticParser.tokens" />
+    <None Include="SqlParser\Grammar\.antlr\SQLiteLexer.interp" />
+    <None Include="SqlParser\Grammar\.antlr\SQLiteLexer.java" />
+    <None Include="SqlParser\Grammar\.antlr\SQLiteLexer.tokens" />
+    <None Include="SqlParser\Grammar\.antlr\SQLiteParser.interp" />
+    <None Include="SqlParser\Grammar\.antlr\SQLiteParser.java" />
+    <None Include="SqlParser\Grammar\.antlr\SQLiteParser.tokens" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Antlr4.Runtime.Standard" Version="4.9.2" />
+    <PackageReference Include="Elasticsearch.Net" Version="7.13.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Ude.NetStandard" Version="1.2.0" />
+  </ItemGroup>
+
+</Project>
