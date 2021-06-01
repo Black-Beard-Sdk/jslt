@@ -32,4 +32,10 @@
     <ProjectReference Include="..\Black.Beard.Jslt.Roslyn\Black.Beard.Jslt.Roslyn.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Jslt.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Black.Beard.Jslt</id>
+    <version>$version$</version>
+    <title>Black Beard jslt</title>
+    <authors>Black.Beard (gaelgael5@gmail.com)</authors>
+    <owners>Black.Beard</owners>
+    <projectUrl>https://github.com/Black-Beard-Sdk/jslt</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>core lib for execute jslt template</description>
+    <releaseNotes>.</releaseNotes>
+    <copyright>Copyright 2019</copyright>
+    <tags>bank holiday</tags>
+
+    <dependencies>
+      <group targetFramework="netcoreapp3.1">
+		<dependency id="Antlr4.Runtime.Standard" Version="4.9.2" />
+		<dependency id="Newtonsoft.Json" Version="13.0.1" />
+		<dependency id="Ude.NetStandard" Version="1.2.0" />
+		<dependency id="Microsoft.CodeAnalysis.CSharp" Version="3.9.0" />
+      </group>
+    </dependencies>
+    
+  </metadata>
+    
+</package>
