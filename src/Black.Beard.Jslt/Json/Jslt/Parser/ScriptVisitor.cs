@@ -267,7 +267,7 @@ namespace Bb.Json.Jslt.Parser
             JsltBase result = null;
             Type type = null;
 
-            var txt = context.STRING().GetText().Trim().Trim('\"');
+            var txt = context.STRING().GetText()?.Trim()?.Trim('\"')?.Replace("\\\\", "\\");
             var containsVariable = txt.Contains("@@");
 
             var jsonType = context.jsonType();
@@ -486,51 +486,43 @@ namespace Bb.Json.Jslt.Parser
 
             var ltItem = context.jsonLtItem();
             if (ltItem != null)
-            {
-                var item = (JsltBase)ltItem.Accept(this);
-                if (item != null)
-                {
-                    if (context.NT() == null)
-                        left = item;
-                    else
-                        left = new JsltOperator(item, OperationEnum.Not) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
-                }
+                left = (JsltBase)ltItem.Accept(this);
 
-                else
-                    return null;
-            }
-
-            OperationEnum operation = OperationEnum.Undefined;
-            var ope = context.operation();
-            if (ope != null)
-                operation = (OperationEnum)ope.Accept(this);
-
-            var right_operation = context.jsonLtOperation();
-            if (right_operation != null)
+            else
             {
 
-                var operationRight = (JsltBase)right_operation.Accept(this);
-                if (operationRight == null)
-                {
-                    AddError(context.Start.ToLocation(), "", "missing binary right expression");
-                    return null;
-                }
+                var subOperations = context.jsonLtOperation();
+                List<JsltBase> _subs = new List<JsltBase>(subOperations.Length);
+                foreach (var item in subOperations)
+                    _subs.Add((JsltBase)item.Accept(this));
+
+                left = _subs[0];
+
+                if (context.NT() != null)
+                    left = new JsltOperator(_subs[0], OperationEnum.Not) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+
                 else
                 {
-                    if (context.PAREN_LEFT() == null)
+
+                    OperationEnum operation = OperationEnum.Undefined;
+                    var ope = context.operation();
+                    if (ope != null)
                     {
 
-                        return new JsltBinaryOperator(left, operation, operationRight) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+                        operation = (OperationEnum)ope.Accept(this);
+
+                        if (_subs.Count == 1)
+                        {
+                            AddError(context.Start.ToLocation(), "", "missing binary right expression");
+                            return null;
+                        }
+                        else
+                            left = new JsltBinaryOperator(left, operation, _subs[1]) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+
                     }
 
-                    return left;
                 }
 
-            }
-            else if (operation != OperationEnum.Undefined)
-            {
-                AddError(context.Start.ToLocation(), "", "missing binary right expression");
-                return null;
             }
 
             return left;
@@ -744,6 +736,10 @@ namespace Bb.Json.Jslt.Parser
                 else if (item.Value is JsltTranslateVariable t)
                     _types.Add(typeof(JToken));
 
+                else if (item.Value is JsltBinaryOperator b)
+                {
+                    _types.Add(typeof(JToken));
+                }
                 else
                 {
                     LocalDebug.Stop();

@@ -134,6 +134,7 @@ namespace Bb.Json.Jslt.Services
             else
             {
                 LocalDebug.Stop();
+                r = rightToken;
             }
 
             try

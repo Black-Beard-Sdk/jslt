@@ -228,6 +228,14 @@ namespace AppJsonEvaluator
                 SaveParameters();
                 TemplateEditor.Save(this._parameters.TemplateFile);
                 _templateUpdated = false;
+
+                this._path = new string[1];
+                if (File.Exists(this._parameters.TemplateFile))
+                    _path[0] = new FileInfo(this._parameters.TemplateFile).Directory.FullName;
+
+                UpdateTemplate();
+                Update();
+
             }
         }
 
@@ -274,21 +282,7 @@ namespace AppJsonEvaluator
 
         private string GetFileFromSaveFile(string title)
         {
-
-            //string initialFilename = string.Empty;
-            //string initialDirectory = string.Empty;
-
-            //if (!string.IsNullOrEmpty(file))
-            //{
-            //    var initialFile = new System.IO.FileInfo(file);
-            //    if (initialFile.Exists)
-            //        initialFilename = initialFile.FullName;
-
-            //    if (initialFile.Directory.Exists)
-            //        initialDirectory = initialFile.Directory.FullName;
-
-            //}
-
+            
             SaveFileDialog saveFileDialog = new SaveFileDialog()
             {
                 Title = title,
@@ -360,22 +354,6 @@ namespace AppJsonEvaluator
         private TextMarkerService textMarkerService;
         CompletionWindow completionWindow;
 
-        private void TemplateEditor_DragEnter(object sender, DragEventArgs e)
-        {
-
-            //var d = e.Data;
-            //var file = d.GetData(DataFormats.FileDrop) as string[];
-            //foreach (var item in file)
-            //{
-            //    var _file = new FileInfo(item);
-            //    if (_file.Exists)
-            //    {
-            //        e.Effects
-            //    }
-            //}
-
-        }
-
         private void TemplateEditor_Drop(object sender, DragEventArgs e)
         {
 
@@ -389,25 +367,24 @@ namespace AppJsonEvaluator
 
                 if (_file.Exists)
                 {
+
+                    this._path = new string[1];
+                    _path[0] = _file.Directory.FullName;
+
                     TemplateEditor.Load(_file.FullName);
                     this.LabelTemplateFile.Content = _file.FullName;
                     _templateUpdated = false;
-
+                    this._parameters = new Parameters()
+                    {
+                        TemplateFile = _file.FullName
+                    };
                     break;
 
                 }
 
             }
         }
-
-        private void TemplateEditor_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.S && e.SystemKey == Key.LeftCtrl)
-            {
-                UpdateTemplate();
-                Update();
-            }
-        }
+                
     }
 
 

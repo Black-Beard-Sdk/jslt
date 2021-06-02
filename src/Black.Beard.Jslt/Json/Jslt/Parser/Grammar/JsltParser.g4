@@ -73,8 +73,10 @@ jsonType : CURRENT_VALUE (URI | TIME | DATETIME | STRING_ | GUID | INTEGER | DEC
 // ---------------------------- jslt ----------------------------
 
 jsonLtOperation :
-     NT? jsonLtItem  (operation jsonLtOperation)?
+     jsonLtItem
+   | NT jsonLtOperation
    | PAREN_LEFT jsonLtOperation PAREN_RIGHT
+   | jsonLtOperation operation jsonLtOperation
    ;
 
 jsonLtItem : 

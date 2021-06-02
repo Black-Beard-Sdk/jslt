@@ -416,7 +416,7 @@ public class JsltParser extends Parser {
 				enterOuterAlt(_localctx, 3);
 				{
 				setState(75);
-				jsonLtOperation();
+				jsonLtOperation(0);
 				}
 				break;
 			default:
@@ -448,7 +448,6 @@ public class JsltParser extends Parser {
 	public final JsonValueStringContext jsonValueString() throws RecognitionException {
 		JsonValueStringContext _localctx = new JsonValueStringContext(_ctx, getState());
 		enterRule(_localctx, 12, RULE_jsonValueString);
-		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
@@ -456,14 +455,14 @@ public class JsltParser extends Parser {
 			match(STRING);
 			setState(80);
 			_errHandler.sync(this);
-			_la = _input.LA(1);
-			if (_la==CURRENT_VALUE) {
+			switch ( getInterpreter().adaptivePredict(_input,5,_ctx) ) {
+			case 1:
 				{
 				setState(79);
 				jsonType();
 				}
+				break;
 			}
-
 			}
 		}
 		catch (RecognitionException re) {
@@ -655,14 +654,17 @@ public class JsltParser extends Parser {
 			return getRuleContext(JsonLtItemContext.class,0);
 		}
 		public TerminalNode NT() { return getToken(JsltParser.NT, 0); }
-		public OperationContext operation() {
-			return getRuleContext(OperationContext.class,0);
+		public List<JsonLtOperationContext> jsonLtOperation() {
+			return getRuleContexts(JsonLtOperationContext.class);
 		}
-		public JsonLtOperationContext jsonLtOperation() {
-			return getRuleContext(JsonLtOperationContext.class,0);
+		public JsonLtOperationContext jsonLtOperation(int i) {
+			return getRuleContext(JsonLtOperationContext.class,i);
 		}
 		public TerminalNode PAREN_LEFT() { return getToken(JsltParser.PAREN_LEFT, 0); }
 		public TerminalNode PAREN_RIGHT() { return getToken(JsltParser.PAREN_RIGHT, 0); }
+		public OperationContext operation() {
+			return getRuleContext(OperationContext.class,0);
+		}
 		public JsonLtOperationContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -670,15 +672,24 @@ public class JsltParser extends Parser {
 	}
 
 	public final JsonLtOperationContext jsonLtOperation() throws RecognitionException {
-		JsonLtOperationContext _localctx = new JsonLtOperationContext(_ctx, getState());
-		enterRule(_localctx, 24, RULE_jsonLtOperation);
-		int _la;
+		return jsonLtOperation(0);
+	}
+
+	private JsonLtOperationContext jsonLtOperation(int _p) throws RecognitionException {
+		ParserRuleContext _parentctx = _ctx;
+		int _parentState = getState();
+		JsonLtOperationContext _localctx = new JsonLtOperationContext(_ctx, _parentState);
+		JsonLtOperationContext _prevctx = _localctx;
+		int _startState = 24;
+		enterRecursionRule(_localctx, 24, RULE_jsonLtOperation, _p);
 		try {
-			setState(106);
+			int _alt;
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(101);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case CURRENT_VALUE:
-			case NT:
 			case TRUE:
 			case FALSE:
 			case NULL:
@@ -686,47 +697,57 @@ public class JsltParser extends Parser {
 			case NUMBER:
 			case INT:
 			case DOT_ID:
-				enterOuterAlt(_localctx, 1);
 				{
 				setState(94);
-				_errHandler.sync(this);
-				_la = _input.LA(1);
-				if (_la==NT) {
-					{
-					setState(93);
-					match(NT);
-					}
-				}
-
-				setState(96);
 				jsonLtItem();
-				setState(100);
-				_errHandler.sync(this);
-				_la = _input.LA(1);
-				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << WILDCARD_SUBSCRIPT) | (1L << EQ) | (1L << NE) | (1L << GT) | (1L << LT) | (1L << LE) | (1L << GE) | (1L << PLUS) | (1L << MINUS) | (1L << DIVID) | (1L << MODULO) | (1L << POWER) | (1L << AND) | (1L << OR) | (1L << AND_EXCLUSIVE) | (1L << OR_EXCLUSIVE) | (1L << COALESCE) | (1L << CHAIN))) != 0)) {
-					{
-					setState(97);
-					operation();
-					setState(98);
-					jsonLtOperation();
-					}
 				}
-
+				break;
+			case NT:
+				{
+				setState(95);
+				match(NT);
+				setState(96);
+				jsonLtOperation(3);
 				}
 				break;
 			case PAREN_LEFT:
-				enterOuterAlt(_localctx, 2);
 				{
-				setState(102);
+				setState(97);
 				match(PAREN_LEFT);
-				setState(103);
-				jsonLtOperation();
-				setState(104);
+				setState(98);
+				jsonLtOperation(0);
+				setState(99);
 				match(PAREN_RIGHT);
 				}
 				break;
 			default:
 				throw new NoViableAltException(this);
+			}
+			_ctx.stop = _input.LT(-1);
+			setState(109);
+			_errHandler.sync(this);
+			_alt = getInterpreter().adaptivePredict(_input,7,_ctx);
+			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
+				if ( _alt==1 ) {
+					if ( _parseListeners!=null ) triggerExitRuleEvent();
+					_prevctx = _localctx;
+					{
+					{
+					_localctx = new JsonLtOperationContext(_parentctx, _parentState);
+					pushNewRecursionContext(_localctx, _startState, RULE_jsonLtOperation);
+					setState(103);
+					if (!(precpred(_ctx, 1))) throw new FailedPredicateException(this, "precpred(_ctx, 1)");
+					setState(104);
+					operation();
+					setState(105);
+					jsonLtOperation(2);
+					}
+					} 
+				}
+				setState(111);
+				_errHandler.sync(this);
+				_alt = getInterpreter().adaptivePredict(_input,7,_ctx);
+			}
 			}
 		}
 		catch (RecognitionException re) {
@@ -735,7 +756,7 @@ public class JsltParser extends Parser {
 			_errHandler.recover(this, re);
 		}
 		finally {
-			exitRule();
+			unrollRecursionContexts(_parentctx);
 		}
 		return _localctx;
 	}
@@ -772,13 +793,13 @@ public class JsltParser extends Parser {
 		JsonLtItemContext _localctx = new JsonLtItemContext(_ctx, getState());
 		enterRule(_localctx, 26, RULE_jsonLtItem);
 		try {
-			setState(115);
+			setState(119);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case DOT_ID:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(108);
+				setState(112);
 				jsonfunctionCall();
 				}
 				break;
@@ -786,42 +807,42 @@ public class JsltParser extends Parser {
 			case FALSE:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(109);
+				setState(113);
 				jsonValueBoolean();
 				}
 				break;
 			case STRING:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(110);
+				setState(114);
 				jsonValueString();
 				}
 				break;
 			case INT:
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(111);
+				setState(115);
 				jsonValueInteger();
 				}
 				break;
 			case NUMBER:
 				enterOuterAlt(_localctx, 5);
 				{
-				setState(112);
+				setState(116);
 				jsonValueNumber();
 				}
 				break;
 			case NULL:
 				enterOuterAlt(_localctx, 6);
 				{
-				setState(113);
+				setState(117);
 				jsonValueNull();
 				}
 				break;
 			case CURRENT_VALUE:
 				enterOuterAlt(_localctx, 7);
 				{
-				setState(114);
+				setState(118);
 				jsonType();
 				}
 				break;
@@ -872,7 +893,7 @@ public class JsltParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(117);
+			setState(121);
 			_la = _input.LA(1);
 			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << WILDCARD_SUBSCRIPT) | (1L << EQ) | (1L << NE) | (1L << GT) | (1L << LT) | (1L << LE) | (1L << GE) | (1L << PLUS) | (1L << MINUS) | (1L << DIVID) | (1L << MODULO) | (1L << POWER) | (1L << AND) | (1L << OR) | (1L << AND_EXCLUSIVE) | (1L << OR_EXCLUSIVE) | (1L << COALESCE) | (1L << CHAIN))) != 0)) ) {
 			_errHandler.recoverInline(this);
@@ -918,32 +939,32 @@ public class JsltParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(119);
+			setState(123);
 			match(DOT_ID);
-			setState(120);
+			setState(124);
 			match(PAREN_LEFT);
-			setState(122);
+			setState(126);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << CURRENT_VALUE) | (1L << NT) | (1L << TRUE) | (1L << FALSE) | (1L << NULL) | (1L << BRACE_LEFT) | (1L << BRACKET_LEFT) | (1L << PAREN_LEFT) | (1L << STRING) | (1L << NUMBER) | (1L << INT) | (1L << DOT_ID))) != 0)) {
 				{
-				setState(121);
+				setState(125);
 				jsonValueList();
 				}
 			}
 
-			setState(124);
+			setState(128);
 			match(PAREN_RIGHT);
-			setState(126);
+			setState(130);
 			_errHandler.sync(this);
-			_la = _input.LA(1);
-			if (_la==BRACE_LEFT) {
+			switch ( getInterpreter().adaptivePredict(_input,10,_ctx) ) {
+			case 1:
 				{
-				setState(125);
+				setState(129);
 				obj();
 				}
+				break;
 			}
-
 			}
 		}
 		catch (RecognitionException re) {
@@ -981,21 +1002,21 @@ public class JsltParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(128);
+			setState(132);
 			jsonValue();
-			setState(133);
+			setState(137);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==COMMA) {
 				{
 				{
-				setState(129);
+				setState(133);
 				match(COMMA);
-				setState(130);
+				setState(134);
 				jsonValue();
 				}
 				}
-				setState(135);
+				setState(139);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
@@ -1012,42 +1033,59 @@ public class JsltParser extends Parser {
 		return _localctx;
 	}
 
+	public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
+		switch (ruleIndex) {
+		case 12:
+			return jsonLtOperation_sempred((JsonLtOperationContext)_localctx, predIndex);
+		}
+		return true;
+	}
+	private boolean jsonLtOperation_sempred(JsonLtOperationContext _localctx, int predIndex) {
+		switch (predIndex) {
+		case 0:
+			return precpred(_ctx, 1);
+		}
+		return true;
+	}
+
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\63\u008b\4\2\t\2"+
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\63\u008f\4\2\t\2"+
 		"\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13"+
 		"\t\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22\t\22"+
 		"\3\2\3\2\3\2\3\3\3\3\3\4\3\4\3\4\3\4\7\4.\n\4\f\4\16\4\61\13\4\3\4\3\4"+
 		"\3\4\3\4\5\4\67\n\4\3\5\3\5\3\5\3\5\3\6\3\6\3\6\3\6\7\6A\n\6\f\6\16\6"+
 		"D\13\6\3\6\3\6\3\6\3\6\5\6J\n\6\3\7\3\7\3\7\5\7O\n\7\3\b\3\b\5\bS\n\b"+
-		"\3\t\3\t\3\n\3\n\3\13\3\13\3\f\3\f\3\r\3\r\3\r\3\16\5\16a\n\16\3\16\3"+
-		"\16\3\16\3\16\5\16g\n\16\3\16\3\16\3\16\3\16\5\16m\n\16\3\17\3\17\3\17"+
-		"\3\17\3\17\3\17\3\17\5\17v\n\17\3\20\3\20\3\21\3\21\3\21\5\21}\n\21\3"+
-		"\21\3\21\5\21\u0081\n\21\3\22\3\22\3\22\7\22\u0086\n\22\f\22\16\22\u0089"+
-		"\13\22\3\22\2\2\23\2\4\6\b\n\f\16\20\22\24\26\30\32\34\36 \"\2\5\3\2#"+
-		"$\4\2\7\13\17\20\5\2\4\4\21\26\30\"\2\u008c\2$\3\2\2\2\4\'\3\2\2\2\6\66"+
-		"\3\2\2\2\b8\3\2\2\2\nI\3\2\2\2\fN\3\2\2\2\16P\3\2\2\2\20T\3\2\2\2\22V"+
-		"\3\2\2\2\24X\3\2\2\2\26Z\3\2\2\2\30\\\3\2\2\2\32l\3\2\2\2\34u\3\2\2\2"+
-		"\36w\3\2\2\2 y\3\2\2\2\"\u0082\3\2\2\2$%\5\4\3\2%&\7\2\2\3&\3\3\2\2\2"+
-		"\'(\5\f\7\2(\5\3\2\2\2)*\7&\2\2*/\5\b\5\2+,\7*\2\2,.\5\b\5\2-+\3\2\2\2"+
-		".\61\3\2\2\2/-\3\2\2\2/\60\3\2\2\2\60\62\3\2\2\2\61/\3\2\2\2\62\63\7\'"+
-		"\2\2\63\67\3\2\2\2\64\65\7&\2\2\65\67\7\'\2\2\66)\3\2\2\2\66\64\3\2\2"+
-		"\2\67\7\3\2\2\289\7-\2\29:\7\6\2\2:;\5\f\7\2;\t\3\2\2\2<=\7(\2\2=B\5\f"+
-		"\7\2>?\7*\2\2?A\5\f\7\2@>\3\2\2\2AD\3\2\2\2B@\3\2\2\2BC\3\2\2\2CE\3\2"+
-		"\2\2DB\3\2\2\2EF\7)\2\2FJ\3\2\2\2GH\7(\2\2HJ\7)\2\2I<\3\2\2\2IG\3\2\2"+
-		"\2J\13\3\2\2\2KO\5\6\4\2LO\5\n\6\2MO\5\32\16\2NK\3\2\2\2NL\3\2\2\2NM\3"+
-		"\2\2\2O\r\3\2\2\2PR\7-\2\2QS\5\30\r\2RQ\3\2\2\2RS\3\2\2\2S\17\3\2\2\2"+
-		"TU\7/\2\2U\21\3\2\2\2VW\7\60\2\2W\23\3\2\2\2XY\t\2\2\2Y\25\3\2\2\2Z[\7"+
-		"%\2\2[\27\3\2\2\2\\]\7\5\2\2]^\t\3\2\2^\31\3\2\2\2_a\7\27\2\2`_\3\2\2"+
-		"\2`a\3\2\2\2ab\3\2\2\2bf\5\34\17\2cd\5\36\20\2de\5\32\16\2eg\3\2\2\2f"+
-		"c\3\2\2\2fg\3\2\2\2gm\3\2\2\2hi\7+\2\2ij\5\32\16\2jk\7,\2\2km\3\2\2\2"+
-		"l`\3\2\2\2lh\3\2\2\2m\33\3\2\2\2nv\5 \21\2ov\5\24\13\2pv\5\16\b\2qv\5"+
-		"\22\n\2rv\5\20\t\2sv\5\26\f\2tv\5\30\r\2un\3\2\2\2uo\3\2\2\2up\3\2\2\2"+
-		"uq\3\2\2\2ur\3\2\2\2us\3\2\2\2ut\3\2\2\2v\35\3\2\2\2wx\t\4\2\2x\37\3\2"+
-		"\2\2yz\7\63\2\2z|\7+\2\2{}\5\"\22\2|{\3\2\2\2|}\3\2\2\2}~\3\2\2\2~\u0080"+
-		"\7,\2\2\177\u0081\5\6\4\2\u0080\177\3\2\2\2\u0080\u0081\3\2\2\2\u0081"+
-		"!\3\2\2\2\u0082\u0087\5\f\7\2\u0083\u0084\7*\2\2\u0084\u0086\5\f\7\2\u0085"+
-		"\u0083\3\2\2\2\u0086\u0089\3\2\2\2\u0087\u0085\3\2\2\2\u0087\u0088\3\2"+
-		"\2\2\u0088#\3\2\2\2\u0089\u0087\3\2\2\2\17/\66BINR`flu|\u0080\u0087";
+		"\3\t\3\t\3\n\3\n\3\13\3\13\3\f\3\f\3\r\3\r\3\r\3\16\3\16\3\16\3\16\3\16"+
+		"\3\16\3\16\3\16\5\16h\n\16\3\16\3\16\3\16\3\16\7\16n\n\16\f\16\16\16q"+
+		"\13\16\3\17\3\17\3\17\3\17\3\17\3\17\3\17\5\17z\n\17\3\20\3\20\3\21\3"+
+		"\21\3\21\5\21\u0081\n\21\3\21\3\21\5\21\u0085\n\21\3\22\3\22\3\22\7\22"+
+		"\u008a\n\22\f\22\16\22\u008d\13\22\3\22\2\3\32\23\2\4\6\b\n\f\16\20\22"+
+		"\24\26\30\32\34\36 \"\2\5\3\2#$\4\2\7\13\17\20\5\2\4\4\21\26\30\"\2\u0090"+
+		"\2$\3\2\2\2\4\'\3\2\2\2\6\66\3\2\2\2\b8\3\2\2\2\nI\3\2\2\2\fN\3\2\2\2"+
+		"\16P\3\2\2\2\20T\3\2\2\2\22V\3\2\2\2\24X\3\2\2\2\26Z\3\2\2\2\30\\\3\2"+
+		"\2\2\32g\3\2\2\2\34y\3\2\2\2\36{\3\2\2\2 }\3\2\2\2\"\u0086\3\2\2\2$%\5"+
+		"\4\3\2%&\7\2\2\3&\3\3\2\2\2\'(\5\f\7\2(\5\3\2\2\2)*\7&\2\2*/\5\b\5\2+"+
+		",\7*\2\2,.\5\b\5\2-+\3\2\2\2.\61\3\2\2\2/-\3\2\2\2/\60\3\2\2\2\60\62\3"+
+		"\2\2\2\61/\3\2\2\2\62\63\7\'\2\2\63\67\3\2\2\2\64\65\7&\2\2\65\67\7\'"+
+		"\2\2\66)\3\2\2\2\66\64\3\2\2\2\67\7\3\2\2\289\7-\2\29:\7\6\2\2:;\5\f\7"+
+		"\2;\t\3\2\2\2<=\7(\2\2=B\5\f\7\2>?\7*\2\2?A\5\f\7\2@>\3\2\2\2AD\3\2\2"+
+		"\2B@\3\2\2\2BC\3\2\2\2CE\3\2\2\2DB\3\2\2\2EF\7)\2\2FJ\3\2\2\2GH\7(\2\2"+
+		"HJ\7)\2\2I<\3\2\2\2IG\3\2\2\2J\13\3\2\2\2KO\5\6\4\2LO\5\n\6\2MO\5\32\16"+
+		"\2NK\3\2\2\2NL\3\2\2\2NM\3\2\2\2O\r\3\2\2\2PR\7-\2\2QS\5\30\r\2RQ\3\2"+
+		"\2\2RS\3\2\2\2S\17\3\2\2\2TU\7/\2\2U\21\3\2\2\2VW\7\60\2\2W\23\3\2\2\2"+
+		"XY\t\2\2\2Y\25\3\2\2\2Z[\7%\2\2[\27\3\2\2\2\\]\7\5\2\2]^\t\3\2\2^\31\3"+
+		"\2\2\2_`\b\16\1\2`h\5\34\17\2ab\7\27\2\2bh\5\32\16\5cd\7+\2\2de\5\32\16"+
+		"\2ef\7,\2\2fh\3\2\2\2g_\3\2\2\2ga\3\2\2\2gc\3\2\2\2ho\3\2\2\2ij\f\3\2"+
+		"\2jk\5\36\20\2kl\5\32\16\4ln\3\2\2\2mi\3\2\2\2nq\3\2\2\2om\3\2\2\2op\3"+
+		"\2\2\2p\33\3\2\2\2qo\3\2\2\2rz\5 \21\2sz\5\24\13\2tz\5\16\b\2uz\5\22\n"+
+		"\2vz\5\20\t\2wz\5\26\f\2xz\5\30\r\2yr\3\2\2\2ys\3\2\2\2yt\3\2\2\2yu\3"+
+		"\2\2\2yv\3\2\2\2yw\3\2\2\2yx\3\2\2\2z\35\3\2\2\2{|\t\4\2\2|\37\3\2\2\2"+
+		"}~\7\63\2\2~\u0080\7+\2\2\177\u0081\5\"\22\2\u0080\177\3\2\2\2\u0080\u0081"+
+		"\3\2\2\2\u0081\u0082\3\2\2\2\u0082\u0084\7,\2\2\u0083\u0085\5\6\4\2\u0084"+
+		"\u0083\3\2\2\2\u0084\u0085\3\2\2\2\u0085!\3\2\2\2\u0086\u008b\5\f\7\2"+
+		"\u0087\u0088\7*\2\2\u0088\u008a\5\f\7\2\u0089\u0087\3\2\2\2\u008a\u008d"+
+		"\3\2\2\2\u008b\u0089\3\2\2\2\u008b\u008c\3\2\2\2\u008c#\3\2\2\2\u008d"+
+		"\u008b\3\2\2\2\16/\66BINRgoy\u0080\u0084\u008b";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

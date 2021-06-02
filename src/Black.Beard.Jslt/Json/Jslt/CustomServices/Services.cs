@@ -25,7 +25,9 @@ namespace Bb.Json.Jslt.CustomServices
 
             if( file.Exists)
                 return file.FullName.LoadContentFromFile().ConvertToJson();
+
             return JValue.CreateNull();
+
         }
 
         /// <summary>
@@ -41,48 +43,6 @@ namespace Bb.Json.Jslt.CustomServices
         {
             var n = utc ? DateTime.UtcNow : DateTime.Now;
             return new JValue(n);
-        }
-
-        [JsltExtensionMethod("sum")]
-        [JsltExtensionMethodParameter("token", "should be an array")]
-        public static JToken ExecuteSum(RuntimeContext ctx, JToken token)
-        {
-
-            double result = 0;
-            if (token != null)
-            {
-
-                if (token is JArray a && a.Count > 0)
-                {
-
-                    foreach (var item in a)
-                    {
-
-                        if (item.Type == JTokenType.Integer)
-                        {
-                            int i = item.Value<int>();
-                            result += i;
-                        }
-                        else if (item.Type == JTokenType.Float)
-                        {
-                            float i = item.Value<float>();
-                            result += i;
-                        }
-                        else
-                            throw new InvalidOperationException("Interger or float expected value");
-
-                    }
-
-                }
-
-            }
-
-            var r = (int)result;
-            if (r < result)
-                return new JValue(result);
-
-            return new JValue(r);
-
         }
 
         [JsltExtensionMethod("uuid")]

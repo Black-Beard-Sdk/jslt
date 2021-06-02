@@ -70,6 +70,7 @@ namespace AppJsonEvaluator
 
             var configuration = new TranformJsonAstConfiguration();
 
+            if (paths != null)
             foreach (var item in paths)
                 if (!string.IsNullOrEmpty(item))
                     configuration.Paths.Add(item);
