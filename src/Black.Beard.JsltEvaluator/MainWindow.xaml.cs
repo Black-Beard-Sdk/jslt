@@ -133,10 +133,10 @@ namespace AppJsonEvaluator
                     if (x < lenght)
                         lenght = x;
 
-                    ITextMarker marker = textMarkerService.Create(index, 10);
+                    ITextMarker marker = textMarkerService.Create(index, lenght);
                     marker.MarkerTypes = TextMarkerTypes.SquigglyUnderline;
                     marker.MarkerColor = Colors.Red;
-                    
+
 
                 }
 
@@ -179,8 +179,6 @@ namespace AppJsonEvaluator
             _templateUpdated = true;
             UpdateFolding(_templateFoldingManager, TemplateEditor);
             UpdateTemplate();
-            Update();
-
         }
 
         private void TargetEditorTextChanged(object sender, EventArgs e)
@@ -282,7 +280,7 @@ namespace AppJsonEvaluator
 
         private string GetFileFromSaveFile(string title)
         {
-            
+
             SaveFileDialog saveFileDialog = new SaveFileDialog()
             {
                 Title = title,
@@ -300,6 +298,7 @@ namespace AppJsonEvaluator
 
         void textEditor_TextArea_TextEntered(object sender, TextCompositionEventArgs e)
         {
+
             if (e.Text == ".")
             {
 
@@ -343,6 +342,15 @@ namespace AppJsonEvaluator
             // We still want to insert the character that was typed.
         }
 
+        private void TemplateEditor_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.F5)
+            {
+                UpdateTemplate();
+                Update();
+            }
+        }
+
         private readonly BraceFoldingStrategy _foldingStrategy;
         private readonly FoldingManager _templateFoldingManager;
         private readonly FoldingManager _targetFoldingManager;
@@ -384,7 +392,8 @@ namespace AppJsonEvaluator
 
             }
         }
-                
+
+        
     }
 
 

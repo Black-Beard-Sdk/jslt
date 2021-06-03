@@ -39,7 +39,7 @@
                     <Label x:Name="LabelTemplateFile" />
                 </ToolBar>
 
-                <avalonEdit:TextEditor x:Name="TemplateEditor" Grid.Row="1" FontFamily="Consolas" FontSize="16" TextChanged="TemplateEditorTextChanged" Drop="TemplateEditor_Drop" >
+                <avalonEdit:TextEditor x:Name="TemplateEditor" Grid.Row="1" FontFamily="Consolas" FontSize="16" TextChanged="TemplateEditorTextChanged" Drop="TemplateEditor_Drop" Keyboard.KeyUp="TemplateEditor_KeyUp" >
 
                 </avalonEdit:TextEditor>
 
