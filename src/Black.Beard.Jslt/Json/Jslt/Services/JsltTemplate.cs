@@ -21,6 +21,7 @@ namespace Bb.Json.Jslt.Services
         public RuntimeContext LastExecutionContext { get; private set; }
 
         public TranformJsonAstConfiguration Configuration { get; internal set; }
+
         public CultureInfo Culture { get; internal set; }
         
         public string Filename { get; internal set; }

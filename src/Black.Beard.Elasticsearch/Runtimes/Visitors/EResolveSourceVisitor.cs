@@ -9,7 +9,7 @@ namespace Bb.Elastic.Runtimes.Visitors
     internal class EResolveSourceVisitor : IVisitor<object>
     {
 
-        public EResolveSourceVisitor(Connections connections, ContextExecutor ctx)
+        public EResolveSourceVisitor(ElasticConnections connections, ContextExecutor ctx)
         {
             this._connection = connections;
             this._ctx = ctx;
@@ -353,7 +353,7 @@ namespace Bb.Elastic.Runtimes.Visitors
 
         }
 
-        private readonly Connections _connection;
+        private readonly ElasticConnections _connection;
 
         public ContextExecutor _ctx { get; }
     }

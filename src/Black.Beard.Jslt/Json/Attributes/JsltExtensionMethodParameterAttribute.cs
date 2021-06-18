@@ -6,7 +6,8 @@ using System.Text;
 namespace Bb.Json.Attributes
 {
     [System.AttributeUsage(AttributeTargets.Method | AttributeTargets.Constructor, Inherited = false, AllowMultiple = true)]
-    sealed class JsltExtensionMethodParameterAttribute : Attribute
+
+    public sealed class JsltExtensionMethodParameterAttribute : Attribute
     {
 
         // This is a positional argument

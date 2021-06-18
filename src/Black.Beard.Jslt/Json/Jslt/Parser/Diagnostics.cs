@@ -94,14 +94,13 @@ namespace Bb.Json.Jslt.Parser
             this.Add(new ErrorModel()
             {
                 Filename = filename,
-                Line = location.Line,
-                StartIndex = location.StartIndex,
-                Column = location.Column,
+                Line = location?.Line ?? 0,
+                StartIndex = location?.StartIndex ?? 0,
+                Column = location?.Column ?? 0,
                 Text = text,
                 Message = message,
                 Severity = SeverityEnum.Error,
             });
-
         }
 
 
@@ -118,7 +117,6 @@ namespace Bb.Json.Jslt.Parser
                 Message = message,
                 Severity = severityEnum,
             });
-
         }
 
         public void AddDiagnostic(SeverityEnum severityEnum, string filename, TokenLocation location, string text, string message)
@@ -126,14 +124,13 @@ namespace Bb.Json.Jslt.Parser
             this.Add(new ErrorModel()
             {
                 Filename = filename,
-                Line = location.Line,
-                StartIndex = location.StartIndex,
-                Column = location.Column,
+                Line = location?.Line ?? 0,
+                StartIndex = location?.StartIndex ?? 0,
+                Column = location?.Column ?? 0,
                 Text = text,
                 Message = message,
                 Severity = severityEnum,
             });
-
         }
 
         #endregion Add

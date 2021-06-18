@@ -29,16 +29,6 @@ namespace Bb.Json.Jslt.Services
             var _errors = new Diagnostics();
             CultureInfo culture = this._configuration.Culture;
 
-            //for (int i = 0; i < sb.Length; i++)
-            //{
-            //    char ii = sb[i];
-            //    if (ii == '\r' || ii == '\n')
-            //    {
-            //        ii = ' ';
-            //        sb[i] = ii;
-            //    }
-            //}
-
             FunctionFoundry _foundry = null;
             JsltBase tree = null;
 

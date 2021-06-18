@@ -12,11 +12,11 @@ namespace Bb.Elastic.Runtimes
 {
 
 
-    public class Executor
+    public class ElasticExecutor
     {
 
 
-        internal Executor(Connections connections)
+        internal ElasticExecutor(ElasticConnections connections)
         {
 
             this._metaVisitor = new MetaVisitor(connections)

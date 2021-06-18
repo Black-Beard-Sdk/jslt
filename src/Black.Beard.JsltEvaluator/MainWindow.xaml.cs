@@ -163,6 +163,12 @@ namespace AppJsonEvaluator
                     var result = _template.Transform(src);
                     var value = result.TokenResult.ToString();
                     TargetEditor.Text = value;
+                    foreach (var item in result.Diagnostics)
+                    {
+                        
+                        Errors.Items.Insert(0, item.Message);
+
+                    }
                 }
                 catch (Exception e2)
                 {

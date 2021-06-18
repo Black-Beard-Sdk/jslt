@@ -4,21 +4,21 @@ using System.Linq;
 
 namespace Bb.Elastic.Runtimes.Models
 {
-    public class Connections
+    public class ElasticConnections
     {
 
 
-        public Connections()
+        public ElasticConnections()
         {
             this._connections = new Dictionary<string, Connection>();
         }
 
-        public Executor GetExecutor()
+        public ElasticExecutor GetExecutor()
         {
-            return new Executor(this);
+            return new ElasticExecutor(this);
         }
 
-        public Connections AddConnection(Connection cnx)
+        public ElasticConnections AddConnection(Connection cnx)
         {
             this._connections.Add(cnx.ConnectionName, cnx);
             cnx.Parent = this;
@@ -27,7 +27,7 @@ namespace Bb.Elastic.Runtimes.Models
 
         public int Count { get => _connections.Count; }
 
-        public Connection this[string key]
+        internal Connection this[string key]
         {
             get
             {

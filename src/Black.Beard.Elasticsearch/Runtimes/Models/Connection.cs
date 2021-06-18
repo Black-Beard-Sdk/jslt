@@ -13,7 +13,7 @@ namespace Bb.Elastic.Runtimes.Models
         }
 
         public string ConnectionName { get; }
-        public Connections Parent { get; internal set; }
+        public ElasticConnections Parent { get; internal set; }
 
         public abstract Result ExecuteQuery<TResponse>(ContextExecutor ctx, object query)
             where TResponse : class, new();

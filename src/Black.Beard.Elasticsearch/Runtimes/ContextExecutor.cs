@@ -11,7 +11,7 @@ namespace Bb.Elastic.Runtimes
     public class ContextExecutor
     {
 
-        internal ContextExecutor(Executor parent, StringBuilder querySql, string filename)
+        internal ContextExecutor(ElasticExecutor parent, StringBuilder querySql, string filename)
         {
             this._parent = parent;
             this._references = new List<Reference>();
@@ -45,7 +45,7 @@ namespace Bb.Elastic.Runtimes
         }
 
 
-        private Executor _parent;
+        private ElasticExecutor _parent;
         private List<Reference> _references;
         private ILookup<string, Reference> _lookup;
 
