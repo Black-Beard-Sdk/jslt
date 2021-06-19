@@ -40,8 +40,9 @@ namespace Bb.Json.Jslt.Services
         public TemplateBuilder(Diagnostics diagnostics)
         {
 
+            _resultReset = new List<MethodCallExpression>();
             this._diagnostics = diagnostics;
-
+            this._indexMethod = 0;
 
 
             this.source = new MethodCompiler();
@@ -145,7 +146,13 @@ namespace Bb.Json.Jslt.Services
         {
             Expression e;
 
+
+
             e = tree.Accept(this) as Expression;
+
+            foreach (var item in _resultReset)
+                source.Add(item);
+
             source.Add(e);
 
             var result = source.Compile<Func<RuntimeContext, JToken, JToken>>();
@@ -296,10 +303,10 @@ namespace Bb.Json.Jslt.Services
                 {
 
                     object value = null;
-                    
+
                     if (node.Value is JsltConstant c)
                         value = c.Value;
-                    
+
                     else
                     {
 
@@ -341,11 +348,23 @@ namespace Bb.Json.Jslt.Services
 
                 }
                 var arguments = typeof(object).NewArray(args.ToArray());
-                Expression result = Expression.Constant(node.ServiceProvider).Call(node.ServiceProvider.Method, arguments);
+                var keyMethod = Expression.Constant($"service_{this._indexMethod++}");
+
+                Expression result = Expression.Constant(node.ServiceProvider).Call(node.ServiceProvider.MethodCall, keyMethod, arguments);
+
+                _resultReset.Add(Expression.Constant(node.ServiceProvider).Call(node.ServiceProvider.MethodReset));
+
 
                 if (node.ServiceProvider.IsCtor)
-                    result = Expression.Call(RuntimeContext._getContentFromService.Method, ctx.Current.Context, ctx.Current.RootSource, result);
+                {
 
+                    Expression src = ctx.Current.RootSource;
+                    if (node.ArgumentsBis.Count > 0)
+                        src = (Expression)node.ArgumentsBis[0].Accept(this);
+
+                    result = Expression.Call(RuntimeContext._getContentFromService.Method, ctx.Current.Context, src, result);
+
+                }
                 return result;
 
             }
@@ -423,12 +442,11 @@ namespace Bb.Json.Jslt.Services
                 {
 
                     var left = (Expression)l.Accept(this);
-
+                    ParameterExpression resultVar = nextBlock.AddVar(left.Type, null, left);
 
                     if (node.Operator == OperationEnum.Coalesce)
                     {
 
-                        ParameterExpression resultVar = nextBlock.AddVar(left.Type, null, left);
                         var _if = nextBlock.If(resultVar.Equal(Expression.Constant(null)));
 
                         ctx.Current.Source = _if.Then;
@@ -439,14 +457,13 @@ namespace Bb.Json.Jslt.Services
                     }
                     //if (node.Operator == OperationEnum.Chain)
                     //{
-                        
-                    //    //ParameterExpression resultVar = nextBlock.AddVar(left.Type, null, left);
+
 
                     //}
                     else
                     {
                         var right = (Expression)r.Accept(this);
-                        var result = RuntimeContext._evaluateBinaryOperator.Method.Call(ctx.Current.Context, left, Expression.Constant(node.Operator), right);
+                        var result = RuntimeContext._evaluateBinaryOperator.Method.Call(ctx.Current.Context, resultVar, Expression.Constant(node.Operator), right);
                         return result;
 
                     }
@@ -462,7 +479,8 @@ namespace Bb.Json.Jslt.Services
         {
             var ctx = BuildCtx;
             var value = (Expression)node.Value.Accept(this);
-            return Expression.Call(ctx.Context, null, Expression.Constant(node.Name), value);
+            return value;
+            // return Expression.Call(ctx.Context, null, Expression.Constant(node.Name), value);
         }
 
         public object VisitLinkedCode(JsltLinkedCode node)
@@ -646,7 +664,8 @@ namespace Bb.Json.Jslt.Services
 
         private readonly MethodCompiler source;
         private readonly Diagnostics _diagnostics;
-
+        private int _indexMethod;
+        private List<MethodCallExpression> _resultReset;
         private static readonly ConstructorInfo _ctorJArray;
         private static readonly MethodInfo _AddJArray;
         private static readonly MethodInfo _jValueGetNull;

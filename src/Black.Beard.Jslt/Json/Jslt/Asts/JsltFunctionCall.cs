@@ -18,11 +18,12 @@ namespace Bb.Json.Jslt.Asts
 
             this.Name = name;
             this.Kind = JsltKind.Function;
-            this._items = new Dictionary<string, JsltArgument>();
+            this._items = new List<JsltArgument>();
+            this._items2 = new List<JsltArgument>();
             foreach (var item in arguments)
             {
                 var argName = "arg" + this._items.Count.ToString();
-                this._items.Add(argName, new JsltArgument()
+                this._items.Add(new JsltArgument()
                 {
                     Name = argName,
                     Value = item,
@@ -31,7 +32,22 @@ namespace Bb.Json.Jslt.Asts
 
         }
 
-        public IEnumerable<JsltArgument> Arguments { get => _items.Values; }
+        public void Inject(JsltBase argument, int position)
+        {
+
+            _items2.Insert(position, new JsltArgument() { Name = string.Empty, Value = argument });
+
+            int index = 0;
+            foreach (var item in _items2)
+            {
+                var argName = "arg" + (index++).ToString();
+                item.Name = argName;
+            }
+
+        }
+
+        public IEnumerable<JsltArgument> Arguments { get => _items; }
+        public List<JsltArgument> ArgumentsBis { get => _items2; }
 
         public Type[] ParameterTypes { get; internal set; }
 
@@ -46,7 +62,8 @@ namespace Bb.Json.Jslt.Asts
             return visitor.VisitFunction(this);
         }
 
-        private readonly Dictionary<string, JsltArgument> _items;
+        private readonly List<JsltArgument> _items;
+        private readonly List<JsltArgument> _items2;
 
     }
 

@@ -157,10 +157,7 @@ namespace Bb.Json.Jslt.Parser
                         result.Source = prop.Value;
 
                     else if (prop.Name.ToLower() == "$where")
-                    {
-                        LocalDebug.Stop();
                         result.Where = prop.Value;
-                    }
 
                 }
                 //else if (prop.Name.StartsWith("@"))
@@ -523,7 +520,24 @@ namespace Bb.Json.Jslt.Parser
                             return null;
                         }
                         else
-                            left = new JsltBinaryOperator(left, operation, _subs[1]) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+                        {
+                            var right = _subs[1];
+                            if (operation == OperationEnum.Chain)
+                            {
+                                if (right is JsltFunctionCall f)
+                                {
+                                    f.Inject(left, 0);
+                                    left = right;
+                                }
+                                else
+                                {
+                                    LocalDebug.Stop();
+                                    left = new JsltBinaryOperator(left, operation, right) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+                                }
+                            }
+                            else
+                                left = new JsltBinaryOperator(left, operation, right) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+                        }
 
                     }
 

@@ -18,25 +18,25 @@ namespace Bb.Json.Jslt.CustomServices
 
         public ServiceDistinct()
         {
-
+            this._true = new JValue(true);
+            this._false = new JValue(false);
         }
 
         public JToken Execute(RuntimeContext ctx, JToken token)
         {
 
             if (token != null && token is JValue j)
-            {
-
                 if (_index.Add(j.Value))
-                    return new JValue(true);
+                    return _true;
 
-            }
-
-            return new JValue(false);
+            return _false;
 
         }
 
         private HashSet<object> _index = new HashSet<object>();
+        
+        private readonly JValue _true;
+        private readonly JValue _false;
 
     }
 

@@ -33,14 +33,6 @@ namespace Bb.Json.Jslt.Services
                 {
                     if (factory.Parameters.Length == parameters.Length)
                         TestConstructor(parameters, result, factory);
-
-                    //else
-                    //{
-                    //    if (factory.Parameters.Length == 0 && parameters.Length == 1)
-                    //    {
-                    //    }
-                    //}
-
                 }
 
                 else if (factory.Parameters.Length == parameters.Length + 1)
