@@ -12,12 +12,15 @@ namespace Bb.Json.Jslt.Services
 {
 
 
-    internal class TemplateBuilder : IJsltJsonVisitor
+    internal class TemplateWithExpressionBuilder : IJsltJsonVisitor
     {
 
 
-        static TemplateBuilder()
+        static TemplateWithExpressionBuilder()
         {
+
+            Bb.Expresssions.ConverterHelper.ResolveConverter(typeof(InternalConverters), (m) => true);
+
             _ctorJProperty = typeof(JProperty).GetConstructor(new Type[] { typeof(string), typeof(object) });
             _ctorJObject = typeof(JObject).GetConstructor(new Type[] { });
             //this._AddJObject = typeof(JObject).GetMethod("Add", new Type[] { typeof(object) });
@@ -37,18 +40,18 @@ namespace Bb.Json.Jslt.Services
         }
 
 
-        public TemplateBuilder(Diagnostics diagnostics)
+        public TemplateWithExpressionBuilder(Diagnostics diagnostics, MethodCompiler compiler)
         {
 
+            PrivatedIndex.Reset();
             _resultReset = new List<MethodCallExpression>();
             this._diagnostics = diagnostics;
             this._indexMethod = 0;
 
+            this._compiler = compiler;
 
-            this.source = new MethodCompiler();
-
-            var Context = this.source.AddParameter(typeof(RuntimeContext), "argContext");
-            var Argument = this.source.AddParameter(typeof(JToken), "argToken");
+            var Context = this._compiler.AddParameter(typeof(RuntimeContext), "argContext");
+            var Argument = this._compiler.AddParameter(typeof(JToken), "argToken");
 
             _stack.Push(new BuildContext()
             {
@@ -56,7 +59,7 @@ namespace Bb.Json.Jslt.Services
                 Context = Context,
                 RootSource = Argument,
                 RootTarget = null,
-                Source = this.source
+                Source = this._compiler
 
             }); ;
 
@@ -142,20 +145,16 @@ namespace Bb.Json.Jslt.Services
 
         }
 
-        internal Func<RuntimeContext, JToken, JToken> GenerateLambda(JsltBase tree)
+        internal Func<RuntimeContext, JToken, JToken> GenerateLambda(JsltBase tree, string filepathCode)
         {
-            Expression e;
-
-
-
-            e = tree.Accept(this) as Expression;
+            Expression e = tree.Accept(this) as Expression;
 
             foreach (var item in _resultReset)
-                source.Add(item);
+                _compiler.Add(item);
 
-            source.Add(e);
+            _compiler.Add(e);
 
-            var result = source.Compile<Func<RuntimeContext, JToken, JToken>>();
+            var result = _compiler.Compile<Func<RuntimeContext, JToken, JToken>>(filepathCode);
 
             return result;
 
@@ -662,7 +661,7 @@ namespace Bb.Json.Jslt.Services
 
         #endregion Context
 
-        private readonly MethodCompiler source;
+        private readonly MethodCompiler _compiler;
         private readonly Diagnostics _diagnostics;
         private int _indexMethod;
         private List<MethodCallExpression> _resultReset;

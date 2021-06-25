@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.JsltEvaluator",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Jslt.Services", "Black.Beard.Jslt.Services\Black.Beard.Jslt.Services.csproj", "{95F6A45E-62D9-436B-9767-C13396659357}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Black.Beard.Elasticsearch", "Black.Beard.Elasticsearch\Black.Beard.Elasticsearch.csproj", "{B34D4F20-21DD-45F7-A720-958EF69384DE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Elasticsearch", "Black.Beard.Elasticsearch\Black.Beard.Elasticsearch.csproj", "{B34D4F20-21DD-45F7-A720-958EF69384DE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

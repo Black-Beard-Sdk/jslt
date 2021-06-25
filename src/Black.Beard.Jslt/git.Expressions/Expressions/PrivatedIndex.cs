@@ -4,7 +4,7 @@
     /// <summary>
     /// internal unique index generator
     /// </summary>
-    internal class PrivatedIndex
+    public class PrivatedIndex
     {
 
         /// <summary>
@@ -23,6 +23,11 @@
 
             }
 
+        }
+
+        public static void Reset()
+        {
+            _indexVariables = 0;
         }
 
         private static object _lock = new object();

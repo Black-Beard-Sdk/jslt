@@ -234,6 +234,11 @@ namespace Bb.Expresssions
             else
                 result = self;
 
+            if (result == null)
+            {
+                LocalDebug.Stop();
+                throw new Exception($"missing converter for convert {sourceType} to {targetType}");
+            }
             return result;
 
         }

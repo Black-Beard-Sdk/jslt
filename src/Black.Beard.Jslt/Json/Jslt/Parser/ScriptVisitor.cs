@@ -48,7 +48,7 @@ namespace Bb.Json.Jslt.Parser
                 Factory service = this._foundry.GetService(item.Name, types, this._diagnostics, context.Start.ToLocation());
                 if (service == null)
                 {
-                    LocalDebug.Stop();
+                    //LocalDebug.Stop();
                     AddError(item.Start, string.Empty, $"the service {item.Name} can't be resolved.");
                 }
                 else
@@ -840,8 +840,8 @@ namespace Bb.Json.Jslt.Parser
         public override object Visit(IParseTree tree)
         {
             EvaluateErrors(tree);
-            if (this._diagnostics.Count > 0)
-                LocalDebug.Stop();
+            //if (this._diagnostics.Count > 0)
+            //    LocalDebug.Stop();
             var result = base.Visit(tree);
 
             return result;

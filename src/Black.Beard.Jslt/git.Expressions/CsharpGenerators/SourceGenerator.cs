@@ -5,7 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 
-namespace Bb.Expresssions
+namespace Bb.CsharpGenerators
 {
 
     public class SourceGenerator : System.Linq.Expressions.ExpressionVisitor

@@ -2,6 +2,8 @@
 
 namespace Bb.Compilers
 {
+
+    [System.Diagnostics.DebuggerDisplay("[{Severity}] {Message}")]
     public class DiagnosticResult
     {
         public List<LocationResult> Locations { get; internal set; }

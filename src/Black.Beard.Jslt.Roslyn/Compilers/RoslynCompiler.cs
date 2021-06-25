@@ -16,11 +16,11 @@ using System.Text;
 namespace Bb.Compilers
 {
 
-    public class Compiler
+    public class RoslynCompiler
     {
 
 
-        public Compiler(HashSet<Assembly> assemblies)
+        public RoslynCompiler(HashSet<Assembly> assemblies)
         {
 
             assemblies.Add(typeof(System.Object).Assembly);
@@ -43,15 +43,14 @@ namespace Bb.Compilers
 
         #region Methods
 
-        public Compiler AddCodeSource(string source, string path = null)
+        public RoslynCompiler AddCodeSource(string source, string path = null)
         {
             this._sources.Add(new FileCode() { Content = source, Filepath = path ?? string.Empty });
             this._hash ^= Crc32.Calculate(source);
             return this;
         }
 
-
-        public Compiler AddReference(string location)
+        public RoslynCompiler AddReference(string location)
         {
             PortableExecutableReference newReference = AssemblyMetadata.CreateFromFile(location).GetReference();
             if (_assemblies.Add(newReference.FilePath))
@@ -59,7 +58,7 @@ namespace Bb.Compilers
             return this;
         }
 
-        public Compiler AddReference(Type type)
+        public RoslynCompiler AddReference(Type type)
         {
             if (!string.IsNullOrEmpty(type.Namespace))
                 _namespaces.Add(type.Namespace);
@@ -67,7 +66,7 @@ namespace Bb.Compilers
             return this;
         }
 
-        public Compiler AddReference(Assembly assembly)
+        public RoslynCompiler AddReference(Assembly assembly)
         {
             var newReference = AssemblyMetadata.CreateFromFile(assembly.Location).GetReference();
             if (_assemblies.Add(assembly.Location))
@@ -75,7 +74,7 @@ namespace Bb.Compilers
             return this;
         }
 
-        public Compiler SetOutput(string outputPah)
+        public RoslynCompiler SetOutput(string outputPah)
         {
             this._outputPah = outputPah;
             return this;

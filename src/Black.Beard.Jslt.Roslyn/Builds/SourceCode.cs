@@ -1,35 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
 namespace Bb.Json.Jslt.Builds
 {
-
-    public class SourceCodes
-    {
-
-        public SourceCodes()
-        {
-            _sources = new Dictionary<string, SourceCode>();
-        }
-
-        public SourceCode Get(string filename)
-        {
-
-            if (!_sources.TryGetValue(filename, out SourceCode code))
-            {
-                code = SourceCode.GetFromFile(filename);
-                _sources.Add(filename, code);
-            }
-
-            return code;
-
-        }
-
-        private readonly Dictionary<string, SourceCode> _sources;
-
-    }
 
     public class SourceCode
     {
@@ -47,7 +21,7 @@ namespace Bb.Json.Jslt.Builds
 
             var getDatas = filename.LoadContentFromFile();
 
-            return new SourceCode(getDatas, name);
+            return new SourceCode(getDatas, name) { Filename = filename };
 
         }
 
@@ -109,7 +83,7 @@ namespace Bb.Json.Jslt.Builds
 
 
         public static SourceCode Empty { get; private set; }
-
+        public string Filename { get; private set; }
 
         public static implicit operator SourceCode(StringBuilder sb)
         {

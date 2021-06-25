@@ -1,10 +1,12 @@
-﻿using Bb.Json.Jslt.Asts;
+﻿using Bb.Expresssions;
+using Bb.Json.Jslt.Asts;
 using Bb.Json.Jslt.Parser;
 using Bb.JSon;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq.Expressions;
 using System.Text;
 
@@ -26,6 +28,12 @@ namespace Bb.Json.Jslt.Services
         public JsltTemplate GetTemplate(StringBuilder sb, string filename)
         {
 
+            if (string.IsNullOrEmpty(this._configuration.OutputPath) && !string.IsNullOrEmpty(filename))
+            {
+                this._configuration.OutputPath = new FileInfo(filename).Directory.FullName;
+            }
+
+            string filepathCode = string.Empty;
             var _errors = new Diagnostics();
             CultureInfo culture = this._configuration.Culture;
 
@@ -51,7 +59,11 @@ namespace Bb.Json.Jslt.Services
 
             Func<RuntimeContext, JToken, JToken> rules = null;
             if (_errors.Success)
-                rules = Get(tree, _foundry, _errors);
+            {
+                var crc = sb.Calculate().ToString();
+                filepathCode =  crc + ".cs";
+                rules = Get(tree, _foundry, _errors, filepathCode);
+            }
 
             JsltTemplate result = new JsltTemplate()
             {
@@ -68,15 +80,21 @@ namespace Bb.Json.Jslt.Services
 
         }
 
-        private Func<RuntimeContext, JToken, JToken> Get(JsltBase tree, FunctionFoundry foundry, Diagnostics _errors)
+        private Func<RuntimeContext, JToken, JToken> Get(JsltBase tree, FunctionFoundry foundry, Diagnostics _errors, string filepathCode)
         {
 
             Func<RuntimeContext, JToken, JToken> fnc;
 
             if (tree != null)
             {
-                var builder = new TemplateBuilder(_errors) { Configuration = this._configuration, EmbbededFunctions = foundry };
-                fnc = builder.GenerateLambda(tree);
+
+                var sourceCompiler = new LocalMethodCompiler()
+                {
+                    OutputPath = this._configuration.OutputPath,
+                };
+
+                var builder = new TemplateWithExpressionBuilder(_errors, sourceCompiler) { Configuration = this._configuration, EmbbededFunctions = foundry };
+                fnc = builder.GenerateLambda(tree, filepathCode);
             }
             else // Template empty
             {

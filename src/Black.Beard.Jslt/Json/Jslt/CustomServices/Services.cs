@@ -16,6 +16,19 @@ namespace Bb.Json.Jslt.CustomServices
     public static partial class Services
     {
 
+        [JsltExtensionMethod("stop")]
+        public static JToken ExecuteStop(RuntimeContext ctx)
+        {
+
+            if (!System.Diagnostics.Debugger.IsAttached)
+                System.Diagnostics.Debugger.Launch();
+
+            ctx.Stop();
+
+            return JValue.CreateNull();
+
+        }
+
         [JsltExtensionMethod("loadjson")]
         [JsltExtensionMethodParameter("sourcePath", "directory source path")]
         public static JToken ExecuteLoadSource(RuntimeContext ctx, string sourcePath)

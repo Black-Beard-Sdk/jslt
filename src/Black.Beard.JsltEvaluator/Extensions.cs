@@ -84,7 +84,7 @@ namespace AppJsonEvaluator
 
         }
 
-        public static JsltTemplate GetTransformProvider(this string self, string[] paths, params Type[] services)
+        public static JsltTemplate GetTransformProvider(this string self, string templatefilename, string[] paths, params Type[] services)
         {
 
 #if UNIT_TEST
@@ -92,9 +92,8 @@ namespace AppJsonEvaluator
 #else
             StringBuilder sb = new StringBuilder(self);
 #endif
-
             var provider = GetProvider(paths, services);
-            JsltTemplate template = provider.GetTemplate(sb, "");
+            JsltTemplate template = provider.GetTemplate(sb, templatefilename);
             return template;
 
         }

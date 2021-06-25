@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Bb.CsharpGenerators;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.SymbolStore;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -17,6 +19,8 @@ namespace Bb.Expresssions
         {
 
         }
+
+        public string OutputPath { get; set; }
 
 
         #region parameters
@@ -73,43 +77,36 @@ namespace Bb.Expresssions
 
         #region Compiler
 
-        public TDelegate Compile<TDelegate>()
+        public virtual TDelegate Compile<TDelegate>(string filepathCode)
         {
 
-            var lbd = GenerateLambda<TDelegate>()
-                .Compile();
-            ;
+            var lbd = GenerateLambda<TDelegate>(filepathCode);
 
-            return lbd;
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+
+                var _u = new string[] { "Newtonsoft.Json.Linq", "Bb.ComponentModel.Factories", "Bb.Json.Jslt.Services" };
+                //var sb = SourceGenerator.GetCode(result, _u);
+                //System.Diagnostics.Debug.WriteLine(sb.ToString());
+
+                var code = SourceCodeDomGenerator.GetCode(lbd, "n_" + Path.GetFileNameWithoutExtension(filepathCode), "Myclass", "MyMethod", _u);
+                System.CodeDom.CodeCompileUnit compileUnit = new System.CodeDom.CodeCompileUnit()
+                {
+
+                };
+
+                string path = Path.Combine(this.OutputPath, "_temps");
+                if (!Directory.Exists(path))
+                    Directory.CreateDirectory(path);
+                string file = Path.Combine(path, filepathCode);
+                compileUnit.Namespaces.Add(code);
+                LocalCodeGenerator.GenerateCsharpCode(compileUnit, file);
+
+            }
+
+            return lbd.Compile();
 
         }
-
-        //public TDelegate CompileWithDebug<TDelegate>()
-        //{
-
-        //    // Ca ne fonctionne plus en DOT NET CORE (plus de methode CompileToMethod(MethodBuilder, ))
-        //    var assemblyName = "dynamic_" + DateTime.UtcNow.Ticks.GetHashCode();
-
-        //    var _asm = AssemblyBuilder.DefineDynamicAssembly(new AssemblyName(assemblyName), AssemblyBuilderAccess.RunAndCollect);
-        //    var _mod = _asm.DefineDynamicModule("mymod");
-        //    var _type = _mod.DefineType("baz", TypeAttributes.Public);
-        //    MethodBuilder _meth = _type.DefineMethod("go", MethodAttributes.Public | MethodAttributes.Static);
-
-        //    var d1 = new SymbolDocumentGenerator();
-
-        //    var lbd = GenerateLambda<TDelegate>()
-        //        .CompileToMethod(_meth, d1);
-
-        //    _asm.Save("tmp.dll");
-
-        //    var lbd = GenerateLambda<TDelegate>()
-        //        .Compile(d1);
-        //    ;
-
-        //    return lbd;
-
-        //}
-
 
         public LambdaExpression GenerateLambda(Type delegateType)
         {
@@ -128,7 +125,7 @@ namespace Bb.Expresssions
 
         }
 
-        public Expression<TDelegate> GenerateLambda<TDelegate>()
+        public Expression<TDelegate> GenerateLambda<TDelegate>(string filepathCode)
         {
 
             var parameters = this._parameters.Items.Select(c => c.Instance).ToArray();
@@ -141,83 +138,14 @@ namespace Bb.Expresssions
 
             var result = Expression.Lambda<TDelegate>(expression, parameters.ToArray());
 
-            //var o = new System.Linq.Expressions.Expression.LambdaExpressionProxy(result).DebugView;
-            //if (System.Diagnostics.Debugger.IsAttached)
-            //    System.Diagnostics.Debug.WriteLine(result.ToString());
-
-            if (System.Diagnostics.Debugger.IsAttached)
-            {
-                var sb = SourceGenerator.GetCode(result, "Newtonsoft.Json.Linq", "Bb.TransformJson");
-                System.Diagnostics.Debug.WriteLine(sb.ToString());
-            }
-
             return result;
 
         }
 
         #endregion compiler
 
-
-
         private Variables _parameters = new Variables();
 
     }
-
-
-    //internal sealed class SymbolDocumentGenerator : DebugInfoGenerator
-    //{
-
-
-    //    public SymbolDocumentGenerator()
-    //    {
-
-           
-    //    }
-
-    //    private ISymbolDocumentWriter GetSymbolWriter(MethodBuilder method, SymbolDocumentInfo document)
-    //    {
-
-    //        ISymbolDocumentWriter result = null;
-    //        if (_symbolWriters == null)
-    //            _symbolWriters = new Dictionary<SymbolDocumentInfo, ISymbolDocumentWriter>();
-
-    //        if (!_symbolWriters.TryGetValue(document, out result))
-    //        {
-    //            //var m = method.Module as ModuleBuilder;
-    //            //result = m.DefineDocument(document.FileName, document.Language, document.LanguageVendor, DocumentType_Text);
-    //            //_symbolWriters.Add(document, result);
-    //        }
-
-    //        return result;
-    //    }
-
-    //    public override void MarkSequencePoint(LambdaExpression method, int ilOffset, DebugInfoExpression sequencePoint)
-    //    {
-
-    //        //MethodBuilder builder = methodBase as MethodBuilder;
-    //        //if (builder != null)
-    //        //{
-    //        //    ilg.MarkSequencePoint(GetSymbolWriter(builder, sequencePoint.Document), sequencePoint.StartLine, sequencePoint.StartColumn, sequencePoint.EndLine, sequencePoint.EndColumn);
-    //        //}
-
-
-    //    }
-
-    //    private Dictionary<SymbolDocumentInfo, ISymbolDocumentWriter> _symbolWriters;
-
-
-    //    //public override void MarkSequencePoint(LambdaExpression method, int ilOffset, DebugInfoExpression sequencePoint)
-    //    //{
-    //    //    throw Error.PdbGeneratorNeedsExpressionCompiler();
-    //    //}
-
-    //    //internal override void SetLocalName(LocalBuilder localBuilder, string name)
-    //    //{
-    //    //    localBuilder.SetLocalSymInfo(name);
-    //    //}
-
-    //    internal static readonly Guid DocumentType_Text = new Guid(0x5a869d0b, 0x6611, 0x11d3, 0xbd, 0x2a, 0, 0, 0xf8, 8, 0x49, 0xbd);
-
-    //}
 
 }

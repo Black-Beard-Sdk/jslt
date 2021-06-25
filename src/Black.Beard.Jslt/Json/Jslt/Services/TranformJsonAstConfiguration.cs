@@ -26,6 +26,7 @@ namespace Bb.Json.Jslt.Services
             this.Services = new ServiceContainer();
             this.Paths = new List<string>();
             this.Paths.Add(Environment.CurrentDirectory);
+            this.OutputPath = string.Empty;
         }
 
         public ServiceContainer Services { get; }
@@ -33,6 +34,8 @@ namespace Bb.Json.Jslt.Services
         public List<string> Paths { get; set; }
 
         public CultureInfo Culture { get; set; }
+
+        public string OutputPath { get; set; }
 
         public FileInfo ResolveFile(string filename)
         {

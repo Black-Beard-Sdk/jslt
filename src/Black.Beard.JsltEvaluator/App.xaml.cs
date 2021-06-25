@@ -17,7 +17,7 @@ namespace AppJsonEvaluator
 
         public App()
         {
-            LocalDebug.Desactivate();
+            //LocalDebug.Desactivate();
         }
 
     }

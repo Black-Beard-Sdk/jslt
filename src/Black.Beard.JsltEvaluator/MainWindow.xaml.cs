@@ -117,7 +117,7 @@ namespace AppJsonEvaluator
             try
             {
 
-                _template = TemplateEditor.Text.GetTransformProvider(_path);
+                _template = TemplateEditor.Text.GetTransformProvider(this._parameters.TemplateFile, _path);
 
                 foreach (var item in _template.Diagnostics)
                 {
@@ -136,7 +136,6 @@ namespace AppJsonEvaluator
                     ITextMarker marker = textMarkerService.Create(index, lenght);
                     marker.MarkerTypes = TextMarkerTypes.SquigglyUnderline;
                     marker.MarkerColor = Colors.Red;
-
 
                 }
 
@@ -385,13 +384,15 @@ namespace AppJsonEvaluator
                     this._path = new string[1];
                     _path[0] = _file.Directory.FullName;
 
-                    TemplateEditor.Load(_file.FullName);
-                    this.LabelTemplateFile.Content = _file.FullName;
-                    _templateUpdated = false;
                     this._parameters = new Parameters()
                     {
                         TemplateFile = _file.FullName
                     };
+
+                    TemplateEditor.Load(_file.FullName);
+                    this.LabelTemplateFile.Content = _file.FullName;
+                    _templateUpdated = false;
+                    
                     break;
 
                 }

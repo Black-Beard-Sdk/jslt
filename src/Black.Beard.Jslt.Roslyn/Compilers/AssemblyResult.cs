@@ -6,6 +6,8 @@ using System.Reflection;
 
 namespace Bb.Compilers
 {
+
+    [System.Diagnostics.DebuggerDisplay("{AssemblyName}")]
     public class AssemblyResult
     {
 

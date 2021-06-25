@@ -42,7 +42,7 @@ namespace Bb.Json.Jslt.Builds
             uint key = 0;
             foreach (var filename in filenames)
             {
-                var src = Sources.Get(filename);
+                var src = Sources.Add(filename);
                 if (src.HasUpdated())
                     changed = true;
                 list.Add(src);
@@ -55,7 +55,7 @@ namespace Bb.Json.Jslt.Builds
             if (result.Count == 0 || changed)
             {
 
-                var compiler = new Compiler(new HashSet<Assembly>(References));
+                var compiler = new RoslynCompiler(new HashSet<Assembly>(References));
 
                 foreach (var item in list)
                     compiler.AddCodeSource(item.Datas, item.Name);

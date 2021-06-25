@@ -64,6 +64,32 @@ namespace Bb.Expresssions
 
         }
 
+        public static void ResolveConverter(Type type, Func<MethodInfo, bool> toOverride)
+        {
+
+            MethodInfo[] ms = type.GetMethods(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
+            foreach (var item in ms)
+            {
+                if (!_names.Contains(item.Name))
+                    continue;
+
+                var p = item.GetParameters();
+                if ((p.Length == 1 || p.Length == 2) && p[0].ParameterType != item.ReturnType)
+                {
+                    if (!_dicConverters.TryGetValue(p[0].ParameterType, out Dictionary<Type, MethodBase> dic2))
+                        _dicConverters.Add(p[0].ParameterType, dic2 = new Dictionary<Type, MethodBase>());
+
+                    if (!dic2.ContainsKey(item.ReturnType))
+                        dic2.Add(item.ReturnType, item);
+
+                    else if (dic2.ContainsKey(item.ReturnType) && toOverride(item))
+                        dic2[item.ReturnType] = item;
+                
+                }
+            }
+
+        }
+
         public static void AddMethod(Type sourceType, Type targetType, MethodBase methodConverter)
         {
 
@@ -173,8 +199,6 @@ namespace Bb.Expresssions
             }
         }
 
-
-
         private static ConstructorInfo LookInCtors(Type sourceType, Type targetType)
         {
 
@@ -184,14 +208,25 @@ namespace Bb.Expresssions
 
                 bool test = true;
                 var p = ctor.GetParameters();
-                if (p.Length == 1 || p.Length == 2)
+                if (p.Length == 1)
                 {
+
                     var type1 = p[0].ParameterType;
+                    if (type1 != sourceType || !typeof(IFormatProvider).IsAssignableFrom(type1))
+                        test = false;
+
+                }
+                else if (p.Length == 2)
+                {
+
+                    var type1 = p[0].ParameterType;
+                    if (type1 != sourceType || !typeof(IFormatProvider).IsAssignableFrom(type1))
+                        test = false;
+
                     var type2 = p[1].ParameterType;
-                    if (type1 != sourceType && typeof(IFormatProvider).IsAssignableFrom(type1))
+                    if (type2 != sourceType || !typeof(IFormatProvider).IsAssignableFrom(type2))
                         test = false;
-                    if (type2 != sourceType && typeof(IFormatProvider).IsAssignableFrom(type2))
-                        test = false;
+
                 }
                 else
                     test = false;

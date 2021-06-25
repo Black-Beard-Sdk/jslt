@@ -21,6 +21,7 @@
   <ItemGroup>
     <PackageReference Include="Antlr4.Runtime.Standard" Version="4.9.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="System.CodeDom" Version="5.0.0" />
     <PackageReference Include="Ude.NetStandard" Version="1.2.0" />
   </ItemGroup>
 
@@ -31,6 +32,21 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Black.Beard.Jslt.Roslyn\Black.Beard.Jslt.Roslyn.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="git.Expressions\CsharpGenerators\ResourceString.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ResourceString.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="git.Expressions\CsharpGenerators\ResourceString.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ResourceString.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>

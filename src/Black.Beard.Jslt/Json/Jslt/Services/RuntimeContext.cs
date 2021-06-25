@@ -42,38 +42,13 @@ namespace Bb.Json.Jslt.Services
 
         #region methods called in the expressions
 
-
-
-        //public static ITransformJsonService MapPropertyService(RuntimeContext ctx, TranformJsonAstConfiguration.Factory<ITransformJsonService> factory, string propertyName, JToken value)
-        //{
-
-        //    ITransformJsonService service = factory.Creator();
-
-        //    (PropertyInfo, Action<object, object>) writer = GetWriter(service.GetType(), propertyName);
-
-        //    if (writer.Item1 != null)
-        //    {
-
-        //        var type = writer.Item1.PropertyType;
-        //        if (type == typeof(string))
-        //            writer.Item2(service, value.ToString());
-
-        //        else if (type.IsValueType)
-        //            writer.Item2(service, Convert.ChangeType(value.ToString(), type));
-
-        //        else if (value is JObject o)
-        //            writer.Item2(service, o.ToObject(type));
-
-        //        else
-        //        {
-        //            writer.Item2(service, value);
-        //        }
-
-        //    }
-
-        //    return service;
-
-        //}
+        [System.Diagnostics.DebuggerStepThrough]
+        [System.Diagnostics.DebuggerNonUserCode]
+        public  void Stop()
+        {
+            if (StopIsActivated)
+                System.Diagnostics.Debugger.Break();
+        }
 
         public static JToken EvaluateUnaryOperator(RuntimeContext ctx, JToken leftToken, OperationEnum @operator)
         {
@@ -879,12 +854,29 @@ namespace Bb.Json.Jslt.Services
             foreach (var item in keys)
             {
 
+                var t1 = string.IsNullOrEmpty(text.Trim().Replace(item, string.Empty).Trim());
+
                 var r = ctx.SubSources.Variables.Get(item.Substring(2));
 
                 if (r != null)
+                {
+
+                    if (keys.Length == 1 && t1)
+                    {
+                        
+                        if (r is JObject || r is JArray)
+                            return (JToken)r;
+                    }
+
                     d = d.Replace(item, r.ToString());
+
+                }
+
                 else
+                {
+                    ctx.Diagnostics.AddError(string.Empty, null, d, $"the key '{item}' can't be resolved.");
                     d = d.Replace(item, string.Empty);
+                }
             }
 
             try
@@ -1020,6 +1012,8 @@ namespace Bb.Json.Jslt.Services
         public JToken TokenResult { get; internal set; }
 
         public TranformJsonAstConfiguration Configuration { get; internal set; }
+
+        public bool StopIsActivated { get; set; } = true;
 
 
         //private static (PropertyInfo, Action<object, object>) GetWriter(Type componentType, string propertyName)
