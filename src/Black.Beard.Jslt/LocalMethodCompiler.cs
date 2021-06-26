@@ -11,12 +11,18 @@ namespace Bb.Expressions
     public class LocalMethodCompiler : MethodCompiler
     {
 
+        public LocalMethodCompiler(bool withDebug)
+        {
+            this._withDebug = withDebug;
+        }
+
+
         public override TDelegate Compile<TDelegate>(string filepathCode)
         {
 
             var lbd = GenerateLambda<TDelegate>(filepathCode);
 
-            if (System.Diagnostics.Debugger.IsAttached)
+            if (this._withDebug)
             {
 
                 var visitor = new ConstantCollector();
@@ -30,7 +36,7 @@ namespace Bb.Expressions
                 if (!Directory.Exists(path))
                     Directory.CreateDirectory(path);
                 string file = Path.Combine(path, filepathCode);
-                var code = SourceCodeDomGenerator.GetCode(lbd, $"N_{name}", "Myclass", "MyMethod", _u);
+                var code = SourceCodeDomGenerator.GetCode(lbd, $"N_{name}", "Myclass", "MyMethod", _withDebug, _u);
                 System.CodeDom.CodeCompileUnit compileUnit = new System.CodeDom.CodeCompileUnit();
                 compileUnit.Namespaces.Add(code);
                 LocalCodeGenerator.GenerateCsharpCode(compileUnit, file);
@@ -100,6 +106,8 @@ namespace Bb.Expressions
             public readonly HashSet<object> _list;
 
         }
+
+        private readonly bool _withDebug;
 
     }
 

@@ -14,10 +14,10 @@ namespace Bb.Expressions.CsharpGenerators
     public class SourceCodeDomGenerator
     {
 
-        private SourceCodeDomGenerator(string @namespace, string classname, string methodname, string[] usings)
+        private SourceCodeDomGenerator(string @namespace, string classname, string methodname, string[] usings, bool withDebug)
         {
 
-
+            this._withDebug = withDebug;
             this._methodname = methodname;
             this._fields = new Dictionary<object, CodeMemberField>();
 
@@ -34,9 +34,9 @@ namespace Bb.Expressions.CsharpGenerators
 
         }
 
-        public static CodeNamespace GetCode(Expression e, string @namespace, string classname, string methodname, params string[] usings)
+        public static CodeNamespace GetCode(Expression e, string @namespace, string classname, string methodname, bool withDebug, params string[] usings)
         {
-            SourceCodeDomGenerator s = new SourceCodeDomGenerator(@namespace, classname, methodname, usings);
+            SourceCodeDomGenerator s = new SourceCodeDomGenerator(@namespace, classname, methodname, usings, withDebug);
             s.Visit(e);
             s.CreatePrivateMethod();
             return s._namespaceRoot;
@@ -383,6 +383,12 @@ namespace Bb.Expressions.CsharpGenerators
             foreach (var item in node.Parameters)
                 this._methodRoot.Parameters.Add(item.ToParameter(_usings));
 
+            if (this._withDebug)
+            {
+                var stop = new CodeMethodInvokeExpression(new CodeVariableReferenceExpression("argContext"), "Stop");
+                this._methodRoot.Statements.Add(stop);
+            }
+
             if (node.Body is BlockExpression b)
             {
                 var block = VisitBlock(b);
@@ -509,7 +515,7 @@ namespace Bb.Expressions.CsharpGenerators
             return new CodeVariableReferenceExpression(node.Name);
 
         }
-     
+
         protected object VisitMethodCall(MethodCallExpression node)
         {
 
@@ -848,6 +854,8 @@ namespace Bb.Expressions.CsharpGenerators
         private readonly string _methodname;
         private readonly CodeTypeDeclaration _typeRoot;
         private readonly HashSet<string> _usings;
+        private readonly bool _withDebug;
+
         private Dictionary<object, string> _variables = new Dictionary<object, string>();
 
         private CodeMemberMethod _methodRoot;

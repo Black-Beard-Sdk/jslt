@@ -25,13 +25,11 @@ namespace Bb.Json.Jslt.Services
 
         }
 
-        public JsltTemplate GetTemplate(StringBuilder sb, string filename)
+        public JsltTemplate GetTemplate(StringBuilder sb, bool withDebug, string filename)
         {
 
             if (string.IsNullOrEmpty(this._configuration.OutputPath) && !string.IsNullOrEmpty(filename))
-            {
                 this._configuration.OutputPath = new FileInfo(filename).Directory.FullName;
-            }
 
             string filepathCode = string.Empty;
             var _errors = new Diagnostics();
@@ -62,7 +60,7 @@ namespace Bb.Json.Jslt.Services
             {
                 var crc = sb.Calculate().ToString();
                 filepathCode =  crc + ".cs";
-                rules = Get(tree, _foundry, _errors, filepathCode);
+                rules = Get(tree, _foundry, _errors, filepathCode, withDebug);
             }
 
             JsltTemplate result = new JsltTemplate()
@@ -80,7 +78,7 @@ namespace Bb.Json.Jslt.Services
 
         }
 
-        private Func<RuntimeContext, JToken, JToken> Get(JsltBase tree, FunctionFoundry foundry, Diagnostics _errors, string filepathCode)
+        private Func<RuntimeContext, JToken, JToken> Get(JsltBase tree, FunctionFoundry foundry, Diagnostics _errors, string filepathCode, bool withDebug)
         {
 
             Func<RuntimeContext, JToken, JToken> fnc;
@@ -88,7 +86,7 @@ namespace Bb.Json.Jslt.Services
             if (tree != null)
             {
 
-                var sourceCompiler = new LocalMethodCompiler()
+                var sourceCompiler = new LocalMethodCompiler(withDebug)
                 {
                     OutputPath = this._configuration.OutputPath,
                 };

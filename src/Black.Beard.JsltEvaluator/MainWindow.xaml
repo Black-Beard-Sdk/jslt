@@ -16,7 +16,10 @@
             <RowDefinition Height="25" />
         </Grid.RowDefinitions>
 
-        <ToolBar Height="100" Grid.Row="0" />
+        <ToolBar Height="100" Grid.Row="0" Header="Debug"  >
+            <CheckBox Content="Debug" x:Name="DebugCheckBox" IsChecked="True" ClickMode="Press" HorizontalAlignment="Left" VerticalAlignment="Top"  />
+
+        </ToolBar>
 
         <Grid Grid.Row="1">
 
@@ -27,19 +30,23 @@
             </Grid.ColumnDefinitions>
 
             <Grid Grid.Column="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="68*"/>
+                    <ColumnDefinition Width="331*"/>
+                </Grid.ColumnDefinitions>
 
                 <Grid.RowDefinitions>
                     <RowDefinition Height="32" />
                     <RowDefinition />
                 </Grid.RowDefinitions>
 
-                <ToolBar Grid.Row="0" >
+                <ToolBar Grid.Row="0" Grid.ColumnSpan="2" >
                     <Button x:Name="BtnOpenTemplate" Content="Open template" Click="BtnOpenTemplate_Click"/>
                     <Button x:Name="BtnSaveTemplate" Content="Save template" Click="BtnSaveTemplate_Click" />
                     <Label x:Name="LabelTemplateFile" />
                 </ToolBar>
 
-                <avalonEdit:TextEditor x:Name="TemplateEditor" Grid.Row="1" FontFamily="Consolas" FontSize="16" TextChanged="TemplateEditorTextChanged" Drop="TemplateEditor_Drop" Keyboard.KeyUp="TemplateEditor_KeyUp" >
+                <avalonEdit:TextEditor x:Name="TemplateEditor" Grid.Row="1" FontFamily="Consolas" FontSize="16" TextChanged="TemplateEditorTextChanged" Drop="TemplateEditor_Drop" Keyboard.KeyUp="TemplateEditor_KeyUp" Grid.ColumnSpan="2" >
 
                 </avalonEdit:TextEditor>
 

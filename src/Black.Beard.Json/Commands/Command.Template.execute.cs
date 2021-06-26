@@ -63,6 +63,7 @@ namespace Bb.Json.Commands
 
                 var optTemplatePath = validator.OptionNoValue("--m", "the result is merge on the source document");
                 var optNoIndent = validator.OptionNoValue("--noIndented", "format stream on one line");
+                var optwithDebug = validator.OptionNoValue("--debug", "activate debug mode");
 
                 config.OnExecute(() =>
                 {
@@ -70,12 +71,14 @@ namespace Bb.Json.Commands
                     if (!validator.Evaluate(out int errorNum))
                         return errorNum;
 
+                    bool withDebug = optwithDebug.HasValue() ? true : false;
+
                     var configuration = new TranformJsonAstConfiguration();
 
                     TemplateTransformProvider Templateprovider = new TemplateTransformProvider(configuration);
                     
                     var sb = new StringBuilder(argTemplatePath.Value.TrimPath().LoadContentFromFile());
-                    JsltTemplate template = Templateprovider.GetTemplate(sb, string.Empty);
+                    JsltTemplate template = Templateprovider.GetTemplate(sb, withDebug, string.Empty);
 
                     JToken result;
                     JToken TokenSource = null;

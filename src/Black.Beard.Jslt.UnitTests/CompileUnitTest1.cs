@@ -476,7 +476,7 @@ namespace Black.Beard.Jslt.UnitTests
                 configuration.Services.ServiceDiscovery.AddService(item.Item2, item.Item1);
 
             TemplateTransformProvider Templateprovider = new TemplateTransformProvider(configuration);
-            JsltTemplate template = Templateprovider.GetTemplate(sb, string.Empty);
+            JsltTemplate template = Templateprovider.GetTemplate(sb, false, string.Empty);
 
             return template;
 

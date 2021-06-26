@@ -116,8 +116,8 @@ namespace AppJsonEvaluator
 
             try
             {
-
-                _template = TemplateEditor.Text.GetTransformProvider(this._parameters.TemplateFile, _path);
+                
+                _template = TemplateEditor.Text.GetTransformProvider(DebugCheckBox.IsChecked.Value, this._parameters.TemplateFile, _path);
 
                 foreach (var item in _template.Diagnostics)
                 {

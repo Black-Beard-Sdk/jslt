@@ -46,8 +46,13 @@ namespace Bb.Json.Jslt.Services
         [System.Diagnostics.DebuggerNonUserCode]
         public void Stop()
         {
-            if (StopIsActivated)
+
+            if (!System.Diagnostics.Debugger.IsAttached)
+                System.Diagnostics.Debugger.Launch();
+
+            if (StopIsActivated && System.Diagnostics.Debugger.IsAttached)
                 System.Diagnostics.Debugger.Break();
+
         }
 
         public static JToken EvaluateUnaryOperator(RuntimeContext ctx, JToken leftToken, OperationEnum @operator)

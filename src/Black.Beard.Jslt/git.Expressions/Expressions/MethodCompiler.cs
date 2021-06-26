@@ -89,7 +89,7 @@ namespace Bb.Expressions
                 //var sb = SourceGenerator.GetCode(result, _u);
                 //System.Diagnostics.Debug.WriteLine(sb.ToString());
 
-                var code = SourceCodeDomGenerator.GetCode(lbd, "n_" + Path.GetFileNameWithoutExtension(filepathCode), "Myclass", "MyMethod", _u);
+                var code = SourceCodeDomGenerator.GetCode(lbd, "n_" + Path.GetFileNameWithoutExtension(filepathCode), "Myclass", "MyMethod", false, _u);
                 System.CodeDom.CodeCompileUnit compileUnit = new System.CodeDom.CodeCompileUnit()
                 {
 
