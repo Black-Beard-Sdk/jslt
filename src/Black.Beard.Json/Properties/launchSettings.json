@@ -2,7 +2,7 @@
   "profiles": {
     "Black.Beard.Json": {
       "commandName": "Project",
-      "commandLineArgs": "xls --sheet:\"Feuil1\" --header:3 --source:\"C:\\Users\\g.beard\\Desktop\\consignes\\test\\demande de renvoi de code.xlsx\" --config:\"C:\\Users\\g.beard\\Desktop\\consignes\\test\\code_config.json\" --out:\"C:\\Users\\g.beard\\Desktop\\consignes\\test\\codes.json\""
+      "commandLineArgs": "format --source \"C:\\Users\\g.beard\\Desktop\\consignes\\test\\mailtosend.json\" --filter \"$.items\" --out \"C:\\Users\\g.beard\\Desktop\\consignes\\test\\avisage.json\" --flatText"
     }
   }
 }

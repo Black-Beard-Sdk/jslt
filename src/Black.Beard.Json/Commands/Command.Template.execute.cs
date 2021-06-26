@@ -125,7 +125,7 @@ namespace Bb.Json.Commands
 
                     if (argTarget.HasValue())
                     {
-                        var @out = argTarget.Value();
+                        var @out = argTarget.Value().TrimPath();
                         if (File.Exists(@out))
                             File.Delete(@out);
 

@@ -6,6 +6,8 @@ using Microsoft.Extensions.CommandLineUtils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace Bb.Json.Commands
@@ -38,35 +40,96 @@ namespace Bb.Json.Commands
 
                 var validator = new GroupArgument(config);
 
-                var optIndent = validator.Option("--indented", "indent the stream input");
-                var optNoIndent = validator.Option("--noIndented", "format stream on one line");
+                var optSource = validator.Option("--source", "json source");
+
+                var optTarget = validator.Option("--out", "output file");
+
+                var optIndent = validator.OptionNoValue("--indented", "indent the stream input");
+                var optNoIndent = validator.OptionNoValue("--noIndented", "format stream on one line");
+                var optText = validator.OptionNoValue("--flatText", "format stream on one line");
+
+                var optFilter = validator.Option("--filter", "json path filter");
 
                 config.OnExecute(() =>
                 {
+
+                    JToken token;
 
                     var inPipe = Input.IsPipedInput;
 
                     if (!inPipe)
                     {
-                        app.ShowHelp();
-                        return ErrorEnum.MissingSource.Error("no source is specified");
+
+                        if (optSource.HasValue())
+                            token = optSource.Value().TrimPath().LoadContentFromFile().ConvertToJson();
+
+                        else
+                        {
+                            app.ShowHelp();
+                            return ErrorEnum.MissingSource.Error("no source is specified");
+                        }
+                    }
+                    else
+                    {
+                        var datas = Input.ReadInput(Encoding.UTF8);
+                        token = JToken.Parse(datas.ToString());
                     }
 
-                    var datas = Input.ReadInput(Encoding.UTF8);
+                    if (optFilter.HasValue())
+                    {
 
-                    var jobject = JObject.Parse(datas.ToString());
+                        var items = token.SelectTokens(optFilter.Value());
+
+                        if (items.Count() == 0)
+                            return 1;
+
+                        if (items.Count() == 1)
+                            token = items.FirstOrDefault();
+
+                        else
+                            token = new JArray(items);
+
+                    }
+
+                    StringBuilder sb = new StringBuilder();
 
                     if (optNoIndent.HasValue())
-                        jobject
-                            .ToString(Formatting.None)
-                            .WriteLineStandard()
-                        ;
+                        sb.Append(token.ToString(Formatting.None));
 
+                    else if (optIndent.HasValue())
+                        sb.Append(token.ToString(Formatting.Indented));
+
+                    else if (optText.HasValue())
+                    {
+                        if (token is JObject o)
+                            sb.AppendLine(o.ToString(Formatting.None));
+
+                        else if (token is JArray a)
+                        {
+                            foreach (var item in a)
+                                sb.AppendLine(item.ToString(Formatting.None));
+                        }
+                        else
+                        {
+
+                        }
+                    }
+
+                    if (optTarget.HasValue())
+                    {
+                        
+                        FileInfo file = new FileInfo(optTarget.Value().TrimPath());
+                        
+                        if (file.Exists)
+                            file.Delete();
+
+                        file.FullName.Save(sb.ToString());
+
+                    }
                     else
-                        jobject
-                            .ToString(Formatting.Indented)
-                            .WriteLineStandard()
-                        ;
+                    {
+
+                    }
 
                     return 0;
 
