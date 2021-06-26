@@ -47,7 +47,6 @@ namespace Bb.Json.Jslt.Services
                     tree = (JsltBase)parser.Visit(visitor);
                     _foundry = visitor.Foundry;
                     culture = visitor.Culture;
-
                 }
             }
             catch (Exception e)

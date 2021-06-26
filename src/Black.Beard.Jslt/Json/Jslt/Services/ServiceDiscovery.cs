@@ -115,6 +115,8 @@ namespace Bb.Json.Jslt.Services
 
             MethodDescription description = JsltExtensionMethodParameterAttribute.Map(new MethodDescription(name, service) { Description = _description });
             Factory<JToken> factory = ObjectCreator.GetActivator<JToken>(service, description);
+
+            //ServiceContainer.Common.AddService(name, factory);
             ServiceContainer.AddService(name, factory);
 
         }

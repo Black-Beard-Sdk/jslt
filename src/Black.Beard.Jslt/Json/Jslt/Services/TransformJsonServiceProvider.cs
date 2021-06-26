@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using static Bb.Json.Jslt.Services.TranformJsonAstConfiguration;
 
 namespace Bb.Json.Jslt.Services
@@ -98,32 +99,18 @@ namespace Bb.Json.Jslt.Services
             return _instances;
         }
 
+        public override string ToString()
+        {
 
-        //private int Evaluate(Type parameterType, Type type)
-        //{
+            StringBuilder sb = new StringBuilder();
+            foreach (var item in _instances)
+            {
+                sb.Append(item.Name);
+                sb.Append(", ");
+            }
+            return sb.ToString().Trim(',', ' ');
 
-        //    if (parameterType == type)
-        //        return 0;
-
-        //    if (parameterType == typeof(long) && type == typeof(int))
-        //        return 1;
-
-        //    if (parameterType == typeof(double) && type == typeof(float))
-        //        return 1;
-
-        //    if (parameterType == typeof(int) && type == typeof(long))
-        //        return 2;
-
-        //    if (parameterType == typeof(float) && type == typeof(double))
-        //        return 2;
-
-        //    if (parameterType.IsAssignableFrom(type))
-        //        return 2;
-
-        //    return -1;
-
-
-        //}
+        }
 
         private List<Factory> _instances = new List<Factory>();
 

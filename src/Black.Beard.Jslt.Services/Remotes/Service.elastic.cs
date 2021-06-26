@@ -19,7 +19,7 @@ namespace Bb.Jslt.Services.Excels
         [JsltExtensionMethodParameter("connectionName", "connection name. if null or not specified in the configuration an exception is thrown.")]
         [JsltExtensionMethodParameter("sql", "sql query to call elasticsearch")]
         //[JsltExtensionMethodParameter("pagined", "if null or false, elastic is called just one time, if true all datas are fetch.")]
-        [JsltExtensionMethod("elastic")]
+        [JsltExtensionMethod("sqlelastic")]
         public static JToken ExecuteElastic(RuntimeContext ctx, string connectionName, string sql/*, bool? pagined*/)
         {
 

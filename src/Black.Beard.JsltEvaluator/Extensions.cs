@@ -69,6 +69,7 @@ namespace AppJsonEvaluator
         {
 
             var configuration = new TranformJsonAstConfiguration();
+            configuration.Assemblies.Add(typeof(Bb.Jslt.Services.Services).Assembly);
 
             if (paths != null)
             foreach (var item in paths)

@@ -27,6 +27,7 @@ namespace Bb.Json.Jslt.Services
             this.Paths = new List<string>();
             this.Paths.Add(Environment.CurrentDirectory);
             this.OutputPath = string.Empty;
+            this.Assemblies = new List<Assembly>();
         }
 
         public ServiceContainer Services { get; }
@@ -36,6 +37,7 @@ namespace Bb.Json.Jslt.Services
         public CultureInfo Culture { get; set; }
 
         public string OutputPath { get; set; }
+        public List<Assembly> Assemblies { get; }
 
         public FileInfo ResolveFile(string filename)
         {

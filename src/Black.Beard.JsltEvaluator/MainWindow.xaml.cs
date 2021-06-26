@@ -313,25 +313,28 @@ namespace AppJsonEvaluator
             
             if (e.Text == ".")
             {
-
+                
                 var serviceProvider = Bb.Json.Jslt.Services.ServiceContainer.Common.GetServices();
 
                 // Open code completion after the user has pressed dot:
                 completionWindow = new CompletionWindow(TemplateEditor.TextArea);
                 IList<ICompletionData> data = completionWindow.CompletionList.CompletionData;
 
-                //data.Add(new MyCompletionData("Item1"));
-
                 foreach (TransformJsonServiceProvider provider in serviceProvider)
                 {
                     foreach (Factory factory in provider.GetItems())
                     {
-                        var c = new MyCompletionData(factory.MethodInfos.Name, factory.MethodInfos.Content, string.IsNullOrEmpty(factory.MethodInfos.Description) ? factory.MethodInfos.Content : factory.MethodInfos.Description);
+                        var c = new MyCompletionData(factory.MethodInfos.Content, factory.MethodInfos.Name, string.IsNullOrEmpty(factory.MethodInfos.Description) ? factory.MethodInfos.Content : factory.MethodInfos.Description);
                         data.Add(c);
                     }
                 }
 
                 completionWindow.Show();
+
+
+                var p = completionWindow.CompletionList.RenderSize;
+                completionWindow.CompletionList.RenderSize = new Size(270, p.Height);
+
                 completionWindow.Closed += delegate
                 {
                     completionWindow = null;

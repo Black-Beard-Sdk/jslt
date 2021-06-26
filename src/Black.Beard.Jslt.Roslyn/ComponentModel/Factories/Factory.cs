@@ -6,6 +6,7 @@ using System.Reflection;
 namespace Bb.ComponentModel.Factories
 {
 
+    [System.Diagnostics.DebuggerDisplay("{Name}")]
     public abstract class Factory
     {
 
@@ -46,6 +47,7 @@ namespace Bb.ComponentModel.Factories
 
         public MethodDescription MethodInfos { get; }
 
+        public string Name { get; set; }
     }
 
     /// <summary>

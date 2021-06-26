@@ -19,6 +19,9 @@ namespace Bb.Json.Jslt.Services
         {
             this.configuration = configuration;
             this.Services = new ServiceContainer();
+
+            foreach (Assembly assembly in configuration.Assemblies)
+                ServiceContainer.Common.ServiceDiscovery.AddAssembly(assembly);
         }
 
         internal Factory GetService(string name, Type[] types, Diagnostics diagnostics, TokenLocation location)
@@ -66,7 +69,8 @@ namespace Bb.Json.Jslt.Services
             AddAssembly(assembly);
 
         }
-        internal void AddAssembly(Assembly assembly)
+        
+        public void AddAssembly(Assembly assembly)
         {
             var types = TypeDiscovery.Instance.GetTypesWithAttributes<JsltExtensionMethodAttribute>(typeof(ITransformJsonService), c => true);
             foreach (var item in types)

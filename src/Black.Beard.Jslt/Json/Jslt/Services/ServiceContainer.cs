@@ -12,9 +12,8 @@ namespace Bb.Json.Jslt.Services
         static ServiceContainer()
         {
             var service = new ServiceContainer();
-            service.ServiceDiscovery.AddAssembly(typeof(TranformJsonAstConfiguration).Assembly);
-
             ServiceContainer.Common = service;
+            service.ServiceDiscovery.AddAssembly(typeof(TranformJsonAstConfiguration).Assembly);
         }
 
         public ServiceContainer()
@@ -44,6 +43,10 @@ namespace Bb.Json.Jslt.Services
 
             if (!_dictionary.TryGetValue(name.ToLower(), out TransformJsonServiceProvider serviceProvider))
                 this._dictionary.Add(name.ToLower(), (serviceProvider = new TransformJsonServiceProvider()));
+
+            provider.Name = name;
+
+            System.Diagnostics.Debug.WriteLine($"service {name} is added");
 
             serviceProvider.Add(provider);
 
@@ -76,6 +79,7 @@ namespace Bb.Json.Jslt.Services
         }
 
         public ServiceDiscovery ServiceDiscovery { get; }
+
         public static ServiceContainer Common { get; }
 
         private readonly Dictionary<string, TransformJsonServiceProvider> _dictionary;

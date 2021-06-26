@@ -74,6 +74,8 @@ namespace Bb.Json.Commands
                     bool withDebug = optwithDebug.HasValue() ? true : false;
 
                     var configuration = new TranformJsonAstConfiguration();
+                    configuration.Assemblies.Add(typeof(Bb.Jslt.Services.Services).Assembly);
+
 
                     TemplateTransformProvider Templateprovider = new TemplateTransformProvider(configuration);
                     

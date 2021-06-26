@@ -47,10 +47,8 @@ namespace Bb.Json.Jslt.Parser
                 var types = ResolveArgumentsTypes(item);
                 Factory service = this._foundry.GetService(item.Name, types, this._diagnostics, context.Start.ToLocation());
                 if (service == null)
-                {
-                    //LocalDebug.Stop();
                     AddError(item.Start, string.Empty, $"the service {item.Name} can't be resolved.");
-                }
+                
                 else
                 {
                     item.ServiceProvider = service;

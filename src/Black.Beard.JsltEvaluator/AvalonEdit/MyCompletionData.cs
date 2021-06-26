@@ -29,7 +29,7 @@ namespace AppJsonEvaluator
 
         public void Complete(TextArea textArea, ISegment completionSegment, EventArgs insertionRequestEventArgs)
         {
-            textArea.Document.Replace(completionSegment, this.Content.ToString());
+            textArea.Document.Replace(completionSegment, this.Text.ToString());
         }
 
     }

@@ -18,7 +18,9 @@ namespace Bb.Jslt.Services
 
 
         [JsltExtensionMethod("phoneisvalid")]
-        public static JToken ExecutePhoneIsValid(RuntimeContext ctx, string phoneNumber, string defaultRegion = "")
+        [JsltExtensionMethodParameter("phoneNumber", "phone number to evaluate")]
+        [JsltExtensionMethodParameter("defaultRegion", "default prefix region")]
+        public static JToken ExecutePhoneIsValid(RuntimeContext ctx, string phoneNumber, string defaultRegion)
         {
 
             try
