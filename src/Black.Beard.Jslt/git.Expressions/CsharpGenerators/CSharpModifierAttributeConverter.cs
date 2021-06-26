@@ -6,7 +6,7 @@ using System;
 using System.ComponentModel;
 using System.Globalization;
 
-namespace Bb.CsharpGenerators
+namespace Bb.Expressions.CsharpGenerators
 {
     internal abstract class CSharpModifierAttributeConverter : TypeConverter
     {

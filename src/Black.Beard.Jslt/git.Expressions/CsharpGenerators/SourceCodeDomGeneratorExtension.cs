@@ -3,7 +3,7 @@ using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace Bb.Expressions
+namespace Bb.Expressions.CsharpGenerators
 {
 
     public static class SourceCodeDomGeneratorExtension
@@ -111,27 +111,5 @@ namespace Bb.Expressions
 
     }
 
-    //public class CodeTypeIs : CodeSnippetExpression
-    //{
-
-    //    public CodeTypeIs(CodeExpression expression, Type type) 
-    //        : base (GenerateCode(expression, type))
-    //    {
-
-    //    }
-
-    //    private static string GenerateCode(CodeExpression expression, Type type)
-    //    {
-            
-    //        var sb = CodeGenerator.GenerateCsharpCode(expression);
-    //        sb.Append(" is ");
-
-    //        //var sb2 = CodeGenerator.GenerateCsharpCode(type.ToRefType());
-
-    //        return sb.ToString();
-
-    //    }
-
-    //}
-
+    
 }

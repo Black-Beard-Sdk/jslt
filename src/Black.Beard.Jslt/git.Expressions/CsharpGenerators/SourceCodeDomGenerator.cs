@@ -8,7 +8,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
-namespace Bb.CsharpGenerators
+namespace Bb.Expressions.CsharpGenerators
 {
 
     public class SourceCodeDomGenerator

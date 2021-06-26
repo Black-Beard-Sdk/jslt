@@ -3,7 +3,7 @@
 
 using System.Reflection;
 
-namespace Bb.CsharpGenerators
+namespace Bb.Expressions.CsharpGenerators
 {
     internal sealed class CSharpTypeAttributeConverter : CSharpModifierAttributeConverter
     {

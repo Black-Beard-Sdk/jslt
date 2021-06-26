@@ -6,7 +6,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Reflection;
 
-namespace Bb.CsharpGenerators
+namespace Bb.Expressions.CsharpGenerators
 {
     public class LocalCSharpCodeProvider : CodeDomProvider
     {

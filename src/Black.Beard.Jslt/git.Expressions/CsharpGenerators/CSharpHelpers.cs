@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
 
-namespace Bb.CsharpGenerators
+namespace Bb.Expressions.CsharpGenerators
 {
     internal abstract class CSharpHelpers
     {

@@ -3,7 +3,7 @@ using System.CodeDom.Compiler;
 using System.IO;
 using System.Text;
 
-namespace Bb.CsharpGenerators
+namespace Bb.Expressions.CsharpGenerators
 {
 
     public class LocalCodeGenerator

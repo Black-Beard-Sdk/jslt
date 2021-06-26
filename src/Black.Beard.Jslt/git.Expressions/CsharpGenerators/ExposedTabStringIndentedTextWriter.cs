@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 
-namespace Bb.CsharpGenerators
+namespace Bb.Expressions.CsharpGenerators
 {
     internal sealed class ExposedTabStringIndentedTextWriter : IndentedTextWriter
     {

@@ -10,7 +10,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 
-namespace Bb.CsharpGenerators
+namespace Bb.Expressions.CsharpGenerators
 {
     internal sealed partial class LocalCSharpCodeGenerator : ICodeCompiler, ICodeGenerator
     {
