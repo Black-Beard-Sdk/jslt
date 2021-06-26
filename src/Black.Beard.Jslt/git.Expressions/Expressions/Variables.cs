@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-namespace Bb.Expresssions
+namespace Bb.Expressions
 {
 
     public class Variables

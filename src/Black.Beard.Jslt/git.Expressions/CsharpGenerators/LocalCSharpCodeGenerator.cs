@@ -1,4 +1,4 @@
-using Bb.Expresssions;
+using Bb.Expressions;
 using Bb.git.Expressions.CsharpGenerators;
 using System;
 using System.CodeDom;

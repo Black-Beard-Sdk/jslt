@@ -1,4 +1,4 @@
-﻿using Bb.Expresssions.Statements;
+﻿using Bb.Expressions.Statements;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
-namespace Bb.Expresssions
+namespace Bb.Expressions
 {
 
     public partial class SourceCode : ICollection<Statement>

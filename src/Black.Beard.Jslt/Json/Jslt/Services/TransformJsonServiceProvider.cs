@@ -1,5 +1,5 @@
 ﻿using Bb.ComponentModel.Factories;
-using Bb.Expresssions;
+using Bb.Expressions;
 using System;
 using System.Collections.Generic;
 using System.Linq;

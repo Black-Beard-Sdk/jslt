@@ -3,7 +3,7 @@ using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace Bb.Expresssions
+namespace Bb.Expressions
 {
 
     public static class SourceCodeDomGeneratorExtension

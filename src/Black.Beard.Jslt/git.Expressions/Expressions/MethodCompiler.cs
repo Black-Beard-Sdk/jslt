@@ -9,7 +9,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 
-namespace Bb.Expresssions
+namespace Bb.Expressions
 {
 
     public class MethodCompiler : SourceCode

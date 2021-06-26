@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace Bb.Expresssions
+namespace Bb.Expressions
 {
     public class Label
     {

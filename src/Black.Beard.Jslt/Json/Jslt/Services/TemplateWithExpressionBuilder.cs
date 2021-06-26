@@ -1,5 +1,5 @@
-﻿using Bb.Expresssions;
-using Bb.Expresssions.Statements;
+﻿using Bb.Expressions;
+using Bb.Expressions.Statements;
 using Bb.Json.Jslt.Asts;
 using Bb.Json.Jslt.Parser;
 using Newtonsoft.Json.Linq;
@@ -19,7 +19,7 @@ namespace Bb.Json.Jslt.Services
         static TemplateWithExpressionBuilder()
         {
 
-            Bb.Expresssions.ConverterHelper.ResolveConverter(typeof(InternalConverters), (m) => true);
+            Bb.Expressions.ConverterHelper.ResolveConverter(typeof(InternalConverters), (m) => true);
 
             _ctorJProperty = typeof(JProperty).GetConstructor(new Type[] { typeof(string), typeof(object) });
             _ctorJObject = typeof(JObject).GetConstructor(new Type[] { });

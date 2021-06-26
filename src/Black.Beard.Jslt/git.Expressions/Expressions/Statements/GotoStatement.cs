@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace Bb.Expresssions.Statements
+namespace Bb.Expressions.Statements
 {
     public class GotoStatement : Statement
     {

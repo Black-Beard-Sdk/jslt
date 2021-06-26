@@ -1,4 +1,4 @@
-﻿namespace Bb.Expresssions
+﻿namespace Bb.Expressions
 {
 
     /// <summary>

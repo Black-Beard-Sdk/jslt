@@ -1,5 +1,5 @@
-﻿using Bb.Expresssions;
-using Bb.Expresssions.Statements;
+﻿using Bb.Expressions;
+using Bb.Expressions.Statements;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +8,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bb.Expresssions
+namespace Bb.Expressions
 {
 
     public partial class SourceCode
