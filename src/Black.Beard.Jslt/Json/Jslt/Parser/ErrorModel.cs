@@ -18,6 +18,8 @@
 
         public SeverityEnum Severity { get; set; }
 
+        public string Location => $"({Line}, {Column})";
+
         public override string ToString()
         {
             return Message.ToString();

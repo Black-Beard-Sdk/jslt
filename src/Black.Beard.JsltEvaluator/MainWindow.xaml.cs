@@ -1,5 +1,6 @@
 ﻿using Bb.ComponentModel.Factories;
 using Bb.Json.Jslt.Asts;
+using Bb.Json.Jslt.Parser;
 using Bb.Json.Jslt.Services;
 using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.CodeCompletion;
@@ -74,6 +75,8 @@ namespace AppJsonEvaluator
             else
                 this._parameters = new Parameters();
 
+            RowErrors.Height = new GridLength(70);
+
         }
 
         void InitializeTextMarkerService()
@@ -116,13 +119,13 @@ namespace AppJsonEvaluator
 
             try
             {
-                
+
                 _template = TemplateEditor.Text.GetTransformProvider(DebugCheckBox.IsChecked.Value, this._parameters.TemplateFile, _path);
 
                 foreach (var item in _template.Diagnostics)
                 {
 
-                    Errors.Items.Add(item.Message);
+                    Errors.Items.Add(item);
 
                     var index = item.StartIndex;
                     if (index > 0)
@@ -145,8 +148,8 @@ namespace AppJsonEvaluator
 
             }
             catch (Exception e1)
-           {
-                Errors.Items.Insert(0, e1.Message);
+            {
+                Errors.Items.Add(new ErrorModel() { Severity = SeverityEnum.Error, Message = e1.Message });
             }
 
         }
@@ -168,14 +171,14 @@ namespace AppJsonEvaluator
                     TargetEditor.Text = value;
                     foreach (var item in result.Diagnostics)
                     {
-                        
-                        Errors.Items.Insert(0, item.Message);
+
+                        Errors.Items.Add(item);
 
                     }
                 }
                 catch (Exception e2)
                 {
-                    Errors.Items.Insert(0, e2.Message);
+                    Errors.Items.Add(new ErrorModel() { Severity = SeverityEnum.Error, Message = e2.Message });
                 }
 
             }
@@ -307,7 +310,7 @@ namespace AppJsonEvaluator
 
         void textEditor_TextArea_TextEntered(object sender, TextCompositionEventArgs e)
         {
-
+            
             if (e.Text == ".")
             {
 
@@ -334,6 +337,7 @@ namespace AppJsonEvaluator
                     completionWindow = null;
                 };
             }
+
         }
 
         void textEditor_TextArea_TextEntering(object sender, TextCompositionEventArgs e)
@@ -353,6 +357,10 @@ namespace AppJsonEvaluator
 
         private void TemplateEditor_KeyUp(object sender, KeyEventArgs e)
         {
+
+            if (e.Key == Key.S && e.IsToggled)
+                SaveTemplate();
+            
             if (e.Key == Key.F5)
             {
                 UpdateTemplate();
@@ -396,7 +404,7 @@ namespace AppJsonEvaluator
                     TemplateEditor.Load(_file.FullName);
                     this.LabelTemplateFile.Content = _file.FullName;
                     _templateUpdated = false;
-                    
+
                     break;
 
                 }
@@ -404,7 +412,22 @@ namespace AppJsonEvaluator
             }
         }
 
-        
+        private void ErrorDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (Errors.SelectedValue != null)
+            {
+                if (Errors.SelectedValue is ErrorModel m)
+                {
+                    if (m.StartIndex != 0)
+                    {
+                        TemplateEditor.SelectionStart = m.StartIndex;
+                        TemplateEditor.SelectionLength = 1;
+                        TemplateEditor.Focus();
+                    }
+                }
+            }
+        }
+
     }
 
 
