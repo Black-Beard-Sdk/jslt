@@ -50,11 +50,11 @@ namespace Bb.Compilers
                 FilePath = location?.SourceTree?.FilePath ?? string.Empty,
 
                 StartCharacter = location?.SourceSpan.Start ?? 0,
-                StartLine = lineSpan.StartLinePosition.Line,
+                StartLine = lineSpan.StartLinePosition.Line + 1,
                 StartColumn = lineSpan.StartLinePosition.Character,
 
                 EndCharacter = location?.SourceSpan.End ?? 0,
-                EndLine = lineSpan.EndLinePosition.Line,
+                EndLine = lineSpan.EndLinePosition.Line + 1,
                 EndColumn = lineSpan.EndLinePosition.Character,
 
             };

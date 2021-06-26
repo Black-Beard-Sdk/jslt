@@ -1,4 +1,5 @@
 ﻿using Bb.Expresssions;
+using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -322,10 +323,10 @@ namespace Bb.CsharpGenerators
                     return new CodeBinaryOperatorExpression(left, CodeBinaryOperatorType.Multiply, new CodePrimitiveExpression(-1));
 
                 case ExpressionType.Increment:
-                    return new CodeMethodInvokeExpression(new CodeThisReferenceExpression(), "PreIncrement", new CodeDirectionExpression(FieldDirection.Ref, left));
+                    return new CodeMethodInvokeExpression(new CodeThisReferenceExpression(), "Increment", left);
 
                 case ExpressionType.Decrement:
-                    return new CodeMethodInvokeExpression(new CodeThisReferenceExpression(), "PreDecrement", new CodeDirectionExpression(FieldDirection.Ref, left));
+                    return new CodeMethodInvokeExpression(new CodeThisReferenceExpression(), "Decrement", left);
 
                 case ExpressionType.IsTrue:
                     return new CodeBinaryOperatorExpression(left, CodeBinaryOperatorType.ValueEquality, new CodePrimitiveExpression(true));
@@ -356,20 +357,20 @@ namespace Bb.CsharpGenerators
             method.Statements.Add(code);
 
             // Create increment method because codeDom don't support unary opérateur
-            method = new CodeMemberMethod() { Name = "PreIncrement", ReturnType = typeof(int).ToRefType(_usings) };
+            method = new CodeMemberMethod() { Name = "Increment", ReturnType = typeof(int).ToRefType(_usings) };
             this._typeRoot.Members.Add(method);
-            method.Parameters.Add(new CodeParameterDeclarationExpression(typeof(int), "self") { Direction = FieldDirection.Ref });
+            method.Parameters.Add(new CodeParameterDeclarationExpression(typeof(int), "self") { Direction = FieldDirection.In });
             var self = new CodeVariableReferenceExpression("self");
             method.Statements.Add(new CodeAssignStatement(self, new CodeBinaryOperatorExpression(self, CodeBinaryOperatorType.Add, new CodePrimitiveExpression(1))));
-            method.Add(new CodeMethodReturnStatement(new CodeBinaryOperatorExpression(self, CodeBinaryOperatorType.Subtract, new CodePrimitiveExpression(1))));
+            method.Add(new CodeMethodReturnStatement(self));
 
             // Create increment method because codeDom don't support unary opérateur
-            method = new CodeMemberMethod() { Name = "PreDecrement", ReturnType = typeof(int).ToRefType(_usings) };
+            method = new CodeMemberMethod() { Name = "Decrement", ReturnType = typeof(int).ToRefType(_usings) };
             this._typeRoot.Members.Add(method);
-            method.Parameters.Add(new CodeParameterDeclarationExpression(typeof(int), "self") { Direction = FieldDirection.Ref });
+            method.Parameters.Add(new CodeParameterDeclarationExpression(typeof(int), "self") { Direction = FieldDirection.In });
             self = new CodeVariableReferenceExpression("self");
             method.Statements.Add(new CodeAssignStatement(self, new CodeBinaryOperatorExpression(self, CodeBinaryOperatorType.Subtract, new CodePrimitiveExpression(1))));
-            method.Add(new CodeMethodReturnStatement(new CodeBinaryOperatorExpression(self, CodeBinaryOperatorType.Add, new CodePrimitiveExpression(1))));
+            method.Add(new CodeMethodReturnStatement(self));
 
         }
 
@@ -483,8 +484,32 @@ namespace Bb.CsharpGenerators
             }
 
             return list;
+
         }
 
+        protected object VisitParameter(ParameterExpression node)
+        {
+
+            if (string.IsNullOrEmpty(node.Name))
+            {
+
+                if (!_variables.TryGetValue(node, out string name))
+                {
+                    name = $"var{node.ToString()}_{_variables.Count}";
+                    _variables.Add(node, name);
+
+                    return new CodeParameterDeclarationExpression(new CodeTypeReference("var"), name);
+
+                }
+
+                return new CodeVariableReferenceExpression(name);
+
+            }
+
+            return new CodeVariableReferenceExpression(node.Name);
+
+        }
+     
         protected object VisitMethodCall(MethodCallExpression node)
         {
 
@@ -523,6 +548,12 @@ namespace Bb.CsharpGenerators
             if (node.Value is string)
                 return node.ToPrimitive();
 
+            if (node.Value.GetType().IsEnum)
+            {
+                var e = new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(node.Type.ToRefType(_usings)), node.Value.ToString());
+                return e;
+            }
+
             if (node.Value.GetType().IsValueType)
                 return node.ToPrimitive();
 
@@ -554,7 +585,7 @@ namespace Bb.CsharpGenerators
         private object VisitTypeIs(TypeBinaryExpression node)
         {
             var left = (CodeExpression)Visit(node.Expression);
-            var right = new CodeTypeOfExpression(node.Type.ToRefType(_usings));
+            var right = new CodeTypeOfExpression(node.TypeOperand.ToRefType(_usings));
             return new CodeBinaryOperatorExpression(new CodeMethodInvokeExpression(left, "GetType"), CodeBinaryOperatorType.IdentityEquality, right);
         }
 
@@ -564,23 +595,6 @@ namespace Bb.CsharpGenerators
             foreach (var item in node.Arguments)
                 result.Parameters.Add((CodeExpression)Visit(item));
             return result;
-        }
-
-        private HashSet<string> _variables = new HashSet<string>();
-        protected object VisitParameter(ParameterExpression node)
-        {
-            if (string.IsNullOrEmpty(node.Name))
-            {
-                var name = node.ToString();
-                if (!_variables.Add(name))
-                    return new CodeVariableReferenceExpression(node.ToString());
-
-                return new CodeParameterDeclarationExpression(new CodeTypeReference("var"), node.ToString());
-
-            }
-
-            return new CodeVariableReferenceExpression(node.Name);
-
         }
 
         protected CodeArrayCreateExpression VisitNewArray(NewArrayExpression node)
@@ -612,17 +626,18 @@ namespace Bb.CsharpGenerators
             }
             else
             {
-                LocalDebug.Stop();
                 var r = Visit(node.IfTrue);
-                if (r != null)
+                if (r != null && r is CodeObject c)
+                    condition.TrueStatements.AddItem(c);
+                else
                 {
-
+                    LocalDebug.Stop();
                 }
             }
 
 
             if (node.IfFalse is BlockExpression bfalse)
-                this._methodRoot.Add(VisitBlock(bfalse));
+                condition.FalseStatements.Add(VisitBlock(bfalse));
 
             else if (node.IfFalse is DefaultExpression dfalse && dfalse.Type == typeof(void))
             {
@@ -630,11 +645,13 @@ namespace Bb.CsharpGenerators
             }
             else
             {
-                LocalDebug.Stop();
                 var r = Visit(node.IfFalse);
-                if (r != null)
-                {
+                if (r != null && r is CodeObject c)
+                    condition.FalseStatements.AddItem(c);
 
+                else
+                {
+                    LocalDebug.Stop();
                 }
             }
 
@@ -711,6 +728,9 @@ namespace Bb.CsharpGenerators
             return result;
         }
 
+
+
+
         protected object VisitGoto(GotoExpression node)
         {
             LocalDebug.Stop();
@@ -735,10 +755,6 @@ namespace Bb.CsharpGenerators
         protected object VisitDefault(DefaultExpression node)
         {
             LocalDebug.Stop();
-            //Append("default(");
-            //Append(node.Type);
-            //Append(")");
-
             return Visit(node);
         }
 
@@ -777,24 +793,6 @@ namespace Bb.CsharpGenerators
             LocalDebug.Stop();
             return Visit(node);
         }
-
-        //protected MemberAssignment VisitMemberAssignment(MemberAssignment node)
-        //{
-        //    LocalDebug.Stop();
-        //    return Visit(node);
-        //}
-
-        //protected MemberBinding VisitMemberBinding(MemberBinding node)
-        //{
-        //    LocalDebug.Stop();
-        //    return VisitMemberBinding(node);
-        //}
-
-        //protected MemberListBinding VisitMemberListBinding(MemberListBinding node)
-        //{
-        //    LocalDebug.Stop();
-        //    return VisitMemberListBinding(node);
-        //}
 
         protected object VisitMemberInit(MemberInitExpression node)
         {
@@ -850,11 +848,12 @@ namespace Bb.CsharpGenerators
         private readonly string _methodname;
         private readonly CodeTypeDeclaration _typeRoot;
         private readonly HashSet<string> _usings;
+        private Dictionary<object, string> _variables = new Dictionary<object, string>();
 
         private CodeMemberMethod _methodRoot;
         private Dictionary<object, CodeMemberField> _fields;
         private CodeStatement _last;
-        
+
     }
 
 

@@ -42,6 +42,11 @@ namespace Bb.Expresssions
                 };
                 build.Sources.Add(file);
                 var assembly = build.Build(name);
+
+
+                if (!assembly.Success && System.Diagnostics.Debugger.IsAttached)
+                    System.Diagnostics.Debugger.Break();
+
                 var ass = assembly.LoadAssembly();
 
                 var type = ass.GetType($"N_{name}." + "Myclass");
@@ -57,7 +62,7 @@ namespace Bb.Expresssions
                 var args = Parameters.ToArray();
                 var l = Expression.Lambda
                 (
-                    Expression.Call(Expression.Constant(instance), method, args), 
+                    Expression.Call(Expression.Constant(instance), method, args),
                     args
                 );
 

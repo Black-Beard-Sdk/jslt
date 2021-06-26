@@ -20,7 +20,7 @@ parser grammar JsltParser;
 
 options { 
     // memoize=True;
-    tokenVocab=JsltLexer; 
+    tokenVocab=JsltLexer;
     }
 
 script :

@@ -44,7 +44,7 @@ namespace Bb.Json.Jslt.Services
 
         [System.Diagnostics.DebuggerStepThrough]
         [System.Diagnostics.DebuggerNonUserCode]
-        public  void Stop()
+        public void Stop()
         {
             if (StopIsActivated)
                 System.Diagnostics.Debugger.Break();
@@ -98,15 +98,23 @@ namespace Bb.Json.Jslt.Services
             object l = null;
             object r = null;
 
-            if (leftToken is JToken tokenLeft)
+            if (leftToken == null)
+                l = null;
+            
+            else if (leftToken is JToken tokenLeft)
                 l = GetValue(tokenLeft);
+
             else
             {
                 LocalDebug.Stop();
             }
 
-            if (rightToken is JToken tokenRight)
+            if (rightToken == null)
+                r = null;
+            
+            else if (rightToken is JToken tokenRight)
                 r = GetValue(tokenRight);
+
             else
             {
                 LocalDebug.Stop();
@@ -863,7 +871,7 @@ namespace Bb.Json.Jslt.Services
 
                     if (keys.Length == 1 && t1)
                     {
-                        
+
                         if (r is JObject || r is JArray)
                             return (JToken)r;
                     }

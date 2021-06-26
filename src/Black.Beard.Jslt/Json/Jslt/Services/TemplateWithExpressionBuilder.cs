@@ -65,6 +65,20 @@ namespace Bb.Json.Jslt.Services
 
         }
 
+        internal Func<RuntimeContext, JToken, JToken> GenerateLambda(JsltBase tree, string filepathCode)
+        {
+            Expression e = tree.Accept(this) as Expression;
+
+            foreach (var item in _resultReset)
+                _compiler.Add(item);
+
+            _compiler.Add(e);
+
+            var result = _compiler.Compile<Func<RuntimeContext, JToken, JToken>>(filepathCode);
+
+            return result;
+
+        }
 
         public object VisitArray(JsltArray node1)
         {
@@ -74,7 +88,7 @@ namespace Bb.Json.Jslt.Services
 
                 var src = ctx.Current.Source;
 
-                var targetArray = src.AddVar(typeof(JArray), null, typeof(JArray).CreateObject());
+                var targetArray = src.AddVar(typeof(JArray), src.GetUniqueVariableName("resultArray"), typeof(JArray).CreateObject());
                 ctx.Current.RootTarget = targetArray;
 
                 foreach (var node in node1.Items)
@@ -83,17 +97,18 @@ namespace Bb.Json.Jslt.Services
                     if (node.Source != null)
                     {
 
-                        var resultToken = src.AddVar((typeof(JToken)), null, (Expression)node.Source.Accept(this));
+                        var resultToken = src.AddVar((typeof(JToken)), src.GetUniqueVariableName("source"), (Expression)node.Source.Accept(this));
+                        node.Source = null;
 
                         // Case when result is array
                         var i = src.If(resultToken.TypeIs(typeof(JArray)));
                         var listArray = i.Then.AddVar(typeof(JArray), null, resultToken.ConvertIfDifferent(typeof(JArray)));
 
-                        var _if = i.Then.For(Expression.Constant(0), listArray.Property("Count"));
-                        _if.Where = Expression.LessThan(_if.Index, listArray.Property("Count"));
-                        ctx.Current.Source = _if.Body;
+                        var _for = i.Then.For(Expression.Constant(0), listArray.Property("Count"));
+                        //_for.Condition = Expression.LessThan(_for.Index, listArray.Property("Count"));
+                        ctx.Current.Source = _for.Body;
 
-                        var itemList = _if.Body.AddVar((typeof(JToken)), null, Expression.Property(listArray, _propJArray_Item, _if.Index));
+                        var itemList = _for.Body.AddVar((typeof(JToken)), src.GetUniqueVariableName("currentArrayItem"), Expression.Property(listArray, _propJArray_Item, _for.Index));
                         ctx.Current.RootSource = itemList;
 
                         Expression b;
@@ -102,9 +117,9 @@ namespace Bb.Json.Jslt.Services
                         if (node.Where != null)
                         {
 
-                            var whereToken = _if.Body.AddVar((typeof(bool)), null, RuntimeContext._convertToBool.Call((Expression)node.Where.Accept(this)));
+                            var whereToken = _for.Body.AddVar((typeof(bool)), null, RuntimeContext._convertToBool.Call((Expression)node.Where.Accept(this)));
 
-                            var _if2 = _if.Body.If(whereToken.IsTrue());
+                            var _if2 = _for.Body.If(whereToken.IsTrue());
 
                             ctx.Current.Source = _if2.Then;
                             b = (Expression)node.Accept(this);
@@ -113,7 +128,7 @@ namespace Bb.Json.Jslt.Services
                         else
                         {
                             b = (Expression)node.Accept(this);
-                            _if.Body.Add(targetArray.Call(_AddJArray, b));
+                            _for.Body.Add(targetArray.Call(_AddJArray, b));
                         }
 
 
@@ -142,21 +157,6 @@ namespace Bb.Json.Jslt.Services
 
             }
 
-
-        }
-
-        internal Func<RuntimeContext, JToken, JToken> GenerateLambda(JsltBase tree, string filepathCode)
-        {
-            Expression e = tree.Accept(this) as Expression;
-
-            foreach (var item in _resultReset)
-                _compiler.Add(item);
-
-            _compiler.Add(e);
-
-            var result = _compiler.Compile<Func<RuntimeContext, JToken, JToken>>(filepathCode);
-
-            return result;
 
         }
 

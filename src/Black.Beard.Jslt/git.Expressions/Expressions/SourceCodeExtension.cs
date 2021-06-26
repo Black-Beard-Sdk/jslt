@@ -50,7 +50,7 @@ namespace Bb.Expresssions
 
             var loop = new ForStatement(initialValueExpression)
             {
-                Where = Expression.LessThan(Index, endValueExpression),
+                Condition = Expression.LessThan(Index, endValueExpression),
                 Index = Index,
                 MoveIndex = Index.PostIncrementAssign(),
             };
@@ -66,7 +66,7 @@ namespace Bb.Expresssions
 
             var loop = new LoopStatement()
             {
-                Where = conditionExpression
+                Condition = conditionExpression
             };
             source.Add(loop);
 

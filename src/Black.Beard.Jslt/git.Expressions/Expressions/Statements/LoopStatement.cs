@@ -16,7 +16,7 @@ namespace Bb.Expresssions.Statements
             this._continueLabel = this.Body.AddLabel(Labels.GetNewName(), KindLabelEnum.Continue);
         }
 
-        public Expression Where { get; set; }
+        public Expression Condition { get; set; }
 
         public override Expression GetExpression(HashSet<string> variableParent)
         {
@@ -26,7 +26,7 @@ namespace Bb.Expresssions.Statements
             if (b1.CanReduce)
                 b1 = b1.Reduce();
 
-            var @if = Expression.IfThenElse(Where, b1, GenerateBreak());
+            var @if = Expression.IfThenElse(Condition, b1, GenerateBreak());
 
             var expression = Expression.Loop(@if, this._breakLabel.Instance, this._continueLabel.Instance);
 

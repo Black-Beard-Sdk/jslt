@@ -63,6 +63,18 @@ namespace Bb.Expresssions
 
         }
 
+        internal string GetNewName(string prefix)
+        {
+            if (prefix == null)
+                throw new InvalidOperationException(nameof(prefix));
+            else
+            {
+                var o = $"{prefix}{PrivatedIndex.GetNewIndex()}";
+                return o;
+            }
+
+        }
+
         internal string GetNewName(Type type = null)
         {
             if (type == null)

@@ -14,6 +14,7 @@ namespace Bb.Compilers
         public AssemblyResult()
         {
             Disgnostics = new List<DiagnosticResult>();
+            this.Documents = new List<string>();
         }
 
         public string AssemblyName { get; internal set; }
@@ -23,6 +24,7 @@ namespace Bb.Compilers
         public string AssemblyFilePdb { get; internal set; }
 
         public List<DiagnosticResult> Disgnostics { get; internal set; }
+        public List<string> Documents { get; }
 
         public bool Success { get; internal set; }
 

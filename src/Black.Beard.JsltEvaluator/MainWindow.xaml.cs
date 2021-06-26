@@ -140,8 +140,12 @@ namespace AppJsonEvaluator
                 }
 
             }
-            catch (Exception e1)
+            catch (ArgumentOutOfRangeException)
             {
+
+            }
+            catch (Exception e1)
+           {
                 Errors.Items.Insert(0, e1.Message);
             }
 

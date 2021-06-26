@@ -74,6 +74,8 @@ namespace Bb.ComponentModel.Factories
         /// </summary>
         /// <param name="args">The arguments.</param>
         /// <returns></returns>
+        [System.Diagnostics.DebuggerStepThrough]
+        [System.Diagnostics.DebuggerNonUserCode]
         public T Call(string key, params dynamic[] args)
         {
 

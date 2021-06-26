@@ -9,6 +9,22 @@ namespace Bb.Expresssions
     public static class SourceCodeDomGeneratorExtension
     {
 
+
+        public static void AddItem(this CodeStatementCollection self, CodeObject item)
+        {
+            if (item is CodeExpression c)
+                self.Add(new CodeExpressionStatement(c));
+
+            else if (item is CodeStatement s)
+                self.Add(s);
+
+            else
+            {
+                LocalDebug.Stop();
+
+            }
+        }
+
         public static int NestedArrayDepth(this CodeTypeReference self) => self.ArrayElementType == null ? 0 : 1 + self.ArrayElementType.NestedArrayDepth();
 
         public static CodePrimitiveExpression ToPrimitive(this ConstantExpression self)

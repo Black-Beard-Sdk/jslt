@@ -90,7 +90,7 @@ namespace Bb.Compilers
 
             ResetFilesIfExists(result);
 
-            var parsedSyntaxTree = Parse();
+            var parsedSyntaxTree = Parse(result);
             CSharpVisitor visitor = new CSharpVisitor();
             foreach (var item in parsedSyntaxTree)
                 visitor.Visit(item.GetRoot());
@@ -148,9 +148,6 @@ namespace Bb.Compilers
 
                     result.Success = resultEmit.Success;
 
-                    if (!resultEmit.Success && System.Diagnostics.Debugger.IsAttached)
-                        System.Diagnostics.Debugger.Break();
-                    
                 }
 
             }
@@ -223,12 +220,14 @@ namespace Bb.Compilers
                 File.Delete(result.AssemblyFilePdb);
         }
 
-        private Microsoft.CodeAnalysis.SyntaxTree[] Parse()
+        private Microsoft.CodeAnalysis.SyntaxTree[] Parse(AssemblyResult result)
         {
 
             List<Microsoft.CodeAnalysis.SyntaxTree> _sources = new List<SyntaxTree>();
             foreach (var item in this._sources)
             {
+
+                result.Documents.Add(item.Filepath);
 
                 CSharpParseOptions options = CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.CSharp6);
                 var stringText = Microsoft.CodeAnalysis.Text.SourceText.From(item.Content, Encoding.UTF8);

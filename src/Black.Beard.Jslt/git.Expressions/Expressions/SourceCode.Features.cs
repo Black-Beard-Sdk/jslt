@@ -126,6 +126,11 @@ namespace Bb.Expresssions
 
         #region variables
 
+        public string GetUniqueVariableName(string prefix)
+        {
+            return this._variables.GetNewName(prefix);
+        }
+
         public ParameterExpression AddVarIfNotExists(ParameterExpression parameter)
         {
 
