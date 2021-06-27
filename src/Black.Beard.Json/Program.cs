@@ -3,6 +3,8 @@ using Bb.Json.Commands;
 using Microsoft.Extensions.CommandLineUtils;
 using System;
 
+
+[assembly: System.Reflection.AssemblyMetadata("githubName", "Black-Beard-Sdk/jslt/releases")]
 namespace Bb.Json
 {
 

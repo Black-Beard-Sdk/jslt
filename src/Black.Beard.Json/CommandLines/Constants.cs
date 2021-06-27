@@ -1,4 +1,6 @@
-﻿namespace Bb
+﻿using System.Reflection;
+
+namespace Bb
 {
     public static class Constants
     {
@@ -7,12 +9,19 @@
         {
             var n = typeof(Constants).Name.Split('.');
             RootCommand = n[n.Length - 1];
+
+            var assemblyName = typeof(Constants).Assembly.GetName();
+
+            ShortVersion = assemblyName.Version.ToString();
+            LongVersion = assemblyName.Version.ToString();
+            Name = assemblyName.Name + " cli " + assemblyName.Version.ToString();
+
         }
 
 
-        public const string Name = "Json cli v1";
-        public const string ShortVersion = "v1";
-        public const string LongVersion = "version 1";
+        public static string Name = "Json cli v1";
+        public static string ShortVersion = "v1";
+        public static string LongVersion = "version 1";
 
         public const string ProgramHelpDescription = "";
         public const string ExtendedHelpText = "";
