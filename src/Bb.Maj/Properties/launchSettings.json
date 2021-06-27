@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Bb.Maj": {
+      "commandName": "Project",
+      "commandLineArgs": "install \"Black-Beard-Sdk/jslt\" \"cli.zip\" \"C:\\Users\\g.beard\\Desktop\\Tests_datadeep\\tools\\json\""
+    }
+  }
+}

@@ -7,6 +7,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
+[assembly: System.Reflection.AssemblyMetadata("githubName", "Black-Beard-Sdk/jslt")]
+[assembly: System.Reflection.AssemblyMetadata("githubartefact", "evaluator.zip")]
 namespace AppJsonEvaluator
 {
     /// <summary>
@@ -18,6 +20,14 @@ namespace AppJsonEvaluator
         public App()
         {
             
+            var updated = Environment.CommandLine.Contains("/update");
+
+            if (updated)
+            {
+                Bb.Maj.Program.RunUpdate(typeof(App).Assembly);
+                Environment.Exit(0);
+            }
+
         }
 
     }

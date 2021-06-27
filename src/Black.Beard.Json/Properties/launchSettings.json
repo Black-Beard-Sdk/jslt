@@ -2,7 +2,7 @@
   "profiles": {
     "Black.Beard.Json": {
       "commandName": "Project",
-      "commandLineArgs": "format --source \"C:\\Users\\g.beard\\Desktop\\consignes\\test\\mailtosend.json\" --filter \"$.items\" --out \"C:\\Users\\g.beard\\Desktop\\consignes\\test\\avisage.json\" --flatText"
+      "commandLineArgs": "update"
     }
   }
 }

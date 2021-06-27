@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Jslt.Services",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Elasticsearch", "Black.Beard.Elasticsearch\Black.Beard.Elasticsearch.csproj", "{B34D4F20-21DD-45F7-A720-958EF69384DE}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bb.Maj", "Bb.Maj\Bb.Maj.csproj", "{AD7A8B3A-1423-44BA-8AF0-D0A345A5515C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{B34D4F20-21DD-45F7-A720-958EF69384DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B34D4F20-21DD-45F7-A720-958EF69384DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B34D4F20-21DD-45F7-A720-958EF69384DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD7A8B3A-1423-44BA-8AF0-D0A345A5515C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD7A8B3A-1423-44BA-8AF0-D0A345A5515C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD7A8B3A-1423-44BA-8AF0-D0A345A5515C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD7A8B3A-1423-44BA-8AF0-D0A345A5515C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

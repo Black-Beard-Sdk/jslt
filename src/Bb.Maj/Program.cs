@@ -1,24 +1,18 @@
 ﻿using Bb.CommandLines.Outs;
-using Bb.Json.Commands;
+using Bb.Maj.Commands;
 using Microsoft.Extensions.CommandLineUtils;
 using System;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 
-
-[assembly: System.Reflection.AssemblyMetadata("githubName", "Black-Beard-Sdk/jslt")]
-[assembly: System.Reflection.AssemblyMetadata("githubartefact", "cli.zip")]
-namespace Bb.Json
+namespace Bb.Maj
 {
 
     public partial class Program
     {
-
-        static Program()
-        {
-
-            // ensure all assemblies are loaded.
-            //var type = typeof(Bb.Jslt.Services.Excels.Column);
-
-        }
+               
 
         public static int ExitCode { get; private set; }
 
@@ -31,14 +25,8 @@ namespace Bb.Json
 
                 app = new CommandLineApplication()
                     .Initialize()
-                    .CommandExecute()
-                    .CommandFormat()
-                    // .CommandImport()
-                    .CommandSchemas()
-                    .CommandExport()
-                    .CommandLoadCsv()
-                    .CommandLoadExcel()
-                    .CommandMaj()
+                    .CommandVersions()
+                    
                 ;
 
                 int result = app.Execute(args);
@@ -52,16 +40,6 @@ namespace Bb.Json
             {
                 FormatException(app, e2);
             }
-            //catch (AggregateException e4)
-            //{
-            //    foreach (var item in e4.InnerExceptions)
-            //    {
-            //        //if (item is AuthenticationException)
-            //        //    AuthorizeException();
-            //        //else
-            //        //    Exception(item);
-            //    }
-            //}
             catch (CommandParsingException e)
             {
 
@@ -101,6 +79,30 @@ namespace Bb.Json
             Environment.ExitCode = Program.ExitCode = 2;
         }
 
+        public static void RunUpdate(Assembly callingAssembly)
+        {
+
+            var attributes = callingAssembly.GetCustomAttributes<AssemblyMetadataAttribute>().ToDictionary(c => c.Key);
+            string packageNameArgument = attributes["githubName"].Value;
+            string artefactNameArgument = attributes["githubartefact"].Value;
+            string targetDirArgument = new FileInfo(callingAssembly.Location).Directory.FullName;
+
+
+            var file = new FileInfo(typeof(Program).Assembly.Location);
+            file = new FileInfo(Path.Combine(file.Directory.FullName, Path.GetFileNameWithoutExtension(file.Name) + ".exe"));
+
+            var process = Process.GetCurrentProcess();
+
+            var info = new ProcessStartInfo()
+            {
+                FileName = file.FullName,
+                Arguments = $"install \"{packageNameArgument}\" \"{artefactNameArgument}\" \"{targetDirArgument}\" --p {process.Id}"
+            };
+
+            var process1 = Process.Start(info);
+
+        }
     }
+         
 
 }

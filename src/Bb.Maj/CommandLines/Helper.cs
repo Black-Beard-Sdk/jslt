@@ -1,5 +1,4 @@
 ﻿using Bb.CommandLines.Validators;
-using Newtonsoft.Json;
 using System;
 using System.IO;
 
@@ -9,7 +8,7 @@ namespace Bb.CommandLines
     {
 
 
-        public static string TrimPath(this string self)
+        internal static string TrimPath(this string self)
         {
 
             var o = self.Trim();

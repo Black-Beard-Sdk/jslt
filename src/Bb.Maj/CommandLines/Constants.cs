@@ -2,7 +2,7 @@
 
 namespace Bb
 {
-    internal static class Constants
+    internal static partial class Constants
     {
 
         static Constants()
@@ -19,7 +19,7 @@ namespace Bb
         }
 
 
-        public static string Name = "Json cli v1";
+        public static string Name = "cli v1";
         public static string ShortVersion = "v1";
         public static string LongVersion = "version 1";
 
