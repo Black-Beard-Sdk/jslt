@@ -90,10 +90,12 @@ namespace Bb.Maj.Commands
                 var validator = new GroupArgument(config);
                 var packageNameArgument = validator.Argument("<github package name>", "github package name");
                 var artefactNameArgument = validator.Argument("<artefact name>", "specifiy the artifact name");
+                var CurrentVersionArgument = validator.Argument("<current version>", "specifiy the current version");
                 var targetDirArgument = validator.Argument("<target path>", "specifiy the target directory");
 
                 var processToWaitOpt = validator.Option("--p", "specifiy a process to waiting to end");
-                var versionOpt = validator.Option("--v", "specifiy the version");
+                var versionOpt = validator.Option("--v", "specifiy the version to install");
+                
 
                 config.OnExecute(() =>
                 {
@@ -119,6 +121,12 @@ namespace Bb.Maj.Commands
                     }
                     else
                         artefact = versions.FirstOrDefault();
+
+                    if (artefact.Version.ToString() == CurrentVersionArgument.Value)
+                    {
+                        Output.WriteLineStandard($"the current version is uptdate");
+                        return 0;
+                    }
 
                     var file = new FileInfo(Path.Combine(Path.GetTempPath(), artefact.Name));
                     if (!file.Directory.Exists)
