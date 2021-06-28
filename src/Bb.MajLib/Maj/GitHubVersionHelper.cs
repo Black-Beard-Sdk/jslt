@@ -35,8 +35,18 @@ namespace Bb.Maj
             if (!string.IsNullOrEmpty(targetVersion))
                 artefact = versions.FirstOrDefault(c => c.Version.ToString() == targetVersion);
             else
+            {
                 artefact = versions.FirstOrDefault();
 
+                var v1 = new Version(CurrentVersion);
+
+                if (v1 < artefact.Version)
+                {
+                    WriteLineStandard($"the current version is in a version greater. please specify the version");
+                    return 0;
+                }
+
+            }
 
             if (artefact.Version.ToString() == CurrentVersion)
             {
@@ -212,7 +222,7 @@ namespace Bb.Maj
 
         }
 
-        public static void RunUpdate(this Assembly callingAssembly)
+        public static Process RestartForUpdate(this Assembly callingAssembly)
         {
 
             var targetDirPath = PrepareMaj(callingAssembly, new FileInfo(callingAssembly.Location).Directory);
@@ -235,6 +245,8 @@ namespace Bb.Maj
             };
 
             var process1 = Process.Start(info);
+
+            return process1;
 
         }
 

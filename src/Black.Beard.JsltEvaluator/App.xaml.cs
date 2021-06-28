@@ -1,10 +1,5 @@
-﻿using Bb;
+﻿using Bb.Maj;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 
 [assembly: System.Reflection.AssemblyMetadata("githubName", "Black-Beard-Sdk/jslt")]
@@ -24,7 +19,7 @@ namespace AppJsonEvaluator
 
             if (updated)
             {
-                typeof(App).Assembly.RunUpdate();
+                typeof(App).Assembly.RestartForUpdate();
                 Environment.Exit(0);
             }
 
