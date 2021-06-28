@@ -1,4 +1,4 @@
-﻿namespace Bb
+﻿namespace Bb.Maj
 {
     internal static partial class Constants
     {

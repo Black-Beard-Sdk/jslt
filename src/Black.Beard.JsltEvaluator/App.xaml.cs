@@ -24,7 +24,7 @@ namespace AppJsonEvaluator
 
             if (updated)
             {
-                Bb.Maj.Program.RunUpdate(typeof(App).Assembly);
+                typeof(App).Assembly.RunUpdate();
                 Environment.Exit(0);
             }
 
