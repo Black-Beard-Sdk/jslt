@@ -11,7 +11,6 @@ using System.Text;
 namespace Bb.Elastic.Runtimes
 {
 
-
     public class ElasticExecutor
     {
 
@@ -101,6 +100,7 @@ namespace Bb.Elastic.Runtimes
             ctx.Request.ExecuableQuery = (List<object>)this._metaVisitor.Visit(tree, ctx);
 
             return ctx;
+
         }
 
         private static AstBase GetTree(ContextExecutor ctx)

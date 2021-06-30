@@ -31,10 +31,7 @@ namespace Bb.Json.Commands
 
         public static CommandLineApplication CommandMaj(this CommandLineApplication app)
         {
-
-            if (!System.Diagnostics.Debugger.IsAttached)
-                System.Diagnostics.Debugger.Launch();
-
+                      
             app.Command("update", config =>
             {
 

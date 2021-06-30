@@ -39,6 +39,7 @@ namespace Bb.Json
                     .CommandLoadCsv()
                     .CommandLoadExcel()
                     .CommandMaj()
+                    .CommandConnectionString()
                 ;
 
                 int result = app.Execute(args);

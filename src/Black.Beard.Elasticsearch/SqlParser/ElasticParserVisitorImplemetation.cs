@@ -30,12 +30,14 @@ namespace Bb.Elastic.Parser
 
         public override AstBase VisitSql_stmt_list([NotNull] ElasticParser.Sql_stmt_listContext context)
         {
+
             AstList<AstBase> result = new AstList<AstBase>(GetLocator(context));
             var stmts = context.sql_stmt();
 
             foreach (var item in stmts)
             {
-                result.Add(item.Accept(this));
+                var a = item.Accept(this);
+                result.Add(a);
             }
 
             return result;
@@ -171,7 +173,7 @@ namespace Bb.Elastic.Parser
         }
 
         /// <summary>
-        /// subquery_table: (table_or_subquery (',' table_or_subquery)* | join_clause);
+        /// subquery_table: (table_or_subquery (',' table_or_subquery)* | join_clauses)
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
@@ -188,7 +190,7 @@ namespace Bb.Elastic.Parser
                     if (source is SpecificationSource s)
                         sources.Add(s);
 
-                    if (source is AliasAstBase a)
+                    else if (source is AliasAstBase a)
                         sources.Add(new SpecificationSourceAlias(GetLocator(sub)) { Alias = a });
 
                     else
