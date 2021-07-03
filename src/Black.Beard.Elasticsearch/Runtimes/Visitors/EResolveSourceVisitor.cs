@@ -62,6 +62,123 @@ namespace Bb.Elastic.Runtimes.Visitors
         //    }
         //}
 
+
+
+        public object VisitIdentifier(Identifier n)
+        {
+
+            if (n.Text != "*")
+            {
+
+                ConnectionElastic cnx = null;
+                ServerTableStructure table = null;
+                var item = n;
+                while (item != null)
+                {
+
+                    switch (item.Kind)
+                    {
+
+                        case IdentifierKindEnum.ServerReference:
+                            cnx = _connection[item.Text] as ConnectionElastic;
+                            item.Reference = cnx;
+                            _ctx.AddReference(new Reference() { Name = item.Text, Value = item, Kind = ReferenceKindEnum.Server });
+                            break;
+
+                        case IdentifierKindEnum.TableReference:
+
+                            var t = _ctx.Get(item.Text);
+                            if (t.Count == 1)
+                            {
+                                var alias = t[0].Value as Identifier;
+                                if (alias.Reference != null)
+                                    table = (ServerTableStructure)alias.Reference;
+                            }
+
+                            if (table != null)
+                            {
+                                if (cnx == null)
+                                {
+                                    if (_connection.Count == 1)
+                                    {
+                                        cnx = _connection[0] as ConnectionElastic;
+                                    }
+                                    else
+                                    {
+                                        var cnxs = _connection.Resolve<ConnectionElastic>(c => c.Tables(_ctx).Contains(item.Text)).ToList();
+                                        if (cnxs.Count > 1)
+                                        {
+                                            _ctx.Trace.AddError(new ResultMessageModel()
+                                            {
+
+                                            });
+                                        }
+                                    }
+                                }
+
+                                table = cnx.Tables(_ctx)[item.Text];
+                                _ctx.AddReference(new Reference() { Name = item.Text, Value = item, Kind = ReferenceKindEnum.Table });
+                            }
+
+                            item.Reference = table;
+
+                            break;
+
+                        case IdentifierKindEnum.ColumnReference:
+                            if (table == null)
+                            {
+                                // Stop();
+                            }
+                            _ctx.AddReference(new Reference() { Name = item.Text, Value = item, Kind = ReferenceKindEnum.Column });
+                            break;
+
+                        case IdentifierKindEnum.FunctionReference:
+                            break;
+
+                        case IdentifierKindEnum.Undefined:
+                        default:
+                            break;
+                    }
+
+                    item = item.TargetRight;
+
+                }
+
+
+
+                //var server = n.GetServerName;
+                //var table = n.GetTableName;
+                //var column = n.GetColumnName;
+                //var function = n.GetfunctionName;
+                //AstBase p = null;
+                //Reference parent = null;
+                //if (server != null)
+                //{
+                //    _ctx.AddReference(parent = new Reference() { Name = server.Text, Kind = ReferenceKindEnum.Server, Value = server });
+                //}
+
+                //if (table != null)
+                //{
+                //    var r = _ctx.Get(table.Text);
+                //    if (r.Count == 1)
+                //        _ctx.AddReference(parent = new Reference() { Name = table.Text, Kind = r[0].Kind, Value = table, Parent = parent });
+                //    else
+                //        _ctx.AddReference(parent = new Reference() { Name = table.Text, Kind = ReferenceKindEnum.Table, Value = table, Parent = parent });
+
+                //}
+
+                //if (column != null)
+                //    _ctx.AddReference(parent = new Reference() { Name = column.Text, Kind = ReferenceKindEnum.Column, Value = column, Parent = parent });
+
+                //if (function != null)
+                //    _ctx.AddReference(parent = new Reference() { Name = function.Text, Kind = ReferenceKindEnum.Function, Value = function, Parent = parent });
+
+            }
+
+            return n;
+
+        }
+
         public object VisitAlias(AliasAstBase n)
         {
 
@@ -159,121 +276,6 @@ namespace Bb.Elastic.Runtimes.Visitors
             return n;
         }
 
-
-        public object VisitIdentifier(Identifier n)
-        {
-            if (n.Text != "*")
-            {
-
-                ConnectionElastic cnx = null;
-                ServerTableStructure table = null;
-                var item = n;
-                while (item != null)
-                {
-
-                    switch (item.Kind)
-                    {
-
-                        case IdentifierKindEnum.ServerReference:
-                            cnx = _connection[item.Text] as ConnectionElastic;
-                            item.Reference = cnx;
-                            _ctx.AddReference(new Reference() { Name = item.Text, Value = item, Kind = ReferenceKindEnum.Server });
-                            break;
-
-                        case IdentifierKindEnum.TableReference:
-
-                            var t = _ctx.Get(item.Text);
-                            if (t.Count == 1)
-                            {
-                                var alias = t[0].Value as Identifier;
-                                if (alias.Reference != null)
-                                    table = (ServerTableStructure)alias.Reference;
-                            }
-
-                            if (table != null)
-                            {
-                                if (cnx == null)
-                                {
-                                    if (_connection.Count == 1)
-                                    {
-                                        cnx = _connection[0] as ConnectionElastic;
-                                    }
-                                    else
-                                    {
-                                        var cnxs = _connection.Resolve<ConnectionElastic>(c => c.Tables(_ctx).Contains(item.Text)).ToList();
-                                        if (cnxs.Count > 1)
-                                        {
-                                            _ctx.Trace.AddError(new ResultMessageModel()
-                                            { 
-                                            
-                                            });
-                                        }
-                                    }
-                                }
-
-                                table = cnx.Tables(_ctx)[item.Text];
-                                _ctx.AddReference(new Reference() { Name = item.Text, Value = item, Kind = ReferenceKindEnum.Table });
-                            }
-
-                            item.Reference = table;
-
-                            break;
-
-                        case IdentifierKindEnum.ColumnReference:
-                            if (table == null)
-                            {
-                                Stop();
-                            }
-                            Stop();
-                            break;
-
-                        case IdentifierKindEnum.FunctionReference:
-                            break;
-
-                        case IdentifierKindEnum.Undefined:
-                        default:
-                            break;
-                    }
-
-                    item = item.TargetRight;
-
-                }
-
-
-
-                //var server = n.GetServerName;
-                //var table = n.GetTableName;
-                //var column = n.GetColumnName;
-                //var function = n.GetfunctionName;
-                //AstBase p = null;
-                //Reference parent = null;
-                //if (server != null)
-                //{
-                //    _ctx.AddReference(parent = new Reference() { Name = server.Text, Kind = ReferenceKindEnum.Server, Value = server });
-                //}
-
-                //if (table != null)
-                //{
-                //    var r = _ctx.Get(table.Text);
-                //    if (r.Count == 1)
-                //        _ctx.AddReference(parent = new Reference() { Name = table.Text, Kind = r[0].Kind, Value = table, Parent = parent });
-                //    else
-                //        _ctx.AddReference(parent = new Reference() { Name = table.Text, Kind = ReferenceKindEnum.Table, Value = table, Parent = parent });
-
-                //}
-
-                //if (column != null)
-                //    _ctx.AddReference(parent = new Reference() { Name = column.Text, Kind = ReferenceKindEnum.Column, Value = column, Parent = parent });
-
-                //if (function != null)
-                //    _ctx.AddReference(parent = new Reference() { Name = function.Text, Kind = ReferenceKindEnum.Function, Value = function, Parent = parent });
-
-            }
-
-            return n;
-
-        }
-
         public object VisitList(AstBase n)
         {
             var n1 = (IEnumerable<AstBase>)n;
@@ -356,6 +358,7 @@ namespace Bb.Elastic.Runtimes.Visitors
         private readonly ElasticConnections _connection;
 
         public ContextExecutor _ctx { get; }
+    
     }
 
 }

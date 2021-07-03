@@ -16,13 +16,15 @@ namespace Bb.Elastic.Runtimes
 
         }
 
+        public bool IsSql { get; internal set; }
+
         public string Filename { get; internal set; }
 
-        public StringBuilder Query { get; internal set; }
+        public StringBuilder QueryText { get; internal set; }
 
         public AstBase Ast { get; internal set; }
 
-        public List<object> ExecuableQuery { get; internal set; }
+        public List<ECall> ExecutableQueries { get; internal set; }
 
         
         public ContextExecutor Parent { get; }

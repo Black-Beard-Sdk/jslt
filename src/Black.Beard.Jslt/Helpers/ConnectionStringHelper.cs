@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
-namespace Bb.Brokers.Configurations
+namespace Bb
 {
 
     public static class ConnectionStringHelper

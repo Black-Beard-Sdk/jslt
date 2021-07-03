@@ -4,9 +4,9 @@ using System.Linq;
 
 namespace Bb.Elastic.Runtimes.Models
 {
+
     public class ElasticConnections
     {
-
 
         public ElasticConnections()
         {
@@ -27,7 +27,7 @@ namespace Bb.Elastic.Runtimes.Models
 
         public int Count { get => _connections.Count; }
 
-        internal Connection this[string key]
+        public Connection this[string key]
         {
             get
             {

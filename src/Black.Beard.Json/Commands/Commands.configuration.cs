@@ -28,14 +28,26 @@ namespace Bb.Json.Commands
     public static partial class Command
     {
 
-
         public static CommandLineApplication CommandConnectionString(this CommandLineApplication app)
         {
+
                   
-            app.Command("cnx", config =>
+            var cnx = app.Command("config", config =>
+            {
+                config.Description = "manage configuration";
+                config.HelpOption(HelpFlag);
+            });
+
+            var types = cnx.Command("types", config =>
+            {
+                config.Description = "manage types configurations";
+                config.HelpOption(HelpFlag);
+            });
+
+            types.Command("add", config =>
             {
 
-                config.Description = "manage connexion";
+                config.Description = "add a new type configuration";
                 config.HelpOption(HelpFlag);
 
                 var validator = new GroupArgument(config);
@@ -43,20 +55,12 @@ namespace Bb.Json.Commands
                 config.OnExecute(() =>
                 {
 
-                    var result = typeof(Command).Assembly.RestartForUpdate();
-
-                    if (result.HasExited)
-                    {
-                        Output.WriteLineStandard("the update process is anormaly quicker");
-                        return 1;
-                    }
-
                     return 0;
 
                 });
 
             });
-                      
+
 
             return app;
 

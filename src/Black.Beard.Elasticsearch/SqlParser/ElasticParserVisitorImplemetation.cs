@@ -50,8 +50,7 @@ namespace Bb.Elastic.Parser
 
         /// <summary>
         /// select_stmt:
-        ///    common_table_stmt? 
-        ///    select_core
+        ///    common_table_stmt? select_core
         ///    compound*
         ///    order_by_stmt? 
         ///    limit_stmt?;
@@ -88,9 +87,11 @@ namespace Bb.Elastic.Parser
             var limit = context.limit_stmts();
             if (limit != null)
                 SelectResult.Limit = (SpecificationLimit)limit.Accept(this);
+            
             else
             {
-                SelectResult.Limit = new SpecificationLimit(GetLocator(limit))
+                var locator = GetLocator(context);
+                SelectResult.Limit = new SpecificationLimit(locator)
                 {
                     Offset = new Literal(null) { Value = 0 },
                     RowCount = new Literal(null) { Value = 10 },

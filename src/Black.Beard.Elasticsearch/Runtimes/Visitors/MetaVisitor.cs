@@ -24,17 +24,23 @@ namespace Bb.Elastic.Runtimes.Visitors
         public object Visit(AstBase n, ContextExecutor ctx)
         {
 
+            object lastResult = null;
+
             foreach (var item in this._visitors)
             {
                 var v = item(this._connections, ctx);
-                v.Visit(n);
+                lastResult = v.Visit(n);
             }
-            return n;
+
+            return lastResult;
 
         }
 
+        internal ElasticConnections Connections => _connections; 
+
         private readonly List<Func<ElasticConnections, ContextExecutor, IVisitor>> _visitors;
         private readonly ElasticConnections _connections;
+
     }
 
 }

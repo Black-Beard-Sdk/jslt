@@ -2,6 +2,7 @@
 
 namespace Bb.Elastic.Runtimes.Models
 {
+
     public abstract class ESerialize
     {
 

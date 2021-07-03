@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Bb.git.Expressions.CsharpGenerators {
+namespace Bb.Expressions.CsharpGenerators {
     using System;
     
     

@@ -1,10 +1,30 @@
 ﻿using Newtonsoft.Json.Linq;
+using System.Text;
 
 namespace Bb.Elastic.Runtimes.Models
 {
+
+    public class StringSpecification : ESerialize
+    {
+
+        public StringSpecification(StringBuilder sb)
+        {
+            this._sb = sb;
+        }
+
+        public override JToken Serialize()
+        {
+            return _sb.ToString();
+        }
+
+        private readonly StringBuilder _sb;
+
+    }
+
     public class ESpecification : ESerialize
     {
         public int From { get; set; }
+
         public int Size { get; set; }
 
         public EQuery Query { get; set; }

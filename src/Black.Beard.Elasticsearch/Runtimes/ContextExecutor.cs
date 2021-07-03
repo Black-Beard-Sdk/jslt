@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -11,6 +12,24 @@ namespace Bb.Elastic.Runtimes
     public class ContextExecutor
     {
 
+        internal ContextExecutor(ElasticExecutor parent, JObject queryElastic, string filename)
+        {
+
+            var formatting = System.Diagnostics.Debugger.IsAttached
+                ? Newtonsoft.Json.Formatting.Indented
+                : Newtonsoft.Json.Formatting.None;
+
+            this._parent = parent;
+            this._references = new List<Reference>();
+            this.Request = new RequestContext(this)
+            {
+                Filename = filename,
+                QueryText = new StringBuilder(queryElastic.ToString(formatting)),
+            };
+
+            this.Trace = new TraceContext(this);
+        }
+
         internal ContextExecutor(ElasticExecutor parent, StringBuilder querySql, string filename)
         {
             this._parent = parent;
@@ -18,7 +37,8 @@ namespace Bb.Elastic.Runtimes
             this.Request = new RequestContext(this)
             {
                 Filename = filename,
-                Query = querySql,
+                QueryText = querySql,
+                IsSql = true,
             };
             this.Trace = new TraceContext(this);
         }
@@ -50,6 +70,7 @@ namespace Bb.Elastic.Runtimes
         private ILookup<string, Reference> _lookup;
 
         public RequestContext Request { get; }
+
         public TraceContext Trace { get; }
     }
 

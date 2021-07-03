@@ -1,6 +1,5 @@
 ﻿using Bb.CommandLines;
 using Bb.CommandLines.Validators;
-using Bb.Jslt.Services.Excels;
 using Microsoft.Extensions.CommandLineUtils;
 using NJsonSchema;
 using System;
@@ -32,34 +31,23 @@ namespace Bb.Json.Commands
 
                 var validator = new GroupArgument(config);
                 var outputdirectory = validator.Option("--out", "output directory path location");
-                var schemaexcel = validator.OptionNoValue("--excelconfig", "generate schema for excel loading configuration");
+
+                var schemaExcel = validator.OptionNoValue("--excel", "generate schema for excel loading configuration");
+                var schemaElastic = validator.OptionNoValue("--elastic", "generate schema for elastic configuration");
 
                 config.OnExecute(() =>
                 {
 
-                    string filename;
-                    JsonSchema result = null;
                     string outputPath = Environment.CurrentDirectory;
 
                     if (outputdirectory.HasValue())
                         outputPath = outputdirectory.Value().TrimPath();
 
-                    if (schemaexcel.HasValue())
-                    {
+                    if (schemaExcel.HasValue())
+                        Generate(typeof(Bb.Jslt.Services.Excels.ExcelReader), outputPath, Path.Combine(outputPath, "excelConfig"));
 
-                        filename = Path.Combine(outputPath, "excelConfig.schema.json");
-                        result = SchemaHelper.GenerateSchemaForClass(typeof(ExcelReader), "excelConfig");
-
-                        var payload = result.ToJson();
-
-                        if (File.Exists(filename))
-                            File.Delete(filename);
-
-                        filename.Save(payload);
-
-                    }
-
-
+                    if (schemaElastic.HasValue())
+                        Generate(typeof(Elasticsearch.Configurations.ElasticConfigurations), outputPath, Path.Combine(outputPath, "elasticConfig"));
 
                     return 0;
 
@@ -70,6 +58,23 @@ namespace Bb.Json.Commands
             return app;
 
         }
+
+        private static void Generate(Type type, string path, string name)
+        {
+
+            var filename = Path.Combine(path, name + ".schema.json");
+
+            JsonSchema result = SchemaHelper.GenerateSchemaForClass(type, name);
+
+            var payload = result.ToJson();
+
+            if (File.Exists(filename))
+                File.Delete(filename);
+
+            filename.Save(payload);
+
+        }
+
 
     }
 }

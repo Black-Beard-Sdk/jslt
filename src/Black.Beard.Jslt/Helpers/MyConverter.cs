@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Globalization;
 
-namespace Bb.Brokers.Configurations
+namespace Bb
 {
     /// <summary>
     /// My Converter

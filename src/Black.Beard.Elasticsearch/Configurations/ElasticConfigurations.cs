@@ -20,8 +20,6 @@ namespace Bb.Elasticsearch.Configurations
             _setting.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
             _setting.Converters.Add(new ElasticConfigurationLoginJsonConverter( AsymetricKindEnum.TripleDES, "GCvjqei110If3GmRG26O12YGNwV3ynOCLTDaliWttiwG"));
 
-            
-
         }
 
         public static ElasticConfigurations Load(string path)

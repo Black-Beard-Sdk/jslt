@@ -1,5 +1,6 @@
 ﻿using Bb.Elastic.Runtimes.Models;
 using Elasticsearch.Net;
+using Nest;
 using System;
 using System.Collections.Generic;
 using System.Linq;

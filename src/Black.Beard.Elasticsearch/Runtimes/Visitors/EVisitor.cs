@@ -40,11 +40,11 @@ namespace Bb.Elastic.Runtimes.Visitors
         public object VisitList(AstBase n)
         {
 
-            List<object> result = new List<object>();
+            List<ECall> result = new List<ECall>();
             var n1 = (IEnumerable<AstBase>)n;
 
             foreach (AstBase item in n1)
-                result.Add(item.Accept(this));
+                result.Add((ECall)item.Accept(this));
 
             return result;
         }

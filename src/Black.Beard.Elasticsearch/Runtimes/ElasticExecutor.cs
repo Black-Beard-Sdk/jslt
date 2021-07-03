@@ -3,6 +3,7 @@ using Bb.Elastic.Runtimes.Models;
 using Bb.Elastic.Runtimes.Visitors;
 using Bb.Elastic.SqlParser.Models;
 using Elasticsearch.Net;
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -42,13 +43,35 @@ namespace Bb.Elastic.Runtimes
         /// <param name="querySql"></param>
         /// <param name="filename"></param>
         /// <returns></returns>
+        public IEnumerable<Result> Execute(JObject query, string filename, string index, string connectionName)
+        {
+
+            var ctx = GetContext(query, filename, index, connectionName);
+
+            List<Result> results = new List<Result>();
+            foreach (ECall item in ctx.Request.ExecutableQueries)
+            {
+                var result = item.Connection.ExecuteQuery<StringResponse>(ctx, item);
+                results.Add(result);
+            }
+
+            return results;
+
+        }
+
+        /// <summary>
+        /// Execute the specified query
+        /// </summary>
+        /// <param name="querySql"></param>
+        /// <param name="filename"></param>
+        /// <returns></returns>
         public IEnumerable<Result> Execute(StringBuilder querySql, string filename)
         {
 
             var ctx = GetContext(querySql, filename);
 
             List<Result> results = new List<Result>();
-            foreach (ECall item in ctx.Request.ExecuableQuery)
+            foreach (ECall item in ctx.Request.ExecutableQueries)
             {
                 var result = item.Connection.ExecuteQuery<StringResponse>(ctx, item);
                 results.Add(result);
@@ -69,7 +92,7 @@ namespace Bb.Elastic.Runtimes
 
             var ctx = GetContext(querySql, filename);
 
-            foreach (ECall item in ctx.Request.ExecuableQuery)
+            foreach (ECall item in ctx.Request.ExecutableQueries)
             {
                 RequestQuery req = item.Connection.Plane(ctx, item);
                 ctx.Request.AppendRequest(req);
@@ -97,7 +120,25 @@ namespace Bb.Elastic.Runtimes
             // Execute multiple visitor for resolve server model, evaluate matching type, ...
             var visitor = new ElasticParserVisitorImplemetation(ctx);
             var tree = visitor.Visit(parser.Tree);
-            ctx.Request.ExecuableQuery = (List<object>)this._metaVisitor.Visit(tree, ctx);
+            ctx.Request.ExecutableQueries = (List<ECall>)this._metaVisitor.Visit(tree, ctx);
+
+            return ctx;
+
+        }
+
+        private ContextExecutor GetContext(JObject querySql, string filename, string index, string connectionName)
+        {
+
+            if (string.IsNullOrEmpty(filename))
+                filename = "Text";
+
+            ContextExecutor ctx = new ContextExecutor(this, querySql, filename);
+
+            var cnx = this._metaVisitor.Connections[connectionName];
+
+            var s = new StringSpecification(ctx.Request.QueryText) { };
+            var e = new ECall() { Connection = cnx, Index = index, Query = s };
+            ctx.Request.ExecutableQueries = new List<ECall>() { e } ;
 
             return ctx;
 
@@ -106,7 +147,7 @@ namespace Bb.Elastic.Runtimes
         private static AstBase GetTree(ContextExecutor ctx)
         {
             // Parse sql
-            SourceParser parser = SourceParser.ParseString(ctx.Request.Query, ctx.Request.Filename, ctx.Trace.Output, ctx.Trace.OutputError);
+            SourceParser parser = SourceParser.ParseString(ctx.Request.QueryText, ctx.Request.Filename, ctx.Trace.Output, ctx.Trace.OutputError);
             var visitor = new ElasticParserVisitorImplemetation(ctx)
             {
             };
