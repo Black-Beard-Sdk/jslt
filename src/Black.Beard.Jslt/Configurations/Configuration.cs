@@ -2,7 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System.Linq;
 
-namespace Bb.Json.Configurations
+namespace Bb.Configurations
 {
 
     public class Configuration
@@ -33,7 +33,6 @@ namespace Bb.Json.Configurations
         {
             return Bb.ComponentModel.TypeDiscovery.Instance.ResolveByName(this.Type);
         }
-
 
     }
 
