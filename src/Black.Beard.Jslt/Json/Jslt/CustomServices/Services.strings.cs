@@ -117,11 +117,18 @@ namespace Bb.Json.Jslt.CustomServices
         {
             if (token is JValue v)
             {
+
+                if (v.Value == null)
+                    return new JValue(0);
+
                 if (v.Value is string t)
                     return new JValue(t.Length);
+
             }
+
             else if (token is JArray a)
                 return new JValue(a.Count);
+
             return new JValue(0);
         }
 
@@ -131,8 +138,15 @@ namespace Bb.Json.Jslt.CustomServices
         public static JToken Executecontains(RuntimeContext ctx, JToken token, string containStr)
         {
             if (token is JValue v)
+            {
+
+                if (v.Value == null)
+                    return JValue.CreateNull(); 
+                
                 if (v.Value is string t)
                     return new JValue(t.Contains(containStr));
+
+            }
             return new JValue(false);
         }
 
@@ -141,8 +155,15 @@ namespace Bb.Json.Jslt.CustomServices
         public static JToken ExecuteLower(RuntimeContext ctx, JToken token)
         {
             if (token is JValue v)
+            {
+
+                if (v.Value == null)
+                    return JValue.CreateNull(); 
+                
                 if (v.Value is string t)
                     return new JValue(t.ToLower());
+            }
+
             return new JValue(false);
         }
 
@@ -151,8 +172,15 @@ namespace Bb.Json.Jslt.CustomServices
         public static JToken ExecuteUpper(RuntimeContext ctx, JToken token)
         {
             if (token is JValue v)
+            {
+
+                if (v.Value == null)
+                    return JValue.CreateNull();
+                
                 if (v.Value is string t)
                     return new JValue(t.ToUpper());
+            }
+
             return new JValue(false);
         }
 
@@ -162,8 +190,16 @@ namespace Bb.Json.Jslt.CustomServices
         public static JToken ExecuteStartsWith(RuntimeContext ctx, JToken token, string txt)
         {
             if (token is JValue v)
+            {
+
+                if (v.Value == null)
+                    return JValue.CreateNull();
+                
                 if (v.Value is string t)
                     return new JValue(t.StartsWith(txt));
+
+            }
+
             return new JValue(false);
         }
 
@@ -173,8 +209,15 @@ namespace Bb.Json.Jslt.CustomServices
         public static JToken ExecuteEndsWith(RuntimeContext ctx, JToken token, string txt)
         {
             if (token is JValue v)
+            {
+
+                if (v.Value == null)
+                    return JValue.CreateNull(); 
+                
                 if (v.Value is string t)
                     return new JValue(t.EndsWith(txt));
+            }
+
             return new JValue(false);
         }
 
@@ -184,8 +227,15 @@ namespace Bb.Json.Jslt.CustomServices
         public static JToken ExecuteTrim(RuntimeContext ctx, JToken token, string txt)
         {
             if (token is JValue v)
+            {
+                
+                if (v.Value == null)
+                    return JValue.CreateNull();
+
                 if (v.Value is string t)
                     return new JValue(t.Trim(txt.ToCharArray()));
+            }
+
             return new JValue(false);
         }
 
@@ -195,8 +245,15 @@ namespace Bb.Json.Jslt.CustomServices
         public static JToken ExecuteIndexOf(RuntimeContext ctx, JToken token, string txt)
         {
             if (token is JValue v)
+            {
+
+                if (v.Value == null)
+                    return JValue.CreateNull();
+                
                 if (v.Value is string t)
                     return new JValue(t.IndexOf(txt[0]));
+            }
+
             return new JValue(false);
         }
 
@@ -206,8 +263,15 @@ namespace Bb.Json.Jslt.CustomServices
         public static JToken ExecuteLastIndexOf(RuntimeContext ctx, JToken token, string txt)
         {
             if (token is JValue v)
+            {
+
                 if (v.Value is string t)
                     return new JValue(t.LastIndexOf(txt[0]));
+
+                if (v.Value == null)
+                    return JValue.CreateNull();
+            }
+
             return new JValue(false);
         }
 
@@ -216,8 +280,15 @@ namespace Bb.Json.Jslt.CustomServices
         public static JToken ExecuteNormalize(RuntimeContext ctx, JToken token)
         {
             if (token is JValue v)
+            {
+
+                if (v.Value == null)
+                    return JValue.CreateNull();
+
                 if (v.Value is string t)
                     return new JValue(t.Normalize());
+            }
+
             return new JValue(false);
         }
 
@@ -228,8 +299,14 @@ namespace Bb.Json.Jslt.CustomServices
         public static JToken ExecutePadLeft(RuntimeContext ctx, JToken token, int lenght, string charset)
         {
             if (token is JValue v)
+            {
+
+                if (v.Value == null)
+                    return JValue.CreateNull();
+                
                 if (v.Value is string t)
                     return new JValue(t.PadLeft(lenght, charset[0]));
+            }
             return new JValue(false);
         }
 
@@ -240,8 +317,14 @@ namespace Bb.Json.Jslt.CustomServices
         public static JToken ExecutePadRight(RuntimeContext ctx, JToken token, int lenght, string charset)
         {
             if (token is JValue v)
+            {
+
+                if (v.Value == null)
+                    return JValue.CreateNull();
+                
                 if (v.Value is string t)
                     return new JValue(t.PadRight(lenght, charset[0]));
+            }
             return new JValue(false);
         }
 
@@ -251,8 +334,14 @@ namespace Bb.Json.Jslt.CustomServices
         public static JToken ExecuteSplit(RuntimeContext ctx, JToken token, string charset)
         {
             if (token is JValue v)
+            {
+
+                if (v.Value == null)
+                    return JValue.CreateNull();
+                
                 if (v.Value is string t)
                     return new JValue(t.Split(charset[0]));
+            }
             return new JValue(false);
 
         }

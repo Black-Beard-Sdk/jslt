@@ -65,6 +65,7 @@ namespace Bb.Json.Jslt.CustomServices
                 catch (System.Exception ex)
                 {
                     ctx.Diagnostics.AddError(string.Empty, null, this.jpathFilter, "json path is invalid filter in the method 'get'. " + ex.Message);
+                    ctx.Break();
                 }
 
             }

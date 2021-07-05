@@ -55,6 +55,11 @@ namespace Bb.Json.Jslt.Services
 
         }
 
+        internal void Break()
+        {
+            this.MustoBreak = true;
+        }
+
         public static JToken EvaluateUnaryOperator(RuntimeContext ctx, JToken leftToken, OperationEnum @operator)
         {
 
@@ -108,11 +113,9 @@ namespace Bb.Json.Jslt.Services
             
             else if (leftToken is JToken tokenLeft)
                 l = GetValue(tokenLeft);
-
+            
             else
-            {
-                LocalDebug.Stop();
-            }
+                l = leftToken;
 
             if (rightToken == null)
                 r = null;
@@ -121,10 +124,7 @@ namespace Bb.Json.Jslt.Services
                 r = GetValue(tokenRight);
 
             else
-            {
-                LocalDebug.Stop();
                 r = rightToken;
-            }
 
             try
             {
@@ -316,7 +316,6 @@ namespace Bb.Json.Jslt.Services
             return false;
 
         }
-
 
         private static bool GreaterThanOrEqual(object l, object r)
         {
@@ -1027,6 +1026,7 @@ namespace Bb.Json.Jslt.Services
         public TranformJsonAstConfiguration Configuration { get; internal set; }
 
         public bool StopIsActivated { get; set; } = true;
+        public bool MustoBreak { get; private set; }
 
 
         //private static (PropertyInfo, Action<object, object>) GetWriter(Type componentType, string propertyName)

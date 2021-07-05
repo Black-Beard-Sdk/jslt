@@ -48,7 +48,7 @@ namespace Bb.Json.Jslt.Parser
                 Factory service = this._foundry.GetService(item.Name, types, this._diagnostics, context.Start.ToLocation());
                 if (service == null)
                     AddError(item.Start, string.Empty, $"the service {item.Name} can't be resolved.");
-                
+
                 else
                 {
                     item.ServiceProvider = service;
@@ -268,7 +268,18 @@ namespace Bb.Json.Jslt.Parser
             JsltBase result = null;
             Type type = null;
 
-            var txt = context.STRING().GetText()?.Trim()?.Trim('\"')?.Replace("\\\\", "\\");
+            var txt = context.STRING().GetText()?.Trim() ?? string.Empty;
+            if (txt.StartsWith(@"""") && txt.EndsWith(@""""))
+                txt = txt.Substring(1, txt.Length - 2);
+            
+            txt = txt.Replace(@"\\", @"\")
+                     .Replace(@"\""", @"""")
+                     .Replace(@"\t", "\t")
+                     .Replace(@"\r", "\r")
+                     .Replace(@"\n", "\n")
+                     ;
+
+
             var containsVariable = txt.Contains("@@");
 
             var jsonType = context.jsonType();

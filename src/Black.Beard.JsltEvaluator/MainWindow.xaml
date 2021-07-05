@@ -71,12 +71,12 @@
                       HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
                       ResizeBehavior="PreviousAndNext"  />
 
-                <ListView x:Name="Errors" Grid.Row="1" SelectionMode="Single" MouseDoubleClick="ErrorDoubleClick" Margin="2249,0,-2248,3" Grid.RowSpan="2">
+                <ListView x:Name="Errors" Grid.Row="1" SelectionMode="Single" MouseDoubleClick="ErrorDoubleClick" Grid.RowSpan="2">
                     <ListView.View>
                         <GridView>
                             <GridViewColumn Header="Severity" Width="70" DisplayMemberBinding="{Binding Severity}" />
                             <GridViewColumn Header="Location" Width="50" DisplayMemberBinding="{Binding Location}" />
-                            <GridViewColumn Header="Message" Width="250" DisplayMemberBinding="{Binding Message}" />
+                            <GridViewColumn Header="Message" Width="400" DisplayMemberBinding="{Binding Message}" />
                         </GridView>
                     </ListView.View>
                 </ListView>

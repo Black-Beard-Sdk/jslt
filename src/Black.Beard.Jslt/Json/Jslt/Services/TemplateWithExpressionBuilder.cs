@@ -94,8 +94,10 @@ namespace Bb.Json.Jslt.Services
                 foreach (var node in node1.Items)
                 {
 
+
                     if (node.Source != null)
                     {
+
 
                         var resultToken = src.AddVar((typeof(JToken)), src.GetUniqueVariableName("source"), (Expression)node.Source.Accept(this));
                         node.Source = null;
@@ -105,6 +107,8 @@ namespace Bb.Json.Jslt.Services
                         var listArray = i.Then.AddVar(typeof(JArray), null, resultToken.ConvertIfDifferent(typeof(JArray)));
 
                         var _for = i.Then.For(Expression.Constant(0), listArray.Property("Count"));
+                        _for.Condition = Expression.AndAlso(_for.Condition, ctx.Current.Context.Property("MustoBreak").IsFalse());
+
                         //_for.Condition = Expression.LessThan(_for.Index, listArray.Property("Count"));
                         ctx.Current.Source = _for.Body;
 
@@ -131,7 +135,6 @@ namespace Bb.Json.Jslt.Services
                             _for.Body.Add(targetArray.Call(_AddJArray, b));
                         }
 
-
                     }
                     else
                     {
@@ -156,7 +159,6 @@ namespace Bb.Json.Jslt.Services
                 return targetArray;
 
             }
-
 
         }
 
