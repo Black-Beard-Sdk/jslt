@@ -23,7 +23,7 @@ namespace Bb.Json.Jslt.CustomServices
 
             var file = ctx.Configuration.ResolveFile(sourcePath);
 
-            if( file.Exists)
+            if (file.Exists)
                 return file.FullName.LoadContentFromFile().ConvertToJson();
             else
             {
@@ -69,14 +69,14 @@ namespace Bb.Json.Jslt.CustomServices
                     _culture = CultureInfo.GetCultureInfo(culture);
 
                 if (v.Type == JTokenType.String)
-                    return new JValue(DateTime.Parse(v.Value.ToString(), _culture) );
+                    return new JValue(DateTime.Parse(v.Value.ToString(), _culture));
 
             }
 
             return token;
 
         }
-     
+
         [JsltExtensionMethod("convert")]
         [JsltExtensionMethodParameter("token", "item to convert")]
         [JsltExtensionMethodParameter("targetType", "target type")]
@@ -85,6 +85,36 @@ namespace Bb.Json.Jslt.CustomServices
             if (token is JValue v)
                 return new JValue(Convert.ChangeType(v.Value, targetType));
             return token;
+        }
+
+        [JsltExtensionMethod("isnull")]
+        [JsltExtensionMethodParameter("token", "token to evaluate")]
+        public static JToken ExecuteIsNull(RuntimeContext ctx, JToken token)
+        {
+
+            if (token == null)
+                return new JValue(true);
+
+            if (token is JValue v)
+                return new JValue(object.Equals(v.Value, null));
+
+            return false;
+
+        }
+
+        [JsltExtensionMethod("isnotnull")]
+        [JsltExtensionMethodParameter("token", "token to evaluate")]
+        public static JToken ExecuteIsNotNull(RuntimeContext ctx, JToken token)
+        {
+
+            if (token == null)
+                return new JValue(false);
+
+            if (token is JValue v)
+                return new JValue(!object.Equals(v.Value, null));
+
+            return false;
+
         }
 
     }

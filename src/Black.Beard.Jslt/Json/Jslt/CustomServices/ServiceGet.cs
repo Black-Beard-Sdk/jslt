@@ -31,7 +31,10 @@ namespace Bb.Json.Jslt.CustomServices
 
 
             if (string.IsNullOrEmpty(jpathFilter))
+            {
                 ctx.Diagnostics.AddError(string.Empty, null, "jpathFilter", "jpathFilter is null or empty in the get method");
+                return token;
+            }
 
             if (this._sourceName is string s)
             {
@@ -52,10 +55,14 @@ namespace Bb.Json.Jslt.CustomServices
                 {
 
                     var result = datas.SelectTokens(this.jpathFilter).ToList();
+
                     if (result.Count == 1)
                         return result[0];
 
-                    else 
+                    if (result.Count == 0)
+                        return JValue.CreateNull();
+
+                    else
                     {
                         var a = new JArray(result);
                         return a;

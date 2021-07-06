@@ -60,13 +60,13 @@ namespace Bb.Expressions.CsharpGenerators
         public static CodeTypeReference ToRefType(this Type returnType, HashSet<string> usings)
         {
 
+            if (typeof(Type).IsAssignableFrom(returnType))
+                return new CodeTypeReference("Type");
+
             var result = new CodeTypeReference(returnType);
 
-
             if (usings != null && usings.Contains(returnType.Namespace))
-            {
                 result.BaseType = result.BaseType.Substring(returnType.Namespace.Length).TrimStart('.');
-            }
 
             return result;
 

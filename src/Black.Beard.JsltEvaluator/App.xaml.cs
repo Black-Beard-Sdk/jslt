@@ -15,8 +15,7 @@ namespace AppJsonEvaluator
         public App()
         {
             
-            var updated = Environment.CommandLine.Contains("/update");
-
+            var updated = Environment.CommandLine.Contains("/u");
             if (updated)
             {
                 typeof(App).Assembly.RestartForUpdate();

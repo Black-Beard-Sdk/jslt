@@ -573,6 +573,10 @@ namespace Bb.Expressions.CsharpGenerators
         private object VisitConvert(UnaryExpression e)
         {
             var o = (CodeExpression)Visit(e.Operand);
+
+            if (e.Type.IsAssignableFrom(e.Operand.Type))
+                return o;
+
             return new CodeCastExpression(e.Type.ToRefType(_usings), o);
         }
 
