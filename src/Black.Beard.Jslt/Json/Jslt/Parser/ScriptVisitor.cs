@@ -646,10 +646,6 @@ namespace Bb.Json.Jslt.Parser
             if (_null != null)
                 return _null.Accept(this);
 
-            var _type = context.jsonType();
-            if (_type != null)
-                return _type.Accept(this);
-
             LocalDebug.Stop();
 
             return null;

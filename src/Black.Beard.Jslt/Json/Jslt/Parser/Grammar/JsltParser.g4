@@ -86,7 +86,6 @@ jsonLtItem :
    | jsonValueInteger
    | jsonValueNumber
    | jsonValueNull
-   | jsonType
    ;
 
 operation : 
