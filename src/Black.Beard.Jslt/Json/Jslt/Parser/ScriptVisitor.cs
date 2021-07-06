@@ -230,13 +230,23 @@ namespace Bb.Json.Jslt.Parser
                 return new JsltConstant() { Value = o, Kind = JsltKind.Integer, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
             }
 
-            return new JsltConstant() { Value = 0, Kind = JsltKind.Integer, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+            JsltBase result = new JsltConstant() { Value = 0, Kind = JsltKind.Integer, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+
+            result = GetConverter(context.jsonType(), result, out Type type);
+
+            return result;
 
         }
 
         public override object VisitJsonValueBoolean([NotNull] JsltParser.JsonValueBooleanContext context)
         {
-            return new JsltConstant() { Value = context.GetText().ToUpper() == "TRUE", Kind = JsltKind.Boolean, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+
+            JsltBase result = new JsltConstant() { Value = context.GetText().ToUpper() == "TRUE", Kind = JsltKind.Boolean, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+
+            result = GetConverter(context.jsonType(), result, out Type type);
+
+            return result;
+
         }
 
         public override object VisitJsonValueNumber([NotNull] JsltParser.JsonValueNumberContext context)
@@ -258,7 +268,11 @@ namespace Bb.Json.Jslt.Parser
 
             }
 
-            return new JsltConstant() { Value = 0, Kind = JsltKind.Integer, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+            JsltBase result = new JsltConstant() { Value = 0, Kind = JsltKind.Integer, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+
+            result = GetConverter(context.jsonType(), result, out Type type);
+
+            return result;
 
         }
 
@@ -278,7 +292,6 @@ namespace Bb.Json.Jslt.Parser
                      .Replace(@"\r", "\r")
                      .Replace(@"\n", "\n")
                      ;
-
 
             var containsVariable = txt.Contains("@@");
 
@@ -467,28 +480,6 @@ namespace Bb.Json.Jslt.Parser
 
         }
 
-        //public override object VisitJsonValueCodeString([NotNull] JsltParser.JsonValueCodeStringContext context)
-        //{
-
-        //    var code = context.CODE_STRING().GetText().Trim('\'');
-
-        //    List<int> lst = new List<int>()
-        //    {
-        //        code.IndexOf(' '),
-        //        code.IndexOf('\t'),
-        //        code.IndexOf('\r'),
-        //        code.IndexOf('\n'),
-        //    };
-
-        //    var index = lst.Where(c => c != -1).Min();
-
-        //    var l = code.Substring(0, index);
-        //    var c = code.Substring(index).Trim();
-
-        //    return AddPosition(new JfunctionBodyDefinition(l, c), context.Start, context.Stop);
-
-        //}
-
         #region Jsonlt
 
         public override object VisitJsonLtOperation([NotNull] JsltParser.JsonLtOperationContext context)
@@ -525,7 +516,7 @@ namespace Bb.Json.Jslt.Parser
 
                         if (_subs.Count == 1)
                         {
-                            AddError(context.Start.ToLocation(), "", "missing binary right expression");
+                            AddError(context.Start.ToLocation(), string.Empty, "missing binary right expression");
                             return null;
                         }
                         else
@@ -552,6 +543,31 @@ namespace Bb.Json.Jslt.Parser
 
                 }
 
+            }
+
+            left = GetConverter( context.jsonType(), left, out Type type);
+            
+            return left;
+
+        }
+
+        private JsltBase GetConverter(JsltParser.JsonTypeContext jsonType, JsltBase left, out Type type)
+        {
+
+            type = typeof(void);
+
+            if (jsonType != null)
+            {
+
+                type = ((JsltConstant)jsonType.Accept(this)).Value as Type;
+
+                if (type == null)
+                    LocalDebug.Stop();
+
+                var c = new JsltConstant() { Value = type, Kind = JsltKind.Type, Start = jsonType.Start.ToLocation(), Stop = jsonType.Stop.ToLocation() };
+                var call = new JsltFunctionCall("convert", new List<JsltBase>() { left, c });
+                this._functions.Add(call);
+                left = call;
             }
 
             return left;
@@ -663,7 +679,6 @@ namespace Bb.Json.Jslt.Parser
             if (arguments != null)
                 argumentsJson.AddRange((List<JsltBase>)arguments.Accept(this));
 
-
             var o = context.obj();
             if (o != null)
                 obj = (JsltObject)o.Accept(this);
@@ -685,6 +700,7 @@ namespace Bb.Json.Jslt.Parser
                     break;
 
                 default:
+
                     if (obj != null)
                         AddError(context.Start.ToLocation(), string.Empty, $"invalid object argument");
 
@@ -692,6 +708,15 @@ namespace Bb.Json.Jslt.Parser
                     {
                         var call = new JsltFunctionCall(name, argumentsJson) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
                         this._functions.Add(call);
+
+                        var type = context.jsonType();
+                        if (type != null)
+                        {
+                            var c = new JsltConstant() { Value = type, Kind = JsltKind.Type, Start = type.Start.ToLocation(), Stop = type.Stop.ToLocation() };
+                            call = new JsltFunctionCall("convert", new List<JsltBase>() { call, c });
+                            this._functions.Add(call);
+                        }
+                         
                         result = call;
                     }
                     break;

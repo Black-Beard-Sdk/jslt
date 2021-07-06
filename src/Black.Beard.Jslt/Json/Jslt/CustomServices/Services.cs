@@ -3,6 +3,7 @@ using Bb.Json.Jslt.Services;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Security.Cryptography;
@@ -82,9 +83,32 @@ namespace Bb.Json.Jslt.CustomServices
         [JsltExtensionMethodParameter("targetType", "target type")]
         public static JToken ExecuteConvert(RuntimeContext ctx, JToken token, Type targetType)
         {
-            if (token is JValue v)
-                return new JValue(Convert.ChangeType(v.Value, targetType));
-            return token;
+
+            try
+            {
+
+                if (token is JValue v)
+                    return new JValue(Convert.ChangeType(v.Value, targetType));
+
+                else if (token is JArray a)
+                {
+                    if (targetType.IsArray)
+                    {
+                        List<JToken> tokens = new List<JToken>(a.Count);
+                        foreach (var item in a)
+                            tokens.Add(ExecuteConvert(ctx, item, targetType));
+                        return new JArray(tokens);
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                ctx.Diagnostics.AddError(string.Empty, null, $"convert method {token} to {targetType}", ex.Message);
+            }
+
+            return new JValue(targetType.GetDefaultValue());
+
         }
 
         [JsltExtensionMethod("isnull")]

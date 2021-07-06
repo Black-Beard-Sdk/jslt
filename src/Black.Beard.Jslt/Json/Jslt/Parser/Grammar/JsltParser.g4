@@ -1,7 +1,7 @@
 /**
  * json transform engine Parser
  *
- * Copyright (c) 2017-2019 Gael beard <gaelgael5@gmail.com>
+ * Copyright (c) 2020-2021 Gael beard <gaelgael5@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,7 @@ script :
     EOF
     ;
 
-
-// ---------------------------- json ----------------------------
+// -------------------------------- json -------------------------------
 /* c.f., https://github.com/antlr/grammars-v4/blob/master/json/JSON.g4 */
 
 json :
@@ -53,29 +52,20 @@ array :
 jsonValue :
      obj
    | array
-   // | jsonValueBoolean
-   // | jsonValueString
-   // | jsonValueInteger
-   // | jsonValueNumber
-   // | jsonValueNull
    | jsonLtOperation
-   //| jsonValueCodeString
    ;
 
 jsonValueString : STRING jsonType?;
-//jsonValueCodeString : CODE_STRING;
-jsonValueNumber : NUMBER;
-jsonValueInteger : INT;
-jsonValueBoolean : TRUE | FALSE;
+jsonValueNumber : NUMBER jsonType?;
+jsonValueInteger : INT jsonType?;
+jsonValueBoolean : (TRUE | FALSE) jsonType?;
 jsonValueNull : NULL;
 jsonType : CURRENT_VALUE (URI | TIME | DATETIME | STRING_ | GUID | INTEGER | DECIMAL);
-
-// ---------------------------- jslt ----------------------------
 
 jsonLtOperation :
      jsonLtItem
    | NT jsonLtOperation
-   | PAREN_LEFT jsonLtOperation PAREN_RIGHT
+   | PAREN_LEFT jsonLtOperation PAREN_RIGHT jsonType? 
    | jsonLtOperation operation jsonLtOperation
    ;
 
@@ -99,12 +89,9 @@ operation :
 // ---------------------------- extended json ----------------------------
 
 jsonfunctionCall :
-   DOT_ID PAREN_LEFT jsonValueList? PAREN_RIGHT obj?
+   DOT_ID PAREN_LEFT jsonValueList? PAREN_RIGHT jsonType? obj?
    ;
 
 jsonValueList : 
    jsonValue (COMMA jsonValue)*
    ;
-
-
-
