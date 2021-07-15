@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Bb.Elastic.Runtimes.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -6,10 +7,10 @@ using System.IO;
 namespace Bb.Elasticsearch.Configurations
 {
 
-    public class ElasticConfigurations : List<ElasticConfiguration>
+    public class ConfigurationList : List<BaseConfiguration>
     {
 
-        static ElasticConfigurations()
+        static ConfigurationList()
         {
 
             _setting = new JsonSerializerSettings()
@@ -18,15 +19,15 @@ namespace Bb.Elasticsearch.Configurations
             };
 
             _setting.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
-            _setting.Converters.Add(new ElasticConfigurationLoginJsonConverter( AsymetricKindEnum.TripleDES, "GCvjqei110If3GmRG26O12YGNwV3ynOCLTDaliWttiwG"));
+            //_setting.Converters.Add(new ElasticConfigurationLoginJsonConverter(AsymetricKindEnum.TripleDES, "GCvjqei110If3GmRG26O12YGNwV3ynOCLTDaliWttiwG"));
 
         }
 
-        public static ElasticConfigurations Load(string path)
+        public static ConfigurationList Load(string path)
         {
             var file = new FileInfo(path);
             var payload = file.LoadContentFromFile();
-            var instance = JsonConvert.DeserializeObject<ElasticConfigurations>(payload, _setting);
+            var instance = JsonConvert.DeserializeObject<ConfigurationList>(payload, _setting);
             instance.Filename = file.FullName;
             return instance;
         }
@@ -35,7 +36,7 @@ namespace Bb.Elasticsearch.Configurations
         {
 
             if (string.IsNullOrEmpty(this.Filename))
-                throw new InvalidDataException(nameof(ElasticConfigurations.Filename));
+                throw new InvalidDataException(nameof(ConfigurationList.Filename));
 
             Save(this.Filename);
 
@@ -57,10 +58,24 @@ namespace Bb.Elasticsearch.Configurations
 
         }
 
-        private static readonly JsonSerializerSettings _setting;
 
         [JsonIgnore]
         public string Filename { get; private set; }
+
+        public ElasticConnectionList GetElasticConnections()
+        {
+
+            var result = new ElasticConnectionList();
+
+            foreach (var item in this)
+                if (item is ElasticConfiguration c)
+                    c.Append(result);
+
+            return result;
+
+        }
+
+        private static readonly JsonSerializerSettings _setting;
 
     }
 

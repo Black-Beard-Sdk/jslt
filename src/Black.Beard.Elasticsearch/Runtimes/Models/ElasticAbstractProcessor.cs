@@ -4,16 +4,17 @@ using System;
 namespace Bb.Elastic.Runtimes.Models
 {
 
-    public abstract class Connection
+    public abstract class ElasticAbstractProcessor
     {
 
-        public Connection(string name)
+        public ElasticAbstractProcessor(string name)
         {
             this.ConnectionName = name;
         }
 
         public string ConnectionName { get; }
-        public ElasticConnections Parent { get; internal set; }
+
+        public ElasticConnectionList Parent { get; internal set; }
 
         public abstract Result ExecuteQuery<TResponse>(ContextExecutor ctx, object query)
             where TResponse : class, new();

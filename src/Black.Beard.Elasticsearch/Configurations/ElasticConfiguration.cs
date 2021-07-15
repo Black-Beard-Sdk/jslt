@@ -10,19 +10,21 @@ namespace Bb.Elasticsearch.Configurations
 {
 
 
-    public class ElasticConfiguration
+    public class ElasticConfiguration : BaseConfiguration
     {
+
+        public ElasticConfiguration(params string[] uris): this()
+        {
+            foreach (var item in uris)
+                this.Uris.Add(item);
+        }
 
         public ElasticConfiguration()
         {
             this.Uris = new List<string>();
-            this.Authentication = new ElasticConfigurationLogin();
         }
 
-        /// <summary>
-        /// Name of the connectionString
-        /// </summary>
-        public string Name { get; set; }
+        public List<string> Uris { get; set; }
 
         /// <summary>
         /// Turns on settings that aid in debugging like DisableDirectStreaming() and PrettyJson()
@@ -60,10 +62,6 @@ namespace Bb.Elasticsearch.Configurations
         /// </summary>
         public int ConnectionLimit { get; set; }
 
-        public List<string> Uris { get; set; }
-
-        public ElasticConfigurationLogin Authentication { get; set; }
-
         /// <summary>
         /// Sets the default timeout in milliseconds for each request to Elasticsearch. Defaults to 60 seconds.
         /// NOTE: You can set this to a high value here, and specify a timeout on Elasticsearch's side.
@@ -76,8 +74,17 @@ namespace Bb.Elasticsearch.Configurations
         public int MaximumRetries { get; set; }
 
 
-        public void Append(ElasticConnections manager)
+        public string AuthenticationKey1 { get; set; }
+
+        public string AuthenticationKey2 { get; set; }
+
+        public ElasticConfigurationLoginKindEnum AuthenticationKind { get; set; }
+
+
+        internal override void Append(object list)
         {
+
+            ElasticConnectionList manager = (ElasticConnectionList)list;
 
             var nodes = Uris.Select(c => new Uri(c)).ToArray();
             var pool = new StaticConnectionPool(nodes);
@@ -100,20 +107,21 @@ namespace Bb.Elasticsearch.Configurations
             if (this.MaximumRetries > 0)
                 settings.MaximumRetries(maxRetries: MaximumRetries);
 
-            if (!string.IsNullOrEmpty(this.Authentication.Key1) && !string.IsNullOrEmpty(this.Authentication.Key2))
+            if (!string.IsNullOrEmpty(this.AuthenticationKey1) && !string.IsNullOrEmpty(this.AuthenticationKey2))
             {
 
-                if (this.Authentication.Kind == ElasticConfigurationLoginKindEnum.Login)
-                    settings.BasicAuthentication(this.Authentication.Key1, this.Authentication.Key2);
+                if (this.AuthenticationKind == ElasticConfigurationLoginKindEnum.Login)
+                    settings.BasicAuthentication(this.AuthenticationKey1, this.AuthenticationKey2);
 
-                if (this.Authentication.Kind == ElasticConfigurationLoginKindEnum.ApiKey)
-                    settings.ApiKeyAuthentication(this.Authentication.Key1, this.Authentication.Key2);
+                if (this.AuthenticationKind == ElasticConfigurationLoginKindEnum.ApiKey)
+                    settings.ApiKeyAuthentication(this.AuthenticationKey1, this.AuthenticationKey2);
 
             }
 
-            manager.AddConnection(new ConnectionElastic(this.Name, new ElasticLowLevelClient(settings)));
+            manager.AddConnection(new ElasticProcessor(this.Name, new ElasticLowLevelClient(settings)));
 
         }
+
 
     }
 

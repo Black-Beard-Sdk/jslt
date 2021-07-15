@@ -9,7 +9,7 @@ namespace Bb.Elastic.Runtimes.Visitors
     internal class EResolveSourceVisitor : IVisitor<object>
     {
 
-        public EResolveSourceVisitor(ElasticConnections connections, ContextExecutor ctx)
+        public EResolveSourceVisitor(ElasticConnectionList connections, ContextExecutor ctx)
         {
             this._connection = connections;
             this._ctx = ctx;
@@ -70,7 +70,7 @@ namespace Bb.Elastic.Runtimes.Visitors
             if (n.Text != "*")
             {
 
-                ConnectionElastic cnx = null;
+                ElasticProcessor cnx = null;
                 ServerTableStructure table = null;
                 var item = n;
                 while (item != null)
@@ -80,7 +80,7 @@ namespace Bb.Elastic.Runtimes.Visitors
                     {
 
                         case IdentifierKindEnum.ServerReference:
-                            cnx = _connection[item.Text] as ConnectionElastic;
+                            cnx = _connection[item.Text] as ElasticProcessor;
                             item.Reference = cnx;
                             _ctx.AddReference(new Reference() { Name = item.Text, Value = item, Kind = ReferenceKindEnum.Server });
                             break;
@@ -101,11 +101,11 @@ namespace Bb.Elastic.Runtimes.Visitors
                                 {
                                     if (_connection.Count == 1)
                                     {
-                                        cnx = _connection[0] as ConnectionElastic;
+                                        cnx = _connection[0] as ElasticProcessor;
                                     }
                                     else
                                     {
-                                        var cnxs = _connection.Resolve<ConnectionElastic>(c => c.Tables(_ctx).Contains(item.Text)).ToList();
+                                        var cnxs = _connection.Resolve<ElasticProcessor>(c => c.Tables(_ctx).Contains(item.Text)).ToList();
                                         if (cnxs.Count > 1)
                                         {
                                             _ctx.Trace.AddError(new ResultMessageModel()
@@ -355,7 +355,7 @@ namespace Bb.Elastic.Runtimes.Visitors
 
         }
 
-        private readonly ElasticConnections _connection;
+        private readonly ElasticConnectionList _connection;
 
         public ContextExecutor _ctx { get; }
     

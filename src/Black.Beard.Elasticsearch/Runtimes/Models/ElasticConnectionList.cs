@@ -5,12 +5,12 @@ using System.Linq;
 namespace Bb.Elastic.Runtimes.Models
 {
 
-    public class ElasticConnections
+    public class ElasticConnectionList
     {
 
-        public ElasticConnections()
+        internal ElasticConnectionList()
         {
-            this._connections = new Dictionary<string, Connection>();
+            this._connections = new Dictionary<string, ElasticAbstractProcessor>();
         }
 
         public ElasticExecutor GetExecutor()
@@ -18,7 +18,7 @@ namespace Bb.Elastic.Runtimes.Models
             return new ElasticExecutor(this);
         }
 
-        public ElasticConnections AddConnection(Connection cnx)
+        public ElasticConnectionList AddConnection(ElasticAbstractProcessor cnx)
         {
             this._connections.Add(cnx.ConnectionName, cnx);
             cnx.Parent = this;
@@ -27,22 +27,22 @@ namespace Bb.Elastic.Runtimes.Models
 
         public int Count { get => _connections.Count; }
 
-        public Connection this[string key]
+        public ElasticAbstractProcessor this[string key]
         {
             get
             {
                 if (!string.IsNullOrEmpty(key))
-                    if (_connections.TryGetValue(key, out Connection cnx))
+                    if (_connections.TryGetValue(key, out ElasticAbstractProcessor cnx))
                         return cnx;
                 return _connections.FirstOrDefault().Value;
             }
         }
 
-        public Connection this[int key] { get => _connections.Values.Skip(key).First(); }
+        public ElasticAbstractProcessor this[int key] { get => _connections.Values.Skip(key).First(); }
 
-        public IEnumerable<Connection> Resolve<T>(Func<T, bool> func = null) where T : Connection
+        public IEnumerable<ElasticAbstractProcessor> Resolve<T>(Func<T, bool> func = null) where T : ElasticAbstractProcessor
         {
-            foreach (Connection item in _connections.Values)
+            foreach (ElasticAbstractProcessor item in _connections.Values)
                 if (item is T c)
                 {
                     if (func == null || func(c))
@@ -52,7 +52,7 @@ namespace Bb.Elastic.Runtimes.Models
 
 
 
-        private readonly Dictionary<string, Connection> _connections;
+        private readonly Dictionary<string, ElasticAbstractProcessor> _connections;
 
 
     }

@@ -129,7 +129,7 @@ namespace Bb.Expressions
 
         }
 
-      
+
         private readonly Dictionary<string, Variable> _variables;
         private Variables _parent;
 

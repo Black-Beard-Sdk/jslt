@@ -9,7 +9,7 @@ namespace Bb.Elastic.Runtimes.Visitors
     public class EVisitor : IVisitor<object>
     {
 
-        public EVisitor(ElasticConnections connections)
+        public EVisitor(ElasticConnectionList connections)
         {
             this._connections = connections;
         }
@@ -514,7 +514,7 @@ namespace Bb.Elastic.Runtimes.Visitors
         }
 
 
-        private readonly ElasticConnections _connections;
+        private readonly ElasticConnectionList _connections;
 
 
     }

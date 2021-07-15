@@ -10,19 +10,18 @@ using System.Reflection;
 
 namespace Bb.Elastic.Runtimes.Models
 {
-    public class ConnectionElastic : Connection
+
+    public class ElasticProcessor : ElasticAbstractProcessor
     {
 
-
-        public ConnectionElastic(string name, ElasticLowLevelClient client) : base(name)
+        internal ElasticProcessor(string name, ElasticLowLevelClient client) : base(name)
         {
             this._client = client;
 
 
-            this.callMethod = typeof(ConnectionElastic).GetMethod("Call", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            this.callMethod = typeof(ElasticProcessor).GetMethod("Call", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
 
         }
-
 
         public override Result ExecuteQuery<TResponse>(ContextExecutor ctx, object query)
         {

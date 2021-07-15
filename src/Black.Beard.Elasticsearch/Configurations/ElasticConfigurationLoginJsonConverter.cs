@@ -7,7 +7,6 @@ namespace Bb.Elasticsearch.Configurations
 
     public class ElasticConfigurationLoginJsonConverter : JsonConverter
     {
-        private static readonly JsonSerializerSettings _setting;
 
         static ElasticConfigurationLoginJsonConverter()
         {
@@ -58,6 +57,9 @@ namespace Bb.Elasticsearch.Configurations
             writer.WriteEndObject();
 
         }
+
+        private static readonly JsonSerializerSettings _setting;
+
 
     }
 

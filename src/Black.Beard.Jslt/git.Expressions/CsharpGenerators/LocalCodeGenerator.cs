@@ -34,7 +34,7 @@ namespace Bb.Expressions.CsharpGenerators
                 // Generate source code using the code generator.
                 provider.GenerateCodeFromCompileUnit(compileunit, tw, new CodeGeneratorOptions()
                 {
-
+                    
                 });
                 // Close the output file.
                 tw.Close();
@@ -43,7 +43,7 @@ namespace Bb.Expressions.CsharpGenerators
 
         public static StringBuilder GenerateCode(CodeDomProvider provider, CodeExpression expression)
         {
-         
+
             // Create an IndentedTextWriter, constructed with
             // a StreamWriter to the source file.
             using (var txt = new System.IO.StringWriter())

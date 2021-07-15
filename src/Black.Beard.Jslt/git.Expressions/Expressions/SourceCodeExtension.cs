@@ -7,7 +7,7 @@ using System.Linq.Expressions;
 
 namespace Bb.Expressions
 {
-        
+
     public static partial class SourceCodeExtension
     {
 

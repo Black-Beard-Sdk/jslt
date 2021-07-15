@@ -15,7 +15,7 @@ namespace Bb.Elastic.Runtimes.Models
 
         public string Index { get; set; }
         
-        public Connection Connection { get; set; }
+        public ElasticAbstractProcessor Connection { get; set; }
 
 
         public Result<TResponse> ExecuteQuery<TResponse>(ContextExecutor ctx)
