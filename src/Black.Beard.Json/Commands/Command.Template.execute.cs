@@ -23,11 +23,11 @@ namespace Bb.Json.Commands
     /// <summary>
     /// 
     /// </summary>
-    public static partial class Command
+    public partial class Command : Command<CommandLine>
     {
 
 
-        public static CommandLineApplication CommandExecute(this CommandLineApplication app)
+        public CommandLineApplication CommandExecute(CommandLineApplication app)
         {
 
             // json template 

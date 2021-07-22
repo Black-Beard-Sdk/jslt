@@ -1,6 +1,7 @@
 ﻿using Bb.CommandLines.Outs;
 using Bb.Json.Commands;
 using Microsoft.Extensions.CommandLineUtils;
+using Microsoft.Extensions.Configuration;
 using System;
 
 
@@ -13,96 +14,36 @@ namespace Bb.Json
     public partial class Program
     {
 
-        static Program()
+        public static object Result { get; private set; }
+
+        public static void Main(string[] args)
         {
 
-            // ensure all assemblies are loaded.
-            //var type = typeof(Bb.Jslt.Services.Excels.Column);
-
-        }
-
-        public static int ExitCode { get; private set; }
-
-        public static void Main(params string[] args)
-        {
-
-            CommandLineApplication app = null;
-            try
+            Action<ConfigurationBuilder> configurationBuilder = (builder) =>
             {
 
-                app = new CommandLineApplication()
-                    .Initialize()
-                    .CommandExecute()
-                    .CommandFormat()
-                    // .CommandImport()
-                    .CommandSchemas()
-                    .CommandExport()
-                    .CommandLoadCsv()
-                    .CommandLoadExcel()
-                    .CommandMaj()
-                    .CommandConnectionString()
+                builder
+                    //.AddJsonFile(@"D:\src\option\src\outTests\schemas\Test.json", optional: false, reloadOnChange: true)
+                    //.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                    //.AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
+                    //.AddSecureStoreFile(@"D:\src\option\src\outTests\securevault.json", "mypwd")
+
+                    .AddEnvironmentVariables()  
                 ;
 
-                int result = app.Execute(args);
+                //if (isDevelopment) //only add secrets in development
+                //{
 
-                Output.Flush();
+                //}
 
-                Environment.ExitCode = Program.ExitCode = result;
-
-            }
-            catch (System.FormatException e2)
-            {
-                FormatException(app, e2);
-            }
-            //catch (AggregateException e4)
-            //{
-            //    foreach (var item in e4.InnerExceptions)
-            //    {
-            //        //if (item is AuthenticationException)
-            //        //    AuthorizeException();
-            //        //else
-            //        //    Exception(item);
-            //    }
-            //}
-            catch (CommandParsingException e)
-            {
-
-                Output.WriteLineError(e.Message);
-                Output.WriteLineError(e.StackTrace);
-                Output.Flush();
-
-                if (e.HResult > 0)
-                    Environment.ExitCode = Program.ExitCode = e.HResult;
-
-                app.ShowHelp();
-
-                Environment.ExitCode = Program.ExitCode = 1;
-
-            }
-            catch (Exception e)
-            {
-
-                Output.WriteLineError(e.Message);
-                Output.WriteLineError(e.StackTrace);
-                Output.Flush();
-
-                if (e.HResult > 0)
-                    Environment.ExitCode = Program.ExitCode = e.HResult;
-
-                Environment.ExitCode = Program.ExitCode = 1;
-
-            }
+            };
+                       
+            var cmd = Bb.CommandLine.Run<Command, Bb.Json.Commands.CommandLine>(configurationBuilder, args);
+            Program.Result = cmd.Result;
 
         }
-
-        private static void FormatException(CommandLineApplication app, FormatException e2)
-        {
-            Output.WriteLineError(e2.Message);
-            Output.Flush();
-            app.ShowHelp();
-            Environment.ExitCode = Program.ExitCode = 2;
-        }
-
+    
     }
+
 
 }

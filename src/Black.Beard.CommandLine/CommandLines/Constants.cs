@@ -19,13 +19,12 @@ namespace Bb
         }
 
 
-        public static string Name = "Json cli v1";
-        public static string ShortVersion = "v1";
-        public static string LongVersion = "version 1";
+        public static string Name;
+        public static string ShortVersion;
+        public static string LongVersion;
 
         public const string ProgramHelpDescription = "";
         public const string ExtendedHelpText = "";
-
 
         public static string RootCommand; 
 

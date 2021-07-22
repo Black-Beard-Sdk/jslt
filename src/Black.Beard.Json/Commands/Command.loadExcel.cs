@@ -25,11 +25,11 @@ namespace Bb.Json.Commands
     /// <summary>
     /// 
     /// </summary>
-    public static partial class Command
+    public partial class Command : Command<CommandLine>
     {
 
 
-        public static CommandLineApplication CommandLoadExcel(this CommandLineApplication app)
+        public static CommandLineApplication CommandLoadExcel(CommandLineApplication app)
         {
 
             var dataCmd1 = app.Command("xls", config =>

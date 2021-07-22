@@ -21,11 +21,11 @@ namespace Bb.Json.Commands
     /// <summary>
     /// 
     /// </summary>
-    public static partial class Command
+    public partial class CommandLines : Command<CommandLine>
     {
 
 
-        public static CommandLineApplication CommandFormat(this CommandLineApplication app)
+        public CommandLineApplication CommandFormat(CommandLineApplication app)
         {
 
 

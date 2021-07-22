@@ -25,10 +25,10 @@ namespace Bb.Json.Commands
     /// <summary>
     /// 
     /// </summary>
-    public static partial class Command
+    public partial class Command : Command<CommandLine>
     {
 
-        public static CommandLineApplication CommandConnectionString(this CommandLineApplication app)
+        public CommandLineApplication CommandConnectionString(CommandLineApplication app)
         {
 
                   

@@ -8,15 +8,15 @@ using System.Reflection;
 namespace Bb.CommandLines.Outs.Printings
 {
 
-    internal static class ConvertToDatatable
+    public static class ConvertToDatatable
     {
 
-        public static DataTable Convert<T>(T result, string label, params Expression<Func<T, object>>[] items)
+        public static DataTable Convert<T>(this T result, string label, params Expression<Func<T, object>>[] items)
         {
             return ConvertList<T>(new T[] { result }, label, items);
         }
 
-        public static DataTable ConvertList<T>(IEnumerable<T> rows, string label, params Expression<Func<T, object>>[] columns)
+        public static DataTable ConvertList<T>(this IEnumerable<T> rows, string label, params Expression<Func<T, object>>[] columns)
         {
 
             Type _type = rows.FirstOrDefault().GetType();
@@ -28,7 +28,7 @@ namespace Bb.CommandLines.Outs.Printings
             return ConvertList(r, label, properties);
         }
 
-        public static DataTable ConvertList(IEnumerable<object> rows, string label, string[] columns)
+        public static DataTable ConvertList(this IEnumerable<object> rows, string label, string[] columns)
         {
 
             Type _type = rows.FirstOrDefault().GetType();

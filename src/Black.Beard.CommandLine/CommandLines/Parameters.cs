@@ -2,7 +2,8 @@
 
 namespace Bb.CommandLines
 {
-    internal class Parameters
+
+    public class Parameters
     {
 
         public string Token { get; set; }

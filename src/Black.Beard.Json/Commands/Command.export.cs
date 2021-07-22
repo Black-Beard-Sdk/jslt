@@ -1,13 +1,10 @@
 ﻿using Bb.CommandLines;
 using Bb.CommandLines.Ins;
-using Bb.CommandLines.Outs;
 using Bb.CommandLines.Validators;
 using Bb.ConvertToDatables;
 using Microsoft.Extensions.CommandLineUtils;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Text;
@@ -24,10 +21,10 @@ namespace Bb.Json.Commands
     /// <summary>
     /// 
     /// </summary>
-    public static partial class Command
+    public partial class Command : Command<CommandLine>
     {
 
-        public static CommandLineApplication CommandExport(this CommandLineApplication app)
+        public CommandLineApplication CommandExport(CommandLineApplication app)
         {
 
             // json template 

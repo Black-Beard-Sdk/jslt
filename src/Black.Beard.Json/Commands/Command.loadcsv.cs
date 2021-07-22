@@ -22,13 +22,13 @@ namespace Bb.Json.Commands
     /// <summary>
     /// 
     /// </summary>
-    public static partial class Command
+    public partial class Command : Command<CommandLine>
     {
 
 
         private static Dictionary<char, char> _accepted = build();
 
-        public static CommandLineApplication CommandLoadCsv(this CommandLineApplication app)
+        public static CommandLineApplication CommandLoadCsv(CommandLineApplication app)
         {
 
             var dataCmd = app.Command("csv", config =>

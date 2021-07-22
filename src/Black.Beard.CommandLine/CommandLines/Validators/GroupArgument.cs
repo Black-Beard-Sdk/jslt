@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace Bb.CommandLines.Validators
 {
 
-    internal class GroupArgument
+    public class GroupArgument
     {
 
 
@@ -86,7 +86,7 @@ namespace Bb.CommandLines.Validators
 
         }
 
-        internal bool Evaluate(out int errorNum)
+        public bool Evaluate(out int errorNum)
         {
 
             errorNum = 0;

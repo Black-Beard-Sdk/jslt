@@ -12,7 +12,7 @@ using System.Text;
 namespace Bb.CommandLines.Outs.Printings
 {
 
-    internal static class PrintDataExtensions
+    public static class PrintDataExtensions
     {
         #region Print Columns
 

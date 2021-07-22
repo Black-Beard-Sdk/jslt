@@ -6,8 +6,8 @@ using System.Text;
 
 namespace Bb.Json
 {
-    
-    public class SchemaHelper
+
+    public static class SchemaHelper
     {
 
         static SchemaHelper()
@@ -28,38 +28,41 @@ namespace Bb.Json
         /// </summary>
         /// <param name="myType">class type</param>
         /// <returns>a string containing JSON schema for a given class type</returns>
-        public static JsonSchema GenerateSchemaForClass(Type myType, string name)
+        public static JsonSchema GenerateSchemaForClass(this Type myType, string name)
         {
 
-            string id = GetUri(myType.Name);
+            //var b = myType.IsGenericType && myType.GetGenericTypeDefinition() == typeof(OptionConfigurationList<>);
+
+            string id = myType.Name;
+            //if (b)
+            //    id = GetUri(id.Substring(0, id.IndexOf('`')), myType.GetGenericArguments()[0].Name);
+            //else
+            id = GetUri(id);
 
             var _schema = JsonSchema.FromType(myType, _settings);
             _schema.AllowAdditionalProperties = true;
             _schema.Id = id;
 
+            //if (b)
+            //{
+            //    var o = _schema.Properties[nameof(OptionConfigurationList<object>.Kind)];
+            //    o.Enumeration.Add(myType.AssemblyQualifiedName);
+            //}
+
             return _schema;
 
         }
 
-        public static string GetUri(params string[] names)
+        public static string GetUri(params string[] args)
         {
-            var p = System.IO.Path.Combine(names);
-            p = System.IO.Path.Combine(GetRoot(), p).Replace("\\", "/");
-            return p;
-        }
-
-        public static string GetRoot()
-        {
-            if (string.IsNullOrEmpty(Root))
-                Root = "http://" + System.IO.Path.Combine(SI, "json", "schemas").Replace("\\", "/");
-            return Root;
+            var result = System.IO.Path.Combine(args);
+            result = System.IO.Path.Combine(result, "schema").Replace("\\", "/");
+            return "http://" + result;
         }
 
         private static readonly JsonSchemaGeneratorSettings _settings;
 
-        public static string Root { get; private set; }
-
-        public static string SI { get; private set; } = "jslt";
-
     }
+
+
 }
