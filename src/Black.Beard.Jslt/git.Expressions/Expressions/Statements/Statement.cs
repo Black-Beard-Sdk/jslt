@@ -15,52 +15,25 @@ namespace Bb.Expressions.Statements
 
         public abstract Expression GetExpression(HashSet<string> variableParent);
 
-
-        internal SourceCode _parent;
-
         public static implicit operator Statement(Expression expression)
         {
             return new ExpressionStatement() { Expression = expression };
         }
 
-        internal abstract void SetParent(SourceCode sourceCodes);
-
-    }
-
-    public abstract class BodyStatement : Statement
-    {
-
-
-        public BodyStatement()
+        internal virtual void SetParent(SourceCode sourceCodes)
         {
-
-        }
-     
-        public SourceCode Body
-        {
-            get
-            {
-
-                if (_body == null)
-                    Body = new SourceCode();
-
-                return _body;
-            }
-            set
-            {
-                if (this._parent != null)
-                    _body.SetParent(_parent);
-
-                _body = value;
-            }
+            _parent = sourceCodes;
         }
 
-        internal override void SetParent(SourceCode sourceCodes)
+        internal SourceCode GetParent()
         {
-            _body.SetParent(sourceCodes);
+            return _parent;
         }
 
-        private SourceCode _body;
+        internal bool ParentIsNull { get => _parent != null; }
+
+        private SourceCode _parent;
+
     }
 
 

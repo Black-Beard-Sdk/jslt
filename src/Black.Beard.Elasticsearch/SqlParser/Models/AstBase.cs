@@ -2,7 +2,7 @@
 
 namespace Bb.Elastic.SqlParser.Models
 {
-    
+
     public abstract class AstBase 
     {
 
@@ -14,7 +14,7 @@ namespace Bb.Elastic.SqlParser.Models
         public abstract T Accept<T>(IVisitor<T> visitor);
 
 
-        public object Reference { get; set; }
+        public AstBase Reference { get; set; }
 
         public Locator Position { get; }
 

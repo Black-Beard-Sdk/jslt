@@ -19,6 +19,18 @@ namespace Bb.Elastic.Runtimes.Visitors
             return (Identifier)v.Visit(self);
         }
 
+        public Identifier VisitElasticServerReference(ElasticServerReference n)
+        {
+            Stop();
+            return null;
+        }
+
+        public Identifier VisitElasticTableReference(ElasticTableReference n)
+        {
+            Stop();
+            return null;
+        }
+
         Identifier IVisitor<Identifier>.SpecificationSourceAlias(SpecificationSourceAlias n)
         {
             return n.Alias;
@@ -29,7 +41,7 @@ namespace Bb.Elastic.Runtimes.Visitors
             return n.Accept(this);
         }
 
-        Identifier IVisitor<Identifier>.VisitAlias(AliasAstBase n)
+        Identifier IVisitor<Identifier>.VisitAlias(AliasReferenceAst n)
         {
             return n;
         }
@@ -152,6 +164,20 @@ namespace Bb.Elastic.Runtimes.Visitors
         {
             return n.Expression.Accept(this);
         }
+
+
+        [System.Diagnostics.DebuggerHidden]
+        [System.Diagnostics.DebuggerNonUserCode]
+        [System.Diagnostics.DebuggerStepThrough]
+        private static void Stop()
+        {
+
+            if (System.Diagnostics.Debugger.IsAttached)
+                System.Diagnostics.Debugger.Break();
+
+        }
+
+      
     }
 
 }

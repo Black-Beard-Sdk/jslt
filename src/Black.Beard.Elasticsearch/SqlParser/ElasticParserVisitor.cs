@@ -207,12 +207,6 @@ public interface IElasticParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitNullable_expr([NotNull] ElasticParser.Nullable_exprContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="ElasticParser.fullname"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitFullname([NotNull] ElasticParser.FullnameContext context);
-	/// <summary>
 	/// Visit a parse tree produced by <see cref="ElasticParser.binary_operator"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
@@ -519,6 +513,12 @@ public interface IElasticParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitName([NotNull] ElasticParser.NameContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="ElasticParser.full_function_name"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitFull_function_name([NotNull] ElasticParser.Full_function_nameContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="ElasticParser.function_name"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
@@ -536,6 +536,18 @@ public interface IElasticParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitTable_name([NotNull] ElasticParser.Table_nameContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="ElasticParser.full_table_name"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitFull_table_name([NotNull] ElasticParser.Full_table_nameContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="ElasticParser.fullname"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitFullname([NotNull] ElasticParser.FullnameContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="ElasticParser.column_name"/>.
 	/// </summary>

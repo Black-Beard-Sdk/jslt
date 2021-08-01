@@ -3,7 +3,6 @@ using Bb.Elastic.Runtimes.Models;
 using Bb.Elasticsearch.Configurations;
 using Bb.Exceptions;
 using Bb.Json.Attributes;
-using Bb.Json.Configurations;
 using Bb.Json.Jslt.Services;
 using Newtonsoft.Json.Linq;
 using System.ComponentModel;
@@ -19,9 +18,9 @@ namespace Bb.Jslt.Services.Excels
     {
 
         [JsltExtensionMethodParameter("connectionName", "connection name. if null or not specified in the configuration an exception is thrown.")]
-        [JsltExtensionMethodParameter("sql", "sql query to call elasticsearch")]
+        [JsltExtensionMethodParameter("query", "sql query to call elasticsearch")]
         //[JsltExtensionMethodParameter("pagined", "if null or false, elastic is called just one time, if true all datas are fetch.")]
-        [JsltExtensionMethod("sqlelastic")]
+        [JsltExtensionMethod("elastic")]
         public static JToken ExecuteElastic(RuntimeContext ctx, string connectionName, string index, JObject query)
         {
 

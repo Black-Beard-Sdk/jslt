@@ -25,14 +25,16 @@
         T VisitTableSpecificationSource(SpecificationSourceTable n);
         T VisitFunctionSpecificationSource(SpecificationSourceFunction n);
         T VisitSelectSpecificationSource(SpecificationSourceSelect n);
+        T VisitElasticServerReference(ElasticServerReference n);
         T SpecificationSourceAlias(SpecificationSourceAlias n);
+        T VisitElasticTableReference(ElasticTableReference n);
         T VisitSpecificationFilter(SpecificationFilter n);
         T VisitSpecificationLimit(SpecificationLimit n);
         T VisitSorting(SpecificationSorting n);
         T VisitSpecificationSort(SpecificationSortItem n);
 
         T VisitList(AstBase n);
-        T VisitAlias(AliasAstBase n);
+        T VisitAlias(AliasReferenceAst n);
         T VisitParameter(ParameterBind n);
         T VisitLiteral(Literal n);
         T VisitIdentifier(Identifier n);

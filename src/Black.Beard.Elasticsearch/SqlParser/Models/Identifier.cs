@@ -8,7 +8,8 @@ namespace Bb.Elastic.SqlParser.Models
     public class Identifier : AstBase
     {
 
-        public Identifier(Locator position) : base(position)
+        public Identifier(Locator position) 
+            : base(position)
         {
 
         }
@@ -17,9 +18,11 @@ namespace Bb.Elastic.SqlParser.Models
         public IdentifierKindEnum Kind { get; set; }
 
         public bool Quoted { get; set; }
+
         public bool WithParenthesis { get; set; }
 
         public Identifier TargetLeft { get; set; }
+
         public Identifier TargetRight
         {
             get => _targetRight;
@@ -41,6 +44,7 @@ namespace Bb.Elastic.SqlParser.Models
         }
 
         public bool IsKeywork { get; set; }
+
         public bool Wildcard { get; set; }
 
         public bool IsComposite => TargetRight != null;
@@ -93,6 +97,7 @@ namespace Bb.Elastic.SqlParser.Models
     public enum IdentifierKindEnum
     {
         Undefined,
+        SchemaReference,
         ServerReference,
         TableReference,
         ColumnReference,

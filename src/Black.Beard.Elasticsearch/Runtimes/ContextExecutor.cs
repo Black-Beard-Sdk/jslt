@@ -47,6 +47,9 @@ namespace Bb.Elastic.Runtimes
 
         public CultureInfo Culture { get => this._parent.Culture; }
 
+        public RequestContext Request { get; }
+
+        public TraceContext Trace { get; }
 
         public List<Reference> Get(string name)
         {
@@ -69,9 +72,7 @@ namespace Bb.Elastic.Runtimes
         private List<Reference> _references;
         private ILookup<string, Reference> _lookup;
 
-        public RequestContext Request { get; }
 
-        public TraceContext Trace { get; }
     }
 
 }

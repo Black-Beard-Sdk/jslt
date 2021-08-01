@@ -1,32 +1,16 @@
 ﻿using System;
-using System.IO;
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Bb
+namespace Bb.Extensions.Secures
 {
 
-    /*
-    
-    https://soat.developpez.com/tutoriels/cryptographie-en-csharp/
 
-    
-
-     */
-
-    public enum AsymetricKindEnum
-    {
-        TripleDES,
-        AesManaged,
-        Rijndael,
-        RC2,
-    }
-
-    public class AsymetricSecure
+    public class SymmetricSecure
     {
 
-
-        public static AsymetricSecure Get(AsymetricKindEnum kind)
+        public static SymmetricSecure Get(SymmetricKindEnum kind)
         {
 
             SymmetricAlgorithm algorithm = null;
@@ -34,19 +18,23 @@ namespace Bb
             switch (kind)
             {
 
-                case AsymetricKindEnum.RC2:
+                case SymmetricKindEnum.DES:
+                    algorithm = new DESCryptoServiceProvider();
+                        break;
+
+                case SymmetricKindEnum.RC2:
                     algorithm = new RC2CryptoServiceProvider();
                     break;
 
-                case AsymetricKindEnum.Rijndael:
+                case SymmetricKindEnum.Rijndael:
                     algorithm = new RijndaelManaged();
                     break;
 
-                case AsymetricKindEnum.AesManaged:
+                case SymmetricKindEnum.AesManaged:
                     algorithm = new AesCryptoServiceProvider();
                     break;
 
-                case AsymetricKindEnum.TripleDES:
+                case SymmetricKindEnum.TripleDES:
                     algorithm = new TripleDESCryptoServiceProvider();
                     break;
 
@@ -54,11 +42,11 @@ namespace Bb
                     break;
             }
 
-            return new AsymetricSecure(algorithm);
+            return new SymmetricSecure(algorithm);
 
         }
 
-        private AsymetricSecure(SymmetricAlgorithm algorithm)
+        private SymmetricSecure(SymmetricAlgorithm algorithm)
         {
             this._algorithm = algorithm;
         }
@@ -74,9 +62,27 @@ namespace Bb
             return result;
         }
 
-        public void Initialize(string keys)
+        public void InitializeFromSalt(string password)
         {
-            
+
+            byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
+            passwordBytes = SHA256.Create().ComputeHash(passwordBytes); // Hash the password with SHA256
+            byte[] saltBytes = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 };
+
+            var _keySize = 256;
+            var _blockSize = 128;
+
+            var key = new Rfc2898DeriveBytes(passwordBytes, saltBytes, 1000);
+            _key = key.GetBytes(_keySize / 8);
+            _iv = key.GetBytes(_blockSize / 8);
+
+            this._algorithm.Mode = CipherMode.CBC;
+
+        }
+
+        public void InitializeFromKey(string keys)
+        {
+
             var k = Convert.FromBase64String(keys);
             var l1 = k[0];
 
@@ -88,10 +94,10 @@ namespace Bb
             var l = k.Length - l1 - 1;
             for (int i = 0; i < l; i++)
                 _iv[i] = k[i + 1 + l1];
-        
+
         }
 
-        public void Initialize(string key, string iv)
+        public void InitializeFromKeys(string key, string iv)
         {
             _key = Convert.FromBase64String(key);
             _iv = Convert.FromBase64String(iv);
@@ -116,7 +122,7 @@ namespace Bb
             return Encoding.Default.GetString(decryptedTextAsByte);
         }
 
-        public string Crypt(string text)
+        public string Encrypt(string text)
         {
             var encryptor = this._algorithm.CreateEncryptor(_key, _iv);
             byte[] textAsByte = Encoding.Default.GetBytes(text);

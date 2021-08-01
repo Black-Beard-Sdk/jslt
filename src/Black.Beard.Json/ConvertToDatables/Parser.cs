@@ -200,9 +200,9 @@ namespace Bb.ConvertToDatables
 
         private readonly List<SourceMappingProperty> _properties;
         private readonly List<Parser> _sub;
-        private List<StructureTable> _newLines;
-        private List<StructureTable> _dependencies;
-        private List<(StructureColumn, StructureColumn)> _parentKeys;
+        private readonly List<StructureTable> _newLines;
+        private readonly List<StructureTable> _dependencies;
+        private readonly List<(StructureColumn, StructureColumn)> _parentKeys;
 
         public StructureSchema Schema { get; }
 

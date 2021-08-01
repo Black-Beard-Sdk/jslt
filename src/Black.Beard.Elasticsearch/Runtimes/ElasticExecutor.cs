@@ -112,18 +112,27 @@ namespace Bb.Elastic.Runtimes
             ContextExecutor ctx = new ContextExecutor(this, querySql, filename);
 
             // Parse sql
-            AstBase ast = GetTree(ctx);
+            AstBase tree = GetTree(ctx);
 
             // Convert ast to local model
             SourceParser parser = SourceParser.ParseString(querySql, filename, ctx.Trace.Output, ctx.Trace.OutputError);
 
             // Execute multiple visitor for resolve server model, evaluate matching type, ...
-            var visitor = new ElasticParserVisitorImplemetation(ctx);
-            var tree = visitor.Visit(parser.Tree);
             ctx.Request.ExecutableQueries = (List<ECall>)this._metaVisitor.Visit(tree, ctx);
 
             return ctx;
 
+        }
+
+        private static AstBase GetTree(ContextExecutor ctx)
+        {
+            // Parse sql
+            SourceParser parser = SourceParser.ParseString(ctx.Request.QueryText, ctx.Request.Filename, ctx.Trace.Output, ctx.Trace.OutputError);
+            var visitor = new ElasticParserVisitorImplemetation(ctx)
+            {
+            };
+            var ast = ctx.Request.Ast = visitor.Visit(parser.Tree);
+            return ast;
         }
 
         private ContextExecutor GetContext(JObject querySql, string filename, string index, string connectionName)
@@ -143,19 +152,7 @@ namespace Bb.Elastic.Runtimes
             return ctx;
 
         }
-
-        private static AstBase GetTree(ContextExecutor ctx)
-        {
-            // Parse sql
-            SourceParser parser = SourceParser.ParseString(ctx.Request.QueryText, ctx.Request.Filename, ctx.Trace.Output, ctx.Trace.OutputError);
-            var visitor = new ElasticParserVisitorImplemetation(ctx)
-            {
-            };
-            var ast = ctx.Request.Ast = visitor.Visit(parser.Tree);
-            return ast;
-        }
-
-        
+                
         private readonly MetaVisitor _metaVisitor;
 
 

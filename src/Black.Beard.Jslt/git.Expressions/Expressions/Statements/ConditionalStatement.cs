@@ -29,8 +29,8 @@ namespace Bb.Expressions.Statements
             {
                 _then = value;
 
-                if (this._parent != null)
-                    _then.SetParent(_parent);
+                if (this.ParentIsNull)
+                    _then.SetParent(this.GetParent());
             }
         }
 
@@ -45,8 +45,8 @@ namespace Bb.Expressions.Statements
             }
             set
             {
-                if (this._parent != null)
-                    _else.SetParent(_parent);
+                if (this.ParentIsNull)
+                    _else.SetParent(this.GetParent());
 
                 _else = value;
             }

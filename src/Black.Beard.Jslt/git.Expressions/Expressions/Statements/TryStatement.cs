@@ -30,8 +30,8 @@ namespace Bb.Expressions.Statements
 
             this._catchs.Add(result);
 
-            if (this._parent != null)
-                result.SetParent(_parent);
+            if (this.ParentIsNull)
+                result.SetParent(this.GetParent());
 
             return result;
 
@@ -51,8 +51,8 @@ namespace Bb.Expressions.Statements
             }
             set
             {
-                if (this._parent != null)
-                    _finally.SetParent(_parent);
+                if (this.ParentIsNull)
+                    _finally.SetParent(this.GetParent());
 
                 _finally = value;
             }

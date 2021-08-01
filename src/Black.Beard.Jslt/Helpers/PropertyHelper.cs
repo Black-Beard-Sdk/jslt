@@ -307,7 +307,7 @@ namespace Bb
 
         private List<Attribute> _attributes;
         private bool? _required;
-        private object _defaultValue;
+        //private object _defaultValue;
         private string _category;
         private string _displayDesciption;
         private string _displayName;

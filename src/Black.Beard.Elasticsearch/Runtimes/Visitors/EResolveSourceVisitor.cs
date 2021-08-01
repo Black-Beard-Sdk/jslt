@@ -22,47 +22,9 @@ namespace Bb.Elastic.Runtimes.Visitors
 
         public object Visit(AstBase n)
         {
-
             n.Accept(this);
-
-            //ResolveTablesStructures();
-
-            //var tables = _ctx.Items.Where(c => c.Kind == ReferenceKindEnum.Table).ToList();
-            //foreach (Reference item in tables)
-            //{
-
-            //}
-
-
             return n;
         }
-
-        //private void ResolveTablesStructures()
-        //{
-        //    var servers = _ctx.Items.Where(c => c.Kind == ReferenceKindEnum.Server).ToList();
-        //    foreach (Reference item in servers)
-        //    {
-        //        var cnx = _connection[item.Name] as ConnectionElastic;
-        //        var items = _ctx.Items.Where(c => c.Parent == item).ToList();
-        //        foreach (var item2 in items)
-        //        {
-
-        //            ServerTableStructure table = cnx.Tables(_ctx)[item2.Name];
-        //            item2.Structure = table.Fields(_ctx);
-
-        //            var items3 = _ctx.Items.Where(c => c.Target == item2).ToList();
-        //            foreach (var item4 in items3)
-        //            {
-        //                item4.Structure = item2.Structure;
-
-        //                var items4 = _ctx.Items.Where(c => c.Kind == ReferenceKindEnum.TableAlias && c.Name == item4.Name).ToList();
-
-        //            }
-        //        }
-        //    }
-        //}
-
-
 
         public object VisitIdentifier(Identifier n)
         {
@@ -73,6 +35,7 @@ namespace Bb.Elastic.Runtimes.Visitors
                 ElasticProcessor cnx = null;
                 ServerTableStructure table = null;
                 var item = n;
+                Reference r;
                 while (item != null)
                 {
 
@@ -80,9 +43,15 @@ namespace Bb.Elastic.Runtimes.Visitors
                     {
 
                         case IdentifierKindEnum.ServerReference:
+                            r = new Reference() { Name = item.Text, Value = item, Kind = ReferenceKindEnum.Server };
+                            _ctx.AddReference(r);
+
                             cnx = _connection[item.Text] as ElasticProcessor;
-                            item.Reference = cnx;
-                            _ctx.AddReference(new Reference() { Name = item.Text, Value = item, Kind = ReferenceKindEnum.Server });
+                            item.Reference = new ElasticServerReference(n.Position)
+                            {
+                                ServerReference = r,
+                                ServerConnection = cnx,
+                            };
                             break;
 
                         case IdentifierKindEnum.TableReference:
@@ -92,7 +61,9 @@ namespace Bb.Elastic.Runtimes.Visitors
                             {
                                 var alias = t[0].Value as Identifier;
                                 if (alias.Reference != null)
-                                    table = (ServerTableStructure)alias.Reference;
+                                {
+                                    // table = (ServerTableStructure)alias.Reference;
+                                }
                             }
 
                             if (table != null)
@@ -116,11 +87,16 @@ namespace Bb.Elastic.Runtimes.Visitors
                                     }
                                 }
 
+                                r = new Reference() { Name = item.Text, Value = item, Kind = ReferenceKindEnum.Table };
                                 table = cnx.Tables(_ctx)[item.Text];
-                                _ctx.AddReference(new Reference() { Name = item.Text, Value = item, Kind = ReferenceKindEnum.Table });
-                            }
+                                _ctx.AddReference(r);
+                            
+                                item.Reference = new ElasticTableReference(n.Position)
+                                {
+                                    TableReference = table,
+                                };
 
-                            item.Reference = table;
+                            }
 
                             break;
 
@@ -179,7 +155,7 @@ namespace Bb.Elastic.Runtimes.Visitors
 
         }
 
-        public object VisitAlias(AliasAstBase n)
+        public object VisitAlias(AliasReferenceAst n)
         {
 
             n.Value.Accept(this);
@@ -241,6 +217,12 @@ namespace Bb.Elastic.Runtimes.Visitors
             return n;
         }
 
+        public object VisitElasticTableReference(ElasticTableReference n)
+        {
+            Stop();
+            //n.TableReference.A(this);
+            return n;
+        }
 
         public object VisitBinaryExpression(BinaryExpression n)
         {
@@ -342,6 +324,10 @@ namespace Bb.Elastic.Runtimes.Visitors
             return n;
         }
 
+        public object VisitElasticServerReference(ElasticServerReference n)
+        {
+            return n;
+        }
 
 
         [System.Diagnostics.DebuggerHidden]

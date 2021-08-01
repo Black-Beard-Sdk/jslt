@@ -87,7 +87,7 @@ namespace Bb.Elastic.Parser
             var limit = context.limit_stmts();
             if (limit != null)
                 SelectResult.Limit = (SpecificationLimit)limit.Accept(this);
-            
+
             else
             {
                 var locator = GetLocator(context);
@@ -191,7 +191,7 @@ namespace Bb.Elastic.Parser
                     if (source is SpecificationSource s)
                         sources.Add(s);
 
-                    else if (source is AliasAstBase a)
+                    else if (source is AliasReferenceAst a)
                         sources.Add(new SpecificationSourceAlias(GetLocator(sub)) { Alias = a });
 
                     else
@@ -252,7 +252,7 @@ namespace Bb.Elastic.Parser
                     var _alias = context.column_alias();
                     if (_alias != null)
                     {
-                        var alias = new AliasAstBase(GetLocator(_alias))
+                        var alias = new AliasReferenceAst(GetLocator(_alias))
                         {
                             Value = r,
                             AliasName = (Identifier)_alias.Accept(this),
@@ -468,18 +468,11 @@ namespace Bb.Elastic.Parser
 
             else
             {
-                var schema = context.schema_name();
 
-                var table = context.table_name();
+                var table = context.full_table_name();
                 if (table != null)
                 {
                     var t = (Identifier)table.Accept(this);
-                    if (schema != null)
-                    {
-                        var s = (Identifier)schema.Accept(this);
-                        s.TargetRight = t;
-                        t = s;
-                    }
                     result.Right = t;
                 }
                 else
@@ -487,17 +480,10 @@ namespace Bb.Elastic.Parser
 
                     var list = context.expr_list();
 
-                    var table_function_name = context.table_function_name();
+                    var table_function_name = context.full_function_name();
                     if (table_function_name != null)
                     {
                         var t2 = (Identifier)table_function_name.Accept(this);
-                        if (schema != null)
-                        {
-                            var s = (Identifier)schema.Accept(this);
-                            s.TargetRight = t2;
-                            t2 = s;
-                        }
-
                         var f = new FunctionCall(GetLocator(table_function_name))
                         {
                             Name = t2,
@@ -778,20 +764,12 @@ namespace Bb.Elastic.Parser
             i = (Identifier)c.Accept(this);
             i.Kind = IdentifierKindEnum.ColumnReference;
 
-            var t = context.table_name();
-            if (t != null)
-            {
-                var j = (Identifier)t.Accept(this);
-                j.Kind = IdentifierKindEnum.TableReference;
-                j.TargetRight = i;
-                i = j;
-            }
-            var s = context.schema_name();
+            var s = context.full_table_name();
             if (s != null)
             {
                 var k = (Identifier)s.Accept(this);
                 k.Kind = IdentifierKindEnum.ServerReference;
-                k.TargetRight = i;
+                k.TargetLast.TargetRight = i;
                 i = k;
             }
 
@@ -803,15 +781,55 @@ namespace Bb.Elastic.Parser
             return context.any_name().Accept(this);
         }
 
+
+        public override AstBase VisitFull_table_name([NotNull] ElasticParser.Full_table_nameContext context)
+        {
+
+            var t = context.table_name();
+
+            var tableName = (Identifier)t.Accept(this);
+            tableName.Kind = IdentifierKindEnum.TableReference;
+
+            var s = context.schema_name();
+
+            if (s != null)
+            {
+                Identifier schema = (Identifier)s.Accept(this);
+                schema.Kind = IdentifierKindEnum.SchemaReference;
+                schema.TargetRight = tableName;
+                tableName = schema;
+            }
+
+            return tableName;
+
+        }
+
+        public override AstBase VisitFull_function_name([NotNull] ElasticParser.Full_function_nameContext context)
+        {
+
+            var f = context.table_function_name();
+            var functionName = (Identifier)f.Accept(this);
+            functionName.Kind = IdentifierKindEnum.FunctionReference;
+
+            var s = context.schema_name();
+            if (s != null)
+            {
+                var schema = (Identifier)s.Accept(this);
+                schema.Kind = IdentifierKindEnum.SchemaReference;
+            }
+
+            return base.VisitFull_function_name(context);
+
+        }
+
         /// <summary>
-        /// table_or_subquery: (
-        ///     	(schema_name '.')? table_name(AS? table_alias)? (
-        ///            (INDEXED BY index_name)
-        ///     		| (NOT INDEXED)
-        ///     	)?
-        ///     )
+        /// table_or_subquery: 
+        ///       (
+        ///     	full_table_name (AS? table_alias)? (
+        ///         ((INDEXED BY index_name) | (NOT INDEXED))?
+        ///       )
         ///     | (
-        ///         (schema_name '.')? table_function_name '(' expr(
+        ///         full_function_name '(' expr(
         ///     		',' expr
         ///     
         ///         )* ')' (AS? table_alias)?
@@ -827,21 +845,13 @@ namespace Bb.Elastic.Parser
             Identifier schema = null;
             AstBase source = null;
 
-            var s = context.schema_name();
-            if (s != null)
-            {
-                schema = (Identifier)s.Accept(this);
-                schema.Kind = IdentifierKindEnum.ServerReference;
-            }
-
             var alias = context.table_alias();
 
-            var t = context.table_name();
+            var t = context.full_table_name();
             if (t != null)
             {
 
                 var tableName = (Identifier)t.Accept(this);
-                tableName.Kind = IdentifierKindEnum.TableReference;
                 if (schema != null)
                 {
                     schema.TargetRight = tableName;
@@ -858,25 +868,23 @@ namespace Bb.Elastic.Parser
                 };
 
                 if (alias != null)
-                    source = new AliasAstBase(GetLocator(alias))
+                    source = new AliasReferenceAst(GetLocator(alias))
                     {
                         AliasName = (Identifier)alias.Accept(this),
                         Value = source,
                     };
 
-
                 return source;
 
             }
 
-            var f = context.table_function_name();
+            var f = context.full_function_name();
             if (t != null)
             {
 
                 Stop();
 
                 var functionName = (Identifier)t.Accept(this);
-                functionName.Kind = IdentifierKindEnum.FunctionReference;
                 if (schema != null)
                 {
                     schema.TargetRight = functionName;
@@ -899,7 +907,7 @@ namespace Bb.Elastic.Parser
 
 
                 if (alias != null)
-                    source = new AliasAstBase(GetLocator(alias))
+                    source = new AliasReferenceAst(GetLocator(alias))
                     {
                         AliasName = (Identifier)alias.Accept(this),
                         Value = source,
@@ -915,9 +923,9 @@ namespace Bb.Elastic.Parser
 
             Stop();
 
-            AliasAstBase _alias = null;
+            AliasReferenceAst _alias = null;
             if (alias != null)
-                _alias = new AliasAstBase(GetLocator(alias))
+                _alias = new AliasReferenceAst(GetLocator(alias))
                 {
                     AliasName = (Identifier)alias.Accept(this),
                 };
@@ -1158,7 +1166,7 @@ namespace Bb.Elastic.Parser
             var i = context.IDENTIFIER();
             var k = context.STRING_LITERAL();
 
-            return new AliasAstBase(GetLocator(context))
+            return new AliasReferenceAst(GetLocator(context))
             {
                 AliasName = (Identifier)i.Accept(this),
                 Value = k.Accept(this),

@@ -25,8 +25,8 @@ namespace Bb.Expressions.Statements
             }
             set
             {
-                if (this._parent != null)
-                    _body.SetParent(_parent);
+                if (this.ParentIsNull)
+                    _body.SetParent(this.GetParent());
 
                 _body = value;
             }

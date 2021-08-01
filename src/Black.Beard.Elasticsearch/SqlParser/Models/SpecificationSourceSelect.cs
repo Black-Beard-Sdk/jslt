@@ -28,7 +28,7 @@ namespace Bb.Elastic.SqlParser.Models
 
         }
 
-        public AliasAstBase Alias { get; set; }
+        public AliasReferenceAst Alias { get; set; }
 
         public override T Accept<T>(IVisitor<T> visitor)
         {

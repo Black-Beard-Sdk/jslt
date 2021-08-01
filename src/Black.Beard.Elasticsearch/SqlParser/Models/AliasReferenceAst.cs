@@ -2,10 +2,12 @@
 
 namespace Bb.Elastic.SqlParser.Models
 {
-    public class AliasAstBase : Identifier
+
+    [System.Diagnostics.DebuggerDisplay("{Value} AS {AliasName}")]
+    public class AliasReferenceAst : Identifier
     {
 
-        public AliasAstBase(Locator position) : base(position)
+        public AliasReferenceAst(Locator position) : base(position)
         {
 
         }

@@ -19,17 +19,55 @@ namespace Bb.Elastic.Runtimes.Visitors
             return n.Accept(this);
         }
 
+        public object SpecificationSourceAlias(SpecificationSourceAlias n)
+        {
+            return n.Alias.Accept(this);
+        }
 
-        public object VisitAlias(AliasAstBase n)
+        public object VisitUnaryExpression(UnaryExpression n)
         {
 
+            switch (n.Operator)
+            {
+                case UnaryOperatorEnum.Undefined:
+                    break;
+                case UnaryOperatorEnum.Not:
+                    break;
+                case UnaryOperatorEnum.Exists:
+                    break;
+                case UnaryOperatorEnum.IsNull:
+                    break;
+                case UnaryOperatorEnum.IsNotNull:
+                    break;
+                case UnaryOperatorEnum.Distinct:
+                    break;
+                default:
+                    break;
+            }
+
             Stop();
+            throw new NotImplementedException();
+        }
+
+
+
+        public object VisitAlias(AliasReferenceAst n)
+        {
 
             var v = n.Value.Accept(this);
-            var name = n.AliasName.Accept(this);
+            // var name = n.AliasName.Accept(this);
 
-            Stop();
-            throw new System.NotImplementedException();
+            if (v is Action<ECall> a)
+            {
+
+            }
+            else
+            {
+                Stop();
+            }
+
+            return v;
+
         }
 
         public object VisitIdentifier(Identifier n)
@@ -466,40 +504,18 @@ namespace Bb.Elastic.Runtimes.Visitors
             throw new NotImplementedException();
         }
 
-        public object SpecificationSourceAlias(SpecificationSourceAlias n)
+
+        public object VisitElasticServerReference(ElasticServerReference n)
         {
             Stop();
             throw new NotImplementedException();
         }
 
-        public object VisitUnaryExpression(UnaryExpression n)
+        public object VisitElasticTableReference(ElasticTableReference n)
         {
-
-            switch (n.Operator)
-            {
-                case UnaryOperatorEnum.Undefined:
-                    break;
-                case UnaryOperatorEnum.Not:
-                    break;
-                case UnaryOperatorEnum.Exists:
-                    break;
-                case UnaryOperatorEnum.IsNull:
-                    break;
-                case UnaryOperatorEnum.IsNotNull:
-                    break;
-                case UnaryOperatorEnum.Distinct:
-                    break;
-                default:
-                    break;
-            }
-
             Stop();
             throw new NotImplementedException();
         }
-
-
-
-
 
 
         [System.Diagnostics.DebuggerHidden]
