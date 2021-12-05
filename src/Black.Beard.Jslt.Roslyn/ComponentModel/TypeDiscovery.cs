@@ -131,7 +131,7 @@ namespace Bb.ComponentModel
                         }
 
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
 
                     throw;

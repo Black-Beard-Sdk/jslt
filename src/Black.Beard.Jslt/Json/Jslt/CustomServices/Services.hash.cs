@@ -106,10 +106,11 @@ namespace Bb.Json.Jslt.CustomServices
             {
 
                 var data = System.Text.Encoding.UTF8.GetBytes(token.ToString());
-                SHA512 shaM = new SHA512Managed();
-                var hashValue = shaM.ComputeHash(data);
-                return new JValue(hashValue.PrintByteArray());
-
+                using (SHA512 shaM = SHA512.Create())
+                {
+                    var hashValue = shaM.ComputeHash(data);
+                    return new JValue(hashValue.PrintByteArray());
+                }
             }
 
             return new JValue(string.Empty);

@@ -76,7 +76,7 @@ namespace Bb.Jslt.Services.Excels
                     {
                         ResolveColumns(table);
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                         throw;
                     }
