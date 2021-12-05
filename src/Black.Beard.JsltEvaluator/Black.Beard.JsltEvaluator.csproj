@@ -33,7 +33,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Bb.MajLib\Bb.MajLib.csproj" />
     <ProjectReference Include="..\Black.Beard.Jslt.Services\Black.Beard.Jslt.Services.csproj" />
     <ProjectReference Include="..\Black.Beard.Jslt\Black.Beard.Jslt.csproj" />
   </ItemGroup>

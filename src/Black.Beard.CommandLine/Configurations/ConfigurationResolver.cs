@@ -34,7 +34,7 @@ namespace Bb.Configurations
                     foreach (var item in Builders)
                         item(builder);
 
-                    var configuration = builder.Build();
+                    _configuration = builder.Build();
 
                 }
 

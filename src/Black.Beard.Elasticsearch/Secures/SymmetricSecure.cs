@@ -19,23 +19,23 @@ namespace Bb.Extensions.Secures
             {
 
                 case SymmetricKindEnum.DES:
-                    algorithm = new DESCryptoServiceProvider();
+                    algorithm = DES.Create();
                         break;
 
                 case SymmetricKindEnum.RC2:
-                    algorithm = new RC2CryptoServiceProvider();
+                    algorithm = RC2.Create();
                     break;
 
                 case SymmetricKindEnum.Rijndael:
-                    algorithm = new RijndaelManaged();
+                    algorithm = Rijndael.Create();
                     break;
 
                 case SymmetricKindEnum.AesManaged:
-                    algorithm = new AesCryptoServiceProvider();
+                    algorithm = Aes.Create();
                     break;
 
                 case SymmetricKindEnum.TripleDES:
-                    algorithm = new TripleDESCryptoServiceProvider();
+                    algorithm = TripleDES.Create();
                     break;
 
                 default:

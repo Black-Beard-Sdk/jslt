@@ -3,7 +3,7 @@ using Bb.CommandLines;
 using Bb.CommandLines.Ins;
 using Bb.CommandLines.Outs;
 using Bb.CommandLines.Validators;
-using Bb.Maj;
+//using Bb.Maj;
 using Bb.Sdk.Csv;
 using Microsoft.Extensions.CommandLineUtils;
 using Newtonsoft.Json;

@@ -1,4 +1,4 @@
-﻿using Bb.Maj;
+﻿//using Bb.Maj;
 using System;
 using System.Windows;
 
@@ -15,12 +15,12 @@ namespace AppJsonEvaluator
         public App()
         {
             
-            var updated = Environment.CommandLine.Contains("/u");
-            if (updated)
-            {
-                typeof(App).Assembly.RestartForUpdate();
-                Environment.Exit(0);
-            }
+            //var updated = Environment.CommandLine.Contains("/u");
+            //if (updated)
+            //{
+            //    typeof(App).Assembly.RestartForUpdate();
+            //    Environment.Exit(0);
+            //}
 
         }
 

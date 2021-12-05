@@ -26,7 +26,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Bb.MajLib\Bb.MajLib.csproj" />
     <ProjectReference Include="..\Black.Beard.CommandLine\Black.Beard.CommandLine.csproj" />
     <ProjectReference Include="..\Black.Beard.Elasticsearch\Black.Beard.Elasticsearch.csproj" />
     <ProjectReference Include="..\Black.Beard.Jslt.Roslyn\Black.Beard.Jslt.Roslyn.csproj" />
