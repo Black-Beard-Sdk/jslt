@@ -19,7 +19,7 @@ namespace Bb.CommandLines.Outs.Printings
         public static DataTable ConvertList<T>(this IEnumerable<T> rows, string label, params Expression<Func<T, object>>[] columns)
         {
 
-            Type _type = rows.FirstOrDefault().GetType();
+            Type _type = rows.First().GetType();
 
             var properties = GetMember(columns).Select(c => c.Name).ToArray();
 

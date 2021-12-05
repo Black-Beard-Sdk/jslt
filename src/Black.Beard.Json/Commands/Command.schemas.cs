@@ -26,7 +26,7 @@ namespace Bb.Json.Commands
     {
 
 
-        public CommandLineApplication CommandSchema(CommandLineApplication app)
+        public CommandLineApplication CommandSchema(CommandLine app)
         {
 
 
@@ -48,28 +48,20 @@ namespace Bb.Json.Commands
 
                 config.OnExecute(() =>
                 {
-
-                    HashSet<string> _list = new HashSet<string>();
-                    foreach (var assemblyFile in assemblyFilename.Values)
-                    {
-                        var ass = new FileInfo(assemblyFile);
-                        _list.Add(ass.FullName);
-                        TypeDiscovery.Instance.LoadAssembly(ass, null);
-                    }
-
-                    var types = TypeDiscovery.Instance.GetTypesWithAttributes(typeof(CategoryAttribute))
-                        .Where(c => FilterConfiguration(c))
-                        .Where(c => _list.Count == 0 || _list.Contains(c.Assembly.Location))
-                        .ToList()
-                    ;
+                   
+                    List<Type> types = LoadFiles(assemblyFilename);
 
                     (app as CommandLine).Result = types;
 
-                    var table = types.ConvertList("", c => c.AssemblyQualifiedName);
-                    table.PrintList();
+                    if (types.Count > 0)
+                    {
+                        var table = types.ConvertList("Types", c => c.FullName);
+                        table.PrintList();
+                    }
+                    else
+                        app.Error.WriteLine("no types found");
 
                     string outputPath = Environment.CurrentDirectory;
-
 
                     return 0;
 
@@ -89,20 +81,7 @@ namespace Bb.Json.Commands
                 config.OnExecute(() =>
                 {
 
-                    HashSet<string> _list = new HashSet<string>();
-                    foreach (var assemblyFile in assemblyFilename.Values)
-                    {
-                        var ass = new FileInfo(assemblyFile);
-                        _list.Add(ass.FullName);
-                        TypeDiscovery.Instance.LoadAssembly(ass, null);
-                    }
-
-                    var types = TypeDiscovery.Instance.GetTypesWithAttributes(typeof(CategoryAttribute))
-                        .Where(c => FilterConfiguration(c))
-                        .Where(c => _list.Count == 0 || _list.Contains(c.Assembly.Location))
-                        .ToList()
-                    ;
-
+                    List<Type> types = LoadFiles(assemblyFilename);
                     string outputPath = outputdirectory.Value.TrimPath();
 
                     foreach (var type in types)
@@ -114,6 +93,59 @@ namespace Bb.Json.Commands
             });
 
             return app;
+
+        }
+
+        private List<Type> LoadFiles(CommandOption assemblyFilename)
+        {
+
+            List<Type> types = new List<Type>();
+            HashSet<string> _list = new HashSet<string>();
+
+            foreach (var assemblyFile in assemblyFilename.Values)
+            {
+                if (!LoadLibrary(assemblyFile))
+                {
+                    if (!LoadLibrary(assemblyFile + ".dll"))
+                    {
+                        if (!LoadLibrary(assemblyFile + ".exe"))
+                        {
+
+                        }
+                        else
+                            _list.Add(assemblyFile + ".exe");
+                    }
+                    else
+                        _list.Add(assemblyFile + ".dll");
+
+                }
+                else
+                    _list.Add(assemblyFile);
+            }
+
+            types = TypeDiscovery.Instance.GetTypesWithAttributes(typeof(CategoryAttribute))
+                .Where(c => FilterConfiguration(c))
+                .ToList();
+
+
+            types = types
+               .Where(c => _list.Count == 0 || _list.Contains(Path.GetFileName(c.Assembly.ManifestModule.ScopeName)))
+               .ToList()
+           ;
+
+            return types;
+        }
+
+        private static bool LoadLibrary(string filename)
+        {
+            var ass = new FileInfo(filename);
+            if (ass.Exists)
+            {
+                TypeDiscovery.Instance.LoadAssembly(ass, null);
+                return true;
+            }
+
+            return false;
 
         }
 

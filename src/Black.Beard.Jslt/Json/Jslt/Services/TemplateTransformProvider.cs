@@ -59,6 +59,7 @@ namespace Bb.Json.Jslt.Services
             {
                 var crc = sb.Calculate().ToString();
                 filepathCode =  crc + ".cs";
+                // Transform the template
                 rules = Get(tree, _foundry, _errors, filepathCode, withDebug);
             }
 
@@ -92,6 +93,7 @@ namespace Bb.Json.Jslt.Services
 
                 var builder = new TemplateWithExpressionBuilder(_errors, sourceCompiler) { Configuration = this._configuration, EmbbededFunctions = foundry };
                 fnc = builder.GenerateLambda(tree, filepathCode);
+
             }
             else // Template empty
             {

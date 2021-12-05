@@ -467,8 +467,12 @@ namespace Bb.ComponentModel
                     {
                         bool test()
                         {
-                            filePdb.Refresh();
-                            return filePdb.Exists;
+                            if (filePdb != null)
+                            {
+                                filePdb.Refresh();
+                                return filePdb.Exists;
+                            }
+                            return false;
                         };
 
                         if (filePdb == null && test())
@@ -478,8 +482,14 @@ namespace Bb.ComponentModel
                         {
                             Trace.WriteLine($"Loading assembly {fileAssembly.FullName}");
                             var data = File.ReadAllBytes(fileAssembly.FullName);
-                            var pdbData = File.ReadAllBytes(filePdb.FullName);
-                            assembly = Assembly.Load(data, pdbData);
+                            if (filePdb != null)
+                            {
+                                var pdbData = File.ReadAllBytes(filePdb.FullName);
+                                assembly = Assembly.Load(data, pdbData);
+                            }
+                            else
+                                assembly = Assembly.Load(data);
+
                         }
                     }
                     catch (Exception e)

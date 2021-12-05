@@ -2,11 +2,13 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 
 namespace Bb.Elasticsearch.Configurations
 {
 
+    [Category("Configuration")]
     public class ConfigurationList : List<BaseConfiguration>
     {
 

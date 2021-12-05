@@ -54,6 +54,7 @@ namespace Bb.Jslt.Services
                     return util.IsValidNumber(number);
                 }
 
+            
             }
             catch (NumberParseException)
             {

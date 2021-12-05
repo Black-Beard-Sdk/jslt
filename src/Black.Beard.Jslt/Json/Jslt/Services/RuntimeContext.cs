@@ -60,6 +60,8 @@ namespace Bb.Json.Jslt.Services
             this.MustoBreak = true;
         }
 
+        #region Operators
+
         public static JToken EvaluateUnaryOperator(RuntimeContext ctx, JToken leftToken, OperationEnum @operator)
         {
 
@@ -204,11 +206,11 @@ namespace Bb.Json.Jslt.Services
                 }
 
             }
-            catch (Exception e)
+            catch (Exception)
             {
-
                 throw;
             }
+
             return result ?? JValue.CreateNull();
 
         }
@@ -832,23 +834,15 @@ namespace Bb.Json.Jslt.Services
 
         }
 
-        private static object GetValue(JToken token)
-        {
-            if (token is JValue v)
-                return v.Value;
+        #endregion Operators
 
-            return null;
-
-        }
-
-        public static JToken GetContentFromService(RuntimeContext ctx, JToken token, ITransformJsonService service)
-        {
-            return service.Execute(ctx, token);
-        }
+        #region Variables
 
         public static void SetVariable(RuntimeContext ctx, string name, object value)
         {
             ctx.SubSources.Variables.Add(name, value);
+            if (value == null)
+                ctx.Diagnostics.AddError(string.Empty, null, name, $"the key '{name}' is setted with null value.");
         }
 
         public static void DelVariable(RuntimeContext ctx, string name)
@@ -868,20 +862,16 @@ namespace Bb.Json.Jslt.Services
 
                 var t1 = string.IsNullOrEmpty(text.Trim().Replace(item, string.Empty).Trim());
 
-                var r = ctx.SubSources.Variables.Get(item.Substring(2));
-
-                if (r != null)
+                if (ctx.SubSources.Variables.Get(item.Substring(2), out object r))
                 {
-
+                    
                     if (keys.Length == 1 && t1)
                     {
 
                         if (r is JObject || r is JArray)
                             return (JToken)r;
                     }
-
-                    d = d.Replace(item, r.ToString());
-
+                        d = d.Replace(item, r?.ToString() ?? String.Empty);
                 }
 
                 else
@@ -903,7 +893,21 @@ namespace Bb.Json.Jslt.Services
 
         }
 
+        #endregion Variables
 
+        private static object GetValue(JToken token)
+        {
+            if (token is JValue v)
+                return v.Value;
+
+            return null;
+
+        }
+
+        public static JToken GetContentFromService(RuntimeContext ctx, JToken token, ITransformJsonService service)
+        {
+            return service.Execute(ctx, token);
+        }
 
         public static JToken GetContentByJPath(RuntimeContext ctx, JToken token, string path)
         {

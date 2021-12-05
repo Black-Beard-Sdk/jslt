@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <AssemblyName>Json</AssemblyName>
     <RootNamespace>Bb.Json</RootNamespace>
     <StartupObject>Bb.Json.Program</StartupObject>
@@ -28,6 +28,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Bb.MajLib\Bb.MajLib.csproj" />
     <ProjectReference Include="..\Black.Beard.CommandLine\Black.Beard.CommandLine.csproj" />
+    <ProjectReference Include="..\Black.Beard.Elasticsearch\Black.Beard.Elasticsearch.csproj" />
     <ProjectReference Include="..\Black.Beard.Jslt.Roslyn\Black.Beard.Jslt.Roslyn.csproj" />
     <ProjectReference Include="..\Black.Beard.Jslt.Services\Black.Beard.Jslt.Services.csproj" />
     <ProjectReference Include="..\Black.Beard.Jslt\Black.Beard.Jslt.csproj" />

@@ -21,13 +21,6 @@ namespace Bb.CommandLines
             System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
         }
 
-
-        public IConfigurationRoot Configuration { get; set; }
-
-
-        public TConfig GetConfiguration<TConfig>(string sectionName) => Configuration.GetSection(sectionName).Get<TConfig>();
-
-
         /// <summary>
         /// Initializes the specified application.
         /// </summary>
@@ -50,10 +43,10 @@ namespace Bb.CommandLines
             var methods = this.GetType().GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
 
             foreach (var method in methods)
-                if (method.Name != nameof(Command<T>.Initialize) && method.ReturnType == typeof(T))
+                if (method.Name != nameof(Command<T>.Initialize) && typeof(CommandLineApplication).IsAssignableFrom(method.ReturnType))
                 {
                     var parameters = method.GetParameters();
-                    if (parameters.Length == 1 && parameters[0].ParameterType == typeof(T))
+                    if (parameters.Length == 1 && typeof(CommandLineApplication).IsAssignableFrom(parameters[0].ParameterType))
                         method.Invoke(this, new object[] { app });
                 }
 
@@ -65,8 +58,6 @@ namespace Bb.CommandLines
         public const string VersionFlag = "-v |--version";
         public static string _access;
 
-
     }
-
 
 }

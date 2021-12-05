@@ -18,27 +18,7 @@ namespace Bb.Json
 
         public static void Main(string[] args)
         {
-
-            Action<ConfigurationBuilder> configurationBuilder = (builder) =>
-            {
-
-                builder
-                    //.AddJsonFile(@"D:\src\option\src\outTests\schemas\Test.json", optional: false, reloadOnChange: true)
-                    //.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                    //.AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
-                    //.AddSecureStoreFile(@"D:\src\option\src\outTests\securevault.json", "mypwd")
-
-                    .AddEnvironmentVariables()  
-                ;
-
-                //if (isDevelopment) //only add secrets in development
-                //{
-
-                //}
-
-            };
-                       
-            var cmd = Bb.CommandLine.Run<Command, Bb.Json.Commands.CommandLine>(configurationBuilder, args);
+            var cmd = Bb.CommandLine.Run<Command, Bb.Json.Commands.CommandLine>(args);
             Program.Result = cmd.Result;
 
         }

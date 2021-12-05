@@ -61,12 +61,14 @@ namespace Bb.Json.Jslt.Services
                 RootTarget = null,
                 Source = this._compiler
 
-            }); ;
+            });
 
         }
 
         internal Func<RuntimeContext, JToken, JToken> GenerateLambda(JsltBase tree, string filepathCode)
         {
+
+            // Start parsing
             Expression e = tree.Accept(this) as Expression;
 
             foreach (var item in _resultReset)
@@ -174,15 +176,7 @@ namespace Bb.Json.Jslt.Services
             {
 
                 var srcRoot = ctx.Current.Source;
-
-                foreach (var item in node.Variables)
-                {
-                    item.ToDesctruct = false;
-                    var i = (Expression)item.Accept(this);
-                    if (i != null)
-                        srcRoot.Add(i);
-                }
-
+              
                 var v1 = ctx.Current.Source.AddVar(typeof(JObject), null, _ctorJObject.CreateObject());
                 ctx.Current.RootTarget = v1;
 
@@ -194,9 +188,30 @@ namespace Bb.Json.Jslt.Services
                     var resultToken = src.AddVar((typeof(JToken)), null, (Expression)node.Source.Accept(this));
                     ctx.Current.RootSource = resultToken;
 
-                    foreach (var item in node.Properties)
+                    //foreach (var item in node.Properties)
+                    //{
+                    //    var prop = (Expression)item.Accept(this);
+                    //    if (prop != null)
+                    //    {
+                    //        var call = RuntimeContext._addProperty.Call(v1, prop);
+                    //        if (call != null)
+                    //            ctx.Current.Source.Add(call);
+                    //        else
+                    //        {
+                    //            _diagnostics.AddError("template builder", item.Start, string.Empty, $"value missing on property {item.Name}");
+                    //        }
+                    //    }
+                    //}
+
+                }
+
+                BuildVariables(node, srcRoot);
+
+                foreach (var item in node.Properties)
+                {
+                    var prop = (Expression)item.Accept(this);
+                    if (prop != null)
                     {
-                        var prop = (Expression)item.Accept(this);
                         var call = RuntimeContext._addProperty.Call(v1, prop);
                         if (call != null)
                             ctx.Current.Source.Add(call);
@@ -204,33 +219,39 @@ namespace Bb.Json.Jslt.Services
                         {
                             _diagnostics.AddError("template builder", item.Start, string.Empty, $"value missing on property {item.Name}");
                         }
+
                     }
-
-                }
-                else
-                {
-
-                    foreach (var item in node.Properties)
-                    {
-                        var prop = (Expression)item.Accept(this);
-                        if (prop != null)
-                            ctx.Current.Source.Add(RuntimeContext._addProperty.Call(v1, prop));
-                    }
-
                 }
 
-                foreach (var item in node.Variables)
-                {
-                    item.ToDesctruct = true;
-                    var i = (Expression)item.Accept(this);
-                    if (i != null)
-                        srcRoot.Add(i);
-                }
+
+                RemoveVariables(node, srcRoot);
 
                 return v1;
 
             }
 
+        }
+
+        private void RemoveVariables(JsltObject node, SourceCode src)
+        {
+            foreach (var item in node.Variables)
+            {
+                item.ToDesctruct = true;
+                var i = (Expression)item.Accept(this);
+                if (i != null)
+                    src.Add(i);
+            }
+        }
+
+        private void BuildVariables(JsltObject node, SourceCode src)
+        {
+            foreach (var item in node.Variables)
+            {
+                item.ToDesctruct = false;
+                var i = (Expression)item.Accept(this);
+                if (i != null)
+                    src.Add(i);
+            }
         }
 
         public object VisitProperty(JsltProperty node)

@@ -338,11 +338,18 @@ namespace Bb.Json.Jslt.CustomServices
 
                 if (v.Value == null)
                     return JValue.CreateNull();
-                
+
                 if (v.Value is string t)
-                    return new JValue(t.Split(charset[0]));
+                {
+
+                    var array = t.Split(charset[0]);
+                    var result = JToken.FromObject(array);
+                    return result;
+                }
+
             }
-            return new JValue(false);
+
+            return new JArray();
 
         }
 

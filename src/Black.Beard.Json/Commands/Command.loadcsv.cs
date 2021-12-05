@@ -28,7 +28,7 @@ namespace Bb.Json.Commands
 
         private static Dictionary<char, char> _accepted = build();
 
-        public static CommandLineApplication CommandLoadCsv(CommandLineApplication app)
+        public static CommandLineApplication CommandLoadCsv(CommandLine app)
         {
 
             var dataCmd = app.Command("csv", config =>

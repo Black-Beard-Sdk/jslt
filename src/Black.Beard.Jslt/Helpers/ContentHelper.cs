@@ -197,6 +197,16 @@ namespace Bb
         }
 
         /// <summary>
+        /// convert the <see cref="Object"/> in <see cref="JToken" />
+        /// </summary>
+        /// <param name="self"></param>
+        /// <returns></returns>
+        public static JToken ConvertToJson(this object self)
+        {
+            return JToken.FromObject(self);
+        }
+
+        /// <summary>
         /// convert the <see cref="StringBuilder"/> in <see cref="JToken" />
         /// </summary>
         /// <param name="self"></param>

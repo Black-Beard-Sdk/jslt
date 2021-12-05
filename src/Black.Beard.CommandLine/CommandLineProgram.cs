@@ -1,5 +1,6 @@
 ﻿using Bb.CommandLines;
 using Bb.CommandLines.Outs;
+using Bb.Configurations;
 using Microsoft.Extensions.CommandLineUtils;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -18,12 +19,14 @@ namespace Bb
 
         public static int ExitCode { get; private set; }
 
-        public static void Main(IConfigurationRoot configuration, string[] args)
+        public static void Main(string[] args)
         {
+
+            //ConfigurationLoader.Instance
 
             var cmd = new TCommandLine()
             {
-                Configuration = configuration,
+                
             };
             try
             {

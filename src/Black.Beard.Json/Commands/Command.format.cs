@@ -25,7 +25,7 @@ namespace Bb.Json.Commands
     {
 
 
-        public CommandLineApplication CommandFormat(CommandLineApplication app)
+        public CommandLineApplication CommandFormat(CommandLine app)
         {
 
 

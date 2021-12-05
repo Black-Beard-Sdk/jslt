@@ -29,7 +29,7 @@ namespace Bb.Json.Commands
     {
 
 
-        public static CommandLineApplication CommandMaj(CommandLineApplication app)
+        public static CommandLineApplication CommandMaj(CommandLine app)
         {
                       
             app.Command("update", config =>

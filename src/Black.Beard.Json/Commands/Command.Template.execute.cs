@@ -27,7 +27,7 @@ namespace Bb.Json.Commands
     {
 
 
-        public CommandLineApplication CommandExecute(CommandLineApplication app)
+        public CommandLineApplication CommandExecute(CommandLine app)
         {
 
             // json template 

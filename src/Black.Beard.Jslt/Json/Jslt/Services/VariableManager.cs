@@ -27,17 +27,24 @@ namespace Bb.Json.Jslt.Services
                 this._datas.Remove(key);
         }
 
-        public object Get(string key)
+        public bool Get(string key, out object resultValue)
         {
 
-            if (!this._datas.TryGetValue(key, out object value))
-                value = Environment.GetEnvironmentVariable(key, _target);
+            resultValue = null;
 
-            return value;
+            if (!this._datas.TryGetValue(key, out resultValue))
+            {
+                var items = Environment.GetEnvironmentVariables();
+                if (items.Contains(key))
+                    resultValue = Environment.GetEnvironmentVariable(key, _target);
+                return false;
+            }
+
+            return true;
 
         }
 
-  
+
         private readonly EnvironmentVariableTarget _target;
         private readonly Sources sources;
         private Dictionary<string, object> _datas;

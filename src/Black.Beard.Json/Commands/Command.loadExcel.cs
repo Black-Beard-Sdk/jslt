@@ -29,7 +29,7 @@ namespace Bb.Json.Commands
     {
 
 
-        public static CommandLineApplication CommandLoadExcel(CommandLineApplication app)
+        public static CommandLineApplication CommandLoadExcel(CommandLine app)
         {
 
             var dataCmd1 = app.Command("xls", config =>
