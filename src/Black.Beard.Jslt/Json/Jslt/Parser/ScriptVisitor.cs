@@ -1081,7 +1081,7 @@ namespace Bb.Json.Jslt.Parser
                                 else
                                     this._diagnostics.AddError(String.Empty, null, String.Empty, "the directives packages accepts only array of string or an array of array of two strings.");
                             }
-                        directives for load packageLoadAssembly(dll2);
+                        LoadAssembly(dll2);
                         break;
 
                     default:
