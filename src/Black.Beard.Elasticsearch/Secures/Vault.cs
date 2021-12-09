@@ -129,7 +129,7 @@ namespace Bb.Extensions.Secures
         {
             if (this._processor == null)
             {
-                this._processor = SymmetricSecure.Get(SymmetricKindEnum.Rijndael);
+                this._processor = SymmetricSecure.Get(SymmetricKindEnum.DES);
                 _processor.InitializeFromSalt(this._saltKey);
             }
             return _processor;

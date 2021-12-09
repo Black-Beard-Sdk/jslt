@@ -26,9 +26,9 @@ namespace Bb.Extensions.Secures
                     algorithm = RC2.Create();
                     break;
 
-                case SymmetricKindEnum.Rijndael:
-                    algorithm = Rijndael.Create();
-                    break;
+                //case SymmetricKindEnum.Rijndael:
+                //    algorithm = Rijndael.Create();
+                //    break;
 
                 case SymmetricKindEnum.AesManaged:
                     algorithm = Aes.Create();

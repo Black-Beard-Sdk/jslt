@@ -1,23 +1,28 @@
-# Custom services
-
-the customs services are use to extend the feature of the Sdk.
-for call the service, you must
-
-* Add a property in the model and declare the value with '$' prefix.   
-In this sample the argument "$argumentName" describe the source
-
 ```JSON
 { "result" : .method(arg1, arg2, ...) }
 ``` 
 
 ## **loadjson**  
 ```JSON
-{ "result" : .loadjson("path document json") }
+{ "result" : .loadjson("path to json document") }
 ``` 
 
 ## **loadxls**  
+The excel file will be loaded an translated in json document.
 ```JSON
-{ "result" : .loadjson("path document json", "path document excel configuration") }
+{ "result" : .loadxls("path to excel document", "path to excel configuration document") }
+``` 
+
+## **readsqlserver**  
+The sql result will be loaded an translated in json document. Note the parameters are not managed. not yet.
+```JSON
+{ "result" : .readsqlserver("connection string", "SELECT * FROM myTable") }
+``` 
+
+## **loadhttpgetJson**  
+call an api and return the content like a json document.
+```JSON
+{ "result" : .loadhttpgetJson("root path", "method name") }
 ``` 
 
 ## **Concat**  

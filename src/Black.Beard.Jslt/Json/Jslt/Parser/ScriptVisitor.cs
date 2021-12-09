@@ -2,6 +2,7 @@
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
 using Bb.Compilers;
+using Bb.ComponentModel;
 using Bb.ComponentModel.Factories;
 using Bb.Json.Jslt.Asts;
 using Bb.Json.Jslt.Builds;
@@ -12,6 +13,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Bb.Json.Jslt.Parser
@@ -28,6 +30,7 @@ namespace Bb.Json.Jslt.Parser
         {
             this._diagnostics = diagnostics;
             this._scriptPath = path;
+            this._scriptPathDirectory = new FileInfo(path).Directory.FullName;
             this._configuration = configuration;
             this._currentCulture = _configuration.Culture;
             this._functions = new List<JsltFunctionCall>();
@@ -103,54 +106,6 @@ namespace Bb.Json.Jslt.Parser
                         result.Append(prop);
                     }
 
-                    else if (prop.Name.ToLower() == "$functions")
-                    {
-                        var cs = new List<FileInfo>();
-
-                        if (prop.Value is JsltArray ar)
-                            foreach (JsltBase fu in ar.Items)
-                                if (fu is JsltConstant v)
-                                    if (v.Value is Uri u)
-                                        CollectCs(u.AbsoluteUri, cs, fu);
-                                    else if (v.Value is string str)
-                                        CollectCs(str, cs, fu);
-
-                        LoadAssemblyFromCs(cs);
-
-                    }
-
-                    else if (prop.Name.ToLower() == "$assemblies")
-                    {
-
-                        var assemblies = new List<string>();
-
-                        if (prop.Value is JsltArray ar)
-                            foreach (JsltBase fu in ar.Items)
-                                if (fu is JsltConstant v)
-                                    if (v.Value is string str)
-                                        assemblies.Add(str);
-
-                        LoadAssembly(assemblies);
-
-                    }
-
-                    else if (prop.Name.ToLower() == "$imports")
-                    {
-
-                        var dll = new List<FileInfo>();
-
-                        if (prop.Value is JsltArray ar)
-                            foreach (JsltBase fu in ar.Items)
-                                if (fu is JsltConstant v)
-                                    if (v.Value is Uri u)
-                                        CollectLib(u.AbsoluteUri, dll, fu);
-                                    else if (v.Value is string str)
-                                        CollectLib(str, dll, fu);
-
-                        LoadAssembly(dll);
-
-                    }
-
                     else if (prop.Name.ToLower() == "$source")
                         result.Source = prop.Value;
 
@@ -158,10 +113,7 @@ namespace Bb.Json.Jslt.Parser
                         result.Where = prop.Value;
 
                 }
-                //else if (prop.Name.StartsWith("@"))
-                //{
 
-                //}
                 else
                     result.Append(prop);
 
@@ -285,7 +237,7 @@ namespace Bb.Json.Jslt.Parser
             var txt = context.STRING().GetText()?.Trim() ?? string.Empty;
             if (txt.StartsWith(@"""") && txt.EndsWith(@""""))
                 txt = txt.Substring(1, txt.Length - 2);
-            
+
             txt = txt.Replace(@"\\", @"\")
                      .Replace(@"\""", @"""")
                      .Replace(@"\t", "\t")
@@ -450,15 +402,11 @@ namespace Bb.Json.Jslt.Parser
                         if (name.StartsWith("@"))
                             return new JsltVariable() { Name = name.Substring(1), Value = value, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
 
-                        else if (name.ToLower() == "$culture" && value is JsltConstant culture)
+
+                        else if (name.ToLower() == "$directives" && value is JsltObject directives)
                         {
-
-                            if (culture.Value is string t)
-                                this._currentCulture = CultureInfo.GetCultureInfo(t);
-
-                            else if (culture.Value is int i)
-                                this._currentCulture = CultureInfo.GetCultureInfo(i);
-
+                            ParseDirectives(directives);
+                            return null;
                         }
 
                     }
@@ -479,6 +427,7 @@ namespace Bb.Json.Jslt.Parser
             return null;
 
         }
+
 
         #region Jsonlt
 
@@ -545,8 +494,8 @@ namespace Bb.Json.Jslt.Parser
 
             }
 
-            left = GetConverter( context.jsonType(), left, out Type type);
-            
+            left = GetConverter(context.jsonType(), left, out Type type);
+
             return left;
 
         }
@@ -716,7 +665,7 @@ namespace Bb.Json.Jslt.Parser
                             call = new JsltFunctionCall("convert", new List<JsltBase>() { call, c });
                             this._functions.Add(call);
                         }
-                         
+
                         result = call;
                     }
                     break;
@@ -939,6 +888,7 @@ namespace Bb.Json.Jslt.Parser
                 this._foundry.AddAssemblyName(assembly);
 
         }
+
         private void CollectLib(string u, List<FileInfo> dll, JsltBase item)
         {
             var file = ResolveFile(u);
@@ -954,6 +904,23 @@ namespace Bb.Json.Jslt.Parser
             }
             else
                 AddError(item.Start, u, $"Failed to local file at position {item.Start.StartIndex}, line {item.Start.Line}, col {item.Start.Column} '{u}'");
+
+        }
+
+        private void CollectPackages(JsltConstant rootUrl, List<FileInfo> packages, JsltConstant package)
+        {
+
+            var p = this._scriptPathDirectory;
+            string packageName = package.Value as string;
+            string url = rootUrl.Value as string;
+
+            var folderLib = Packages
+                    .EnsurePackageIsLoaded(url, packageName,
+                        Path.Combine(this._scriptPathDirectory, "packages")
+                    );
+
+            foreach (var item in folderLib.GetFiles("*.dll"))
+                packages.Add(item);
 
         }
 
@@ -1036,12 +1003,102 @@ namespace Bb.Json.Jslt.Parser
             );
         }
 
+        #region directives
 
+        private void ParseDirectives(JsltObject directives)
+        {
+
+            foreach (JsltProperty prop in directives.Properties)
+            {
+
+                switch (prop.Name.ToLower())
+                {
+
+                    case "culture":
+                        var _culture = prop.Value as JsltConstant;
+                        if (_culture != null)
+                        {
+                            if (_culture.Value is string t)
+                                this._currentCulture = CultureInfo.GetCultureInfo(t);
+
+                            else if (_culture.Value is int i)
+                                this._currentCulture = CultureInfo.GetCultureInfo(i);
+                        }
+                        break;
+
+                    case "functions":
+                        var cs = new List<FileInfo>();
+                        if (prop.Value is JsltArray ar1)
+                            foreach (JsltBase fu in ar1.Items)
+                                if (fu is JsltConstant v)
+                                    if (v.Value is Uri u)
+                                        CollectCs(u.AbsoluteUri, cs, fu);
+                                    else if (v.Value is string str && !string.IsNullOrEmpty(str))
+                                        CollectCs(str, cs, fu);
+                        LoadAssemblyFromCs(cs);
+                        break;
+
+                    case "assemblies":
+                        var assemblies = new List<string>();
+                        if (prop.Value is JsltArray ar2)
+                            foreach (JsltBase fu in ar2.Items)
+                                if (fu is JsltConstant v)
+                                    if (v.Value is string str && !string.IsNullOrEmpty(str))
+                                        assemblies.Add(str);
+                        LoadAssembly(assemblies);
+                        break;
+
+                    case "imports":
+                        var dll1 = new List<FileInfo>();
+                        if (prop.Value is JsltArray ar3)
+                            foreach (JsltBase fu in ar3.Items)
+                                if (fu is JsltConstant v)
+                                    if (v.Value is Uri u)
+                                        CollectLib(u.AbsoluteUri, dll1, fu);
+                                    else if (v.Value is string str)
+                                        CollectLib(str, dll1, fu);
+                        LoadAssembly(dll1);
+                        break;
+
+                    case "packages":
+                        var dll2 = new List<FileInfo>();
+                        if (prop.Value is JsltArray ar4)
+                            foreach (JsltBase fu in ar4.Items)
+                            {
+                                if (fu is JsltConstant packageName)
+                                    CollectPackages(new JsltConstant() { Value = @"https://www.nuget.org/api/v2/package/" }, dll2, packageName);
+
+                                else if (fu is JsltArray ar5)
+                                {
+                                    if (ar5.Items.Count != 2)
+                                        this._diagnostics.AddError(String.Empty, null, String.Empty, "the directives packages must to have two strings");
+
+                                    else
+                                    {
+                                        CollectPackages(ar5.Items[0] as JsltConstant, dll2, ar5.Items[1] as JsltConstant);
+                                    }
+                                }
+                                else
+                                    this._diagnostics.AddError(String.Empty, null, String.Empty, "the directives packages accepts only array of string or an array of array of two strings.");
+                            }
+                        directives for load packageLoadAssembly(dll2);
+                        break;
+
+                    default:
+                        break;
+                }
+
+            }
+
+        }
+
+        #endregion directives
 
         private StringBuilder _initialSource;
         private Diagnostics _diagnostics;
         private readonly FunctionFoundry _foundry;
         private readonly string _scriptPath;
+        private readonly string _scriptPathDirectory;
         private TranformJsonAstConfiguration _configuration;
         private CultureInfo _currentCulture;
         private List<JsltFunctionCall> _functions;
@@ -1049,3 +1106,5 @@ namespace Bb.Json.Jslt.Parser
     }
 
 }
+
+

@@ -9,7 +9,7 @@
         DES,
         TripleDES,
         AesManaged,
-        Rijndael,
+        //Rijndael,
         RC2,
     }
       

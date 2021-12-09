@@ -22,6 +22,7 @@ SUBSCRIPT : '.' ;
 WILDCARD_SUBSCRIPT : '*' ;
 CURRENT_VALUE : '@' ;
 COLON : ':';
+SHARP : '#';
 
 URI : 'uri';
 TIME : 'time';

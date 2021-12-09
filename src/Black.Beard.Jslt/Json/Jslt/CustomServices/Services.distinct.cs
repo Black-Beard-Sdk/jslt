@@ -19,7 +19,8 @@ namespace Bb.Json.Jslt.CustomServices
 
 
         [JsltExtensionMethod("distinct")]
-        [JsltExtensionMethodParameter("sourcePath", "directory source path")]
+        [JsltExtensionMethodParameter("source", "Json array that contains duplicate datas.")]
+        [JsltExtensionMethodParameter("sourcePath", "json path that select the unique key")]
         public static JToken Executedistinct(RuntimeContext ctx, JToken source, string sourcePath)
         {
 

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31205.134
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Jslt", "Black.Beard.Jslt\Black.Beard.Jslt.csproj", "{B901CA29-56B9-42A8-9234-BA5F41F58EDB}"
 EndProject
@@ -20,6 +20,23 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bb.MajLib", "Bb.MajLib\Bb.MajLib.csproj", "{77DF4D75-B354-4519-AD7F-64EA764261AE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.CommandLine", "Black.Beard.CommandLine\Black.Beard.CommandLine.csproj", "{EECB1A72-ED3E-4B66-B4A9-6657F8B4B234}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F4F3EC60-D90A-4902-8103-7CBC47A99ED5}"
+	ProjectSection(SolutionItems) = preProject
+		..\Documentation\Custom_services.md = ..\Documentation\Custom_services.md
+		..\Documentation\Format_DateTime.md = ..\Documentation\Format_DateTime.md
+		..\Documentation\Format_double.md = ..\Documentation\Format_double.md
+		..\Documentation\Format_Guid.md = ..\Documentation\Format_Guid.md
+		..\Documentation\Format_integer.md = ..\Documentation\Format_integer.md
+		..\Documentation\Format_Timespan.md = ..\Documentation\Format_Timespan.md
+		..\Documentation\JsltLexer.rrd.html = ..\Documentation\JsltLexer.rrd.html
+		..\Documentation\JsltParser.rrd.html = ..\Documentation\JsltParser.rrd.html
+		..\Documentation\jsonexcutable.md = ..\Documentation\jsonexcutable.md
+		..\Documentation\jsonpath.md = ..\Documentation\jsonpath.md
+		..\LICENSE = ..\LICENSE
+		..\README.md = ..\README.md
+		..\RefreshCode.bat = ..\RefreshCode.bat
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

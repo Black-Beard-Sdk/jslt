@@ -59,6 +59,10 @@ namespace Bb.Json.Jslt.Parser
 
         public void AddWarning(string filename, TokenLocation location, string text, string message)
         {
+
+            if (location == null)
+                location = new TokenLocation();
+
             this.Add(new ErrorModel()
             {
                 Filename = filename,
@@ -91,6 +95,10 @@ namespace Bb.Json.Jslt.Parser
 
         public void AddError(string filename, TokenLocation location, string text, string message)
         {
+
+            if (location == null)
+                location = new TokenLocation();
+
             this.Add(new ErrorModel()
             {
                 Filename = filename,
@@ -121,6 +129,10 @@ namespace Bb.Json.Jslt.Parser
 
         public void AddDiagnostic(SeverityEnum severityEnum, string filename, TokenLocation location, string text, string message)
         {
+
+            if (location == null)
+                location = new TokenLocation();
+
             this.Add(new ErrorModel()
             {
                 Filename = filename,

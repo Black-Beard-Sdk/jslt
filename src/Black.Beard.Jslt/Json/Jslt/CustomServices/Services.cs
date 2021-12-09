@@ -12,8 +12,6 @@ using System.Text;
 namespace Bb.Json.Jslt.CustomServices
 {
 
-
-
     public static partial class Services
     {
 
@@ -25,7 +23,9 @@ namespace Bb.Json.Jslt.CustomServices
             var file = ctx.Configuration.ResolveFile(sourcePath);
 
             if (file.Exists)
-                return file.FullName.LoadContentFromFile().ConvertToJson();
+                return file.FullName
+                    .LoadContentFromFile()
+                    .ConvertToJson();
             else
             {
                 ctx.Diagnostics.AddDiagnostic(Parser.SeverityEnum.Warning, string.Empty, new Parser.TokenLocation(), "file.FullName", $"file '{file.FullName}' not found");
