@@ -9,10 +9,8 @@
     <PackageProjectUrl></PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/Black-Beard-Sdk/jslt</RepositoryUrl>
-    <AssemblyVersion>$Env:APPVEYOR_BUILD_VERSION</AssemblyVersion>
-    <FileVersion>$Env:APPVEYOR_BUILD_VERSION</FileVersion>
-    <PackageLicenseFile>C:\Src\jslt\LICENSE</PackageLicenseFile>
-    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <AssemblyVersion></AssemblyVersion>
+    <FileVersion></FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
