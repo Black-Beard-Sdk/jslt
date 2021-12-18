@@ -4,6 +4,15 @@
     <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>Bb</RootNamespace>
     <GenerateAppxPackageOnBuild>true</GenerateAppxPackageOnBuild>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Description>Implementation of jslt language in DOTNET. Use a template for transform Json To another json. Consider the following template. note this template is a json that describe the structure of the target json. If the template is empty, the process return the initial source json.</Description>
+    <PackageProjectUrl></PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/Black-Beard-Sdk/jslt</RepositoryUrl>
+    <AssemblyVersion>$Env:APPVEYOR_BUILD_VERSION</AssemblyVersion>
+    <FileVersion>$Env:APPVEYOR_BUILD_VERSION</FileVersion>
+    <PackageLicenseFile>C:\Src\jslt\LICENSE</PackageLicenseFile>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <ItemGroup>
@@ -29,6 +38,13 @@
   <ItemGroup>
     <Folder Include="git.Expressions\Expressions\Statements\" />
     <Folder Include="Json\Jslt\Parser\Grammar\.antlr\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
