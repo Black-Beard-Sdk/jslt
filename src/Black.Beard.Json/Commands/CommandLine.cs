@@ -2,6 +2,7 @@
 
 namespace Bb.Json.Commands
 {
+
     public partial class CommandLine : CommandLineApplication
     {
 

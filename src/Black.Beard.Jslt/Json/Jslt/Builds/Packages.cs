@@ -117,7 +117,7 @@ namespace Bb.Json.Jslt.Builds
             if (file.Exists)
                 file.Delete();
 
-            ContentHelper.Download(rootPath, file);
+            ContentHelper.Download(rootPath, file, c => { });
 
             return file;
 

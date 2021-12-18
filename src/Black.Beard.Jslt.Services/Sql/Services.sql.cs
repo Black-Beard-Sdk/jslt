@@ -41,7 +41,7 @@ namespace Bb.Jslt.Services.Sql
                 {
                     cnx.Open();
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     ctx.Diagnostics.AddError(String.Empty, null, connexion, $"the connection '{connexion}' can't be resolved.");
                     return resultValue;

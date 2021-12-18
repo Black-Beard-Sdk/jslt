@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Jslt", "Black.B
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Jslt.UnitTests", "Black.Beard.Jslt.UnitTests\Black.Beard.Jslt.UnitTests.csproj", "{CBEB0DAC-ED05-4AA7-BA98-8EA64014F1F7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Jslt.Roslyn", "Black.Beard.Jslt.Roslyn\Black.Beard.Jslt.Roslyn.csproj", "{00D49E9A-ED3D-4192-8F84-1C14997BC0C6}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Json", "Black.Beard.Json\Black.Beard.Json.csproj", "{AE3F64C5-BD49-4925-91C0-304734C92EB6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.JsltEvaluator", "Black.Beard.JsltEvaluator\Black.Beard.JsltEvaluator.csproj", "{AD2F2F62-55DF-468B-B8AC-EA44A5D64702}"
@@ -16,10 +14,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Jslt.Services", "Black.Beard.Jslt.Services\Black.Beard.Jslt.Services.csproj", "{95F6A45E-62D9-436B-9767-C13396659357}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Elasticsearch", "Black.Beard.Elasticsearch\Black.Beard.Elasticsearch.csproj", "{B34D4F20-21DD-45F7-A720-958EF69384DE}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bb.MajLib", "Bb.MajLib\Bb.MajLib.csproj", "{77DF4D75-B354-4519-AD7F-64EA764261AE}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.CommandLine", "Black.Beard.CommandLine\Black.Beard.CommandLine.csproj", "{EECB1A72-ED3E-4B66-B4A9-6657F8B4B234}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F4F3EC60-D90A-4902-8103-7CBC47A99ED5}"
 	ProjectSection(SolutionItems) = preProject
@@ -52,10 +46,6 @@ Global
 		{CBEB0DAC-ED05-4AA7-BA98-8EA64014F1F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CBEB0DAC-ED05-4AA7-BA98-8EA64014F1F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CBEB0DAC-ED05-4AA7-BA98-8EA64014F1F7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{00D49E9A-ED3D-4192-8F84-1C14997BC0C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{00D49E9A-ED3D-4192-8F84-1C14997BC0C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{00D49E9A-ED3D-4192-8F84-1C14997BC0C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{00D49E9A-ED3D-4192-8F84-1C14997BC0C6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AE3F64C5-BD49-4925-91C0-304734C92EB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AE3F64C5-BD49-4925-91C0-304734C92EB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AE3F64C5-BD49-4925-91C0-304734C92EB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -72,14 +62,6 @@ Global
 		{B34D4F20-21DD-45F7-A720-958EF69384DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B34D4F20-21DD-45F7-A720-958EF69384DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B34D4F20-21DD-45F7-A720-958EF69384DE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{77DF4D75-B354-4519-AD7F-64EA764261AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{77DF4D75-B354-4519-AD7F-64EA764261AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{77DF4D75-B354-4519-AD7F-64EA764261AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{77DF4D75-B354-4519-AD7F-64EA764261AE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EECB1A72-ED3E-4B66-B4A9-6657F8B4B234}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EECB1A72-ED3E-4B66-B4A9-6657F8B4B234}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EECB1A72-ED3E-4B66-B4A9-6657F8B4B234}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EECB1A72-ED3E-4B66-B4A9-6657F8B4B234}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
