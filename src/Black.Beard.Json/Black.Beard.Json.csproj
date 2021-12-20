@@ -15,7 +15,7 @@
   <ItemGroup>
     <PackageReference Include="Black.Beard.CommandLine" Version="1.0.8" />
     <PackageReference Include="Black.Beard.Helpers.ContentLoaders" Version="1.0.4" />
-    <PackageReference Include="Black.Beard.Roslyn" Version="1.0.1" />
+    <PackageReference Include="Black.Beard.Roslyn" Version="1.0.2" />
     <PackageReference Include="ExcelDataReader" Version="3.6.0" />
     <PackageReference Include="ExcelDataReader.DataSet" Version="3.6.0" />
     <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.1" />
