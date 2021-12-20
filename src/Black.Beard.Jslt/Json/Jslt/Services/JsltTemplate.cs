@@ -47,7 +47,7 @@ namespace Bb.Json.Jslt.Services
 
         public RuntimeContext GetContext(Sources sources)
         {
-            return new RuntimeContext(sources)
+            return new RuntimeContext(sources, this.Diagnostics)
             {
                 Configuration = this.Configuration,
             };

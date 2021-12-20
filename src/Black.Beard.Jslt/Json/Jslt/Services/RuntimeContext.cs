@@ -33,11 +33,14 @@ namespace Bb.Json.Jslt.Services
 
         }
 
-        internal RuntimeContext(Sources sources)
+        internal RuntimeContext(Sources sources, Diagnostics diagnostic)
         {
+
+            var d = diagnostic ?? new Diagnostics();
+
             TokenSource = sources.Source.Datas;
             SubSources = sources;
-            _diagnostics = new Diagnostics();
+            _diagnostics = d;
         }
 
         #region methods called in the expressions

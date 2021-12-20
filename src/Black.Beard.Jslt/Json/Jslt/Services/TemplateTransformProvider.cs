@@ -25,14 +25,14 @@ namespace Bb.Json.Jslt.Services
 
         }
 
-        public JsltTemplate GetTemplate(StringBuilder sb, bool withDebug, string filename)
+        public JsltTemplate GetTemplate(StringBuilder sb, bool withDebug, string filename, Diagnostics diagnostics = null)
         {
 
             if (string.IsNullOrEmpty(this._configuration.OutputPath) && !string.IsNullOrEmpty(filename))
                 this._configuration.OutputPath = new FileInfo(filename).Directory.FullName;
 
             string filepathCode = string.Empty;
-            var _errors = new Diagnostics();
+            var _errors = diagnostics ?? new Diagnostics();
             CultureInfo culture = this._configuration.Culture;
 
             FunctionFoundry _foundry = null;
