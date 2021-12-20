@@ -130,36 +130,36 @@ You can use the command line json.exe.
 // Intialization of the configuration
 var configuration = new TranformJsonAstConfiguration()
 {
-    Path = Environment.CurrentDirector,
+    OutputPath = Environment.CurrentDirectory,
 };
 
 // add a custom service : Note the services in the sdk are already registered
 configuration.Services.ServiceDiscovery.AddService("serviceName", typeof(service));
-// if you want to implement your service : use interface Bb.Json.Jslt.Services.ITransformJsonService                
+// if you want to implement your service : use and implemente the interface Bb.Json.Jslt.Services.ITransformJsonService                
 
 TemplateTransformProvider Templateprovider = new TemplateTransformProvider(configuration);
 
 //Build the template translator
 StringBuilder sbPayloadTemplate = new StringBuilder(@"payload template");
-JsltTemplate template = Templateprovider.GetTemplate(sb, "name of the template file");
+JsltTemplate template = Templateprovider.GetTemplate(sbPayloadTemplate, false, "name of the template file");
 
 
 // now the source json
 // from text
 var source1 = SourceJson.GetFromText("payload");
 // from file
-var source2 = SourceJson.GetFromfile("filename");
+var source2 = SourceJson.GetFromFile("filename");
 // from json
 var source3 = SourceJson.GetFromJson(new JObject());
 
-// Create the sources object with the primay source of data
+// Create the sources object with the primary source of data
 var src = new Sources(source1);
 // you can add additional source of datas
 src.Add(source2);
 src.Add(source3);
 
-RuntimeContext ctx = template.Transform(sbSource);
-result = ctx.TokenResult;
+RuntimeContext ctx = template.Transform(src);
+var result = ctx.TokenResult;
 
 ```
 

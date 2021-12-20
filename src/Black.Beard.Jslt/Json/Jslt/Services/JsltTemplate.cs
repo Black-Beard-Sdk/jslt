@@ -23,26 +23,34 @@ namespace Bb.Json.Jslt.Services
         public TranformJsonAstConfiguration Configuration { get; internal set; }
 
         public CultureInfo Culture { get; internal set; }
-        
+
         public string Filename { get; internal set; }
-        
+
         public JsltBase Tree { get; internal set; }
-        
+
         internal StringBuilder Rule { get; set; }
 
         public Diagnostics Diagnostics { get; internal set; }
 
-        public RuntimeContext Transform(Sources sources)
+        public RuntimeContext Transform(Sources sources, RuntimeContext ctx = null)
         {
+            if (ctx == null)
+                ctx = GetContext(sources);
 
-            var ctx = new RuntimeContext(sources)
-            {
-                Configuration = this.Configuration,
-            };
+            else
+                ctx.Configuration = this.Configuration;
 
             ctx.TokenResult = Rules(ctx, ctx.TokenSource);
             return ctx;
 
+        }
+
+        public RuntimeContext GetContext(Sources sources)
+        {
+            return new RuntimeContext(sources)
+            {
+                Configuration = this.Configuration,
+            };
         }
 
     }
