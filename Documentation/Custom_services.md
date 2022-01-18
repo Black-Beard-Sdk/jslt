@@ -6,6 +6,13 @@
 ```JSON
 { "result" : .loadjson("path to json document") }
 ``` 
+## **loadhtml**  
+the path can be a local file or a web url. the load is implemented be http agility pack.
+```JSON
+{ "result" : .loadhtml("path to load and convert") }
+``` 
+
+
 
 ## **loadxls**  
 The excel file will be loaded an translated in json document.
