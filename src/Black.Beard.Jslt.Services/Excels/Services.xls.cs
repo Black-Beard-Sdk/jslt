@@ -16,6 +16,8 @@ namespace Bb.Jslt.Services.Excels
     {
 
         [JsltExtensionMethod("loadxls")]
+        [JsltExtensionMethodParameter("sourcePath", "source file path")]
+        [JsltExtensionMethodParameter("configPath", "configuration path")]
         public static JToken ExecuteLoadSource(RuntimeContext ctx, string sourcePath, string configPath)
         {
 

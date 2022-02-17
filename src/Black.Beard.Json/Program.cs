@@ -20,7 +20,6 @@ namespace Bb.Json
         {
             var cmd = Bb.CommandLine.Run<Command, Bb.Json.Commands.CommandLine>(args);
             Program.Result = cmd.Result;
-
         }
     
     }

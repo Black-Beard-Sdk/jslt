@@ -81,6 +81,9 @@ namespace AppJsonEvaluator
 
         void InitializeTextMarkerService()
         {
+
+            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+
             var textMarkerService = new TextMarkerService(TemplateEditor.Document);
             TemplateEditor.TextArea.TextView.BackgroundRenderers.Add(textMarkerService);
             TemplateEditor.TextArea.TextView.LineTransformers.Add(textMarkerService);
@@ -156,7 +159,6 @@ namespace AppJsonEvaluator
 
         private void Update()
         {
-
 
             if (_template != null && _template.Diagnostics.Success)
             {

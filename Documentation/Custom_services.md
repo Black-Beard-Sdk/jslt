@@ -1,3 +1,5 @@
+
+## **Syntax for calling function**
 ```JSON
 { "result" : .method(arg1, arg2, ...) }
 ``` 
@@ -6,13 +8,40 @@
 ```JSON
 { "result" : .loadjson("path to json document") }
 ``` 
+
+## **loadcsv**  
+```JSON
+{ "result" : .loadjson("path to csv document", "hasHeader", "separator", "quote", "escape") }
+
+// By default 
+{ "result" : .loadjson("path to csv document", true, null, null, null) }
+
+// is equivalent to
+{ "result" : .loadjson("path to csv document", true, ";", "\"", "\\") }
+
+``` 
+
+## **loadmcsv**  
+```JSON
+{ "result" : .loadjson("path to multi header csv document", "rulePayload") }
+
+/*
+    Rule payload sample : 
+    PARENT : CHILD1;                    // Child1 is embedded in the parent
+    CHILD1 : SUBCHILD1 | SUBCHILD2;     // subchild1 or subchild2 are embbed in child1
+*/
+
+// Sample 
+{ "result" : .loadjson("\\documentFile.dat", "PARENT:CHILD1;CHILD1:SUBCHILD1|SUBCHILD2;") }
+
+
+``` 
+
 ## **loadhtml**  
 the path can be a local file or a web url. the load is implemented be http agility pack.
 ```JSON
 { "result" : .loadhtml("path to load and convert") }
 ``` 
-
-
 
 ## **loadxls**  
 The excel file will be loaded an translated in json document.
