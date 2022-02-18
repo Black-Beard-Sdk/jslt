@@ -1,28 +1,19 @@
 ﻿using Bb.ComponentModel.Factories;
-using Bb.Json.Jslt.Asts;
 using Bb.Json.Jslt.Parser;
 using Bb.Json.Jslt.Services;
 using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.CodeCompletion;
-using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Folding;
 using Microsoft.Win32;
+using ScintillaNET;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace AppJsonEvaluator
 {
@@ -47,7 +38,7 @@ namespace AppJsonEvaluator
             this._foldingStrategy = new BraceFoldingStrategy();
 
             _templateFoldingManager = UpdateTemplate(TemplateEditor);
-            _targetFoldingManager = UpdateTemplate(TargetEditor);
+            //                      _targetFoldingManager = UpdateTemplate(TargetEditor);
 
 
             this._parameterFile = System.IO.Path.Combine(Environment.CurrentDirectory, "parameters");
@@ -78,6 +69,8 @@ namespace AppJsonEvaluator
             RowErrors.Height = new GridLength(70);
 
         }
+
+
 
         void InitializeTextMarkerService()
         {
@@ -168,9 +161,24 @@ namespace AppJsonEvaluator
                 try
                 {
                     var src = new Sources(SourceJson.GetFromText(""));
-                    var result = _template.Transform(src);
-                    var value = result.TokenResult.ToString();
-                    TargetEditor.Text = value;
+                    RuntimeContext result = _template.Transform(src);
+
+                    if (_template.RuleOutput != null)
+                    {
+                        var sb = _template.RuleOutput(result, result.TokenResult);
+                        //TargetEditor.Text = sb.ToString();
+                        //                          TextBox.Text = sb.ToString();
+                        this.TextArea.Text = sb.ToString();
+                    }
+                    else
+                    {
+                        var value = result.TokenResult.ToString();
+                        //                          TargetEditor.Text = value;
+
+                        this.TextArea.Text = value;
+
+                    }
+
                     foreach (var item in result.Diagnostics)
                     {
 
@@ -197,7 +205,7 @@ namespace AppJsonEvaluator
 
         private void TargetEditorTextChanged(object sender, EventArgs e)
         {
-            UpdateFolding(_targetFoldingManager, TargetEditor);
+            //              UpdateFolding(_targetFoldingManager, TargetEditor);
 
         }
 
@@ -312,10 +320,10 @@ namespace AppJsonEvaluator
 
         void textEditor_TextArea_TextEntered(object sender, TextCompositionEventArgs e)
         {
-            
+
             if (e.Text == ".")
             {
-                
+
                 var serviceProvider = Bb.Json.Jslt.Services.ServiceContainer.Common.GetServices();
 
                 // Open code completion after the user has pressed dot:
@@ -365,7 +373,7 @@ namespace AppJsonEvaluator
 
             if (e.Key == Key.S && e.IsToggled)
                 SaveTemplate();
-            
+
             if (e.Key == Key.F5)
             {
                 UpdateTemplate();
@@ -432,6 +440,285 @@ namespace AppJsonEvaluator
                 }
             }
         }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+
+            // Create the interop host control.
+            System.Windows.Forms.Integration.WindowsFormsHost host =
+                new System.Windows.Forms.Integration.WindowsFormsHost();
+
+            // Create the MaskedTextBox control.
+            this.TextArea = CreateEditor();
+
+            // Assign the MaskedTextBox control as the host control's child.
+            host.Child = TextArea;
+
+            // Add the interop host control to the Grid
+            // control's collection of child controls.
+            this.gridRender.Children.Add(host);
+
+        }
+
+        #region Scintilla
+
+        private Scintilla CreateEditor()
+        {
+
+            Scintilla textArea;
+
+            // CREATE CONTROL
+            textArea = new Scintilla()
+            {
+                // BASIC CONFIG
+                Dock = System.Windows.Forms.DockStyle.Fill,
+
+                // INITIAL VIEW CONFIG
+                WrapMode = WrapMode.None,
+                IndentationGuides = IndentView.LookBoth,
+
+            };
+
+            textArea.TextChanged += (this.OnTextChanged);
+
+
+            // STYLING
+            InitColors(textArea);
+            InitSyntaxColoring(textArea);
+
+            // NUMBER MARGIN
+            InitNumberMargin(textArea);
+
+            // BOOKMARK MARGIN
+            InitBookmarkMargin(textArea);
+
+            // CODE FOLDING MARGIN
+            InitCodeFolding(textArea);
+
+            // DRAG DROP
+            // InitDragDropFile(textArea);
+
+            // DEFAULT FILE
+            //LoadDataFromFile("../../MainForm.cs");
+
+            // INIT HOTKEYS
+            InitHotkeys(textArea);
+
+            return textArea;
+
+        }
+
+        private void InitColors(Scintilla textArea)
+        {
+            //  IntToColor(0x114D9C)
+            textArea.BackColor = System.Drawing.Color.White;
+            textArea.SetSelectionBackColor(true, System.Drawing.Color.Gray);
+        }
+
+        public static System.Drawing.Color IntToColor(int rgb)
+        {
+            return System.Drawing.Color.FromArgb(255, (byte)(rgb >> 16), (byte)(rgb >> 8), (byte)rgb);
+        }
+
+        private void InitSyntaxColoring(Scintilla textArea)
+        {
+
+            // Configure the default style
+            textArea.StyleResetDefault();
+            textArea.Styles[ScintillaNET.Style.Default].Font = "Consolas";
+            textArea.Styles[ScintillaNET.Style.Default].Size = 10;
+            textArea.Styles[ScintillaNET.Style.Default].BackColor = System.Drawing.Color.White; // IntToColor(0x212121);
+            textArea.Styles[ScintillaNET.Style.Default].ForeColor = System.Drawing.Color.Black; // IntToColor(0xFFFFFF);
+            textArea.StyleClearAll();
+
+            textArea.Styles[ScintillaNET.Style.Json.Default].ForeColor = System.Drawing.Color.Black;
+
+            textArea.Styles[ScintillaNET.Style.Json.PropertyName].ForeColor = System.Drawing.Color.BlueViolet;
+
+            textArea.Styles[ScintillaNET.Style.Json.EscapeSequence].ForeColor = System.Drawing.Color.Red;
+
+            textArea.Styles[ScintillaNET.Style.Json.String].ForeColor = System.Drawing.Color.ForestGreen;
+            textArea.Styles[ScintillaNET.Style.Json.Uri].ForeColor = System.Drawing.Color.Blue;
+            textArea.Styles[ScintillaNET.Style.Json.Number].ForeColor = System.Drawing.Color.Black;
+            textArea.Styles[ScintillaNET.Style.Json.Keyword].ForeColor = System.Drawing.Color.Blue;
+
+            textArea.Styles[ScintillaNET.Style.Json.Operator].ForeColor = System.Drawing.Color.Black;
+            textArea.Styles[ScintillaNET.Style.Json.CompactIRI].ForeColor = System.Drawing.Color.Black;
+            textArea.Styles[ScintillaNET.Style.Json.LdKeyword].ForeColor = System.Drawing.Color.Black;
+            textArea.Styles[ScintillaNET.Style.Json.StringEol].ForeColor = System.Drawing.Color.Black;
+
+            textArea.Styles[ScintillaNET.Style.Json.BlockComment].ForeColor = System.Drawing.Color.SeaGreen;
+            textArea.Styles[ScintillaNET.Style.Json.LineComment].ForeColor = System.Drawing.Color.SeaGreen;
+
+            textArea.Styles[ScintillaNET.Style.Json.Error].ForeColor = System.Drawing.Color.Red;
+
+            textArea.Lexer = Lexer.Json;
+
+            textArea.SetKeywords(0, "class extends implements import interface new case do while else if for in switch throw get set function var try catch finally while with default break continue delete return each const namespace package include use is as instanceof typeof author copy default deprecated eventType example exampleText exception haxe inheritDoc internal link mtasc mxmlc param private return see serial serialData serialField since throws usage version langversion playerversion productversion dynamic private public partial static intrinsic internal native override protected AS3 final super this arguments null Infinity NaN undefined true false abstract as base bool break by byte case catch char checked class const continue decimal default delegate do double descending explicit event extern else enum false finally fixed float for foreach from goto group if implicit in int interface internal into is lock long new null namespace object operator out override orderby params private protected public readonly ref return switch struct sbyte sealed short sizeof stackalloc static string select this throw true try typeof uint ulong unchecked unsafe ushort using var virtual volatile void while where yield");
+            textArea.SetKeywords(1, "void Null ArgumentError arguments Array Boolean Class Date DefinitionError Error EvalError Function int Math Namespace Number Object RangeError ReferenceError RegExp SecurityError String SyntaxError TypeError uint XML XMLList Boolean Byte Char DateTime Decimal Double Int16 Int32 Int64 IntPtr SByte Single UInt16 UInt32 UInt64 UIntPtr Void Path File System Windows Forms ScintillaNET");
+
+        }
+
+        private void InitNumberMargin(Scintilla textArea)
+        {
+
+            textArea.Styles[ScintillaNET.Style.LineNumber].BackColor = System.Drawing.Color.LightGray;  // IntToColor(BACK_COLOR);
+            textArea.Styles[ScintillaNET.Style.LineNumber].ForeColor = System.Drawing.Color.Black;      // IntToColor(FORE_COLOR);
+            textArea.Styles[ScintillaNET.Style.IndentGuide].ForeColor = System.Drawing.Color.Red;       // IntToColor(FORE_COLOR);
+            textArea.Styles[ScintillaNET.Style.IndentGuide].BackColor = System.Drawing.Color.LightGray; // IntToColor(BACK_COLOR);
+
+            var nums = textArea.Margins[NUMBER_MARGIN];
+            nums.Width = 30;
+            nums.Type = MarginType.Number;
+            nums.Sensitive = true;
+            nums.Mask = 0;
+
+            textArea.MarginClick += TextArea_MarginClick;
+        }
+
+        private void InitBookmarkMargin(Scintilla textArea)
+        {
+
+            //TextArea.SetFoldMarginColor(true, IntToColor(BACK_COLOR));
+
+            var margin = textArea.Margins[BOOKMARK_MARGIN];
+            margin.Width = 20;
+            margin.Sensitive = true;
+            margin.Type = MarginType.Symbol;
+            margin.Mask = (1 << BOOKMARK_MARKER);
+            //margin.Cursor = MarginCursor.Arrow;
+
+            var marker = textArea.Markers[BOOKMARK_MARKER];
+            marker.Symbol = MarkerSymbol.Circle;
+            marker.SetBackColor(IntToColor(0xFF003B));
+            marker.SetForeColor(IntToColor(0x000000));
+            marker.SetAlpha(100);
+
+        }
+
+        private void InitCodeFolding(Scintilla textArea)
+        {
+
+            textArea.SetFoldMarginColor(true, System.Drawing.Color.White);  //  IntToColor(BACK_COLOR)
+            textArea.SetFoldMarginHighlightColor(true, IntToColor(BACK_COLOR));
+
+            // Enable code folding
+            textArea.SetProperty("fold", "1");
+            textArea.SetProperty("fold.compact", "1");
+
+            // Configure a margin to display folding symbols
+            textArea.Margins[FOLDING_MARGIN].Type = MarginType.Symbol;
+            textArea.Margins[FOLDING_MARGIN].Mask = Marker.MaskFolders;
+            textArea.Margins[FOLDING_MARGIN].Sensitive = true;
+            textArea.Margins[FOLDING_MARGIN].Width = 20;
+
+            // Set colors for all folding markers
+            for (int i = 25; i <= 31; i++)
+            {
+                textArea.Markers[i].SetForeColor(IntToColor(BACK_COLOR)); // styles for [+] and [-]
+                textArea.Markers[i].SetBackColor(IntToColor(FORE_COLOR)); // styles for [+] and [-]
+            }
+
+            // Configure folding markers with respective symbols
+            textArea.Markers[Marker.Folder].Symbol = CODEFOLDING_CIRCULAR ? MarkerSymbol.CirclePlus : MarkerSymbol.BoxPlus;
+            textArea.Markers[Marker.FolderOpen].Symbol = CODEFOLDING_CIRCULAR ? MarkerSymbol.CircleMinus : MarkerSymbol.BoxMinus;
+            textArea.Markers[Marker.FolderEnd].Symbol = CODEFOLDING_CIRCULAR ? MarkerSymbol.CirclePlusConnected : MarkerSymbol.BoxPlusConnected;
+            textArea.Markers[Marker.FolderMidTail].Symbol = MarkerSymbol.TCorner;
+            textArea.Markers[Marker.FolderOpenMid].Symbol = CODEFOLDING_CIRCULAR ? MarkerSymbol.CircleMinusConnected : MarkerSymbol.BoxMinusConnected;
+            textArea.Markers[Marker.FolderSub].Symbol = MarkerSymbol.VLine;
+            textArea.Markers[Marker.FolderTail].Symbol = MarkerSymbol.LCorner;
+
+            // Enable automatic folding
+            textArea.AutomaticFold = (AutomaticFold.Show | AutomaticFold.Click | AutomaticFold.Change);
+
+        }
+
+        private void InitHotkeys(Scintilla TextArea)
+        {
+
+            // register the hotkeys with the form
+            //HotKeyManager.AddHotKey(this, OpenSearch, Keys.F, true);
+            //HotKeyManager.AddHotKey(this, OpenFindDialog, Keys.F, true, false, true);
+            //HotKeyManager.AddHotKey(this, OpenReplaceDialog, Keys.R, true);
+            //HotKeyManager.AddHotKey(this, OpenReplaceDialog, Keys.H, true);
+            //HotKeyManager.AddHotKey(this, Uppercase, Keys.U, true);
+            //HotKeyManager.AddHotKey(this, Lowercase, Keys.L, true);
+            //HotKeyManager.AddHotKey(this, ZoomIn, Keys.Oemplus, true);
+            //HotKeyManager.AddHotKey(this, ZoomOut, Keys.OemMinus, true);
+            //HotKeyManager.AddHotKey(this, ZoomDefault, Keys.D0, true);
+            //HotKeyManager.AddHotKey(this, CloseSearch, Keys.Escape);
+
+            // remove conflicting hotkeys from scintilla
+            TextArea.ClearCmdKey(System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F);
+            //TextArea.ClearCmdKey(System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.R);
+            //TextArea.ClearCmdKey(System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.H);
+            //TextArea.ClearCmdKey(System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.L);
+            //TextArea.ClearCmdKey(System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.U);
+
+        }
+
+        /// <summary>
+        /// set this true to show circular buttons for code folding (the [+] and [-] buttons on the margin)
+        /// </summary>
+        private const bool CODEFOLDING_CIRCULAR = true;
+
+        private void OnTextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void TextArea_MarginClick(object sender, MarginClickEventArgs e)
+        {
+            Scintilla TextArea = sender as Scintilla;
+
+
+            if (e.Margin == BOOKMARK_MARGIN)
+            {
+                // Do we have a marker for this line?
+                const uint mask = (1 << BOOKMARK_MARKER);
+                var line = TextArea.Lines[TextArea.LineFromPosition(e.Position)];
+                if ((line.MarkerGet() & mask) > 0)
+                {
+                    // Remove existing bookmark
+                    line.MarkerDelete(BOOKMARK_MARKER);
+                }
+                else
+                {
+                    // Add bookmark
+                    line.MarkerAdd(BOOKMARK_MARKER);
+                }
+            }
+        }
+
+        /// <summary>
+        /// the background color of the text area
+        /// </summary>
+        private const int BACK_COLOR = 0x2A211C;
+
+        /// <summary>
+        /// default text color of the text area
+        /// </summary>
+        private const int FORE_COLOR = 0xB7B7B7;
+
+        /// <summary>
+        /// change this to whatever margin you want the bookmarks/breakpoints to show in
+        /// </summary>
+        private const int BOOKMARK_MARGIN = 2;
+        private const int BOOKMARK_MARKER = 2;
+
+        /// <summary>
+        /// change this to whatever margin you want the line numbers to show in
+        /// </summary>
+        private const int NUMBER_MARGIN = 1;
+
+        /// <summary>
+        /// change this to whatever margin you want the code folding tree (+/-) to show in
+        /// </summary>
+        private const int FOLDING_MARGIN = 3;
+
+        private Scintilla TextArea { get; set; }
+
+        #endregion Scintilla
 
     }
 

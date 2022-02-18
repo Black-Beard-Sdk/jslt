@@ -26,6 +26,7 @@ namespace Bb.Json.Attributes
 
         public string Description { get; }
 
+        public bool ForOutput { get; set; }
 
         public static JsltExtensionMethodAttribute GetAttribute(MemberInfo method)
         {

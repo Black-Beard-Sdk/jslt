@@ -417,8 +417,21 @@ namespace Bb.Expressions.CsharpGenerators
             }
             else
             {
-                LocalDebug.Stop();
-                Visit(node.Body);
+                var e = Visit(node.Body);
+
+                if (e != null)
+                {
+                    if (node.ReturnType != typeof(void))
+                    {
+                        if (e is CodeExpression expression)
+                            this._methodRoot.Add(new CodeMethodReturnStatement(expression));
+
+                        else
+                        {
+                            LocalDebug.Stop();
+                        }
+                    }
+                }
             }
 
             var ctor = new CodeConstructor() { Attributes = MemberAttributes.Public };

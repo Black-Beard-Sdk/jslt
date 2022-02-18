@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 
 namespace Bb.Json.Jslt.Services
 {
@@ -40,16 +41,11 @@ namespace Bb.Json.Jslt.Services
                             {
 
                                 var methods = MethodDiscovery.GetMethods(type, BindingFlags.Public | BindingFlags.Static, typeof(JToken)).ToList();
-                                foreach (var method in methods)
-                                {
-                                    var attribute = method.GetCustomAttribute<JsltExtensionMethodAttribute>();
-                                    if (attribute != null)
-                                    {
-                                        var parameters = method.GetParameters();
-                                        if (parameters.Length >= 1 && parameters[0].ParameterType == typeof(RuntimeContext))
-                                            AddService(method, attribute.Name);
-                                    }
-                                }
+                                if (methods.Any())
+                                    Append(methods);
+                                methods = MethodDiscovery.GetMethods(type, BindingFlags.Public | BindingFlags.Static, typeof(StringBuilder)).ToList();
+                                if (methods.Any())
+                                    Append(methods);
 
                             }
 
@@ -58,6 +54,20 @@ namespace Bb.Json.Jslt.Services
                         _assemblies.Add(assemblyName);
 
                     }
+        }
+
+        private void Append(List<MethodInfo> methods)
+        {
+            foreach (var method in methods)
+            {
+                var attribute = method.GetCustomAttribute<JsltExtensionMethodAttribute>();
+                if (attribute != null)
+                {
+                    var parameters = method.GetParameters();
+                    if (parameters.Length >= 1 && parameters[0].ParameterType == typeof(RuntimeContext))
+                        AddService(method, attribute.Name, attribute.ForOutput);
+                }
+            }
         }
 
         /// <summary>
@@ -87,7 +97,9 @@ namespace Bb.Json.Jslt.Services
 
                 MethodDescription description = JsltExtensionMethodParameterAttribute.Map(new MethodDescription(name, ctor) { Description = _description });
                 Factory<ITransformJsonService> factory = ObjectCreator.GetActivator<ITransformJsonService>(ctor, description);
-                ServiceContainer.AddService(name, factory);
+
+                ServiceContainer.AddService(name, factory, false);
+
             }
 
         }
@@ -97,10 +109,12 @@ namespace Bb.Json.Jslt.Services
         /// </summary>
         /// <param name="service"></param>
         /// <returns>return the current instance of <see cref="TranformJsonAstConfiguration"/> for using in fluence code.</returns>
-        public void AddService(MethodInfo service, string name = null)
+        public void AddService(MethodInfo service, string name = null, bool forOutput = false)
         {
 
             string _description = string.Empty;
+            bool _forOutput = forOutput;
+
             if (string.IsNullOrEmpty(name))
             {
 
@@ -109,20 +123,26 @@ namespace Bb.Json.Jslt.Services
                     throw new ArgumentNullException($"service {service}, can't be added by type. missing {typeof(JsltExtensionMethodAttribute)} ");
 
                 name = n.Name;
+                _forOutput = n.ForOutput;
                 _description = n.Description;
 
             }
 
             MethodDescription description = JsltExtensionMethodParameterAttribute.Map(new MethodDescription(name, service) { Description = _description });
-            Factory<JToken> factory = ObjectCreator.GetActivator<JToken>(service, description);
 
-            //ServiceContainer.Common.AddService(name, factory);
-            ServiceContainer.AddService(name, factory);
-
+            if (_forOutput)
+            {
+                Factory<StringBuilder> factory = ObjectCreator.GetActivator<StringBuilder>(service, description);
+                ServiceContainer.AddService(name, factory, true);
+            }
+            else
+            {
+                Factory<JToken> factory = ObjectCreator.GetActivator<JToken>(service, description);
+                ServiceContainer.AddService(name, factory, false);
+            }
         }
 
         public ServiceContainer ServiceContainer { get; }
-
 
         internal HashSet<string> _assemblies;
 

@@ -4,7 +4,6 @@ using Bb.Json.Jslt.Parser;
 using Bb.JSon;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq.Expressions;
@@ -34,7 +33,7 @@ namespace Bb.Json.Jslt.Services
             string filepathCode = string.Empty;
             var _errors = diagnostics ?? new Diagnostics();
             CultureInfo culture = this._configuration.Culture;
-
+            OutputModelConfiguration outputConfiguration = null;
             FunctionFoundry _foundry = null;
             JsltBase tree = null;
 
@@ -47,6 +46,8 @@ namespace Bb.Json.Jslt.Services
                     tree = (JsltBase)parser.Visit(visitor);
                     _foundry = visitor.Foundry;
                     culture = visitor.Culture;
+                    outputConfiguration = visitor.OutputConfiguration;
+
                 }
             }
             catch (Exception e)
@@ -55,12 +56,21 @@ namespace Bb.Json.Jslt.Services
             }
 
             Func<RuntimeContext, JToken, JToken> rules = null;
+            Func<RuntimeContext, JToken, StringBuilder> ruleOutput = null;
+
             if (_errors.Success)
             {
                 var crc = sb.Calculate().ToString();
                 filepathCode =  crc + ".cs";
                 // Transform the template
                 rules = Get(tree, _foundry, _errors, filepathCode, withDebug);
+
+                if (outputConfiguration != null && outputConfiguration.Function != null)
+                {
+                    var codeName = Path.GetFileNameWithoutExtension(filepathCode) + "_output" + Path.GetExtension(filepathCode);
+                    ruleOutput = GetOutput(outputConfiguration.Function, _foundry, _errors, codeName, withDebug);
+                }
+
             }
 
             JsltTemplate result = new JsltTemplate()
@@ -68,6 +78,7 @@ namespace Bb.Json.Jslt.Services
                 Rule = sb,
                 Configuration = this._configuration,
                 Rules = rules,
+                RuleOutput = ruleOutput,
                 Tree = tree,
                 Culture = culture,
                 Filename = filename,
@@ -110,6 +121,40 @@ namespace Bb.Json.Jslt.Services
             return fnc;
 
         }
+
+        private Func<RuntimeContext, JToken, StringBuilder> GetOutput(JsltBase tree, FunctionFoundry foundry, Diagnostics _errors, string filepathCode, bool withDebug)
+        {
+
+            Func<RuntimeContext, JToken, StringBuilder> fnc;
+
+            if (tree != null)
+            {
+
+                var sourceCompiler = new LocalMethodCompiler(withDebug)
+                {
+                    OutputPath = this._configuration.OutputPath,
+                };
+
+                var builder = new OutputExpressionBuilder(_errors, sourceCompiler) { Configuration = this._configuration, EmbbededFunctions = foundry };
+                fnc = builder.GenerateLambdaOutput(tree, filepathCode);
+
+            }
+            else // Template empty
+            {
+                var arg = Expression.Parameter(typeof(RuntimeContext), "arg0");
+                var arg1 = Expression.Parameter(typeof(JToken), "arg1");
+                var lbd = Expression.Lambda<Func<RuntimeContext, JToken, StringBuilder>>(arg1, arg, arg1);
+
+                if (lbd.CanReduce)
+                    lbd.ReduceAndCheck();
+
+                fnc = lbd.Compile();
+            }
+
+            return fnc;
+
+        }
+
 
         private TranformJsonAstConfiguration _configuration;
 

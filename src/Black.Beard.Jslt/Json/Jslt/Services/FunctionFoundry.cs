@@ -24,6 +24,38 @@ namespace Bb.Json.Jslt.Services
                 ServiceContainer.Common.ServiceDiscovery.AddAssembly(assembly);
         }
 
+       
+
+        internal Factory GetServiceOutput(string name, Type[] types, Diagnostics diagnostics, TokenLocation location)
+        {
+
+            var result = this.Services.GetOutputService(name, types);
+            if (result != null)
+                return result;
+
+            result = this.configuration.Services.GetOutputService(name, types);
+            if (result != null)
+                return result;
+
+            var result2 = this.Services.GetOutputService(name);
+            if (result2 != null)
+                diagnostics.AddError(null, location, name, $"Service {name} exists but bad arguments calling");
+
+            else
+            {
+                result2 = this.configuration.Services.GetOutputService(name);
+                if (result2 != null)
+                    diagnostics.AddError(null, location, name, $"Service {name} exists but bad arguments calling");
+
+                else
+                    diagnostics.AddError(null, location, name, $"Service {name} not found");
+
+            }
+
+            return null;
+
+        }
+
         internal Factory GetService(string name, Type[] types, Diagnostics diagnostics, TokenLocation location)
         {
 
@@ -81,6 +113,8 @@ namespace Bb.Json.Jslt.Services
         {
 
             string _description = string.Empty;
+            bool _forOutput = false;
+
             if (string.IsNullOrEmpty(name))
             {
                 var n = JsltExtensionMethodAttribute.GetAttribute(service);
@@ -89,6 +123,8 @@ namespace Bb.Json.Jslt.Services
 
                 name = n.Name;
                 _description = n.Description;
+                _forOutput = n.ForOutput;
+
             }
 
             var ctors = service.GetConstructors();
@@ -97,7 +133,7 @@ namespace Bb.Json.Jslt.Services
 
                 MethodDescription description = JsltExtensionMethodParameterAttribute.Map( new MethodDescription(name, ctor) { Description = _description });
                 Factory<ITransformJsonService> factory = ObjectCreator.GetActivator<ITransformJsonService>(ctor, description);
-                Services.AddService(name, factory);
+                Services.AddService(name, factory, _forOutput);
             }
 
             return this;

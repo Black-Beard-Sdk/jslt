@@ -69,7 +69,7 @@ for cast a value you must use this syntax '@type'
 * @decimal
 
 ### Custom services
-the customs services are used to extend the feature of the Sdk.
+the customs services are used to extend the feature of the Sdk. You can create your own customs services.
 
 That is the skeleton
 ```CSHARP
@@ -87,6 +87,7 @@ I give you the method loadjson like sample
 public static JToken ExecuteLoadSource(RuntimeContext ctx, string sourcePath)
 {
 
+    // Use the system for resolve the file with path relative to the current template script.
     var file = ctx.Configuration.ResolveFile(sourcePath);
 
     if (file.Exists)

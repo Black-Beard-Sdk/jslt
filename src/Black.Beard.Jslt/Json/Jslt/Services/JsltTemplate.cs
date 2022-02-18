@@ -31,6 +31,7 @@ namespace Bb.Json.Jslt.Services
         internal StringBuilder Rule { get; set; }
 
         public Diagnostics Diagnostics { get; internal set; }
+        public Func<RuntimeContext, JToken, StringBuilder> RuleOutput { get; internal set; }
 
         public RuntimeContext Transform(Sources sources, RuntimeContext ctx = null)
         {

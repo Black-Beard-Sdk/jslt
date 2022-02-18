@@ -23,6 +23,33 @@ namespace Bb.Json.Jslt.Services
             _instances.Add(factory);
         }
 
+        public Factory GetForOutput(Type[] parameters)
+        {
+
+            List<(int[], Factory)> result = new List<(int[], Factory)>(_instances.Count);
+            foreach (var factory in _instances)
+            {
+
+                if (factory.IsCtor)
+                {
+                    if (factory.Parameters.Length == parameters.Length)
+                        TestConstructor(parameters, result, factory);
+                }
+
+                else if (factory.Parameters.Length == parameters.Length + 1)
+                    TestMethod(parameters, result, factory);
+
+            }
+
+            if (result.Count == 1)
+                return result[0].Item2 as Factory;
+
+            foreach (var item in result.OrderBy(c => c.Item1[0]).ThenByDescending(c => c.Item1[1]).OrderByDescending(c => c.Item1[2]))
+                return item.Item2 as Factory;
+
+            return null;
+        }
+
         public Factory Get(Type[] parameters)
         {
 

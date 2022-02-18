@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text;
 
 namespace Bb.Json.Jslt.Services
 {
@@ -62,6 +63,22 @@ namespace Bb.Json.Jslt.Services
                 Source = this._compiler
 
             });
+
+        }
+        internal Func<RuntimeContext, StringBuilder> GenerateLambdaOutput(JsltBase tree, string filepathCode)
+        {
+
+            // Start parsing
+            Expression e = tree.Accept(this) as Expression;
+
+            foreach (var item in _resultReset)
+                _compiler.Add(item);
+
+            _compiler.Add(e);
+
+            var result = _compiler.Compile<Func<RuntimeContext, StringBuilder>>(filepathCode);
+
+            return result;
 
         }
 
