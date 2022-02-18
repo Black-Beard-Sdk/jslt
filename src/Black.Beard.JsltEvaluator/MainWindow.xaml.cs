@@ -70,6 +70,8 @@ namespace AppJsonEvaluator
 
             RowErrors.Height = new GridLength(70);
 
+            //this.TemplateEditor.SelectionStart
+
         }
 
         //public static bool keyMatch(KeyEventArg.TYos e, Key key, bool ctrl = false, bool shift = false, bool alt = false)
@@ -357,23 +359,26 @@ namespace AppJsonEvaluator
             if (e.Text == ".")
             {
 
-                var serviceProvider = Bb.Json.Jslt.Services.ServiceContainer.Common.GetServices();
+                List<MyCompletionData> items = new List<MyCompletionData>();
+
+
+                foreach (var provider in Bb.Json.Jslt.Services.ServiceContainer.Common.GetServices())
+                    foreach (Factory factory in provider.GetItems())
+                        items.Add(new MyCompletionData(factory.MethodInfos.Content, factory.MethodInfos.Name, string.IsNullOrEmpty(factory.MethodInfos.Description) ? factory.MethodInfos.Content : factory.MethodInfos.Description));
+
+
+                foreach (var provider in Bb.Json.Jslt.Services.ServiceContainer.Common.GetOutputServices())
+                    foreach (Factory factory in provider.GetItems())
+                        items.Add(new MyCompletionData(factory.MethodInfos.Content, factory.MethodInfos.Name, string.IsNullOrEmpty(factory.MethodInfos.Description) ? factory.MethodInfos.Content : factory.MethodInfos.Description));
+
 
                 // Open code completion after the user has pressed dot:
                 completionWindow = new CompletionWindow(TemplateEditor.TextArea);
                 IList<ICompletionData> data = completionWindow.CompletionList.CompletionData;
-
-                foreach (TransformJsonServiceProvider provider in serviceProvider)
-                {
-                    foreach (Factory factory in provider.GetItems())
-                    {
-                        var c = new MyCompletionData(factory.MethodInfos.Content, factory.MethodInfos.Name, string.IsNullOrEmpty(factory.MethodInfos.Description) ? factory.MethodInfos.Content : factory.MethodInfos.Description);
-                        data.Add(c);
-                    }
-                }
+                foreach (MyCompletionData item in items.OrderBy(c => c.Text))
+                    data.Add(item);
 
                 completionWindow.Show();
-
 
                 var p = completionWindow.CompletionList.RenderSize;
                 completionWindow.CompletionList.RenderSize = new Size(270, p.Height);
@@ -382,6 +387,7 @@ namespace AppJsonEvaluator
                 {
                     completionWindow = null;
                 };
+
             }
 
         }

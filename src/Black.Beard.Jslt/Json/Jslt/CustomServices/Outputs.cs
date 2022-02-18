@@ -13,7 +13,7 @@ namespace Bb.Json.Jslt.CustomServices
     {
 
         [JsltExtensionMethod("to_json", ForOutput = true)]
-        [JsltExtensionMethodParameter("indented", "serialize json indeted if true")]
+        [JsltExtensionMethodParameter("indented", "serialize json indented if value is true")]
         [JsltExtensionMethodParameter("ignoreNullAndEmptyValue", "remove empty and null value of the output")]
         public static StringBuilder ExecuteToJson(RuntimeContext ctx, bool indented, bool ignoreNullAndEmptyValue)
         {
