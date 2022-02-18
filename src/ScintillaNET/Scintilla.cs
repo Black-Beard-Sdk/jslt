@@ -23,6 +23,7 @@ namespace ScintillaNET
     [Docking(DockingBehavior.Ask)]
     public class Scintilla : Control
     {
+
         #region Fields
 
         // WM_DESTROY workaround
@@ -965,50 +966,50 @@ namespace ScintillaNET
                     //using (var mutex = new Mutex(false, name))
                     //{
 
-                        //var access = new MutexAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), MutexRights.FullControl, AccessControlType.Allow);
-                        //var security = new MutexSecurity();
-                        //security.AddAccessRule(access);
-                        //mutex.SetAccessControl(security);
+                    //var access = new MutexAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), MutexRights.FullControl, AccessControlType.Allow);
+                    //var security = new MutexSecurity();
+                    //security.AddAccessRule(access);
+                    //mutex.SetAccessControl(security);
 
-                        var ownsHandle = false;
+                    var ownsHandle = false;
+                    try
+                    {
                         try
                         {
-                            try
-                            {
                             //Thread.Sleep(5000);
-                                //ownsHandle = mutex.WaitOne(5000, false); // 5 sec
-                                //if (ownsHandle == false)
-                                //{
-                                    //var timeoutMessage = string.Format(CultureInfo.InvariantCulture, "Timeout waiting for exclusive access to '{0}'.", modulePath);
-                                    //throw new TimeoutException(timeoutMessage);
-                                //}
-                            }
-                            catch (AbandonedMutexException)
-                            {
-                                // Previous process terminated abnormally
-                                ownsHandle = true;
-                            }
-
-                            // Double-checked (process) lock
-                            if (!File.Exists(modulePath))
-                            {
-                                // Write the embedded file to disk
-                                var directory = Path.GetDirectoryName(modulePath);
-                                if (!Directory.Exists(directory))
-                                    Directory.CreateDirectory(directory);
-
-                                var resource = string.Format(CultureInfo.InvariantCulture, "ScintillaNET.{0}.SciLexer.dll.gz", (IntPtr.Size == 4 ? "x86" : "x64"));
-                                using (var resourceStream = typeof(Scintilla).Assembly.GetManifestResourceStream(resource))
-                                using (var gzipStream = new GZipStream(resourceStream, CompressionMode.Decompress))
-                                using (var fileStream = File.Create(modulePath))
-                                    gzipStream.CopyTo(fileStream);
-                            }
+                            //ownsHandle = mutex.WaitOne(5000, false); // 5 sec
+                            //if (ownsHandle == false)
+                            //{
+                            //var timeoutMessage = string.Format(CultureInfo.InvariantCulture, "Timeout waiting for exclusive access to '{0}'.", modulePath);
+                            //throw new TimeoutException(timeoutMessage);
+                            //}
                         }
-                        finally
+                        catch (AbandonedMutexException)
                         {
-                            //if (ownsHandle)
-                            //    mutex.ReleaseMutex();
+                            // Previous process terminated abnormally
+                            ownsHandle = true;
                         }
+
+                        // Double-checked (process) lock
+                        if (!File.Exists(modulePath))
+                        {
+                            // Write the embedded file to disk
+                            var directory = Path.GetDirectoryName(modulePath);
+                            if (!Directory.Exists(directory))
+                                Directory.CreateDirectory(directory);
+
+                            var resource = string.Format(CultureInfo.InvariantCulture, "ScintillaNET.{0}.SciLexer.dll.gz", (IntPtr.Size == 4 ? "x86" : "x64"));
+                            using (var resourceStream = typeof(Scintilla).Assembly.GetManifestResourceStream(resource))
+                            using (var gzipStream = new GZipStream(resourceStream, CompressionMode.Decompress))
+                            using (var fileStream = File.Create(modulePath))
+                                gzipStream.CopyTo(fileStream);
+                        }
+                    }
+                    finally
+                    {
+                        //if (ownsHandle)
+                        //    mutex.ReleaseMutex();
+                    }
                     //}
                 }
             }
@@ -6223,8 +6224,43 @@ namespace ScintillaNET
             Margins = new MarginCollection(this);
             Markers = new MarkerCollection(this);
             Selections = new SelectionCollection(this);
+
         }
 
+
+        public void InterceptKey(Action function, Keys key, bool ctrl = false, bool shift = false, bool alt = false)
+        {
+
+            HotKeyManager.AddHotKey(this, function, key, ctrl, shift, alt);
+
+        }            
+
         #endregion Constructors
+
     }
+
+    internal class HotKeyManager
+    {
+
+        public static bool Enable = true;
+
+        public static void AddHotKey(Control form, Action function, Keys key, bool ctrl = false, bool shift = false, bool alt = false)
+        {
+
+            form.KeyDown += delegate (object sender, KeyEventArgs e) {
+                if (IsHotkey(e, key, ctrl, shift, alt))
+                {
+                    function();
+                }
+            };
+
+        }
+
+        public static bool IsHotkey(KeyEventArgs eventData, Keys key, bool ctrl = false, bool shift = false, bool alt = false)
+        {
+            return eventData.KeyCode == key && eventData.Control == ctrl && eventData.Shift == shift && eventData.Alt == alt;
+        }
+
+    }
+
 }

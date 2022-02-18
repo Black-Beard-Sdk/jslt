@@ -1028,7 +1028,35 @@ namespace Bb.Json.Jslt.Parser
                 {
 
                     case "output":
-                        this.OutputConfiguration = new OutputModelConfiguration() { Function = prop.Value as JsltFunctionCall };
+                        if (prop.Value is JsltObject output)
+                        {
+
+                            JsltFunctionCall mode = null;
+                            JsltPath filter = null;
+
+                            foreach (JsltProperty prop1 in output.Properties)
+                                switch (prop1.Name.ToLower())
+                                {
+                                    case "mode":
+                                        mode = prop1.Value as JsltFunctionCall;
+                                        break;
+
+                                    case "filter":
+                                        filter = prop1.Value as JsltPath;
+                                        break;
+
+                                    default:
+                                        break;
+                                }
+
+                            this.OutputConfiguration = new OutputModelConfiguration()
+                            {
+                                Function = mode,
+                                Filter = filter,
+                            };
+
+                        }
+
                         break;
 
                     case "culture":

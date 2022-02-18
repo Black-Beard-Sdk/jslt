@@ -14,9 +14,11 @@ namespace Bb.Json.Jslt.Services
 
         }
 
-        public Factory OutputFunction { get; internal set; }
 
         public JsltFunctionCall Function { get; internal set; }
+
+        public JsltPath Filter { get; internal set; }
+
     }
 
 

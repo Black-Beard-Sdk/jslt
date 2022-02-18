@@ -1,13 +1,13 @@
 ﻿<Window x:Class="AppJsonEvaluator.MainWindow"
         
+        xmlns:ucSearch="Bb.JsltEvaluator.SearchUC"
         xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:AppJsonEvaluator"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" Loaded="Window_Loaded">
+        Title="MainWindow" Height="450" Width="1000" Loaded="Window_Loaded">
     <Grid>
 
         <Grid.RowDefinitions>
@@ -72,25 +72,14 @@
                 </Grid.RowDefinitions>
 
                 <Grid Grid.Row="0" x:Name="gridRender">
-
-                    <!--<avalonEdit:TextEditor 
-                    x:Name="TargetEditor" 
-                    Grid.Row="0" 
-                    FontFamily="Consolas" 
-                    FontSize="16" 
-                    TextChanged="TargetEditorTextChanged"
-                    WordWrap="True"
-                    Margin="0,4,0,-4" >
-                    </avalonEdit:TextEditor>-->
-
+                <WindowsFormsHost x:Name="ControlBag" />
                 </Grid>
-                
-
+               
                 <GridSplitter Background="DarkGray"  ResizeDirection="Rows" Grid.Row="1"
                       HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
                       ResizeBehavior="PreviousAndNext"  />
 
-                <ListView x:Name="Errors" Grid.Row="1" SelectionMode="Single" MouseDoubleClick="ErrorDoubleClick" Grid.RowSpan="2">
+                <ListView x:Name="Errors" Grid.Row="2" SelectionMode="Single" MouseDoubleClick="ErrorDoubleClick" Grid.RowSpan="2">
                     <ListView.View>
                         <GridView>
                             <GridViewColumn Header="Severity" Width="70" DisplayMemberBinding="{Binding Severity}" />
@@ -99,8 +88,8 @@
                         </GridView>
                     </ListView.View>
                 </ListView>
-            
-                
+
+
             </Grid>
 
         </Grid>

@@ -61,7 +61,7 @@ namespace Bb.Json.Jslt.Services
             if (_errors.Success)
             {
                 var crc = sb.Calculate().ToString();
-                filepathCode =  crc + ".cs";
+                filepathCode = crc + ".cs";
                 // Transform the template
                 rules = Get(tree, _foundry, _errors, filepathCode, withDebug);
 
@@ -78,7 +78,11 @@ namespace Bb.Json.Jslt.Services
                 Rule = sb,
                 Configuration = this._configuration,
                 Rules = rules,
-                RuleOutput = ruleOutput,
+                RuleOutput = new OutputSerializationRule()
+                {
+                    Filter = outputConfiguration.Filter?.Value,
+                    Rule = ruleOutput,
+                },
                 Tree = tree,
                 Culture = culture,
                 Filename = filename,

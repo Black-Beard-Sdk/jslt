@@ -1028,7 +1028,7 @@ namespace Bb.Json.Jslt.Services
         public Diagnostics Diagnostics { get => _diagnostics; }
 
 
-        public JToken TokenResult { get; internal set; }
+        public JToken TokenResult { get; set; }
 
         public TranformJsonAstConfiguration Configuration { get; internal set; }
 

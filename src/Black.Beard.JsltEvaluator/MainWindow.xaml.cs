@@ -1,17 +1,21 @@
 ﻿using Bb.ComponentModel.Factories;
+using Bb.JsltEvaluator;
 using Bb.Json.Jslt.Parser;
 using Bb.Json.Jslt.Services;
 using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.CodeCompletion;
 using ICSharpCode.AvalonEdit.Folding;
 using Microsoft.Win32;
+using Newtonsoft.Json.Linq;
 using ScintillaNET;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.IO;
+using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -32,14 +36,9 @@ namespace AppJsonEvaluator
             TemplateEditor.TextArea.TextEntering += textEditor_TextArea_TextEntering;
             TemplateEditor.TextArea.TextEntered += textEditor_TextArea_TextEntered;
 
-            //// ensure all assemblies are loaded.
-            //var type = typeof(Bb.Jslt.Services.Excels.Column);
-
             this._foldingStrategy = new BraceFoldingStrategy();
 
             _templateFoldingManager = UpdateTemplate(TemplateEditor);
-            //                      _targetFoldingManager = UpdateTemplate(TargetEditor);
-
 
             this._parameterFile = System.IO.Path.Combine(Environment.CurrentDirectory, "parameters");
             if (System.IO.File.Exists(this._parameterFile))
@@ -67,10 +66,17 @@ namespace AppJsonEvaluator
                 this._parameters = new Parameters();
 
             RowErrors.Height = new GridLength(70);
-
+                               
         }
 
-
+        //public static bool keyMatch(KeyEventArg.TYos e, Key key, bool ctrl = false, bool shift = false, bool alt = false)
+        //{
+        //    bool keyIsOk = e.Key == key;
+        //    bool CtrlIsOk = ctrl == ((e.KeyboardDevice.Modifiers & ModifierKeys.Control) == ModifierKeys.Control);
+        //    bool shiftIsOk = shift == ((e.KeyboardDevice.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift);
+        //    bool altIsOk = alt == ((e.KeyboardDevice.Modifiers & ModifierKeys.Alt) == ModifierKeys.Alt);
+        //    return keyIsOk && CtrlIsOk && shiftIsOk && altIsOk;
+        //}
 
         void InitializeTextMarkerService()
         {
@@ -99,6 +105,7 @@ namespace AppJsonEvaluator
 
         protected override void OnClosing(CancelEventArgs e)
         {
+
             if (_templateUpdated)
                 SaveTemplate();
 
@@ -160,31 +167,49 @@ namespace AppJsonEvaluator
 
                 try
                 {
-                    var src = new Sources(SourceJson.GetFromText(""));
+                    var src = new Sources(SourceJson.GetFromText(String.Empty));
                     RuntimeContext result = _template.Transform(src);
+
+                    var resultTokens = result.TokenResult;
 
                     if (_template.RuleOutput != null)
                     {
-                        var sb = _template.RuleOutput(result, result.TokenResult);
-                        //TargetEditor.Text = sb.ToString();
-                        //                          TextBox.Text = sb.ToString();
-                        this.TextArea.Text = sb.ToString();
+
+                        if (!string.IsNullOrEmpty(_template.RuleOutput.Filter))
+                        {
+                            var selects = resultTokens.SelectTokens(_template.RuleOutput.Filter).ToList();
+                            if (selects.Count == 1)
+                                resultTokens = selects[0];
+
+                            else if (selects.Count > 1)
+                                resultTokens = new JArray(selects);
+
+                            else
+                            {
+                                resultTokens = JValue.CreateNull();
+                            }
+
+                        }
+
+                        if (_template.RuleOutput.Rule != null)
+                        {
+
+                            result.TokenResult = resultTokens;
+
+                            var sb = _template.RuleOutput.Rule(result, null);
+                            this.TextArea.Text = sb.ToString();
+                        }
+                        else
+                            this.TextArea.Text = resultTokens.ToString();
+
                     }
                     else
-                    {
-                        var value = result.TokenResult.ToString();
-                        //                          TargetEditor.Text = value;
+                        this.TextArea.Text = result.TokenResult.ToString();
 
-                        this.TextArea.Text = value;
-
-                    }
 
                     foreach (var item in result.Diagnostics)
-                    {
-
                         Errors.Items.Add(item);
-
-                    }
+                
                 }
                 catch (Exception e2)
                 {
@@ -201,12 +226,6 @@ namespace AppJsonEvaluator
             _templateUpdated = true;
             UpdateFolding(_templateFoldingManager, TemplateEditor);
             UpdateTemplate();
-        }
-
-        private void TargetEditorTextChanged(object sender, EventArgs e)
-        {
-            //              UpdateFolding(_targetFoldingManager, TargetEditor);
-
         }
 
         private void UpdateFolding(FoldingManager foldingManager, TextEditor textEditor)
@@ -443,22 +462,75 @@ namespace AppJsonEvaluator
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-
-            // Create the interop host control.
-            System.Windows.Forms.Integration.WindowsFormsHost host =
-                new System.Windows.Forms.Integration.WindowsFormsHost();
-
             // Create the MaskedTextBox control.
             this.TextArea = CreateEditor();
-
             // Assign the MaskedTextBox control as the host control's child.
-            host.Child = TextArea;
+            ControlBag.Child = TextArea;
+        }
 
-            // Add the interop host control to the Grid
-            // control's collection of child controls.
-            this.gridRender.Children.Add(host);
+        #region Search
+        internal void CloseSearch()
+        {
+
+            if (this._windowSearch != null)
+            {
+                this._lastSearch = this._windowSearch.TextSearch;
+                this._windowSearch = null;
+            }
+        }
+
+        private void OpenSearch()
+        {
+
+            if (!SearchIsOpen)
+            {
+                if (this._windowSearch == null)
+                {
+                    this._windowSearch = new SearchWindow();
+                    this._windowSearch.Show();
+                    this._windowSearch.TextArea = TextArea;
+                    this._windowSearch.Parent = this;
+                }
+                
+                if (!string.IsNullOrEmpty(this._lastSearch))
+                    this._windowSearch.TextSearch = this._lastSearch;
+
+                this._windowSearch.TakeFocus();
+                SearchIsOpen = true;
+            }
+            else
+            {
+
+
+                SearchIsOpen = false;
+
+                if (this._windowSearch != null)
+                {
+                    this._windowSearch.Close();
+                }
+
+            }       
 
         }
+
+        public void InvokeIfNeeded(Action action)
+        {
+            //if (this.InvokeRequired)
+            //{
+            //    this.BeginInvoke(action);
+            //}
+            //else
+            //{
+            //    action.Invoke();
+            //}
+        }
+
+        bool SearchIsOpen = false;
+        private string _lastSearch;
+        private SearchWindow _windowSearch;
+
+        #endregion Search
+
 
         #region Scintilla
 
@@ -480,7 +552,6 @@ namespace AppJsonEvaluator
             };
 
             textArea.TextChanged += (this.OnTextChanged);
-
 
             // STYLING
             InitColors(textArea);
@@ -554,8 +625,8 @@ namespace AppJsonEvaluator
 
             textArea.Lexer = Lexer.Json;
 
-            textArea.SetKeywords(0, "class extends implements import interface new case do while else if for in switch throw get set function var try catch finally while with default break continue delete return each const namespace package include use is as instanceof typeof author copy default deprecated eventType example exampleText exception haxe inheritDoc internal link mtasc mxmlc param private return see serial serialData serialField since throws usage version langversion playerversion productversion dynamic private public partial static intrinsic internal native override protected AS3 final super this arguments null Infinity NaN undefined true false abstract as base bool break by byte case catch char checked class const continue decimal default delegate do double descending explicit event extern else enum false finally fixed float for foreach from goto group if implicit in int interface internal into is lock long new null namespace object operator out override orderby params private protected public readonly ref return switch struct sbyte sealed short sizeof stackalloc static string select this throw true try typeof uint ulong unchecked unsafe ushort using var virtual volatile void while where yield");
-            textArea.SetKeywords(1, "void Null ArgumentError arguments Array Boolean Class Date DefinitionError Error EvalError Function int Math Namespace Number Object RangeError ReferenceError RegExp SecurityError String SyntaxError TypeError uint XML XMLList Boolean Byte Char DateTime Decimal Double Int16 Int32 Int64 IntPtr SByte Single UInt16 UInt32 UInt64 UIntPtr Void Path File System Windows Forms ScintillaNET");
+            //textArea.SetKeywords(0, "class extends implements import interface new case do while else if for in switch throw get set function var try catch finally while with default break continue delete return each const namespace package include use is as instanceof typeof author copy default deprecated eventType example exampleText exception haxe inheritDoc internal link mtasc mxmlc param private return see serial serialData serialField since throws usage version langversion playerversion productversion dynamic private public partial static intrinsic internal native override protected AS3 final super this arguments null Infinity NaN undefined true false abstract as base bool break by byte case catch char checked class const continue decimal default delegate do double descending explicit event extern else enum false finally fixed float for foreach from goto group if implicit in int interface internal into is lock long new null namespace object operator out override orderby params private protected public readonly ref return switch struct sbyte sealed short sizeof stackalloc static string select this throw true try typeof uint ulong unchecked unsafe ushort using var virtual volatile void while where yield");
+            //textArea.SetKeywords(1, "void Null ArgumentError arguments Array Boolean Class Date DefinitionError Error EvalError Function int Math Namespace Number Object RangeError ReferenceError RegExp SecurityError String SyntaxError TypeError uint XML XMLList Boolean Byte Char DateTime Decimal Double Int16 Int32 Int64 IntPtr SByte Single UInt16 UInt32 UInt64 UIntPtr Void Path File System Windows Forms ScintillaNET");
 
         }
 
@@ -574,6 +645,7 @@ namespace AppJsonEvaluator
             nums.Mask = 0;
 
             textArea.MarginClick += TextArea_MarginClick;
+
         }
 
         private void InitBookmarkMargin(Scintilla textArea)
@@ -636,24 +708,11 @@ namespace AppJsonEvaluator
         private void InitHotkeys(Scintilla TextArea)
         {
 
-            // register the hotkeys with the form
-            //HotKeyManager.AddHotKey(this, OpenSearch, Keys.F, true);
-            //HotKeyManager.AddHotKey(this, OpenFindDialog, Keys.F, true, false, true);
-            //HotKeyManager.AddHotKey(this, OpenReplaceDialog, Keys.R, true);
-            //HotKeyManager.AddHotKey(this, OpenReplaceDialog, Keys.H, true);
-            //HotKeyManager.AddHotKey(this, Uppercase, Keys.U, true);
-            //HotKeyManager.AddHotKey(this, Lowercase, Keys.L, true);
-            //HotKeyManager.AddHotKey(this, ZoomIn, Keys.Oemplus, true);
-            //HotKeyManager.AddHotKey(this, ZoomOut, Keys.OemMinus, true);
-            //HotKeyManager.AddHotKey(this, ZoomDefault, Keys.D0, true);
+            // remove conflicting hotkeys from scintilla
+            //TextArea.InterceptKey(OpenSearch, System.Windows.Forms.Keys.F, true);
             //HotKeyManager.AddHotKey(this, CloseSearch, Keys.Escape);
 
-            // remove conflicting hotkeys from scintilla
             TextArea.ClearCmdKey(System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F);
-            //TextArea.ClearCmdKey(System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.R);
-            //TextArea.ClearCmdKey(System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.H);
-            //TextArea.ClearCmdKey(System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.L);
-            //TextArea.ClearCmdKey(System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.U);
 
         }
 
@@ -720,7 +779,10 @@ namespace AppJsonEvaluator
 
         #endregion Scintilla
 
-    }
+        private void Click_Search(object sender, RoutedEventArgs e)
+        {
 
+        }
+    }
 
 }
