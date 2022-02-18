@@ -95,6 +95,10 @@
         </Grid>
 
         <StatusBar Height="20" Grid.Row="3">
+            <StatusBarItem>
+                <ProgressBar Width="250" Height="20" x:Name="progressBar" />
+            </StatusBarItem>
         </StatusBar>
+        
     </Grid>
 </Window>

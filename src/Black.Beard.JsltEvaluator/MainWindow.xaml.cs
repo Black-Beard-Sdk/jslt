@@ -14,10 +14,13 @@ using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace AppJsonEvaluator
 {
@@ -66,7 +69,7 @@ namespace AppJsonEvaluator
                 this._parameters = new Parameters();
 
             RowErrors.Height = new GridLength(70);
-                               
+
         }
 
         //public static bool keyMatch(KeyEventArg.TYos e, Key key, bool ctrl = false, bool shift = false, bool alt = false)
@@ -119,6 +122,8 @@ namespace AppJsonEvaluator
             _template = null;
             Errors.Items.Clear();
             textMarkerService.RemoveAll(m => true);
+            progressBar.IsIndeterminate = true;
+            progressBar.Refresh();
 
             try
             {
@@ -154,6 +159,10 @@ namespace AppJsonEvaluator
             {
                 Errors.Items.Add(new ErrorModel() { Severity = SeverityEnum.Error, Message = e1.Message });
             }
+            finally
+            {
+                progressBar.IsIndeterminate = false;
+            }
 
         }
 
@@ -163,10 +172,13 @@ namespace AppJsonEvaluator
             if (_template != null && _template.Diagnostics.Success)
             {
 
+                progressBar.IsIndeterminate = true;
+                progressBar.Refresh();
                 Errors.Items.Clear();
 
                 try
                 {
+
                     var src = new Sources(SourceJson.GetFromText(String.Empty));
                     RuntimeContext result = _template.Transform(src);
 
@@ -206,18 +218,20 @@ namespace AppJsonEvaluator
                     else
                         this.TextArea.Text = result.TokenResult.ToString();
 
-
                     foreach (var item in result.Diagnostics)
                         Errors.Items.Add(item);
-                
+
                 }
                 catch (Exception e2)
                 {
                     Errors.Items.Add(new ErrorModel() { Severity = SeverityEnum.Error, Message = e2.Message });
                 }
+                finally
+                {
+                    progressBar.IsIndeterminate = false;
+                }
 
             }
-
 
         }
 
@@ -491,7 +505,7 @@ namespace AppJsonEvaluator
                     this._windowSearch.TextArea = TextArea;
                     this._windowSearch.Parent = this;
                 }
-                
+
                 if (!string.IsNullOrEmpty(this._lastSearch))
                     this._windowSearch.TextSearch = this._lastSearch;
 
@@ -509,7 +523,7 @@ namespace AppJsonEvaluator
                     this._windowSearch.Close();
                 }
 
-            }       
+            }
 
         }
 
@@ -783,6 +797,21 @@ namespace AppJsonEvaluator
         {
 
         }
+
     }
 
+    public static class ExtensionMethods
+    {
+
+        private static readonly Action EmptyDelegate = delegate
+        {
+            Thread.Sleep(1000);
+        };
+
+        public static void Refresh(this UIElement uiElement)
+        {
+            uiElement.Dispatcher.Invoke(DispatcherPriority.Render, EmptyDelegate);
+        }
+
+    }
 }
