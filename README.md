@@ -186,15 +186,20 @@ You can manage any directives
    "assemblies":["assembly name referenced in the gac"],
    "functions":["path of the csharp file"],
    "packages":["path of the package on nuget.org"],
-   "imports": ["path of the assembly flie"]
-}
+   "imports": ["path of the assembly flie"],
+   "output": 
+   {
+       "filter": "$.datas", // It is json path for filter just one part of the output document
+       "Mode": .to_block()  // Behavior the output serialization
+   }
+}   
 
 ``` 
 
-### Culture
+### culture
 Set the culture of the process. The Culture specifies a unique name for each culture, based on RFC 4646. The name is a combination of an ISO 639 two-letter lowercase culture code associated with a language and an ISO 3166 two-letter uppercase subculture code associated with a country or region. In addition, for apps that target .NET Framework 4 or later and are running under Windows 10 or later, culture names that correspond to valid BCP-47 language tags are supported.
 
-### Imports
+### imports
 Take a list of assemblies files. the path is relative to the json template file.
 
 ### assemblies
@@ -222,3 +227,41 @@ You can use
 ``` 
 
 
+### output
+the output manage the serialization
+
+#### Filter
+Select just a part of the output document
+
+#### Mode
+Mode is a function that serialize the output document.
+
+##### to_block()
+If the output is an array
+all lines are serialized (one object by line)
+
+##### to_json(bool indented, bool ignoreNullAndEmptyValues)
+serialize the output in classical serialization
+
+You can write your own serialize service. The returned type must be a StringBuilder
+```CSHARP
+
+[JsltExtensionMethod("to_block", ForOutput = true)]
+public static StringBuilder ExecuteToBlock(RuntimeContext ctx)
+{
+
+    var source = ctx.TokenResult;
+    var result = new StringBuilder();
+
+    if (source is JObject o)
+        result.AppendLine(o.ToString(Newtonsoft.Json.Formatting.None));
+
+    else if (source is JArray a)    
+        foreach (var item in a)
+            result.AppendLine(item.ToString(Newtonsoft.Json.Formatting.None));
+    
+    return result;
+
+}
+
+``` 

@@ -109,6 +109,10 @@ namespace Bb.Json.Jslt.Services
 
         }
 
+        public IEnumerable<TransformJsonServiceProvider> GetOutputServices()
+        {
+            return _dictionaryOutput.Values;
+        }
 
         public IEnumerable<TransformJsonServiceProvider> GetServices()
         {

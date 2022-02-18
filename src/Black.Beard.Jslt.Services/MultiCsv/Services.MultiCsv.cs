@@ -24,7 +24,7 @@ namespace Bb.Jslt.Services.MultiCsv
 
                 var visitor = new JsonVisitor()
                 {
-                    IgnoreEmptyProperties = true,
+                    //IgnoreEmptyProperties = true,
                 };
 
                 FileReader reader = FileReader.Readfile(file.FullName, rulePayload ?? string.Empty);
