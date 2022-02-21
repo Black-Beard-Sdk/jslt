@@ -122,10 +122,10 @@ namespace Bb.Json.Jslt.Parser
                         result.Append(prop);
                     }
 
-                    else if (prop.Name.ToLower() == "$source")
+                    else if (prop.Name == "$" || prop.Name.ToLower() == "$source")
                         result.Source = prop.Value;
 
-                    else if (prop.Name.ToLower() == "$where")
+                    else if (prop.Name.ToLower() == "?" || prop.Name.ToLower() == "$where")
                         result.Where = prop.Value;
 
                 }
