@@ -18,8 +18,10 @@ namespace Bb.Json.Jslt.Asts
 
             this.Name = name;
             this.Kind = JsltKind.Function;
+
             this._items = new List<JsltArgument>();
             this._items2 = new List<JsltArgument>();
+
             foreach (var item in arguments)
             {
                 var argName = "arg" + this._items.Count.ToString();
@@ -47,6 +49,7 @@ namespace Bb.Json.Jslt.Asts
         }
 
         public IEnumerable<JsltArgument> Arguments { get => _items; }
+
         public List<JsltArgument> ArgumentsBis { get => _items2; }
 
         public Type[] ParameterTypes { get; internal set; }

@@ -26,11 +26,17 @@ namespace Bb.Json.Jslt.Parser
         /// 
         /// </summary>
         /// <param name="culture"></param>
-        public ScriptVisitor(TranformJsonAstConfiguration configuration, Diagnostics diagnostics, string path = null)
+        public ScriptVisitor(TranformJsonAstConfiguration configuration, Diagnostics diagnostics, string path)
         {
+
             this._diagnostics = diagnostics;
             this._scriptPath = path;
-            this._scriptPathDirectory = new FileInfo(path).Directory.FullName;
+
+            if (!string.IsNullOrEmpty(path))
+                this._scriptPathDirectory = new FileInfo(path).Directory.FullName;
+            else
+                this._scriptPathDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
             this._configuration = configuration;
             this._currentCulture = _configuration.Culture;
             this._functions = new List<JsltFunctionCall>();

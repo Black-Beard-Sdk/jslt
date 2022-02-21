@@ -43,6 +43,7 @@ namespace Bb.Json.Jslt.Services
             _diagnostics = d;
         }
 
+
         #region methods called in the expressions
 
         [System.Diagnostics.DebuggerStepThrough]

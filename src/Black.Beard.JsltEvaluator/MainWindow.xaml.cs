@@ -1,7 +1,9 @@
 ﻿using Bb.ComponentModel.Factories;
 using Bb.JsltEvaluator;
+using Bb.JsltEvaluator.Wizards;
 using Bb.Json.Jslt.Parser;
 using Bb.Json.Jslt.Services;
+using Bb.Maj;
 using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.CodeCompletion;
 using ICSharpCode.AvalonEdit.Folding;
@@ -14,13 +16,11 @@ using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.IO;
 using System.Linq;
-using System.Threading;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Threading;
 
 namespace AppJsonEvaluator
 {
@@ -182,46 +182,7 @@ namespace AppJsonEvaluator
                 {
 
                     var src = new Sources(SourceJson.GetFromText(String.Empty));
-                    RuntimeContext result = _template.Transform(src);
-
-                    var resultTokens = result.TokenResult;
-
-                    if (_template.RuleOutput != null)
-                    {
-
-                        if (!string.IsNullOrEmpty(_template.RuleOutput.Filter))
-                        {
-                            var selects = resultTokens.SelectTokens(_template.RuleOutput.Filter).ToList();
-                            if (selects.Count == 1)
-                                resultTokens = selects[0];
-
-                            else if (selects.Count > 1)
-                                resultTokens = new JArray(selects);
-
-                            else
-                            {
-                                resultTokens = JValue.CreateNull();
-                            }
-
-                        }
-
-                        if (_template.RuleOutput.Rule != null)
-                        {
-
-                            result.TokenResult = resultTokens;
-
-                            var sb = _template.RuleOutput.Rule(result, null);
-                            this.TextArea.Text = sb.ToString();
-                        }
-                        else
-                            this.TextArea.Text = resultTokens.ToString();
-
-                    }
-                    else
-                        this.TextArea.Text = result.TokenResult.ToString();
-
-                    foreach (var item in result.Diagnostics)
-                        Errors.Items.Add(item);
+                    this.TextArea.Text = _template.TransformForOutput(src);
 
                 }
                 catch (Exception e2)
@@ -548,6 +509,7 @@ namespace AppJsonEvaluator
         bool SearchIsOpen = false;
         private string _lastSearch;
         private SearchWindow _windowSearch;
+        private string _lastShownFolder;
 
         #endregion Search
 
@@ -799,25 +761,141 @@ namespace AppJsonEvaluator
 
         #endregion Scintilla
 
-        private void Click_Search(object sender, RoutedEventArgs e)
+
+        private async void ButtonGenerateCmdLine(object sender, RoutedEventArgs e)
         {
+
+            IEnumerable<FileInfo> files = null;
+            if (_template != null)
+                files = ResolveDependentFilesVisitor.Visit(_template.Tree, _template.Configuration);
+
+            string scriptName = "myScript";
+            if (!string.IsNullOrEmpty(this.LabelTemplateFile.Content.ToString()))
+                scriptName = Path.GetFileName(this.LabelTemplateFile.Content.ToString());
+
+
+            var model = new WizardModel()
+
+                .SetTitle("Create Command line")
+                .SetVariable("templateContent", TemplateEditor.Text)
+
+                .Add(new WizardTabModel("templateName", "Please give me the name of the script") { }
+                .IsRequired()
+                .SetModel(scriptName)
+                .SetTemplate(TemplateEnum.Text))
+
+                .Add(new WizardTabModel("folderCmd", "Please select a folder to store the command line") { }
+                .IsRequired()
+                .SetTemplate(TemplateEnum.ButtonExecute)
+                .SetAction((uc, t) =>
+                {
+
+                    System.Windows.Forms.FolderBrowserDialog folderDialog = new System.Windows.Forms.FolderBrowserDialog()
+                    {
+                        InitialDirectory = _lastShownFolder,
+                    };
+
+                    var result = folderDialog.ShowDialog();
+                    if (result == System.Windows.Forms.DialogResult.OK)
+                    {
+                        t.Model = uc.DataText = folderDialog.SelectedPath;
+                        _lastShownFolder = folderDialog.SelectedPath;
+                    }
+                }
+                ))
+
+                .Execute(async (model) =>
+                {
+
+
+                    var folderCmd = model["folderCmd"].ToString();
+                    var templateName = model["templateName"].ToString();
+
+
+                    if (!Directory.Exists(folderCmd))
+                        Directory.CreateDirectory(folderCmd);
+
+
+                    templateName = Path.GetFileNameWithoutExtension(templateName) + ".json";
+                    string folderCli = "cli";
+
+
+                    StringBuilder sb = new StringBuilder();
+                    sb.AppendLine($"{folderCli}\\json.exe template execute \"{templateName}\" --out \"output.json\"");
+
+
+                    var file = Path.Combine(folderCmd, "run.bat");
+                    if (File.Exists(file))
+                        File.Delete(file);
+                    Bb.ContentHelper.Save(file, sb.ToString());
+
+
+                    if (files != null)
+                        foreach (var dependancyFile in files)
+                        {
+                            var targetFile = Path.Combine(folderCmd, dependancyFile.Name);
+                            dependancyFile.CopyTo(targetFile);
+                        }
+
+                    file = Path.Combine(folderCmd, templateName);
+                    if (File.Exists(file))
+                        File.Delete(file);
+                    Bb.ContentHelper.Save(file, model["templateContent"].ToString());
+
+                    var targetFolder = Path.Combine(folderCmd, folderCli);
+                    if (!Directory.Exists(targetFolder))
+                        Directory.CreateDirectory(targetFolder);
+
+                    var resultDownload = await DownloadLastversion(targetFolder, "cli.zip", false);
+
+                });
+
+            ;
+
+
+            var wizard = new WizardWindow(model);
+
+            wizard.Show();
+
+
+
+
+
+
+            //    var targetFolder = new DirectoryInfo(Path.Combine(folderDialog.SelectedPath, folderCli));
+
+
+
+            //    progressBar.IsIndeterminate = true;
+            //    progressBar.Refresh();
+            //    this.Refresh();
+            //    var resultDownload = await DownloadLastversion(targetFolder.FullName, "cli.zip");
+            //    progressBar.IsIndeterminate = false;
+
+            //}
+
 
         }
 
-    }
 
-    public static class ExtensionMethods
-    {
-
-        private static readonly Action EmptyDelegate = delegate
+        private async Task<bool> DownloadLastversion(string targetFolder, string packageName, bool deleteDownloadToEnd)
         {
-            Thread.Sleep(1000);
-        };
 
-        public static void Refresh(this UIElement uiElement)
-        {
-            uiElement.Dispatcher.Invoke(DispatcherPriority.Render, EmptyDelegate);
+            var githubMaj = new GitHubVersionHelper(githubRepository);
+
+            var lastVersion = await githubMaj.ResolveLastVersion();
+            var versions = await githubMaj.GetUrls(lastVersion);
+
+            var cli = versions.First(c => c.Name == packageName);
+
+            var result = await githubMaj.Download(cli, targetFolder, deleteDownloadToEnd);
+
+            return result == 0;
+
         }
 
+        private const string githubRepository = "Black-Beard-Sdk/jslt";
+
     }
+
 }

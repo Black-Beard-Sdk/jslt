@@ -2,7 +2,8 @@
   "profiles": {
     "Black.Beard.Json": {
       "commandName": "Project",
-      "commandLineArgs": "schema list"
+      "commandLineArgs": "template execute \"RefCommun_transform.json\" --out:\"output.json\" --debug",
+      "workingDirectory": "C:\\Users\\g.beard\\Desktop\\Docs\\TestJslt\\TestExportTemplate"
     }
   }
 }

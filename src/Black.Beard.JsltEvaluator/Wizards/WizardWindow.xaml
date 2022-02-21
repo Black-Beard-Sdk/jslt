@@ -1,0 +1,52 @@
+﻿<Window x:Class="Bb.JsltEvaluator.Wizards.WizardWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Bb.JsltEvaluator.Wizards"
+        mc:Ignorable="d"
+        Title="WizardWindow" Height="530" Width="900">
+    <Grid>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+
+        <Image Source="/Wizards/stickers-baguette-magique.jpg"  />
+
+        <Grid Grid.Column="1">
+
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition Height="70" />
+                <RowDefinition Height="15" />
+            </Grid.RowDefinitions>
+
+            <GroupBox Header="{Binding Title }" Margin="10" Grid.Row="0" FontSize="26">
+
+                <StackPanel Orientation="Vertical">
+
+                    <Label Content="{Binding TabDescription }" FontSize="24" Margin="0,20,0,0"  />
+
+                    <WindowsFormsHost x:Name="DataTemplate" Margin="20" />
+
+                    <Label Content="{Binding TabErrors}" FontSize="24" Margin="0,20,0,0" Foreground="Red"   />
+
+                </StackPanel>
+            </GroupBox>
+
+            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" >
+                <Button Content="Cancel" Width="100" Height="40" Margin="10" FontSize="16" Click="Cancel" IsCancel="true" />
+                <Button Content="Previous" Width="100" Height="40" Margin="10" FontSize="16" Click="MovePrevious" IsEnabled="{Binding CanMovePrevious}" />
+                <Button Content="Next" Width="100" Height="40" Margin="10" FontSize="16" Click="MoveNext" IsEnabled="{Binding CanMoveNext}" />
+                <Button Content="Terminer" Width="100" Height="40" Margin="10" FontSize="16" Click="Terminate" IsEnabled="{Binding CanTerminate}" />
+            </StackPanel>
+
+            <ProgressBar Grid.Row="2" x:Name="progressBar" />
+            
+        </Grid>
+
+
+    </Grid>
+</Window>

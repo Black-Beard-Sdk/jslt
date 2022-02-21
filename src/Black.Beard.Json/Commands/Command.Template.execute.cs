@@ -58,11 +58,10 @@ namespace Bb.Json.Commands
                     , ValidatorExtension.EvaluateFileExist
                 );
 
-                var argTarget = validator.Option("--out", "json target path that contains output data"
+                var argTarget = validator.Option("--out", "json target path that must output data"
                 );
 
                 var optTemplatePath = validator.OptionNoValue("--m", "the result is merge on the source document");
-                var optNoIndent = validator.OptionNoValue("--noIndented", "format stream on one line");
                 var optwithDebug = validator.OptionNoValue("--debug", "activate debug mode");
 
                 config.OnExecute(() =>
@@ -78,9 +77,10 @@ namespace Bb.Json.Commands
 
 
                     TemplateTransformProvider Templateprovider = new TemplateTransformProvider(configuration);
-                    
-                    var sb = new StringBuilder(argTemplatePath.Value.TrimPath().LoadContentFromFile());
-                    JsltTemplate template = Templateprovider.GetTemplate(sb, withDebug, string.Empty);
+
+                    var path = new FileInfo(argTemplatePath.Value.TrimPath());
+                    var sb = new StringBuilder(path.LoadContentFromFile());
+                    JsltTemplate template = Templateprovider.GetTemplate(sb, withDebug, path.FullName);
 
                     JToken result;
                     JToken TokenSource = null;
@@ -92,20 +92,17 @@ namespace Bb.Json.Commands
                         payload = new Sources(SourceJson.GetFromFile(argSource.Value().TrimPath()));
                    
                     else if (!inPipe)
-                    {
                         payload = new Sources(SourceJson.GetFromText(""));
-                        //app.ShowHelp();
-                        //return ErrorEnum.MissingSource.Error("no source specified");
-                    }
                     else
                         payload = new Sources(SourceJson.GetFromText(Input.ReadInput(Encoding.UTF8)));
 
                     var resultCtx = template.Transform(payload);
 
-                    result = resultCtx.TokenResult;
 
                     if (optTemplatePath.HasValue())
                     {
+
+                        result = resultCtx.TokenResult;
 
                         if (TokenSource is JObject o)
                             o.Merge(result, new JsonMergeSettings
@@ -119,9 +116,11 @@ namespace Bb.Json.Commands
                                 MergeArrayHandling = MergeArrayHandling.Union,
                             });
 
+                        resultCtx.TokenResult = result;
+                    
                     }
 
-                    var resultPayload = result.ToString(optNoIndent.HasValue() ? Formatting.None : Formatting.Indented);
+                    var resultPayload = template.ApplyOutput(resultCtx);
 
                     if (argTarget.HasValue())
                     {

@@ -26,7 +26,7 @@ namespace Bb.Json.Jslt.Services
 
         public JsltTemplate GetTemplate(StringBuilder sb, bool withDebug, string filename, Diagnostics diagnostics = null)
         {
-
+               
             if (string.IsNullOrEmpty(this._configuration.OutputPath) && !string.IsNullOrEmpty(filename))
                 this._configuration.OutputPath = new FileInfo(filename).Directory.FullName;
 

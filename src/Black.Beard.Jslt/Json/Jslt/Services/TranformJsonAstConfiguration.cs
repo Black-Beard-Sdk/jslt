@@ -8,8 +8,6 @@ namespace Bb.Json.Jslt.Services
 {
 
 
-
-
     public partial class TranformJsonAstConfiguration
     {
 
@@ -30,6 +28,7 @@ namespace Bb.Json.Jslt.Services
         public CultureInfo Culture { get; set; }
 
         public string OutputPath { get; set; }
+
         public List<Assembly> Assemblies { get; }
 
         public FileInfo ResolveFile(string filename)
