@@ -89,7 +89,11 @@ operation :
 // ---------------------------- extended json ----------------------------
 
 jsonfunctionCall :
-   DOT_ID PAREN_LEFT jsonValueList? PAREN_RIGHT jsonType? obj?
+   jsonfunctionName PAREN_LEFT jsonValueList? PAREN_RIGHT jsonType? obj?
+   ;
+
+jsonfunctionName : 
+   ID
    ;
 
 jsonValueList : 

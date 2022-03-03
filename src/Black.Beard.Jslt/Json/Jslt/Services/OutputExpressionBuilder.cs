@@ -271,6 +271,14 @@ namespace Bb.Json.Jslt.Services
             }
         }
 
+        public object VisitDirective(JsltDirective node)
+        {
+
+
+            return null;
+
+        }
+
         public object VisitProperty(JsltProperty node)
         {
             Expression getValue = null;

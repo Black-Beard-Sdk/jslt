@@ -9,7 +9,7 @@ namespace Bb.JsltEvaluator.Wizards
 {
 
 
-    [System.Diagnostics.DebuggerDisplay("{TabTitle}")]
+    [System.Diagnostics.DebuggerDisplay("{Current}")]
     public class WizardModel : INotifyPropertyChanged
     {
 

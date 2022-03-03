@@ -29,6 +29,8 @@ namespace Bb.Json.Jslt.Asts
                 {
                     Name = argName,
                     Value = item,
+                    Start = item.Start.Clone(),
+                    Stop = item.Stop.Clone(),
                 });
             }
 
@@ -37,7 +39,13 @@ namespace Bb.Json.Jslt.Asts
         public void Inject(JsltBase argument, int position)
         {
 
-            _items2.Insert(position, new JsltArgument() { Name = string.Empty, Value = argument });
+            _items2.Insert(position, new JsltArgument() 
+            {
+                Name = string.Empty, 
+                Value = argument, 
+                Start = argument.Start.Clone(),
+                Stop = argument.Stop.Clone() 
+            });
 
             int index = 0;
             foreach (var item in _items2)

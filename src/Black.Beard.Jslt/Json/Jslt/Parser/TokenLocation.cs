@@ -4,13 +4,27 @@ using Bb.Compilers;
 namespace Bb.Json.Jslt.Parser
 {
 
-
+    [System.Diagnostics.DebuggerDisplay("{StartIndex}, {StopIndex} : ({Line},{Column})")]
     public class TokenLocation
     {
 
         public TokenLocation()
         {
 
+        }
+
+        public TokenLocation(int start, int end)
+        {
+            this.StartIndex = start;
+            this.StopIndex = end;
+        }
+
+        public TokenLocation(int start, int end, int line, int column)
+        {
+            this.StartIndex = start;
+            this.StopIndex = end;
+            this.Line = line;
+            this.Column = column;
         }
 
         public TokenLocation(Antlr4.Runtime.IToken token)
@@ -36,6 +50,11 @@ namespace Bb.Json.Jslt.Parser
         public int StartIndex { get; }
 
         public int StopIndex { get; }
+
+        public TokenLocation Clone()
+        {
+            return new TokenLocation(this.StartIndex, this.StopIndex);
+        }
 
     }
 

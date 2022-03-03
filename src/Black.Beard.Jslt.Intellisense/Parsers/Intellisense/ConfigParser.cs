@@ -1,63 +1,34 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+using Bb.Intellisense;
+using Bb.Parsers.Intellisense.Jslt;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace Bb.Json.Jslt.Parser
+namespace Bb.Parsers.Intellisense
 {
-
-    public class ScriptParser
+    public class ConfigParser
     {
 
-        private ScriptParser(TextWriter output, TextWriter outputError)
+        private ConfigParser(TextWriter output, TextWriter outputError)
         {
-
             this.Output = output ?? Console.Out;
             this.OutputError = outputError ?? Console.Error;
             this._includes = new HashSet<string>();
         }
 
-        public static ScriptParser ParseString(StringBuilder source, string sourceFile = "", TextWriter output = null, TextWriter outputError = null)
+        public static ConfigParser ParseString(StringBuilder source, string sourceFile = "", TextWriter output = null, TextWriter outputError = null)
         {
             ICharStream stream = CharStreams.fromString(source.ToString());
 
-            var parser = new ScriptParser(output, outputError)
+            var parser = new ConfigParser(output, outputError)
             {
                 File = sourceFile ?? string.Empty,
                 Content = source,
-                Crc = Crc32.Calculate(source),
-            };
-            parser.ParseCharStream(stream);
-            return parser;
-
-        }
-
-        /// <summary>
-        /// Load specified document in a dedicated parser
-        /// </summary>
-        /// <param name="source"></param>
-        /// <param name="output"></param>
-        /// <param name="outputError"></param>
-        /// <returns></returns>
-        public static ScriptParser ParsePath(string source, TextWriter output = null, TextWriter outputError = null)
-        {
-
-            var payload = source.LoadContentFromFile();
-            ICharStream stream = CharStreams.fromString(payload.ToString());
-
-            var parser = new ScriptParser(output, outputError)
-            {
-                File = source,
-                Content = new StringBuilder(payload),
-                Crc = Crc32.Calculate(payload),
+                Crc = source.ToString().GetHashCode(),
             };
 
             parser.ParseCharStream(stream);
-
             return parser;
 
         }
@@ -85,16 +56,12 @@ namespace Bb.Json.Jslt.Parser
             if (visitor is IFile f)
                 f.Filename = this.File;
 
-            if (System.Diagnostics.Debugger.IsAttached)
-                System.Diagnostics.Trace.WriteLine(this.File);
-
             var context = this._context;
             return visitor.Visit(context);
 
         }
 
         public bool InError { get => this._parser.ErrorListeners.Count > 0; }
-        public uint Crc { get; private set; }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ParseCharStream(ICharStream stream)
@@ -107,17 +74,17 @@ namespace Bb.Json.Jslt.Parser
                 BuildParseTree = true,
                 //Trace = ScriptParser.Trace, // Ca plante sur un null, pourquoi ?
             };
-            
-            _context = _parser.script();
 
+            _context = _parser.script();
+                        
         }
 
         public JsltParser Parser { get => this._parser; }
 
         private JsltParser _parser;
         private JsltParser.ScriptContext _context;
-
         public bool IsFragment { get; private set; }
+        public int Crc { get; private set; }
     }
 
 }

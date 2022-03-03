@@ -4,6 +4,7 @@ using Bb.JsltEvaluator.Wizards;
 using Bb.Json.Jslt.Parser;
 using Bb.Json.Jslt.Services;
 using Bb.Maj;
+using Bb.Parsers.Intellisense;
 using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.CodeCompletion;
 using ICSharpCode.AvalonEdit.Folding;
@@ -35,9 +36,11 @@ namespace AppJsonEvaluator
         {
 
             InitializeComponent();
+
+            this._parsers = new Parsers();
+
             InitializeTextMarkerService();
             TemplateEditor.TextArea.TextEntering += textEditor_TextArea_TextEntering;
-            TemplateEditor.TextArea.TextEntered += textEditor_TextArea_TextEntered;
 
             this._foldingStrategy = new BraceFoldingStrategy();
 
@@ -70,18 +73,99 @@ namespace AppJsonEvaluator
 
             RowErrors.Height = new GridLength(70);
 
-            //this.TemplateEditor.SelectionStart
+
+            InitializeCompletion();
+
 
         }
 
-        //public static bool keyMatch(KeyEventArg.TYos e, Key key, bool ctrl = false, bool shift = false, bool alt = false)
-        //{
-        //    bool keyIsOk = e.Key == key;
-        //    bool CtrlIsOk = ctrl == ((e.KeyboardDevice.Modifiers & ModifierKeys.Control) == ModifierKeys.Control);
-        //    bool shiftIsOk = shift == ((e.KeyboardDevice.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift);
-        //    bool altIsOk = alt == ((e.KeyboardDevice.Modifiers & ModifierKeys.Alt) == ModifierKeys.Alt);
-        //    return keyIsOk && CtrlIsOk && shiftIsOk && altIsOk;
-        //}
+        private void InitializeCompletion()
+        {
+
+            var completionProvider = new CompletionDataProvider();
+
+            completionProvider.Add(new CompletionDataFactory("jsonfunctionName")
+                .SetAction
+                (
+                    (key, result) =>
+                    {
+
+                        foreach (var provider in Bb.Json.Jslt.Services.ServiceContainer.Common.GetServices())
+                            foreach (Factory factory in provider.GetItems())
+                                result.Add(new CompletionData(factory.MethodInfos.Content, factory.MethodInfos.Name, string.IsNullOrEmpty(factory.MethodInfos.Description) ? factory.MethodInfos.Content : factory.MethodInfos.Description));
+
+                        foreach (var provider in Bb.Json.Jslt.Services.ServiceContainer.Common.GetOutputServices())
+                            foreach (Factory factory in provider.GetItems())
+                                result.Add(new CompletionData(factory.MethodInfos.Content, factory.MethodInfos.Name, string.IsNullOrEmpty(factory.MethodInfos.Description) ? factory.MethodInfos.Content : factory.MethodInfos.Description));
+
+                    }
+                ));
+
+            completionProvider.Add(new CompletionDataFactory("jsonValueBoolean")
+                .SetAction
+                (
+                    (key, result) =>
+                    {
+                        result.Add(new CompletionData(Tokens.Get("TRUE")));
+                        result.Add(new CompletionData(Tokens.Get("FALSE")));
+                    }
+                ));
+
+
+            completionProvider.Add(new CompletionDataFactory("STRING")
+            .SetAction
+            (
+                (key, result) =>
+                {
+                    result.Add(new CompletionData(@"""""", @"""""", "string value"));
+                }
+            ));
+
+
+            // 
+
+            completionProvider.Add(new CompletionDataFactory("jsonValueNull")
+                .SetAction
+                (
+                    (key, result) =>
+                    {
+                        result.Add(new CompletionData(Tokens.Get("NULL")));
+                    }
+                ));
+
+            completionProvider.Add(new CompletionDataFactory("jsonType")
+                .SetAction
+                (
+                    (key, result) =>
+                    {
+                        result.Add(Tokens.Get("URI").GetFromToken(t => "@" + t.Text, t => "@" + t.Text, t => string.Empty));
+                        result.Add(Tokens.Get("TIME").GetFromToken(t => "@" + t.Text, t => "@" + t.Text, t => string.Empty));
+                        result.Add(Tokens.Get("DATETIME").GetFromToken(t => "@" + t.Text, t => "@" + t.Text, t => string.Empty));
+                        result.Add(Tokens.Get("STRING_").GetFromToken(t => "@" + t.Text, t => "@" + t.Text, t => string.Empty));
+                        result.Add(Tokens.Get("GUID").GetFromToken(t => "@" + t.Text, t => "@" + t.Text, t => string.Empty));
+                        result.Add(Tokens.Get("WHEN").GetFromToken(t => "@" + t.Text, t => "@" + t.Text, t => string.Empty));
+                        result.Add(Tokens.Get("CASE").GetFromToken(t => "@" + t.Text, t => "@" + t.Text, t => string.Empty));
+                        result.Add(Tokens.Get("DEFAULT").GetFromToken(t => "@" + t.Text, t => "@" + t.Text, t => string.Empty));
+                        result.Add(Tokens.Get("INTEGER").GetFromToken(t => "@" + t.Text, t => "@" + t.Text, t => string.Empty));
+                        result.Add(Tokens.Get("DECIMAL").GetFromToken(t => "@" + t.Text, t => "@" + t.Text, t => string.Empty));
+                    }
+                ));
+
+            completionProvider.Add(new CompletionDataFactory("BRACE_LEFT", "BRACKET_LEFT", "NT", "PAREN_LEFT")
+                .SetAction
+                (
+                    (key, result) =>
+                    {
+                        result.Add(new CompletionData(key.Token.Name.Replace("_", " "), key.Token.Text, string.Empty));
+                    }
+                ));
+
+
+            // 
+
+            this._completionProvider = completionProvider;
+
+        }
 
         void InitializeTextMarkerService()
         {
@@ -116,6 +200,13 @@ namespace AppJsonEvaluator
 
             base.OnClosing(e);
 
+        }
+
+        private void TemplateEditorTextChanged(object sender, EventArgs e)
+        {
+            _templateUpdated = true;
+            UpdateFolding(_templateFoldingManager, TemplateEditor);
+            UpdateTemplate();
         }
 
         private void UpdateTemplate()
@@ -196,13 +287,6 @@ namespace AppJsonEvaluator
 
             }
 
-        }
-
-        private void TemplateEditorTextChanged(object sender, EventArgs e)
-        {
-            _templateUpdated = true;
-            UpdateFolding(_templateFoldingManager, TemplateEditor);
-            UpdateTemplate();
         }
 
         private void UpdateFolding(FoldingManager foldingManager, TextEditor textEditor)
@@ -314,43 +398,32 @@ namespace AppJsonEvaluator
 
         }
 
-        void textEditor_TextArea_TextEntered(object sender, TextCompositionEventArgs e)
+        private void OpenCompletions()
         {
 
-            if (e.Text == ".")
+            // récupération des propositions de completions contextuelles à la position.
+            var position = TemplateEditor.SelectionStart;
+            var keys = this._parsers.GetIntellisense(position, new StringBuilder(TemplateEditor.Text), this._parameters.TemplateFile);
+            if (keys.Count == 0)
             {
 
-                List<MyCompletionData> items = new List<MyCompletionData>();
-
-
-                foreach (var provider in Bb.Json.Jslt.Services.ServiceContainer.Common.GetServices())
-                    foreach (Factory factory in provider.GetItems())
-                        items.Add(new MyCompletionData(factory.MethodInfos.Content, factory.MethodInfos.Name, string.IsNullOrEmpty(factory.MethodInfos.Description) ? factory.MethodInfos.Content : factory.MethodInfos.Description));
-
-
-                foreach (var provider in Bb.Json.Jslt.Services.ServiceContainer.Common.GetOutputServices())
-                    foreach (Factory factory in provider.GetItems())
-                        items.Add(new MyCompletionData(factory.MethodInfos.Content, factory.MethodInfos.Name, string.IsNullOrEmpty(factory.MethodInfos.Description) ? factory.MethodInfos.Content : factory.MethodInfos.Description));
-
-
-                // Open code completion after the user has pressed dot:
-                completionWindow = new CompletionWindow(TemplateEditor.TextArea);
-                IList<ICompletionData> data = completionWindow.CompletionList.CompletionData;
-                foreach (MyCompletionData item in items.OrderBy(c => c.Text))
-                    data.Add(item);
-
-                completionWindow.Show();
-
-                var p = completionWindow.CompletionList.RenderSize;
-                completionWindow.CompletionList.RenderSize = new Size(270, p.Height);
-
-                completionWindow.Closed += delegate
-                {
-                    completionWindow = null;
-                };
-
             }
+            var completions = this._completionProvider.GetCompletions(keys);
 
+            // Open code completion && map from proposition
+            completionWindow = new CompletionWindow(TemplateEditor.TextArea);
+            IList<ICompletionData> data = completionWindow.CompletionList.CompletionData;
+            foreach (CompletionData item in completions.OrderBy(c => c.Priority))
+                data.Add(new MyCompletionData(item));
+
+            completionWindow.Show();
+            var p = completionWindow.CompletionList.RenderSize;
+            completionWindow.CompletionList.RenderSize = new Size(270, p.Height);
+
+            completionWindow.Closed += delegate
+            {
+                completionWindow = null;
+            };
         }
 
         void textEditor_TextArea_TextEntering(object sender, TextCompositionEventArgs e)
@@ -371,19 +444,23 @@ namespace AppJsonEvaluator
         private void TemplateEditor_KeyUp(object sender, KeyEventArgs e)
         {
 
-            if (e.Key == Key.S && e.IsToggled)
+            if (e.keyMatch(Key.Space, true))
+                OpenCompletions();
+
+            else if (e.keyMatch(Key.F5, true))
                 SaveTemplate();
 
-            if (e.Key == Key.F5)
+            else if (e.Key == Key.F5)
             {
                 UpdateTemplate();
                 Update();
             }
+
         }
 
         private readonly BraceFoldingStrategy _foldingStrategy;
         private readonly FoldingManager _templateFoldingManager;
-        private readonly FoldingManager _targetFoldingManager;
+        private readonly Parsers _parsers;
         private JsltTemplate _template;
         private string _parameterFile;
         private Parameters _parameters;
@@ -449,7 +526,9 @@ namespace AppJsonEvaluator
             ControlBag.Child = TextArea;
         }
 
+
         #region Search
+
         internal void CloseSearch()
         {
 
@@ -510,6 +589,7 @@ namespace AppJsonEvaluator
         private string _lastSearch;
         private SearchWindow _windowSearch;
         private string _lastShownFolder;
+        private CompletionDataProvider _completionProvider;
 
         #endregion Search
 
@@ -876,7 +956,6 @@ namespace AppJsonEvaluator
 
 
         }
-
 
         private async Task<bool> DownloadLastversion(string targetFolder, string packageName, bool deleteDownloadToEnd)
         {

@@ -193,7 +193,7 @@ namespace Bb.Json.Jslt.Services
             {
 
                 var srcRoot = ctx.Current.Source;
-              
+
                 var v1 = ctx.Current.Source.AddVar(typeof(JObject), null, _ctorJObject.CreateObject());
                 ctx.Current.RootTarget = v1;
 
@@ -269,6 +269,14 @@ namespace Bb.Json.Jslt.Services
                 if (i != null)
                     src.Add(i);
             }
+        }
+
+        public object VisitDirective(JsltDirective node)
+        {
+
+
+            return null;
+
         }
 
         public object VisitProperty(JsltProperty node)

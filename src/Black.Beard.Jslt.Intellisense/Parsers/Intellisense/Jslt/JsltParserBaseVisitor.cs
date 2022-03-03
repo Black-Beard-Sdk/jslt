@@ -19,7 +19,7 @@
 // Ambiguous reference in cref attribute
 #pragma warning disable 419
 
-namespace Bb.Json.Jslt.Parser {
+namespace Bb.Parsers.Intellisense.Jslt {
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
 using IToken = Antlr4.Runtime.IToken;
@@ -215,4 +215,4 @@ public partial class JsltParserBaseVisitor<Result> : AbstractParseTreeVisitor<Re
 	/// <return>The visitor result.</return>
 	public virtual Result VisitJsonValueList([NotNull] JsltParser.JsonValueListContext context) { return VisitChildren(context); }
 }
-} // namespace Bb.Json.Jslt.Parser
+} // namespace Bb.Parsers.Intellisense.Jslt

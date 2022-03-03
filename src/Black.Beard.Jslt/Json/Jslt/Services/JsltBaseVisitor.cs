@@ -169,6 +169,22 @@ namespace Bb.Json.Jslt.Services
 
         }
 
+        public virtual object VisitDirective(JsltDirective node)
+        {
+
+            if (node.Where != null)
+                node.Where.Accept(this);
+
+            if (node.Source != null)
+                node.Source.Accept(this);
+
+            if (node.Value != null)
+                node.Value.Accept(this);
+
+            return node;
+
+        }
+
         public virtual object VisitProperty(JsltProperty node)
         {
 

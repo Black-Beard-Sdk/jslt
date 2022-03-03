@@ -1,0 +1,2 @@
+move *.cs ..
+move *.tokens ..

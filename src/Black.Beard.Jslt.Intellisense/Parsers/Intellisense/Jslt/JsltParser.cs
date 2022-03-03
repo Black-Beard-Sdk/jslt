@@ -19,7 +19,7 @@
 // Ambiguous reference in cref attribute
 #pragma warning disable 419
 
-namespace Bb.Json.Jslt.Parser {
+namespace Bb.Parsers.Intellisense.Jslt {
 using System;
 using System.IO;
 using System.Text;
@@ -1325,4 +1325,4 @@ public partial class JsltParser : Parser {
 
 
 }
-} // namespace Bb.Json.Jslt.Parser
+} // namespace Bb.Parsers.Intellisense.Jslt

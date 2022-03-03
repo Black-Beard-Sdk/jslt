@@ -1,4 +1,5 @@
-﻿using ICSharpCode.AvalonEdit.CodeCompletion;
+﻿using Bb.Parsers.Intellisense;
+using ICSharpCode.AvalonEdit.CodeCompletion;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Editing;
 using System;
@@ -9,6 +10,13 @@ namespace AppJsonEvaluator
     /// completion drop down.
     public class MyCompletionData : ICompletionData
     {
+
+        public MyCompletionData(CompletionData completion) 
+            : this(completion.Text, (string)completion.Content, (string)completion.Description)
+        {
+
+        }
+
         public MyCompletionData(string text, string content, string description)
         {
             this.Text = text;
@@ -17,6 +25,7 @@ namespace AppJsonEvaluator
         }
 
         public System.Windows.Media.ImageSource Image { get { return null; } }
+
 
         public string Text { get; private set; }
 

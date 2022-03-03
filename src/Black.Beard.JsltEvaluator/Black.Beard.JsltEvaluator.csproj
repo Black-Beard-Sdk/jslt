@@ -45,6 +45,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Black.Beard.Jslt.Intellisense\Black.Beard.Jslt.Intellisense.csproj" />
     <ProjectReference Include="..\Black.Beard.Jslt.Services\Black.Beard.Jslt.Services.csproj" />
     <ProjectReference Include="..\Black.Beard.Jslt\Black.Beard.Jslt.csproj" />
     <ProjectReference Include="..\ScintillaNET\ScintillaNET.csproj" />

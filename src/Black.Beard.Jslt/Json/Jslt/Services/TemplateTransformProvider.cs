@@ -42,7 +42,7 @@ namespace Bb.Json.Jslt.Services
                 if (sb.Length > 0)
                 {
                     var parser = ScriptParser.ParseString(sb);
-                    var visitor = new ScriptVisitor(this._configuration, _errors, filename);
+                    var visitor = new ScriptVisitor(this._configuration, parser.Parser, _errors, filename);
                     tree = (JsltBase)parser.Visit(visitor);
                     _foundry = visitor.Foundry;
                     culture = visitor.Culture;
@@ -80,7 +80,7 @@ namespace Bb.Json.Jslt.Services
                 Rules = rules,
                 RuleOutput = new OutputSerializationRule()
                 {
-                    Filter = outputConfiguration.Filter?.Value,
+                    Filter = outputConfiguration?.Filter?.Value,
                     Rule = ruleOutput,
                 },
                 Tree = tree,

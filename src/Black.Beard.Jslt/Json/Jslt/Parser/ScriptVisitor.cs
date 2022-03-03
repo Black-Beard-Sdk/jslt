@@ -1,4 +1,5 @@
 ﻿using Antlr4.Runtime;
+using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
 using Bb.Compilers;
@@ -26,9 +27,9 @@ namespace Bb.Json.Jslt.Parser
         /// 
         /// </summary>
         /// <param name="culture"></param>
-        public ScriptVisitor(TranformJsonAstConfiguration configuration, Diagnostics diagnostics, string path)
+        public ScriptVisitor(TranformJsonAstConfiguration configuration, JsltParser parser, Diagnostics diagnostics, string path)
         {
-
+            this._parser = parser;
             this._diagnostics = diagnostics;
             this._scriptPath = path;
 
@@ -113,7 +114,7 @@ namespace Bb.Json.Jslt.Parser
                 {
 
                 }
-                else if (prop.Name.StartsWith("$"))
+                else if (prop.Name.StartsWith("$") && prop.Name != "$directives")
                 {
 
                     if (prop.Name.StartsWith("$$"))
@@ -293,7 +294,7 @@ namespace Bb.Json.Jslt.Parser
                         else
                             args = new List<JsltBase>() { new JsltPath() { Value = txt, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() }, c };
 
-                        var call = new JsltFunctionCall("convert", args);
+                        var call = new JsltFunctionCall("convert", args) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
                         this._functions.Add(call);
                         result = call;
 
@@ -422,7 +423,7 @@ namespace Bb.Json.Jslt.Parser
                         else if (name.ToLower() == "$directives" && value is JsltObject directives)
                         {
                             ParseDirectives(directives);
-                            return null;
+                            return new JsltDirective() { Name = name, Value = value, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
                         }
 
                     }
@@ -635,13 +636,18 @@ namespace Bb.Json.Jslt.Parser
             return null;
         }
 
+        public override object VisitJsonfunctionName([NotNull] JsltParser.JsonfunctionNameContext context)
+        {
+            return context.ID().ToString();
+        }
+
         public override object VisitJsonfunctionCall([NotNull] JsltParser.JsonfunctionCallContext context)
         {
 
             JsltBase result = null;
             JsltObject obj = null;
 
-            var name = context.DOT_ID().ToString().TrimStart('.', ' ');
+            var name = (string)VisitJsonfunctionName(context.jsonfunctionName());
             List<JsltBase> argumentsJson = new List<JsltBase>();
             var arguments = context.jsonValueList();
             if (arguments != null)
@@ -827,7 +833,17 @@ namespace Bb.Json.Jslt.Parser
                 if (item is ErrorNodeImpl e)
                     AddError(e);
 
-                int c = item.ChildCount;
+                else if (item is ParserRuleContext r)
+                {
+
+                    if (r.exception != null)
+                    {
+                        AddError(r);
+                    }
+
+                }
+
+                        int c = item.ChildCount;
                 for (int i = 0; i < c; i++)
                 {
                     IParseTree child = item.GetChild(i);
@@ -1009,6 +1025,23 @@ namespace Bb.Json.Jslt.Parser
 
         }
 
+        void AddError(ParserRuleContext r)
+        {
+            ATNState state = this._parser.Atn.states[r.invokingState];
+            var o0 = this._parser.RuleNames[state.ruleIndex];
+            var o1 = this._parser.RuleNames[r.RuleIndex];
+
+            this._diagnostics
+                .AddError(
+                    Filename,
+                    r.Start.Line,
+                    r.Start.StartIndex,
+                    r.Start.Column,
+                    r.Start.Text,
+                    $"Failed to parse script. '{o0}' expect '{o1}'"
+            );
+        }
+
         void AddError(ErrorNodeImpl e)
         {
             this._diagnostics
@@ -1146,6 +1179,7 @@ namespace Bb.Json.Jslt.Parser
         #endregion directives
 
         private StringBuilder _initialSource;
+        private readonly JsltParser _parser;
         private Diagnostics _diagnostics;
         private readonly FunctionFoundry _foundry;
         private readonly string _scriptPath;
