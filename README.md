@@ -45,7 +45,7 @@ A sample for call the method
 { "prices": [{"n" : 1}, {"n" : 2}, {"n" : 3}] }
 
 // Template
-{ "prices": .sum("$..n") } // sum method is a service registered in the services list.
+{ "prices": sum("$..n") } // sum method is a service registered in the services list.
 
 // Result
 { "prices":  6 }
@@ -55,7 +55,7 @@ A sample for call the method
 if the string start with '\$' the value is automatically convert in json path. if the method expect a string you must cast the value.
 
 ```JSON
-{ "prices": .method("$..n" @string) } 
+{ "prices": method("$..n" @string) } 
 ```  
 
 ### cast
@@ -114,7 +114,7 @@ the method when is very usefull. it is a switch case.
 
 ```JSON
 {
-    "prices": .when("$.prop1" @string) 
+    "prices": when("$.prop1" @string) 
     {
         "case1": { /* structure to inject if the value of '$.prop1' is equal to 'case1' */ }
     }
@@ -190,7 +190,7 @@ You can manage any directives
    "output": 
    {
        "filter": "$.datas", // It is json path for filter just one part of the output document
-       "Mode": .to_block()  // Behavior the output serialization
+       "Mode": to_block()  // Behavior the output serialization
    }
 }   
 

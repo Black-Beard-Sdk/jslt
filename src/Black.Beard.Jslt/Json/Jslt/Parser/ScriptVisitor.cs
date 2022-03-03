@@ -740,7 +740,7 @@ namespace Bb.Json.Jslt.Parser
             {
                 if (item.Value is JsltFunctionCall ctor)
                 {
-                    LocalDebug.Stop();
+                    //LocalDebug.Stop();
                     var types = ResolveArgumentsTypes(ctor);
                     var service = this._foundry.GetService(ctor.Name, types, this._diagnostics, n.Start);
                     if (service == null)

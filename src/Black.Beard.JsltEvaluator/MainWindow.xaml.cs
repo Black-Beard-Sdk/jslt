@@ -74,15 +74,27 @@ namespace AppJsonEvaluator
 
             RowErrors.Height = new GridLength(70);
             InitializeCompletion();
-            this._timer = new Timer(this.TimerProc);
+            this._timer1 = new Timer(this.TimerProc1);
+            this._timer2 = new Timer(this.TimerProc2);
 
         }
 
-        private void TimerProc(object state)
+        private void TimerProc1(object state)
         {
-            this._timer.Dispose();
-            this._timer = new Timer(this.TimerProc);
+            this._timer1.Dispose();
+            this._timer1 = new Timer(this.TimerProc1);
             this.Dispatcher.Invoke(new Action(() => UpdateDiagnostic()));
+        }
+
+        private void TimerProc2(object state)
+        {
+            if (!this._undoTimer)
+            {
+                if (this._timer2 != null)
+                    this._timer2.Dispose();
+                this._timer2 = new Timer(this.TimerProc2);
+                this.Dispatcher.BeginInvoke(new Action(() => UpdateTemplate()));
+            }
         }
 
         private void InitializeCompletion()
@@ -210,9 +222,16 @@ namespace AppJsonEvaluator
 
         private void TemplateEditorTextChanged(object sender, EventArgs e)
         {
+            this._undoTimer = true;
+            if (this._timer2 != null)
+                this._timer2.Dispose();
+            this._timer2 = new Timer(this.TimerProc2);
+
             _templateUpdated = true;
             UpdateFolding(_templateFoldingManager, TemplateEditor);
-            UpdateTemplate();
+
+            _timer2.Change(600, 100);
+
         }
 
         private void UpdateTemplate()
@@ -231,12 +250,9 @@ namespace AppJsonEvaluator
                 var text = TemplateEditor.Text;
                 var filename = this._parameters.TemplateFile;
 
-                this.Dispatcher.BeginInvoke(() =>
-                {
-                    _template = text.GetTransformProvider(debug, filename, _path);
-                    if (this._timer != null)
-                        this._timer.Change(400, 0);
-                });
+                _template = text.GetTransformProvider(debug, filename, _path);
+                if (this._timer1 != null)
+                    this._timer1.Change(400, 0);
 
             }
             catch (ArgumentOutOfRangeException)
@@ -256,25 +272,34 @@ namespace AppJsonEvaluator
 
         private void UpdateDiagnostic()
         {
-
-            foreach (var item in _template.Diagnostics)
+            if (_template != null)
             {
+                foreach (var item in _template.Diagnostics)
+                {
 
-                Errors.Items.Add(item);
+                    Errors.Items.Add(item);
 
-                var index = item.StartIndex;
-                if (index > 0)
-                    index--;
+                    var index = item.StartIndex;
+                    if (index > 0)
+                        index--;
 
-                int lenght = 5;
-                var x = TemplateEditor.Document.TextLength - index;
-                if (x < lenght)
-                    lenght = x;
+                    int lenght = 5;
+                    var x = TemplateEditor.Document.TextLength - index;
+                    if (x < lenght)
+                        lenght = x;
 
-                ITextMarker marker = textMarkerService.Create(index, lenght);
-                marker.MarkerTypes = TextMarkerTypes.SquigglyUnderline;
-                marker.MarkerColor = Colors.Red;
+                    try
+                    {
+                        ITextMarker marker = textMarkerService.Create(index, lenght);
+                        marker.MarkerTypes = TextMarkerTypes.SquigglyUnderline;
+                        marker.MarkerColor = Colors.Red;
+                    }
+                    catch (Exception e1)
+                    {
+                        Errors.Items.Add(new ErrorModel() { Severity = SeverityEnum.Error, Message = e1.Message });
+                    }
 
+                }
             }
         }
 
@@ -284,18 +309,14 @@ namespace AppJsonEvaluator
             if (_template != null && _template.Diagnostics.Success)
             {
 
-
                 progressBar.IsIndeterminate = true;
                 progressBar.Refresh();
                 Errors.Items.Clear();
 
-
                 try
                 {
-
                     var src = new Sources(SourceJson.GetFromText(String.Empty));
                     this.TextArea.Text = _template.TransformForOutput(src);
-
                 }
                 catch (Exception e2)
                 {
@@ -305,8 +326,6 @@ namespace AppJsonEvaluator
                 {
                     progressBar.IsIndeterminate = false;
                 }
-
-
 
             }
 
@@ -339,6 +358,12 @@ namespace AppJsonEvaluator
         private void BtnSaveTemplate_Click(object sender, RoutedEventArgs e)
         {
             SaveTemplate();
+        }
+
+        private void BtnRun_Click(object sender, RoutedEventArgs e)
+        {
+            UpdateTemplate();
+            Update();
         }
 
         private void SaveTemplate()
@@ -486,7 +511,8 @@ namespace AppJsonEvaluator
         private readonly BraceFoldingStrategy _foldingStrategy;
         private readonly FoldingManager _templateFoldingManager;
         private readonly Parsers _parsers;
-        private Timer _timer;
+        private Timer _timer1;
+        private Timer _timer2;
         private JsltTemplate _template;
         private string _parameterFile;
         private Parameters _parameters;
@@ -616,6 +642,7 @@ namespace AppJsonEvaluator
         private SearchWindow _windowSearch;
         private string _lastShownFolder;
         private CompletionDataProvider _completionProvider;
+        private bool _undoTimer;
 
         #endregion Search
 

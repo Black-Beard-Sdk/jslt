@@ -61,34 +61,15 @@ namespace Bb.Parsers.Intellisense
 
                 HashSet<int> _h = new HashSet<int>();
                 HashSet<ATNState> _h2 = new HashSet<ATNState>();
-
-
-                int ruleIndex;
-                if (item is ParserRuleContext r)
+                               
+                if (item is ParserRuleContext r1)
                 {
-
-                    ruleIndex = r.RuleIndex;
-                    var stateInvoking = this._parser.Atn.states[r.invokingState];
-                    ResolveExpectedNext(stateInvoking, ruleIndex, false, _h, _h2);
-                    HashSet<Token> _h3 = ResolveExpectedTokens(_h2);
-
-                    HashSet<string> _h4 = new HashSet<string>();
-                    foreach (var item1 in _h2)
-                    {
-                        var name = _parser.RuleNames[item1.ruleIndex];
-                        if (_h4.Add(name))
-                            result.Add(new IntellisenseKey(item1, name));
-                    }
-
-                    foreach (var item2 in _h3)
-                        result.Add(new IntellisenseKey(item2));
-
+                    Evaluate(result, _h, _h2, r1);
                 }
                 else if (item is TerminalNodeImpl t)
                 {
-
-                    ruleIndex = t.Symbol.TokenIndex;
-
+                    var r2 = t.Parent as ParserRuleContext;
+                    Evaluate(result, _h, _h2, r2);
                 }
                 else
                 {
@@ -103,6 +84,26 @@ namespace Bb.Parsers.Intellisense
 
         }
 
+        private void Evaluate(List<IntellisenseKey> result, HashSet<int> _h, HashSet<ATNState> _h2, ParserRuleContext r1)
+        {
+
+            int ruleIndex = r1.RuleIndex;
+            var stateInvoking = this._parser.Atn.states[r1.invokingState];
+            ResolveExpectedNext(stateInvoking, ruleIndex, false, _h, _h2);
+            HashSet<Token> _h3 = ResolveExpectedTokens(_h2);
+
+            HashSet<string> _h4 = new HashSet<string>();
+            foreach (var item1 in _h2)
+            {
+                var name = _parser.RuleNames[item1.ruleIndex];
+                if (_h4.Add(name))
+                    result.Add(new IntellisenseKey(item1, name));
+            }
+
+            foreach (var item2 in _h3)
+                result.Add(new IntellisenseKey(item2));
+
+        }
 
         private HashSet<Token> ResolveExpectedTokens(HashSet<ATNState> _h2)
         {
