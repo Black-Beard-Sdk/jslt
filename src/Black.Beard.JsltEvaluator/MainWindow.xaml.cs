@@ -18,6 +18,7 @@ using System.ComponentModel.Design;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -72,11 +73,16 @@ namespace AppJsonEvaluator
                 this._parameters = new Parameters();
 
             RowErrors.Height = new GridLength(70);
-
-
             InitializeCompletion();
+            this._timer = new Timer(this.TimerProc);
 
+        }
 
+        private void TimerProc(object state)
+        {
+            this._timer.Dispose();
+            this._timer = new Timer(this.TimerProc);
+            this.Dispatcher.Invoke(new Action(() => UpdateDiagnostic()));
         }
 
         private void InitializeCompletion()
@@ -221,27 +227,16 @@ namespace AppJsonEvaluator
             try
             {
 
-                _template = TemplateEditor.Text.GetTransformProvider(DebugCheckBox.IsChecked.Value, this._parameters.TemplateFile, _path);
+                var debug = DebugCheckBox.IsChecked.Value;
+                var text = TemplateEditor.Text;
+                var filename = this._parameters.TemplateFile;
 
-                foreach (var item in _template.Diagnostics)
+                this.Dispatcher.BeginInvoke(() =>
                 {
-
-                    Errors.Items.Add(item);
-
-                    var index = item.StartIndex;
-                    if (index > 0)
-                        index--;
-
-                    int lenght = 5;
-                    var x = TemplateEditor.Document.TextLength - index;
-                    if (x < lenght)
-                        lenght = x;
-
-                    ITextMarker marker = textMarkerService.Create(index, lenght);
-                    marker.MarkerTypes = TextMarkerTypes.SquigglyUnderline;
-                    marker.MarkerColor = Colors.Red;
-
-                }
+                    _template = text.GetTransformProvider(debug, filename, _path);
+                    if (this._timer != null)
+                        this._timer.Change(400, 0);
+                });
 
             }
             catch (ArgumentOutOfRangeException)
@@ -259,15 +254,41 @@ namespace AppJsonEvaluator
 
         }
 
+        private void UpdateDiagnostic()
+        {
+
+            foreach (var item in _template.Diagnostics)
+            {
+
+                Errors.Items.Add(item);
+
+                var index = item.StartIndex;
+                if (index > 0)
+                    index--;
+
+                int lenght = 5;
+                var x = TemplateEditor.Document.TextLength - index;
+                if (x < lenght)
+                    lenght = x;
+
+                ITextMarker marker = textMarkerService.Create(index, lenght);
+                marker.MarkerTypes = TextMarkerTypes.SquigglyUnderline;
+                marker.MarkerColor = Colors.Red;
+
+            }
+        }
+
         private void Update()
         {
 
             if (_template != null && _template.Diagnostics.Success)
             {
 
+
                 progressBar.IsIndeterminate = true;
                 progressBar.Refresh();
                 Errors.Items.Clear();
+
 
                 try
                 {
@@ -284,6 +305,8 @@ namespace AppJsonEvaluator
                 {
                     progressBar.IsIndeterminate = false;
                 }
+
+
 
             }
 
@@ -320,11 +343,13 @@ namespace AppJsonEvaluator
 
         private void SaveTemplate()
         {
+
             if (string.IsNullOrEmpty(this._parameters.TemplateFile))
                 this._parameters.TemplateFile = GetFileFromSaveFile("Save template");
 
             if (!string.IsNullOrEmpty(this._parameters.TemplateFile))
             {
+
                 SaveParameters();
                 TemplateEditor.Save(this._parameters.TemplateFile);
                 _templateUpdated = false;
@@ -333,8 +358,8 @@ namespace AppJsonEvaluator
                 if (File.Exists(this._parameters.TemplateFile))
                     _path[0] = new FileInfo(this._parameters.TemplateFile).Directory.FullName;
 
-                UpdateTemplate();
-                Update();
+                //UpdateTemplate();
+                //Update();
 
             }
         }
@@ -461,6 +486,7 @@ namespace AppJsonEvaluator
         private readonly BraceFoldingStrategy _foldingStrategy;
         private readonly FoldingManager _templateFoldingManager;
         private readonly Parsers _parsers;
+        private Timer _timer;
         private JsltTemplate _template;
         private string _parameterFile;
         private Parameters _parameters;
