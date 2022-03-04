@@ -98,11 +98,23 @@
 
         </Grid>
 
-        <StatusBar Height="20" Grid.Row="3">
+        <StatusBar Height="27" Grid.Row="3">
+            
             <StatusBarItem>
                 <ProgressBar Width="250" Height="20" x:Name="progressBar" />
             </StatusBarItem>
-            <Label x:Name="LabelTemplateFile" />
+            
+            <Label Content="Position" VerticalAlignment="Center" Height="24" />
+            <Label x:Name="PositionIndex" Height="24" VerticalAlignment="Center" />
+
+            <Label Content="Line" Height="24" VerticalAlignment="Center" />
+            <Label x:Name="PositionLine" Height="24" VerticalAlignment="Center" />
+
+            <Label Content="Col" Height="24" VerticalAlignment="Center" />
+            <Label x:Name="PositionColumn" Height="24" VerticalAlignment="Center" />
+
+            <Label x:Name="LabelTemplateFile" Height="24" VerticalAlignment="Center" />
+
         </StatusBar>
 
     </Grid>

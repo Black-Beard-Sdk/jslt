@@ -7,6 +7,7 @@ using Bb.Maj;
 using Bb.Parsers.Intellisense;
 using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.CodeCompletion;
+using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Folding;
 using Microsoft.Win32;
 using Newtonsoft.Json.Linq;
@@ -42,7 +43,6 @@ namespace AppJsonEvaluator
 
             InitializeTextMarkerService();
             TemplateEditor.TextArea.TextEntering += textEditor_TextArea_TextEntering;
-
             this._foldingStrategy = new BraceFoldingStrategy();
 
             _templateFoldingManager = UpdateTemplate(TemplateEditor);
@@ -76,8 +76,32 @@ namespace AppJsonEvaluator
             InitializeCompletion();
             this._timer1 = new Timer(this.TimerProc1);
             this._timer2 = new Timer(this.TimerProc2);
+            this._timer3 = new Timer(this.TimerProc3);
+            this._timer3.Change(1000, 700);
 
         }
+
+        private void TimerProc3(object state)
+        {
+
+            this.Dispatcher.BeginInvoke(() =>
+            {
+
+                int index = 0;
+                int line = 0;
+
+                index = TemplateEditor.CaretOffset;
+                DocumentLine docLine = TemplateEditor.Document.GetLineByOffset(index);
+                var location = TemplateEditor.Document.GetLocation(index);
+                line = docLine.LineNumber;
+
+                this.PositionIndex.Content = index;
+                this.PositionLine.Content = location.Line;
+                this.PositionColumn.Content = location.Column;
+
+            });
+
+        }    
 
         private void TimerProc1(object state)
         {
@@ -85,7 +109,7 @@ namespace AppJsonEvaluator
             this._timer1 = new Timer(this.TimerProc1);
             this.Dispatcher.Invoke(new Action(() => UpdateDiagnostic()));
         }
-
+        
         private void TimerProc2(object state)
         {
             if (!this._undoTimer)
@@ -513,6 +537,7 @@ namespace AppJsonEvaluator
         private readonly Parsers _parsers;
         private Timer _timer1;
         private Timer _timer2;
+        private readonly Timer _timer3;
         private JsltTemplate _template;
         private string _parameterFile;
         private Parameters _parameters;

@@ -20,14 +20,14 @@ using System.Text;
 namespace Bb.Json.Jslt.Parser
 {
 
-    public class ScriptVisitor : JsltParserBaseVisitor<object>
+    public class ScriptBuilderVisitor : JsltParserBaseVisitor<object>
     {
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="culture"></param>
-        public ScriptVisitor(TranformJsonAstConfiguration configuration, JsltParser parser, Diagnostics diagnostics, string path)
+        public ScriptBuilderVisitor(TranformJsonAstConfiguration configuration, JsltParser parser, Diagnostics diagnostics, string path)
         {
             this._parser = parser;
             this._diagnostics = diagnostics;
@@ -395,10 +395,67 @@ namespace Bb.Json.Jslt.Parser
         public override object VisitPair([NotNull] JsltParser.PairContext context)
         {
 
-            var name = context.STRING()?.GetText().Trim().Trim('\"') ?? string.Empty;
+            var txt = context.STRING();
+            var name = txt?.GetText().Trim().Trim('\"');
 
             if (!string.IsNullOrEmpty(name))
             {
+
+                Dictionary<string, JToken> metadatas = new Dictionary<string, JToken>();
+                if (name.Contains(";"))
+                {
+
+                    var start = context.Start;
+                    var startIndex = start.StartIndex;
+
+                    var array = name.Split(';');
+                    name = array[0];
+                    startIndex += name.Length + 1;
+
+                    for (int i = 1; i < array.Length; i++)
+                    {
+
+                        var payload = array[i].Split(":");
+
+                        if (metadatas.TryGetValue(payload[0], out var v))
+                            AddError(new TokenLocation(startIndex, startIndex = payload.Length, start.Line, start.Column), string.Empty, $"duplicated value on metadata key {payload[0]}");
+
+                        else
+                        {
+
+                            var metaKey = payload[0];
+                            startIndex += metaKey.Length + 1;
+                            JToken prop = null;
+
+                            if (payload.Length == 1)
+                            {
+                                var location = new TokenLocation(startIndex, startIndex + payload.Length, start.Line, start.Column);
+                                AddError(location, "Failed to parse json", $"The conversion of {metaKey} in Json value failed");
+                            }
+                            else
+                            {
+                                var payloadValue = payload[1].Replace("'", @"""");
+                                try
+                                {
+                                    prop = JToken.Parse(payloadValue);
+                                }
+                                catch (Exception ex)
+                                {
+                                    var location = new TokenLocation(startIndex, startIndex + payload.Length, start.Line, start.Column);
+                                    AddError(location, "Failed to parse json", $"The conversion of {payloadValue} in Json value failed");
+                                }
+
+                                if (prop != null)
+                                    metadatas.Add(metaKey, prop);
+                            }
+
+                        }
+
+                        startIndex += payload.Length + 1;
+
+                    }
+
+                }
 
                 JsltBase value = null;
 
@@ -843,7 +900,7 @@ namespace Bb.Json.Jslt.Parser
 
                 }
 
-                        int c = item.ChildCount;
+                int c = item.ChildCount;
                 for (int i = 0; i < c; i++)
                 {
                     IParseTree child = item.GetChild(i);
