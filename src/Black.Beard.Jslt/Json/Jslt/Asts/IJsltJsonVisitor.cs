@@ -38,7 +38,9 @@ namespace Bb.Json.Jslt.Asts
         object VisitTranslateVariable(JsltTranslateVariable node);
 
         object VisitJVariable(JsltVariable node);
-        object VisitMetadata(JsltMetadata jsltMetadata);
+
+        object VisitMetadata(JsltMetadata node);
+
     }
 
 }

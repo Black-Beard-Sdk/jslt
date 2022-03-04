@@ -109,6 +109,19 @@ namespace Bb.Json.Jslt.Services
             return node;
         }
 
+        public object VisitMetadata(JsltMetadata node)
+        {
+
+            if (node.Where != null)
+                node.Where.Accept(this);
+
+            if (node.Source != null)
+                node.Source.Accept(this);
+
+            return node;
+
+        }
+
         public virtual object VisitFunction(JsltFunctionCall node)
         {
 
@@ -196,6 +209,9 @@ namespace Bb.Json.Jslt.Services
 
             if (node.Value != null)
                 node.Value.Accept(this);
+
+            foreach (var item in node.Metadatas)
+                item.Accept(this);
 
             return node;
 

@@ -186,6 +186,11 @@ namespace Bb.Json.Jslt.Services
             return Expression.Constant(node.Value);
         }
 
+        public object VisitMetadata(JsltMetadata node)
+        {
+            return Expression.Constant(node.Value);
+        }
+
         public object VisitObject(JsltObject node)
         {
 
@@ -273,10 +278,7 @@ namespace Bb.Json.Jslt.Services
 
         public object VisitDirective(JsltDirective node)
         {
-
-
             return null;
-
         }
 
         public object VisitProperty(JsltProperty node)

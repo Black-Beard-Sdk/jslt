@@ -186,6 +186,11 @@ namespace Bb.Json.Jslt.Services
             return Expression.Constant(node.Value);
         }
 
+        public object VisitMetadata(JsltMetadata node)
+        {
+            return Expression.Constant(node.Value);
+        }
+
         public object VisitObject(JsltObject node)
         {
 
@@ -284,6 +289,7 @@ namespace Bb.Json.Jslt.Services
             Expression getValue = null;
             var name = Expression.Constant(node.Name);
             var _value = node.Value;
+
             if (_value != null)
             {
 

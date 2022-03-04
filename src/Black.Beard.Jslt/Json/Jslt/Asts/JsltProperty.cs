@@ -11,7 +11,7 @@ namespace Bb.Json.Jslt.Asts
         public JsltProperty()
         {
             this.Kind = JsltKind.Property;
-            _metadatas = new Dictionary<string, JToken>();
+            _metadatas = new Dictionary<string, JsltMetadata>();
         }
 
         public string Name { get; set; }
@@ -22,6 +22,8 @@ namespace Bb.Json.Jslt.Asts
         {
             return visitor.VisitProperty(this);
         }
+
+        public IEnumerable<JsltMetadata> Metadatas { get => _metadatas.Values; }
 
         public bool GetMetadata(string metadataName, out JsltMetadata metadataValue)
         {
@@ -41,6 +43,7 @@ namespace Bb.Json.Jslt.Asts
         }
 
         private Dictionary<string, JsltMetadata> _metadatas { get; set; }
+
 
     }
 
