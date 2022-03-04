@@ -1,65 +1,69 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <RootNamespace>Bb</RootNamespace>
-    <GenerateAppxPackageOnBuild>true</GenerateAppxPackageOnBuild>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Description>Implementation of jslt language in DOTNET. Use a template for transform Json To another json.</Description>
-    <PackageProjectUrl></PackageProjectUrl>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <RepositoryUrl>https://github.com/Black-Beard-Sdk/jslt</RepositoryUrl>
-    <AssemblyVersion></AssemblyVersion>
-    <FileVersion></FileVersion>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<RootNamespace>Bb</RootNamespace>
+		<GenerateAppxPackageOnBuild>true</GenerateAppxPackageOnBuild>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Description>Implementation of jslt language in DOTNET. Use a template for transform Json document to another json document.</Description>
+		<PackageProjectUrl></PackageProjectUrl>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<AssemblyVersion></AssemblyVersion>
+		<FileVersion></FileVersion>
+		<RepositoryUrl>https://github.com/Black-Beard-Sdk/jslt</RepositoryUrl>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="ConvertToDatables\**" />
-    <EmbeddedResource Remove="ConvertToDatables\**" />
-    <None Remove="ConvertToDatables\**" />
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Remove="ConvertToDatables\**" />
+		<Compile Remove="src\**" />
+		<EmbeddedResource Remove="ConvertToDatables\**" />
+		<EmbeddedResource Remove="src\**" />
+		<None Remove="ConvertToDatables\**" />
+		<None Remove="src\**" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Compile Remove="Json\Jslt\Services\Factory.cs" />
-    <Compile Remove="Json\Jslt\Services\ObjectCreator.cs" />
-    <Compile Remove="Json\Jslt\Services\TranformJsonTemplateReader.cs" />
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Remove="Json\Jslt\Services\Factory.cs" />
+		<Compile Remove="Json\Jslt\Services\ObjectCreator.cs" />
+		<Compile Remove="Json\Jslt\Services\TranformJsonTemplateReader.cs" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Antlr4.Runtime.Standard" Version="4.9.3" />
-    <PackageReference Include="Black.Beard.Helpers.ContentLoaders" Version="1.0.5" />
-    <PackageReference Include="Black.Beard.Roslyn" Version="1.0.2" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="SharpCompress" Version="0.30.1" />
-    <PackageReference Include="System.CodeDom" Version="6.0.0" />
-    <PackageReference Include="Ude.NetStandard" Version="1.2.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Antlr4.Runtime.Standard" Version="4.9.3" />
+		<PackageReference Include="Black.Beard.Helpers.ContentLoaders" Version="1.0.5" />
+		<PackageReference Include="Black.Beard.Roslyn" Version="1.0.2" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+		<PackageReference Include="SharpCompress" Version="0.30.1" />
+		<PackageReference Include="System.CodeDom" Version="6.0.0" />
+		<PackageReference Include="Ude.NetStandard" Version="1.2.0" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="git.Expressions\Expressions\Statements\" />
-    <Folder Include="Json\Jslt\Parser\Grammar\.antlr\" />
-  </ItemGroup>
+	<ItemGroup>
+		<Folder Include="git.Expressions\Expressions\Statements\" />
+		<Folder Include="Json\Jslt\Parser\Grammar\.antlr\" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Include="..\..\README.md">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Update="git.Expressions\CsharpGenerators\ResourceString.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>ResourceString.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="git.Expressions\CsharpGenerators\ResourceString.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>ResourceString.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Update="git.Expressions\CsharpGenerators\ResourceString.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>ResourceString.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+	</ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Update="git.Expressions\CsharpGenerators\ResourceString.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>ResourceString.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
+	<ItemGroup>
+	  <None Update="README.md">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	</ItemGroup>
 
 </Project>

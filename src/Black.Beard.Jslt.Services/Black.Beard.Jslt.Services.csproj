@@ -1,38 +1,54 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <RootNamespace>Bb.Jslt.Services</RootNamespace>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<RootNamespace>Bb.Jslt.Services</RootNamespace>
 
-  <ItemGroup>
-    <PackageReference Include="ExcelDataReader" Version="3.6.0" />
-    <PackageReference Include="ExcelDataReader.DataSet" Version="3.6.0" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.42" />
-    <PackageReference Include="libphonenumber-csharp" Version="8.12.43" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="NJsonSchema" Version="10.6.8" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
-  </ItemGroup>
+		<RepositoryUrl>https://github.com/Black-Beard-Sdk/jslt</RepositoryUrl>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Description>support extended method(loading excel, html, multicsv, sql).</Description>
+		<PackageProjectUrl></PackageProjectUrl>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<AssemblyVersion></AssemblyVersion>
+		<FileVersion></FileVersion>
+		
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Black.Beard.Elasticsearch\Black.Beard.Elasticsearch.csproj" />
-    <ProjectReference Include="..\Black.Beard.Jslt\Black.Beard.Jslt.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="ExcelDataReader" Version="3.6.0" />
+		<PackageReference Include="ExcelDataReader.DataSet" Version="3.6.0" />
+		<PackageReference Include="HtmlAgilityPack" Version="1.11.42" />
+		<PackageReference Include="libphonenumber-csharp" Version="8.12.43" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+		<PackageReference Include="NJsonSchema" Version="10.6.8" />
+		<PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Csv\ExceptionMessage.Designer.cs">
-      <DependentUpon>ExceptionMessage.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-    </Compile>
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Black.Beard.Elasticsearch\Black.Beard.Elasticsearch.csproj" />
+		<ProjectReference Include="..\Black.Beard.Jslt\Black.Beard.Jslt.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Update="Csv\ExceptionMessage.resx">
-      <LastGenOutput>ExceptionMessage.Designer.cs</LastGenOutput>
-      <Generator>ResXFileCodeGenerator</Generator>
-    </EmbeddedResource>
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Update="Csv\ExceptionMessage.Designer.cs">
+			<DependentUpon>ExceptionMessage.resx</DependentUpon>
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Update="Csv\ExceptionMessage.resx">
+			<LastGenOutput>ExceptionMessage.Designer.cs</LastGenOutput>
+			<Generator>ResXFileCodeGenerator</Generator>
+		</EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="README.md">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	</ItemGroup>
 
 </Project>
