@@ -23,12 +23,12 @@ namespace Bb.Json.Jslt.Asts
             return visitor.VisitProperty(this);
         }
 
-        public bool GetMetadata(string metadataName, out JToken metadataValue)
+        public bool GetMetadata(string metadataName, out JsltMetadata metadataValue)
         {
             return _metadatas.TryGetValue(metadataName, out metadataValue);
         }
 
-        public bool AddMetadata(string metadataName, JToken metadataValue)
+        public bool AddMetadata(string metadataName, JsltMetadata metadataValue)
         {
 
             if (_metadatas.ContainsKey(metadataName))
@@ -40,7 +40,7 @@ namespace Bb.Json.Jslt.Asts
 
         }
 
-        private Dictionary<string, JToken> _metadatas { get; set; }
+        private Dictionary<string, JsltMetadata> _metadatas { get; set; }
 
     }
 

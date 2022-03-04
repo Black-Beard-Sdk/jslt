@@ -401,61 +401,7 @@ namespace Bb.Json.Jslt.Parser
             if (!string.IsNullOrEmpty(name))
             {
 
-                Dictionary<string, JToken> metadatas = new Dictionary<string, JToken>();
-                if (name.Contains(";"))
-                {
-
-                    var start = context.Start;
-                    var startIndex = start.StartIndex;
-
-                    var array = name.Split(';');
-                    name = array[0];
-                    startIndex += name.Length + 1;
-
-                    for (int i = 1; i < array.Length; i++)
-                    {
-
-                        var payload = array[i].Split(":");
-
-                        if (metadatas.TryGetValue(payload[0], out var v))
-                            AddError(new TokenLocation(startIndex, startIndex = payload.Length, start.Line, start.Column), string.Empty, $"duplicated value on metadata key {payload[0]}");
-
-                        else
-                        {
-
-                            var metaKey = payload[0];
-                            startIndex += metaKey.Length + 1;
-                            JToken prop = null;
-
-                            if (payload.Length == 1)
-                            {
-                                var location = new TokenLocation(startIndex, startIndex + payload.Length, start.Line, start.Column);
-                                AddError(location, "Failed to parse json", $"The conversion of {metaKey} in Json value failed");
-                            }
-                            else
-                            {
-                                var payloadValue = payload[1].Replace("'", @"""");
-                                try
-                                {
-                                    prop = JToken.Parse(payloadValue);
-                                }
-                                catch (Exception ex)
-                                {
-                                    var location = new TokenLocation(startIndex, startIndex + payload.Length, start.Line, start.Column);
-                                    AddError(location, "Failed to parse json", $"The conversion of {payloadValue} in Json value failed");
-                                }
-
-                                if (prop != null)
-                                    metadatas.Add(metaKey, prop);
-                            }
-
-                        }
-
-                        startIndex += payload.Length + 1;
-
-                    }
-
-                }
+                Dictionary<string, JsltMetadata> metadatas = BuildMetadatas(context, ref name);
 
                 JsltBase value = null;
 
@@ -488,18 +434,87 @@ namespace Bb.Json.Jslt.Parser
                 }
                 else
                 {
-                    //value = new JsltConstant() { Value = null, Kind = JsltKind.Null, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
                     AddError(context.Start.ToLocation(), string.Empty, $"missing value for property {name}");
                     return null;
                 }
 
-                return new JsltProperty() { Name = name, Value = value, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+                var result = new JsltProperty() { Name = name, Value = value, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+
+                foreach (var item in metadatas)
+                    result.AddMetadata(item.Key, item.Value);
+
+                return result;
 
             }
 
             AddError(context.Start.ToLocation(), string.Empty, $"missing value for property {name}");
             return null;
 
+        }
+
+        private Dictionary<string, JsltMetadata> BuildMetadatas(JsltParser.PairContext context, ref string name)
+        {
+            Dictionary<string, JsltMetadata> metadatas = new Dictionary<string, JsltMetadata>();
+            if (name.Contains(";"))
+            {
+
+                var start = context.Start;
+                var startIndex = start.StartIndex;
+
+                var array = name.Split(';');
+                name = array[0];
+                startIndex += name.Length + 2;
+
+                for (int i = 1; i < array.Length; i++)
+                {
+
+                    var lastIndex = startIndex;
+
+                    var payload = array[i].Split(":");
+
+                    if (metadatas.TryGetValue(payload[0], out var v))
+                        AddError(new TokenLocation(startIndex, payload.Length, start.Line, start.Column), string.Empty, $"duplicated value on metadata key {payload[0]}");
+
+                    else
+                    {
+
+                        var metaKey = payload[0];
+                        JToken prop = null;
+
+                        if (payload.Length == 1)
+                        {
+                            var location = new TokenLocation(startIndex, startIndex + payload.Length, start.Line, start.Column);
+                            AddError(location, "Failed to parse json", $"The conversion of {metaKey} in Json value failed.The charset separator is ':'");
+                        }
+                        else
+                        {
+
+                            startIndex += metaKey.Length;
+                            var payloadValue = payload[1].Replace("'", @"""");
+                            try
+                            {
+                                prop = JToken.Parse(payloadValue);
+                            }
+                            catch (Exception ex)
+                            {
+                                var location = new TokenLocation(startIndex, startIndex + payload.Length, start.Line, start.Column);
+                                AddError(location, "Failed to parse json", $"The conversion of {payloadValue} in Json value failed");
+                            }
+                            startIndex += payloadValue.Length;
+                            if (prop != null)
+                                metadatas.Add(metaKey, new JsltMetadata() { Start = new TokenLocation(lastIndex, startIndex, start.Line, start.Column), Value = prop });
+
+                        }
+
+                    }
+
+                    startIndex += payload.Length + 1;
+
+                }
+
+            }
+
+            return metadatas;
         }
 
 

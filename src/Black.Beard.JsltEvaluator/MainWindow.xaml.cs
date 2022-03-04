@@ -74,10 +74,10 @@ namespace AppJsonEvaluator
 
             RowErrors.Height = new GridLength(70);
             InitializeCompletion();
-            this._timer1 = new Timer(this.TimerProc1);
-            this._timer2 = new Timer(this.TimerProc2);
-            this._timer3 = new Timer(this.TimerProc3);
-            this._timer3.Change(1000, 700);
+            this._timerMajDiagnostic = new Timer(this.TimerProc1);
+            this._timerMajUpdateTemplate = new Timer(this.TimerProc2);
+            this._timerMajLocalisation = new Timer(this.TimerProc3);
+            this._timerMajLocalisation.Change(1000, 700);
 
         }
 
@@ -105,8 +105,8 @@ namespace AppJsonEvaluator
 
         private void TimerProc1(object state)
         {
-            this._timer1.Dispose();
-            this._timer1 = new Timer(this.TimerProc1);
+            this._timerMajDiagnostic.Dispose();
+            this._timerMajDiagnostic = new Timer(this.TimerProc1);
             this.Dispatcher.Invoke(new Action(() => UpdateDiagnostic()));
         }
         
@@ -114,9 +114,9 @@ namespace AppJsonEvaluator
         {
             if (!this._undoTimer)
             {
-                if (this._timer2 != null)
-                    this._timer2.Dispose();
-                this._timer2 = new Timer(this.TimerProc2);
+                if (this._timerMajUpdateTemplate != null)
+                    this._timerMajUpdateTemplate.Dispose();
+                this._timerMajUpdateTemplate = new Timer(this.TimerProc2);
                 this.Dispatcher.BeginInvoke(new Action(() => UpdateTemplate()));
             }
         }
@@ -247,14 +247,14 @@ namespace AppJsonEvaluator
         private void TemplateEditorTextChanged(object sender, EventArgs e)
         {
             this._undoTimer = true;
-            if (this._timer2 != null)
-                this._timer2.Dispose();
-            this._timer2 = new Timer(this.TimerProc2);
+            if (this._timerMajUpdateTemplate != null)
+                this._timerMajUpdateTemplate.Dispose();
+            this._timerMajUpdateTemplate = new Timer(this.TimerProc2);
 
             _templateUpdated = true;
             UpdateFolding(_templateFoldingManager, TemplateEditor);
 
-            _timer2.Change(600, 100);
+            _timerMajUpdateTemplate.Change(600, 100);
 
         }
 
@@ -275,8 +275,8 @@ namespace AppJsonEvaluator
                 var filename = this._parameters.TemplateFile;
 
                 _template = text.GetTransformProvider(debug, filename, _path);
-                if (this._timer1 != null)
-                    this._timer1.Change(400, 0);
+                if (this._timerMajDiagnostic != null)
+                    this._timerMajDiagnostic.Change(400, 0);
 
             }
             catch (ArgumentOutOfRangeException)
@@ -535,9 +535,9 @@ namespace AppJsonEvaluator
         private readonly BraceFoldingStrategy _foldingStrategy;
         private readonly FoldingManager _templateFoldingManager;
         private readonly Parsers _parsers;
-        private Timer _timer1;
-        private Timer _timer2;
-        private readonly Timer _timer3;
+        private Timer _timerMajDiagnostic;
+        private Timer _timerMajUpdateTemplate;
+        private readonly Timer _timerMajLocalisation;
         private JsltTemplate _template;
         private string _parameterFile;
         private Parameters _parameters;
