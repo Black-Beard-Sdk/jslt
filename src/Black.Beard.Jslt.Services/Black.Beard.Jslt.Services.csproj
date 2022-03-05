@@ -11,7 +11,7 @@
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<AssemblyVersion></AssemblyVersion>
 		<FileVersion></FileVersion>
-		
+		<IncludeSymbols>true</IncludeSymbols>
 	</PropertyGroup>
 
 	<ItemGroup>

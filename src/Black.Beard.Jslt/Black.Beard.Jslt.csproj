@@ -11,6 +11,7 @@
 		<AssemblyVersion></AssemblyVersion>
 		<FileVersion></FileVersion>
 		<RepositoryUrl>https://github.com/Black-Beard-Sdk/jslt</RepositoryUrl>
+		<IncludeSymbols>true</IncludeSymbols>
 	</PropertyGroup>
 
 	<ItemGroup>
