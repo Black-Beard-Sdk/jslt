@@ -22,24 +22,6 @@ namespace Bb.Json.Jslt.Services
             this._dictionary = new Dictionary<string, TransformJsonServiceProvider>();
             this._dictionaryOutput = new Dictionary<string, TransformJsonServiceProvider>();
             this.ServiceDiscovery = new ServiceDiscovery(this);
-
-            if (ServiceContainer.Common != null)
-                this.Replicate(ServiceContainer.Common);
-
-        }
-
-        private void Replicate(ServiceContainer common)
-        {
-
-            foreach (var item in common._dictionary)
-                this._dictionary.Add(item.Key, item.Value);
-
-            foreach (var item in common._dictionaryOutput)
-                this._dictionaryOutput.Add(item.Key, item.Value);
-
-            foreach (var item in common.ServiceDiscovery._assemblies)
-                this.ServiceDiscovery._assemblies.Add(item);
-
         }
 
         public ServiceContainer AddService(string name, Factory provider, bool forOutput)
@@ -70,6 +52,9 @@ namespace Bb.Json.Jslt.Services
         public Factory GetOutputService(string name, Type[] parameters)
         {
 
+            if (ServiceContainer.Common != this)
+                return ServiceContainer.Common.GetOutputService(name, parameters);
+
             if (_dictionaryOutput.TryGetValue(name.ToLower(), out TransformJsonServiceProvider serviceProvider))
                 return serviceProvider.GetForOutput(parameters);
 
@@ -81,6 +66,9 @@ namespace Bb.Json.Jslt.Services
         public Factory GetService(string name, Type[] parameters)
         {
 
+            if (ServiceContainer.Common != this)
+                return ServiceContainer.Common.GetService(name, parameters);
+
             if (_dictionary.TryGetValue(name.ToLower(), out TransformJsonServiceProvider serviceProvider))
                 return serviceProvider.Get(parameters);
 
@@ -90,6 +78,9 @@ namespace Bb.Json.Jslt.Services
 
         public TransformJsonServiceProvider GetService(string name)
         {
+
+            if (ServiceContainer.Common != this)
+                return ServiceContainer.Common.GetService(name);
 
             if (_dictionary.TryGetValue(name.ToLower(), out TransformJsonServiceProvider serviceProvider))
                 return serviceProvider;
@@ -102,6 +93,9 @@ namespace Bb.Json.Jslt.Services
         public TransformJsonServiceProvider GetOutputService(string name)
         {
 
+            if (ServiceContainer.Common != this)
+                return ServiceContainer.Common.GetOutputService(name);
+
             if (_dictionaryOutput.TryGetValue(name.ToLower(), out TransformJsonServiceProvider serviceProvider))
                 return serviceProvider;
 
@@ -111,12 +105,26 @@ namespace Bb.Json.Jslt.Services
 
         public IEnumerable<TransformJsonServiceProvider> GetOutputServices()
         {
-            return _dictionaryOutput.Values;
+
+            if (ServiceContainer.Common != this)
+                foreach (var item in ServiceContainer.Common.GetOutputServices())
+                    yield return item;
+
+            foreach (var item in _dictionaryOutput.Values)
+                yield return item;
+
         }
 
         public IEnumerable<TransformJsonServiceProvider> GetServices()
         {
-            return _dictionary.Values;
+
+            if (ServiceContainer.Common != this)
+                foreach (var item in ServiceContainer.Common.GetServices())
+                    yield return item;
+
+            foreach (var item in _dictionary.Values)
+                yield return item;
+
         }
 
         public ServiceDiscovery ServiceDiscovery { get; }

@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace Bb.Json.Jslt.CustomServices
@@ -98,6 +99,33 @@ namespace Bb.Json.Jslt.CustomServices
             else if (source is JArray a)
                 foreach (var item in a)
                     result.AppendLine(item.ToString(Newtonsoft.Json.Formatting.None));
+
+            return result;
+
+        }
+
+        [JsltExtensionMethod("to_blockfile", ForOutput = true)]
+        [JsltExtensionMethodParameter("filename", "filename where the datas will be streamed")]
+        public static StringBuilder ExecuteToBlockFile(RuntimeContext ctx, string filename)
+        {
+
+            var file = ctx.Configuration.ResolveFile(filename);
+            
+            if (!file.Directory.Exists)
+                file.Directory.Create();
+
+            var source = ctx.TokenResult;
+
+            var result = new StringBuilder();
+
+            if (source is JObject o)
+                result.AppendLine(o.ToString(Newtonsoft.Json.Formatting.None));
+
+            else if (source is JArray a)
+                foreach (var item in a)
+                    result.AppendLine(item.ToString(Newtonsoft.Json.Formatting.None));
+
+            File.AppendAllText(file.FullName, result.ToString());
 
             return result;
 

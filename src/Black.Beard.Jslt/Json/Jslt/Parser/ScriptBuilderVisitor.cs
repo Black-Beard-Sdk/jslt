@@ -120,7 +120,11 @@ namespace Bb.Json.Jslt.Parser
                     if (prop.Name.StartsWith("$$"))
                     {
                         prop.Name = prop.Name.Substring(1);
-                        result.Append(prop);
+
+                        if (result.Properties.Any(c => c.Name == prop.Name))
+                            AddError(prop.Start, "Semantic error", $"the property name '{prop.Name}' allready exists");
+                        else
+                            result.Append(prop);
                     }
 
                     else if (prop.Name == "$" || prop.Name.ToLower() == "$source")
@@ -132,8 +136,12 @@ namespace Bb.Json.Jslt.Parser
                 }
 
                 else
-                    result.Append(prop);
-
+                {
+                    if (result.Properties.Any(c => c.Name == prop.Name))
+                        AddError(prop.Start, "Semantic error", $"the property name '{prop.Name}' allready exists");
+                    else
+                        result.Append(prop);
+                }
             }
 
             return result;
@@ -428,7 +436,10 @@ namespace Bb.Json.Jslt.Parser
                             ParseDirectives(directives);
                             return new JsltDirective() { Name = name, Value = value, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
                         }
-
+                        else if (name.StartsWith("$") && name != "$")
+                        {
+                            AddWarning(value.Start, "syntax", $"{name} is not reconized.");
+                        }
                     }
 
                 }
@@ -1157,8 +1168,12 @@ namespace Bb.Json.Jslt.Parser
                                         break;
 
                                     default:
+                                        AddWarning(prop1.Start, "syntax", $"Not reconized property '{prop1.Name}' of $edirectives.");
                                         break;
                                 }
+
+                            if (mode == null)
+                                AddError(prop.Start, "syntax", $"The property 'mode' is required and expecte a function (to_json(), ...).");
 
                             this.OutputConfiguration = new OutputModelConfiguration()
                             {
@@ -1241,6 +1256,7 @@ namespace Bb.Json.Jslt.Parser
                         break;
 
                     default:
+                        AddWarning(prop.Start, "syntax", $"Not reconized property '{prop.Name}' of $edirectives.");
                         break;
                 }
 

@@ -531,12 +531,16 @@ namespace AppJsonEvaluator
         {
             if (e.Text.Length > 0 && completionWindow != null)
             {
-                if (!char.IsLetterOrDigit(e.Text[0]))
+
+                var c = e.Text[0];
+
+                if (!char.IsLetterOrDigit(c) && c != '_')
                 {
                     // Whenever a non-letter is typed while the completion window is open,
                     // insert the currently selected element.
                     completionWindow.CompletionList.RequestInsertion(e);
                 }
+
             }
             // Do not set e.Handled=true.
             // We still want to insert the character that was typed.
