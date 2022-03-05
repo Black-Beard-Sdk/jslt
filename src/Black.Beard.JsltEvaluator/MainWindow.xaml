@@ -7,7 +7,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="1000" Loaded="Window_Loaded">
+        Title="Evaluator jslt" Height="450" Width="1000" Loaded="Window_Loaded">
     <Grid>
 
         <Grid.RowDefinitions>
@@ -17,30 +17,45 @@
         </Grid.RowDefinitions>
 
         <ToolBar Height="30" Grid.Row="0"  >
+            
             <Button Name="OpenButton" Click="BtnOpenTemplate_Click" ToolTip="Open file">
                 <Button.Content>
                     <Image Source="/icons8-folder-24.png" Width="24" />
                 </Button.Content>
             </Button>
+            
             <Button x:Name="BtnSaveTemplate" Click="BtnSaveTemplate_Click" ToolTip="Save the current template">
                 <Button.Content>
                     <Image Source="/icons8-sauvegarder-32.png" Width="24" />
                 </Button.Content>
             </Button>
+            
+            <Separator Background="Gray" />
+
+            <Button x:Name="BtnVariables" Click="BtnOpenVariables_Click" ToolTip="Manage variables">
+                <Button.Content>
+                    <Image Source="/toolbox.png" Width="24" />
+                </Button.Content>
+            </Button>
+            
             <Button x:Name="BtnSaveRun" Click="BtnRun_Click" ToolTip="(F5) Run">
                 <Button.Content>
                     <Image Source="/Run.png" Width="24" />
                 </Button.Content>
             </Button>
+            
             <Separator Background="Gray" />
+            
             <CheckBox x:Name="DebugCheckBox" ClickMode="Press" HorizontalAlignment="Left" VerticalAlignment="Top" ToolTip="Mode debug">
                 <Image Source="/icons8-bug-32.png" Width="24" />
             </CheckBox>
+            
             <Button x:Name="BtnGenerateCommandLine" Click="ButtonGenerateCmdLine" ToolTip="generate the command line batch">
                 <Button.Content>
                     <Image Source="/icons8-generated-photos-50.png" Width="22" />
                 </Button.Content>
             </Button>
+            
         </ToolBar>
 
         <Grid Grid.Row="1">

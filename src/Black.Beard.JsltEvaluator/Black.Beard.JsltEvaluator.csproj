@@ -31,6 +31,7 @@
     <None Remove="icons8-generated-photos-50.png" />
     <None Remove="icons8-sauvegarder-32.png" />
     <None Remove="Run.png" />
+    <None Remove="toolbox.png" />
     <None Remove="Wizards\stickers-baguette-magique.jpg" />
   </ItemGroup>
 
@@ -58,6 +59,7 @@
     <Resource Include="icons8-generated-photos-50.png" />
     <Resource Include="icons8-sauvegarder-32.png" />
     <Resource Include="Run.png" />
+    <Resource Include="toolbox.png" />
     <Resource Include="Wizards\stickers-baguette-magique.jpg" />
   </ItemGroup>
 

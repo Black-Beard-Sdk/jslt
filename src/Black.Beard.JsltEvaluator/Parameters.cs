@@ -5,6 +5,8 @@
 
         public string TemplateFile { get; set; }
 
+        public string Variables { get; set; }
+
     }
 
 }

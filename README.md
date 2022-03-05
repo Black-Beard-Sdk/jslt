@@ -159,6 +159,9 @@ var src = new Sources(source1);
 src.Add(source2);
 src.Add(source3);
 
+// Add a value for for accessing from the template
+src.Variables.Add("My value", new JValue(1));
+
 RuntimeContext ctx = template.Transform(src);
 var result = ctx.TokenResult;
 

@@ -16,6 +16,12 @@ namespace Bb.Json.Jslt.Services
         }
 
 
+        public void Add(IDictionary<string, object> variables)
+        {
+            foreach (var item in variables)
+                Add(item.Key, item.Value);
+        }
+
         public void Add(string key, object value)
         {
             this._datas.Add(key, value);

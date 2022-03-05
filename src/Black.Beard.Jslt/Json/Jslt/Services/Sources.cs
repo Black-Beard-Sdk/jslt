@@ -17,6 +17,12 @@ namespace Bb.Json.Jslt.Services
             this.Variables = new VariableManager(this, target);
         }
 
+
+        public static Sources GetEmpty()
+        {
+            return new Sources(SourceJson.GetFromText(String.Empty));
+        }
+
         public SourceJson Source { get; }
 
 

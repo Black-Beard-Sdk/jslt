@@ -10,6 +10,7 @@ using ICSharpCode.AvalonEdit.CodeCompletion;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Folding;
 using Microsoft.Win32;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ScintillaNET;
 using System;
@@ -38,7 +39,6 @@ namespace AppJsonEvaluator
         {
 
             InitializeComponent();
-
             this._parsers = new Parsers();
 
             InitializeTextMarkerService();
@@ -46,8 +46,8 @@ namespace AppJsonEvaluator
             this._foldingStrategy = new BraceFoldingStrategy();
 
             _templateFoldingManager = UpdateTemplate(TemplateEditor);
-
             this._parameterFile = System.IO.Path.Combine(Environment.CurrentDirectory, "parameters");
+
             if (System.IO.File.Exists(this._parameterFile))
             {
 
@@ -71,6 +71,8 @@ namespace AppJsonEvaluator
             }
             else
                 this._parameters = new Parameters();
+
+            this._variableHelper = new VariableHelper(this._parameters);
 
             RowErrors.Height = new GridLength(70);
             InitializeCompletion();
@@ -339,7 +341,9 @@ namespace AppJsonEvaluator
 
                 try
                 {
-                    var src = new Sources(SourceJson.GetFromText(String.Empty));
+                    var src = Sources.GetEmpty();
+                    src.Variables.Add(_variableHelper.GetVariables());
+                    src.Variables.Add("My value", new JValue(1));
                     this.TextArea.Text = _template.TransformForOutput(src);
                 }
                 catch (Exception e2)
@@ -382,6 +386,14 @@ namespace AppJsonEvaluator
         private void BtnSaveTemplate_Click(object sender, RoutedEventArgs e)
         {
             SaveTemplate();
+        }
+
+        private void BtnOpenVariables_Click(object sender, RoutedEventArgs e)
+        {
+
+            if (this._variableHelper.OpenWindow())
+                SaveParameters();
+
         }
 
         private void BtnRun_Click(object sender, RoutedEventArgs e)
@@ -534,6 +546,7 @@ namespace AppJsonEvaluator
 
         private readonly BraceFoldingStrategy _foldingStrategy;
         private readonly FoldingManager _templateFoldingManager;
+        private VariableHelper _variableHelper;
         private readonly Parsers _parsers;
         private Timer _timerMajDiagnostic;
         private Timer _timerMajUpdateTemplate;
