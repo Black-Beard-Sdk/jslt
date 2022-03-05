@@ -25,7 +25,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Black.Beard.Elasticsearch\Black.Beard.Elasticsearch.csproj" />
 		<ProjectReference Include="..\Black.Beard.Jslt\Black.Beard.Jslt.csproj" />
 	</ItemGroup>
 
