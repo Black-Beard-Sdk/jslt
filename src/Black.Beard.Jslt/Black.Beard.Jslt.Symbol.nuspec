@@ -19,7 +19,7 @@
 	</metadata>
 
 	<files>
-		<file src=".\*.pdb" target="lib" />
+		<file src=".\*.pdb" target="lib/net6.0" />
 	</files>
 
 </package>
