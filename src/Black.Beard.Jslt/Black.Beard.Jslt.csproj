@@ -63,9 +63,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="Black.Beard.Jslt.Symbol.nuspec">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
 	  <None Update="README.md">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	    <Pack>True</Pack>
