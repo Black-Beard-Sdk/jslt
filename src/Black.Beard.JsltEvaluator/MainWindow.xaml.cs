@@ -103,7 +103,7 @@ namespace AppJsonEvaluator
 
             });
 
-        }    
+        }
 
         private void TimerProc1(object state)
         {
@@ -111,7 +111,7 @@ namespace AppJsonEvaluator
             this._timerMajDiagnostic = new Timer(this.TimerProc1);
             this.Dispatcher.Invoke(new Action(() => UpdateDiagnostic()));
         }
-        
+
         private void TimerProc2(object state)
         {
             if (!this._undoTimer)
@@ -487,29 +487,44 @@ namespace AppJsonEvaluator
         private void OpenCompletions()
         {
 
-            // récupération des propositions de completions contextuelles à la position.
-            var position = TemplateEditor.SelectionStart;
-            var keys = this._parsers.GetIntellisense(position, new StringBuilder(TemplateEditor.Text), this._parameters.TemplateFile);
-            if (keys.Count == 0)
+            try
             {
+
+                // récupération des propositions de completions contextuelles à la position.
+                var position = TemplateEditor.SelectionStart;
+                var keys = this._parsers.GetIntellisense(position, new StringBuilder(TemplateEditor.Text), this._parameters.TemplateFile);
+                if (keys.Count == 0)
+                {
+
+                }
+
+                var completions = this._completionProvider.GetCompletions(keys);
+
+                if (completions.Exceptions.Count> 0)
+                    foreach (var item in completions.Exceptions)
+                        Errors.Items.Add(new ErrorModel() { Severity = SeverityEnum.Error, Message = item.Message, Text = item.ToString() });
+
+                // Open code completion && map from proposition
+                completionWindow = new CompletionWindow(TemplateEditor.TextArea);
+                IList<ICompletionData> data = completionWindow.CompletionList.CompletionData;
+                foreach (CompletionData item in completions.OrderBy(c => c.Priority))
+                    data.Add(new MyCompletionData(item));
+
+                completionWindow.Show();
+                var p = completionWindow.CompletionList.RenderSize;
+                completionWindow.CompletionList.RenderSize = new Size(270, p.Height);
+
+                completionWindow.Closed += delegate
+                {
+                    completionWindow = null;
+                };
 
             }
-            var completions = this._completionProvider.GetCompletions(keys);
-
-            // Open code completion && map from proposition
-            completionWindow = new CompletionWindow(TemplateEditor.TextArea);
-            IList<ICompletionData> data = completionWindow.CompletionList.CompletionData;
-            foreach (CompletionData item in completions.OrderBy(c => c.Priority))
-                data.Add(new MyCompletionData(item));
-
-            completionWindow.Show();
-            var p = completionWindow.CompletionList.RenderSize;
-            completionWindow.CompletionList.RenderSize = new Size(270, p.Height);
-
-            completionWindow.Closed += delegate
+            catch (Exception ex)
             {
-                completionWindow = null;
-            };
+                Errors.Items.Add(new ErrorModel() { Severity = SeverityEnum.Error, Message = ex.Message, Text = ex.ToString() });
+            }
+
         }
 
         void textEditor_TextArea_TextEntering(object sender, TextCompositionEventArgs e)

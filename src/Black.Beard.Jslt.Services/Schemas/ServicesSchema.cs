@@ -7,7 +7,7 @@ namespace Bb.Jslt.Services.Schemas
 {
 
 
-    public static partial class Services
+    public static partial class ServicesSchema
     {
 
         [JsltExtensionMethod("schema", "use json fragment for build a schema.")]

@@ -13,7 +13,7 @@ using System.Text;
 namespace Bb.Jslt.Services.Sql
 {
 
-    public static partial class Services
+    public static partial class ServicesSql
     {
 
 

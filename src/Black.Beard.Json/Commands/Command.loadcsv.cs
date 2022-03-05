@@ -3,6 +3,7 @@ using Bb.CommandLines;
 using Bb.CommandLines.Ins;
 using Bb.CommandLines.Outs;
 using Bb.CommandLines.Validators;
+using Bb.Jslt.Services.Sql;
 using Bb.Sdk.Csv;
 using Microsoft.Extensions.CommandLineUtils;
 using Newtonsoft.Json;
@@ -138,7 +139,7 @@ namespace Bb.Json.Commands
 
                                 var n = reader.GetName(i);
                                 string name = hasHeader
-                                    ? Bb.Jslt.Services.Sql.Services.GetLabel(n)
+                                    ? ServicesSql.GetLabel(n)
                                     : "Column" + i.ToString();
 
                                 var value = reader.GetValue(i);

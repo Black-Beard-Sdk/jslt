@@ -12,7 +12,7 @@ namespace Bb.Jslt.Services.Excels
 {
 
 
-    public static partial class Services
+    public static partial class ServicesXls
     {
 
         [JsltExtensionMethod("loadxls")]

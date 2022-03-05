@@ -14,7 +14,7 @@ using System.Text;
 namespace Bb.Jslt.Services.Html
 {
 
-    public static partial class Services
+    public static class ServiceHtml
     {
 
 

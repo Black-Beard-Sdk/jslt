@@ -11,13 +11,24 @@
 
         public string[] Names { get; }
 
+        public Exception Exception { get; private set; }
 
         internal void Populate(IntellisenseKey key, CompletionResult result)
         {
+
+            Exception = null;
+
             if (this._action == null)
                 throw new NullReferenceException("Please intialize the provider with the method SetAction");
 
-            this._action(key, result);
+            try
+            {
+                this._action(key, result);
+            }
+            catch (Exception ex)
+            {
+                this.Exception = ex;
+            }
         }
 
         public CompletionDataFactory SetAction(Action<IntellisenseKey, CompletionResult> action)

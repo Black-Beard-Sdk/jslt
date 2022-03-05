@@ -41,13 +41,20 @@ namespace Bb.Parsers.Intellisense
         public CompletionResult GetCompletions(List<IntellisenseKey> keys)
         {
 
+            List<Exception> _exceptions = new List<Exception>();
             var result = new CompletionResult();
 
             foreach (var key in keys)
                 if (_factories.TryGetValue(key.Name, out var factory))
+                {
                     factory.Populate(key, result);
+                    if (factory.Exception != null)
+                        _exceptions.Add(factory.Exception);
+                }
                 else
                     Debug.WriteLine($"completion key {key.Name} not matches");
+
+            result.Exceptions = _exceptions;
 
             return result;
         }

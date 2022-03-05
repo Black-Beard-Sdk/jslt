@@ -1,4 +1,5 @@
-﻿using Bb.Json.Attributes;
+﻿using Bb.Jslt.Services.Sql;
+using Bb.Json.Attributes;
 using Bb.Json.Jslt.Services;
 using Bb.Sdk.Csv;
 using Newtonsoft.Json.Linq;
@@ -13,7 +14,7 @@ namespace Bb.Jslt.Services.Csv
 {
 
 
-    public static partial class Services
+    public static class ServiceCsv
     {
 
         [JsltExtensionMethod("loadcsv")]
@@ -22,7 +23,7 @@ namespace Bb.Jslt.Services.Csv
         [JsltExtensionMethodParameter("separator", "separator charset. If null the value is ';'")]
         [JsltExtensionMethodParameter("quote", "quote charset. If null the value is '\"'")]
         [JsltExtensionMethodParameter("escape", "quote charset. If null the value is '\"'")]
-        public static JToken ExecuteLoadSource(RuntimeContext ctx, string sourcePath, bool hasHeader, string separator, string quote, string escape)
+        public static JToken ExecuteLoadCsvSource(RuntimeContext ctx, string sourcePath, bool hasHeader, string separator, string quote, string escape)
         {
 
             if (string.IsNullOrEmpty(separator))
@@ -93,7 +94,7 @@ namespace Bb.Jslt.Services.Csv
 
                         var n = reader.GetName(i);
                         string name = hasHeader
-                            ? Bb.Jslt.Services.Sql.Services.GetLabel(n)
+                            ? ServicesSql.GetLabel(n)
                             : "Column" + i.ToString();
 
                         var value = reader.GetValue(i);

@@ -7,7 +7,7 @@ using System.Collections.Generic;
 namespace Bb.Jslt.Services.MultiCsv
 {
 
-    public static partial class Services
+    public static partial class ServicesMultiCsv
     {
 
         [JsltExtensionMethod("loadmcsv", "Load csv with multi header")]

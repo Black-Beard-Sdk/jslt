@@ -10,11 +10,11 @@
         }
 
         public string Message { get; set; }
-        public string Text { get; internal set; }
-        public int Column { get; internal set; }
-        public int StartIndex { get; internal set; }
-        public int Line { get; internal set; }
-        public string Filename { get; internal set; }
+        public string Text { get; set; }
+        public int Column { get; set; }
+        public int StartIndex { get; set; }
+        public int Line { get; set; }
+        public string Filename { get; set; }
 
         public SeverityEnum Severity { get; set; }
 

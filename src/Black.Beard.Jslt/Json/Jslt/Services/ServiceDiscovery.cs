@@ -43,6 +43,7 @@ namespace Bb.Json.Jslt.Services
                                 var methods = MethodDiscovery.GetMethods(type, BindingFlags.Public | BindingFlags.Static, typeof(JToken)).ToList();
                                 if (methods.Any())
                                     Append(methods);
+
                                 methods = MethodDiscovery.GetMethods(type, BindingFlags.Public | BindingFlags.Static, typeof(StringBuilder)).ToList();
                                 if (methods.Any())
                                     Append(methods);
