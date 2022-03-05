@@ -104,6 +104,7 @@
                             <GridViewColumn Header="Severity" Width="70" DisplayMemberBinding="{Binding Severity}" />
                             <GridViewColumn Header="Location" Width="50" DisplayMemberBinding="{Binding Location}" />
                             <GridViewColumn Header="Message" Width="400" DisplayMemberBinding="{Binding Message}" />
+                            <GridViewColumn Header="Text" Width="400" DisplayMemberBinding="{Binding Text}" />
                         </GridView>
                     </ListView.View>
                 </ListView>
