@@ -6,12 +6,11 @@
 		<GenerateAppxPackageOnBuild>true</GenerateAppxPackageOnBuild>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Description>Implementation of jslt language in DOTNET. Use a template for transform Json document to another json document.</Description>
-		<PackageProjectUrl></PackageProjectUrl>
+		<PackageProjectUrl>https://github.com/Black-Beard-Sdk/jslt</PackageProjectUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<AssemblyVersion></AssemblyVersion>
 		<FileVersion></FileVersion>
 		<RepositoryUrl>https://github.com/Black-Beard-Sdk/jslt</RepositoryUrl>
-		<IncludeSymbols>true</IncludeSymbols>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -45,6 +44,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Include="..\..\LICENSE" Link="LICENSE" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Compile Update="git.Expressions\CsharpGenerators\ResourceString.Designer.cs">
 			<DesignTime>True</DesignTime>
 			<AutoGen>True</AutoGen>
@@ -60,6 +63,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Update="Black.Beard.Jslt.Symbol.nuspec">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
 	  <None Update="README.md">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	    <Pack>True</Pack>
