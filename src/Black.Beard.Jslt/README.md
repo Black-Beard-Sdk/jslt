@@ -61,6 +61,7 @@ The following sample for help you to easy start.
 
 ```
 
+Now a sample for use template
 ```CSHARP
 
     var file = new FileInfo(rulePayload);
