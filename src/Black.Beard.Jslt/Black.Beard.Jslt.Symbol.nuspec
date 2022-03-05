@@ -7,7 +7,7 @@
 		<version>$version$</version>
 		
 		<authors>Black.Beard</authors>
-		<readme>README.md</readme>
+		
 		<description>Implementation of jslt language in DOTNET. Use a template for transform Json document to another json document.</description>
 		<repository url="https://github.com/Black-Beard-Sdk/jslt" />
 		
