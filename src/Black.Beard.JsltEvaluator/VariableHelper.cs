@@ -13,7 +13,6 @@ namespace AppJsonEvaluator
         public VariableHelper(Parameters parameters)
         {
             this._parameters = parameters;
-            this._variables = new Dictionary<string, object>();
         }
 
 
@@ -65,51 +64,24 @@ namespace AppJsonEvaluator
 
         }
                
-        public IDictionary<string, object> GetVariables()
+        public IDictionary<string, JToken> GetVariables()
         {
-            this._variables.Clear();
-            var datas = JObject.Parse(GetCode());
-            ApplyVariables(datas);
-            return this._variables;
-        }
-
-        private void ApplyVariables(JObject datas)
-        {
-
-            foreach (var data in datas.Properties())
+            try
+            {
+                var datas = JObject.Parse(GetCode());
+                return datas.ExtractVariables();
+            }
+            catch (Exception)
             {
 
-                var name = data.Name;
-                if (name.StartsWith("@"))
-                {
-                    name = name.Substring(1);
-                    if (_variables.ContainsKey(name))
-                        throw new Exception("duplicated variable key");
-                    _variables.Add(name, data.Value);
-                }
-
-                TryToApplyChildres(data.Value);
 
             }
 
-        }
-
-        private void TryToApplyChildres(JToken data)
-        {
-            
-            if (data is JObject o)
-                ApplyVariables(o);
-
-            else if (data is JArray a)
-                foreach (var item in a)
-                    TryToApplyChildres(item);
+            return null;
 
         }
-
-
+               
         private readonly Parameters _parameters;
-        private Dictionary<string, object> _variables;
-
 
     }
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 
 namespace Bb.Json.Jslt.Services
@@ -16,10 +17,11 @@ namespace Bb.Json.Jslt.Services
         }
 
 
-        public void Add(IDictionary<string, object> variables)
+        public void Add(IDictionary<string, JToken>? variables)
         {
-            foreach (var item in variables)
-                Add(item.Key, item.Value);
+            if (variables != null)
+                foreach (var item in variables)
+                    Add(item.Key, item.Value);
         }
 
         public void Add(string key, object value)
