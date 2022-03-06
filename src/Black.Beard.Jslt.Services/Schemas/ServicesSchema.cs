@@ -14,10 +14,14 @@ namespace Bb.Jslt.Services.Schemas
         [JsltExtensionMethodParameter("fragment", "fragment to analyze.")]
         public static JToken LoadSchema(RuntimeContext ctx, JToken fragment)
         {
+
             var schemaObject = JsonSchema.FromSampleJson(fragment.ToString());
             var datasPayload = schemaObject.ToJson();
             var datas = JObject.Parse(datasPayload);
+
             return datas;
+
         }
+
     }
 }

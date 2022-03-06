@@ -63,7 +63,9 @@ namespace Bb.Elastic.Runtimes.Models
 
             var sb = ContentHelper.LoadContentFromFile(this.Filename);
             JArray a = JArray.Parse(sb.ToString());
+
             this.Deserialize(a);
+
         }
 
         public void Save()
