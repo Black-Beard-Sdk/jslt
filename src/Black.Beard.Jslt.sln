@@ -36,6 +36,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScintillaNET", "ScintillaNE
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Jslt.Intellisense", "Black.Beard.Jslt.Intellisense\Black.Beard.Jslt.Intellisense.csproj", "{930D9FBE-770C-4FDB-9BAF-BF335B97F2DC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Black.Beard.Jslt.Output.StoreSql", "Black.Beard.Jslt.Output.StoreSql\Black.Beard.Jslt.Output.StoreSql.csproj", "{1CEFFAE6-F119-41C7-A9E5-2E39C7065E86}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -91,6 +93,12 @@ Global
 		{930D9FBE-770C-4FDB-9BAF-BF335B97F2DC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{930D9FBE-770C-4FDB-9BAF-BF335B97F2DC}.Signed|Any CPU.ActiveCfg = Debug|Any CPU
 		{930D9FBE-770C-4FDB-9BAF-BF335B97F2DC}.Signed|Any CPU.Build.0 = Debug|Any CPU
+		{1CEFFAE6-F119-41C7-A9E5-2E39C7065E86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CEFFAE6-F119-41C7-A9E5-2E39C7065E86}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CEFFAE6-F119-41C7-A9E5-2E39C7065E86}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CEFFAE6-F119-41C7-A9E5-2E39C7065E86}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1CEFFAE6-F119-41C7-A9E5-2E39C7065E86}.Signed|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CEFFAE6-F119-41C7-A9E5-2E39C7065E86}.Signed|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

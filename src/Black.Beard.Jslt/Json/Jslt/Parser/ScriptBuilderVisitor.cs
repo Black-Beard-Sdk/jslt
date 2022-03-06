@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -263,12 +264,63 @@ namespace Bb.Json.Jslt.Parser
             if (txt.StartsWith(@"""") && txt.EndsWith(@""""))
                 txt = txt.Substring(1, txt.Length - 2);
 
-            txt = txt.Replace(@"\\", @"\")
-                     .Replace(@"\""", @"""")
-                     .Replace(@"\t", "\t")
-                     .Replace(@"\r", "\r")
-                     .Replace(@"\n", "\n")
-                     ;
+
+            StringBuilder sb = new StringBuilder(txt.Length + 10);
+            for (int i = 0; i < txt.Length; i++)
+            {
+
+                var c = txt[i];
+
+                if (c == '\\')
+                {
+                    c = txt[++i];
+                    switch (c)
+                    {
+
+                        case '\\':
+                            sb.Append(c);
+                            break;
+
+                        case '\"':
+                            sb.Append(c);
+                            break;
+
+                        case '\t':
+                            LocalDebug.Stop();
+                            sb.Append(c);
+                            break;
+
+                        case '\n':
+                            LocalDebug.Stop();
+                            sb.Append(c);
+                            break;
+
+                        case '\r':
+                            LocalDebug.Stop();
+                            sb.Append(c);
+                            break;
+
+                        default:
+                            LocalDebug.Stop();
+                            break;
+                    }
+
+                }
+                else
+                    sb.Append(c);
+
+            }
+
+            txt = sb.ToString();
+
+            //txt = txt.
+            //          
+            //         .Replace(@"\""", @"""")
+            //         .Replace(@"\t", "\t")
+            //         .Replace(@"\r", "\r")
+            //         .Replace(@"\n", "\n")
+            ;
+
 
             var containsVariable = txt.Contains("@@");
 
@@ -959,12 +1011,12 @@ namespace Bb.Json.Jslt.Parser
         private void LoadAssemblyFromCs(List<FileInfo> sources)
         {
 
-            var assembly = CSharp.GetAssembly(sources.Select(c => c.FullName).ToArray());
+            var assemblyDescription = CSharp.GetAssembly(sources.Select(c => c.FullName).ToArray());
 
-            if (!assembly.Success)
+            if (!assemblyDescription.Success)
             {
 
-                foreach (DiagnosticResult diagnostic in assembly.Disgnostics)
+                foreach (DiagnosticResult diagnostic in assemblyDescription.Disgnostics)
                 {
                     var location = new TokenLocation(diagnostic.Locations.FirstOrDefault()) { };
                     if (diagnostic.IsWarningAsError)
@@ -988,14 +1040,23 @@ namespace Bb.Json.Jslt.Parser
 
             }
 
-            this._foundry.AddAssembly(assembly.AssemblyFile);
+            Assembly assembly = TypeDiscovery.Instance.AddAssemblyFile(assemblyDescription.AssemblyFile, System.Diagnostics.Debugger.IsAttached);
+            var discovery = this._configuration.Services.ServiceDiscovery;
+            discovery.AddAssembly(assembly);
 
         }
 
         private void LoadAssembly(List<FileInfo> sources)
         {
+
+            var discovery = this._configuration.Services.ServiceDiscovery;
+
             foreach (var file in sources)
-                this._foundry.AddAssembly(file.FullName);
+            {
+                Assembly assembly = TypeDiscovery.Instance.AddAssemblyFile(file.FullName, System.Diagnostics.Debugger.IsAttached);
+                discovery.AddAssembly(assembly);
+            }
+
         }
 
         private void LoadAssembly(List<string> sources)
@@ -1062,15 +1123,7 @@ namespace Bb.Json.Jslt.Parser
             var file = new FileInfo(u);
 
             if (!file.Exists)
-            {
-
-                if (!string.IsNullOrEmpty(this._scriptPath))
-                    file = this._configuration.ResolveFile(this._scriptPath);
-
-                if (!file.Exists)
-                    file = this._configuration.ResolveFile(u);
-
-            }
+                file = this._configuration.ResolveFile(u);
 
             return file;
 
@@ -1108,19 +1161,27 @@ namespace Bb.Json.Jslt.Parser
 
         void AddError(ParserRuleContext r)
         {
-            ATNState state = this._parser.Atn.states[r.invokingState];
-            var o0 = this._parser.RuleNames[state.ruleIndex];
-            var o1 = this._parser.RuleNames[r.RuleIndex];
+
+            int stateId = r.invokingState;
+
+            if (stateId == -1)
+                stateId = r.exception.OffendingState;
+
+            ATNState state = this._parser.Atn.states[stateId];
+            string o0 = this._parser.RuleNames[state.ruleIndex];
+            string o1 = this._parser.RuleNames[r.RuleIndex];
 
             this._diagnostics
-                .AddError(
+                .AddError
+                (
                     Filename,
                     r.Start.Line,
                     r.Start.StartIndex,
                     r.Start.Column,
                     r.Start.Text,
                     $"Failed to parse script. '{o0}' expect '{o1}'"
-            );
+                );
+
         }
 
         void AddError(ErrorNodeImpl e)
@@ -1187,51 +1248,74 @@ namespace Bb.Json.Jslt.Parser
                         var _culture = prop.Value as JsltConstant;
                         if (_culture != null)
                         {
-                            if (_culture.Value is string t)
-                                this._currentCulture = CultureInfo.GetCultureInfo(t);
+                            try
+                            {
 
-                            else if (_culture.Value is int i)
-                                this._currentCulture = CultureInfo.GetCultureInfo(i);
+                                if (_culture.Value is string t)
+                                    this._currentCulture = CultureInfo.GetCultureInfo(t);
+
+                                else if (_culture.Value is int i)
+                                    this._currentCulture = CultureInfo.GetCultureInfo(i);
+
+                            }
+                            catch (Exception)
+                            {
+                                AddError(prop.Start, "syntax", $"Culture can't be resolved. https://docs.microsoft.com/fr-fr/dotnet/api/system.globalization.cultureinfo.getcultureinfo");
+                            }
+
                         }
                         break;
 
                     case "functions":
                         var cs = new List<FileInfo>();
                         if (prop.Value is JsltArray ar1)
+                        {
                             foreach (JsltBase fu in ar1.Items)
                                 if (fu is JsltConstant v)
                                     if (v.Value is Uri u)
                                         CollectCs(u.AbsoluteUri, cs, fu);
                                     else if (v.Value is string str && !string.IsNullOrEmpty(str))
                                         CollectCs(str, cs, fu);
+                        }
+                        else
+                            AddError(prop.Start, "syntax", $"'functions' must to have an array of string with the filenames of scripts.");
                         LoadAssemblyFromCs(cs);
                         break;
 
                     case "assemblies":
                         var assemblies = new List<string>();
                         if (prop.Value is JsltArray ar2)
+                        {
                             foreach (JsltBase fu in ar2.Items)
                                 if (fu is JsltConstant v)
                                     if (v.Value is string str && !string.IsNullOrEmpty(str))
                                         assemblies.Add(str);
+                        }
+                        else
+                            AddError(prop.Start, "syntax", $"'assemblies' must to have an array of string with the assemblies referenced in the Gac.");
                         LoadAssembly(assemblies);
                         break;
 
                     case "imports":
                         var dll1 = new List<FileInfo>();
                         if (prop.Value is JsltArray ar3)
+                        {
                             foreach (JsltBase fu in ar3.Items)
                                 if (fu is JsltConstant v)
                                     if (v.Value is Uri u)
                                         CollectLib(u.AbsoluteUri, dll1, fu);
                                     else if (v.Value is string str)
                                         CollectLib(str, dll1, fu);
+                        }
+                        else
+                            AddError(prop.Start, "syntax", $"'imports' must to have an array of string with the filenames of libraries.");
                         LoadAssembly(dll1);
                         break;
 
                     case "packages":
                         var dll2 = new List<FileInfo>();
                         if (prop.Value is JsltArray ar4)
+                        {
                             foreach (JsltBase fu in ar4.Items)
                             {
                                 if (fu is JsltConstant packageName)
@@ -1250,11 +1334,15 @@ namespace Bb.Json.Jslt.Parser
                                 else
                                     this._diagnostics.AddError(String.Empty, null, String.Empty, "the directives packages accepts only array of string or an array of array of two strings.");
                             }
+                        }
+                        else
+                            AddError(prop.Start, "syntax", $"'packages' must to have an array of string with the package names.");
+
                         LoadAssembly(dll2);
                         break;
 
                     default:
-                        AddWarning(prop.Start, "syntax", $"Not reconized property '{prop.Name}' of $edirectives.");
+                        AddWarning(prop.Start, "syntax", $"Not reconized property '{prop.Name}' of $directives.");
                         break;
                 }
 

@@ -16,7 +16,7 @@ namespace Bb.Json.Jslt.Services
             service.ServiceDiscovery.AddAssembly(typeof(TranformJsonAstConfiguration).Assembly);
         }
 
-        public ServiceContainer()
+        private ServiceContainer()
         {
 
             this._dictionary = new Dictionary<string, TransformJsonServiceProvider>();

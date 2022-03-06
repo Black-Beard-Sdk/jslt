@@ -18,7 +18,7 @@ namespace Bb.Json.Jslt.Services
         public FunctionFoundry(TranformJsonAstConfiguration configuration)
         {
             this.configuration = configuration;
-            this.Services = new ServiceContainer();
+            this.Services = this.configuration.Services; 
 
             foreach (Assembly assembly in configuration.Assemblies)
                 ServiceContainer.Common.ServiceDiscovery.AddAssembly(assembly);
@@ -89,24 +89,31 @@ namespace Bb.Json.Jslt.Services
         private TranformJsonAstConfiguration configuration;
         private ServiceContainer Services;
 
-        internal void AddAssembly(string assemblyFilename)
+        internal Assembly AddAssembly(string assemblyFilename)
         {
             Assembly assembly = TypeDiscovery.Instance.AddAssemblyFile(assemblyFilename, System.Diagnostics.Debugger.IsAttached);
             AddAssembly(assembly);
+            return assembly;
         }
 
-        internal void AddAssemblyName(string assemblyname)
+        internal Assembly AddAssemblyName(string assemblyname)
         {
             Assembly assembly = TypeDiscovery.Instance.AddAssemblyname(assemblyname);
             AddAssembly(assembly);
+            return assembly;
 
         }
         
-        public void AddAssembly(Assembly assembly)
+        public Assembly AddAssembly(Assembly assembly)
         {
-            var types = TypeDiscovery.Instance.GetTypesWithAttributes<JsltExtensionMethodAttribute>(typeof(ITransformJsonService), c => true);
+            
+            var types = TypeDiscovery.Instance.GetTypesWithAttributes<JsltExtensionMethodAttribute>(typeof(ITransformJsonService), c => true)
+            .Where(c => c.Assembly == assembly);
+
             foreach (var item in types)
                 AddService(item, null);
+
+            return assembly;
         }
 
         public FunctionFoundry AddService(Type service, string name = null)
