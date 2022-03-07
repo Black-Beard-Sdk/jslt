@@ -52,6 +52,7 @@ namespace Bb.Json.Jslt.Services
             }
             catch (Exception e)
             {
+                LocalDebug.Stop();
                 throw new ParsingJsonException("Failed to parse Json. " + e.Message, e);
             }
 

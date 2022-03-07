@@ -24,16 +24,16 @@ CURRENT_VALUE : '@' ;
 COLON : ':';
 SHARP : '#';
 
-URI : 'uri';
-TIME : 'time';
-DATETIME : 'datetime';
-STRING_ : 'string';
-GUID : 'uuid';
-WHEN : 'when';
-CASE : 'case';
+URI_TYPE : '@uri';
+TIME_TYPE : '@time';
+DATETIME_TYPE : '@datetime';
+STRING_TYPE : '@string';
+GUID_TYPE : '@uuid';
+WHEN_TYPE : '@when';
+INTEGER_TYPE : '@integer';
+DECIMAL_TYPE : '@decimal';
+
 DEFAULT : 'default';
-INTEGER : 'integer';
-DECIMAL : 'decimal';
 
 EQ : '==' ;
 NE : '!=' ;
@@ -119,3 +119,7 @@ ID
 // DOT_ID
 //   : '.' [_A-Za-z]+ [_A-Za-z0-9]*
 //   ;
+
+IDLOWCASE
+   : [_a-z] [_a-z0-9]*
+   ;

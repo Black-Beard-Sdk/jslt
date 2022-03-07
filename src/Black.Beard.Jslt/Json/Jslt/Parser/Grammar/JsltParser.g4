@@ -60,7 +60,7 @@ jsonValueNumber : NUMBER jsonType?;
 jsonValueInteger : INT jsonType?;
 jsonValueBoolean : (TRUE | FALSE) jsonType?;
 jsonValueNull : NULL;
-jsonType : CURRENT_VALUE (URI | TIME | DATETIME | STRING_ | GUID | INTEGER | DECIMAL);
+jsonType : (URI_TYPE | TIME_TYPE | DATETIME_TYPE | STRING_TYPE | GUID_TYPE | INTEGER_TYPE | DECIMAL_TYPE | CURRENT_VALUE IDLOWCASE);
 
 jsonLtOperation :
      jsonLtItem

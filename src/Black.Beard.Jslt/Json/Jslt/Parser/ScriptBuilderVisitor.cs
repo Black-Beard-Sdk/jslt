@@ -420,27 +420,35 @@ namespace Bb.Json.Jslt.Parser
         public override object VisitJsonType([NotNull] JsltParser.JsonTypeContext context)
         {
 
+            var lowcase = context.IDLOWCASE();
+            if (lowcase != null)
+            {
+
+                LocalDebug.Stop();
+
+            }
+
             var txt = context.GetText().Substring(1);
 
-            if (context.URI() != null)
+            if (context.URI_TYPE() != null)
                 return new JsltConstant() { Value = typeof(Uri), Kind = JsltKind.Type, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
 
-            else if (context.TIME() != null)
+            else if (context.TIME_TYPE() != null)
                 return new JsltConstant() { Value = typeof(TimeSpan), Kind = JsltKind.Type, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
 
-            else if (context.DATETIME() != null)
+            else if (context.DATETIME_TYPE() != null)
                 return new JsltConstant() { Value = typeof(DateTime), Kind = JsltKind.Type, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
 
-            else if (context.STRING_() != null)
+            else if (context.STRING_TYPE() != null)
                 return new JsltConstant() { Value = typeof(string), Kind = JsltKind.Type, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
 
-            else if (context.GUID() != null)
+            else if (context.GUID_TYPE() != null)
                 return new JsltConstant() { Value = typeof(Guid), Kind = JsltKind.Type, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
 
-            else if (context.INTEGER() != null)
+            else if (context.INTEGER_TYPE() != null)
                 return new JsltConstant() { Value = typeof(Int64), Kind = JsltKind.Type, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
 
-            else if (context.DECIMAL() != null)
+            else if (context.DECIMAL_TYPE() != null)
                 return new JsltConstant() { Value = typeof(decimal), Kind = JsltKind.Type, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
 
             throw new NotImplementedException(context.GetText());
@@ -596,56 +604,63 @@ namespace Bb.Json.Jslt.Parser
             {
 
                 var subOperations = context.jsonLtOperation();
-                List<JsltBase> _subs = new List<JsltBase>(subOperations.Length);
-                foreach (var item in subOperations)
-                    _subs.Add((JsltBase)item.Accept(this));
-
-                left = _subs[0];
-                if (left != null)
+                if (subOperations.Length > 0)
                 {
+                    List<JsltBase> _subs = new List<JsltBase>(subOperations.Length);
+                    foreach (var item in subOperations)
+                        _subs.Add((JsltBase)item.Accept(this));
 
-                    if (context.NT() != null)
-                        left = new JsltOperator(_subs[0], OperationEnum.Not) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
-
-                    else
+                    left = _subs.Count > 0 ? _subs[0] : null;
+                    if (left != null)
                     {
 
-                        OperationEnum operation = OperationEnum.Undefined;
-                        var ope = context.operation();
-                        if (ope != null)
+                        if (context.NT() != null)
+                            left = new JsltOperator(_subs[0], OperationEnum.Not) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+
+                        else
                         {
 
-                            operation = (OperationEnum)ope.Accept(this);
+                            OperationEnum operation = OperationEnum.Undefined;
+                            var ope = context.operation();
+                            if (ope != null)
+                            {
 
-                            if (_subs.Count == 1)
-                            {
-                                AddError(context.Start.ToLocation(), string.Empty, "missing binary right expression");
-                                return null;
-                            }
-                            else
-                            {
-                                var right = _subs[1];
-                                if (operation == OperationEnum.Chain)
+                                operation = (OperationEnum)ope.Accept(this);
+
+                                if (_subs.Count == 1)
                                 {
-                                    if (right is JsltFunctionCall f)
-                                    {
-                                        f.Inject(left, 0);
-                                        left = right;
-                                    }
-                                    else
-                                    {
-                                        LocalDebug.Stop();
-                                        left = new JsltBinaryOperator(left, operation, right) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
-                                    }
+                                    AddError(context.Start.ToLocation(), string.Empty, "missing binary right expression");
+                                    return null;
                                 }
                                 else
-                                    left = new JsltBinaryOperator(left, operation, right) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+                                {
+                                    var right = _subs[1];
+                                    if (operation == OperationEnum.Chain)
+                                    {
+                                        if (right is JsltFunctionCall f)
+                                        {
+                                            f.Inject(left, 0);
+                                            left = right;
+                                        }
+                                        else
+                                        {
+                                            LocalDebug.Stop();
+                                            left = new JsltBinaryOperator(left, operation, right) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+                                        }
+                                    }
+                                    else
+                                        left = new JsltBinaryOperator(left, operation, right) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+                                }
+
                             }
 
                         }
 
                     }
-
+                    else
+                    {
+                        AddError(context.Start.ToLocation(), string.Empty, $"Missing opperandes");
+                    }
                 }
             }
 
