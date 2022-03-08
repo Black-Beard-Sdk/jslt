@@ -230,7 +230,7 @@ namespace Bb.Json.Jslt.Services
                 node.Expression.Accept(this);
 
             foreach (var item in node.Cases)
-                item.Where.Accept(this);
+                item?.Where?.Accept(this);
 
             if (node.Default != null)
                 node.Default.Accept(this);
@@ -249,7 +249,7 @@ namespace Bb.Json.Jslt.Services
                 node.Source.Accept(this);
 
             if (node.Value != null)
-                node.Value.Where.Accept(this);
+                node.Value.Where?.Accept(this);
 
             return node;
 

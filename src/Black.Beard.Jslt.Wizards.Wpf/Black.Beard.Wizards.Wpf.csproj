@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>Bb</RootNamespace>
+    <UseWindowsForms>true</UseWindowsForms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Wizards\Wpf\stickers-baguette-magique.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Wizards\Wpf\stickers-baguette-magique.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Wizards\Wpf\UISelectFolder.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="Wizards\Wpf\UIExecuteMethod.cs" />
+    <Compile Update="Wizards\Wpf\WizardWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Wizards\Wpf\WizardWindow.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+
+</Project>

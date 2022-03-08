@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bb.JsltEvaluator.Wizards
+namespace Bb.Wizards
 {
 
 
@@ -51,7 +51,7 @@ namespace Bb.JsltEvaluator.Wizards
             return this;
         }
 
-        internal WizardModel SetVariable(string variableName, object value)
+        public WizardModel SetVariable(string variableName, object value)
         {
             this._variables.Add(variableName, value);
             return this;
@@ -105,8 +105,12 @@ namespace Bb.JsltEvaluator.Wizards
             get => _tabs[this._index].Model;
             set
             {
-                _tabs[this._index].Model = value;
-                StateChange();
+                var old = _tabs[this._index].Model;
+                if (old != value)
+                {
+                    _tabs[this._index].Model = value;
+                    StateChange();
+                }
             }
         }
 
@@ -130,7 +134,7 @@ namespace Bb.JsltEvaluator.Wizards
             get
             {
 
-                if (_index < this._tabs.Count)
+                if (_index + 1 == this._tabs.Count)
                     if (this._tabs[_index].Validate())
                         return true;
 

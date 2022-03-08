@@ -32,7 +32,6 @@
     <None Remove="icons8-sauvegarder-32.png" />
     <None Remove="Run.png" />
     <None Remove="toolbox.png" />
-    <None Remove="Wizards\stickers-baguette-magique.jpg" />
   </ItemGroup>
 
   <ItemGroup>
@@ -50,6 +49,7 @@
     <ProjectReference Include="..\Black.Beard.Jslt.Intellisense\Black.Beard.Jslt.Intellisense.csproj" />
     <ProjectReference Include="..\Black.Beard.Jslt.Output.StoreSql\Black.Beard.Jslt.Output.StoreSql.csproj" />
     <ProjectReference Include="..\Black.Beard.Jslt.Services\Black.Beard.Jslt.Services.csproj" />
+    <ProjectReference Include="..\Black.Beard.Jslt.Wizards.Wpf\Black.Beard.Wizards.Wpf.csproj" />
     <ProjectReference Include="..\Black.Beard.Jslt\Black.Beard.Jslt.csproj" />
     <ProjectReference Include="..\ScintillaNET\ScintillaNET.csproj" />
   </ItemGroup>
@@ -61,7 +61,6 @@
     <Resource Include="icons8-sauvegarder-32.png" />
     <Resource Include="Run.png" />
     <Resource Include="toolbox.png" />
-    <Resource Include="Wizards\stickers-baguette-magique.jpg" />
   </ItemGroup>
 
 </Project>

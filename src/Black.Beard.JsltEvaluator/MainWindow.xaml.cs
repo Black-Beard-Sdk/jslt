@@ -1,6 +1,6 @@
 ﻿using Bb.ComponentModel.Factories;
 using Bb.JsltEvaluator;
-using Bb.JsltEvaluator.Wizards;
+using Bb.Wizards;
 using Bb.Json.Jslt.Parser;
 using Bb.Json.Jslt.Services;
 using Bb.Maj;
@@ -25,6 +25,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using Bb.Wizards.Wpf;
 
 namespace AppJsonEvaluator
 {
@@ -970,29 +971,16 @@ namespace AppJsonEvaluator
                 .SetVariable("templateContent", TemplateEditor.Text)
 
                 .Add(new WizardTabModel("templateName", "Please give me the name of the script") { }
-                .IsRequired()
-                .SetModel(scriptName)
-                .SetTemplate(TemplateEnum.Text))
+                    .IsRequired()
+                    .SetModel(scriptName)
+                    .SetTemplate(TemplateEnum.Text)
+                    )
 
                 .Add(new WizardTabModel("folderCmd", "Please select a folder to store the command line") { }
-                .IsRequired()
-                .SetTemplate(TemplateEnum.ButtonExecute)
-                .SetAction((uc, t) =>
-                {
-
-                    System.Windows.Forms.FolderBrowserDialog folderDialog = new System.Windows.Forms.FolderBrowserDialog()
-                    {
-                        InitialDirectory = _lastShownFolder,
-                    };
-
-                    var result = folderDialog.ShowDialog();
-                    if (result == System.Windows.Forms.DialogResult.OK)
-                    {
-                        t.Model = uc.DataText = folderDialog.SelectedPath;
-                        _lastShownFolder = folderDialog.SelectedPath;
-                    }
-                }
-                ))
+                    .IsRequired()
+                    .SetModel(_lastShownFolder)
+                    .SetTemplate(TemplateEnum.SelectFolder)
+                    )
 
                 .Execute(async (model) =>
                 {
@@ -1047,21 +1035,12 @@ namespace AppJsonEvaluator
 
             wizard.Show();
 
-
-
-
-
-
             //    var targetFolder = new DirectoryInfo(Path.Combine(folderDialog.SelectedPath, folderCli));
-
-
-
             //    progressBar.IsIndeterminate = true;
             //    progressBar.Refresh();
             //    this.Refresh();
             //    var resultDownload = await DownloadLastversion(targetFolder.FullName, "cli.zip");
             //    progressBar.IsIndeterminate = false;
-
             //}
 
 

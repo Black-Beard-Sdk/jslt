@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace Bb.JsltEvaluator.Wizards
+namespace Bb.Wizards
 {
 
     [System.Diagnostics.DebuggerDisplay("{Title}")]
-    public class WizardTabModel
+    public class WizardTabModel : INotifyPropertyChanged
     {
 
 
@@ -45,6 +46,16 @@ namespace Bb.JsltEvaluator.Wizards
 
         }
 
+        public WizardTabModel SetAllowed()
+        {
+            this.AllowedDrop = true;
+            return this;
+        }
+
+        public bool AllowedDrop { get; private set; }
+
+
+
         public List<ValidationAttribute> Validators { get; }
 
 
@@ -68,8 +79,19 @@ namespace Bb.JsltEvaluator.Wizards
             }
             set
             {
-                _model = value;
+                if (_model != value)
+                {
+                    _model = value;
+                    PropertyHasChanged();
+                }
             }
+        }
+
+
+        private void PropertyHasChanged()
+        {
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(Model)));
         }
 
 
@@ -78,10 +100,12 @@ namespace Bb.JsltEvaluator.Wizards
 
         public bool Validate()
         {
+
             bool test = true;
             StringBuilder sb = new StringBuilder();
 
             if (this.Model != null)
+            {
                 foreach (var attribute in this.Validators)
                 {
 
@@ -98,15 +122,47 @@ namespace Bb.JsltEvaluator.Wizards
                         test = false;
                     }
                 }
-            this.Errors = sb.ToString();
+
+                this.Errors = sb.ToString();
+
+            }
+            else test = false;
 
             return test;
+
+        }
+
+        public bool TryValidate(object data)
+        {
+
+            bool test = true;
+
+            foreach (var attribute in this.Validators)
+            {
+
+                var validationContext = new ValidationContext(data, null, null)
+                {
+                    MemberName = this.Title,
+                };
+
+                var result = attribute.GetValidationResult(data, validationContext);
+
+                if (result != null)
+                    test = false;
+            }
+
+            return test;
+
         }
 
         private object _model;
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
         public object Tag { get; private set; }
 
-        public WizardTabModel SetAction(Action<ExecuteMethod, WizardTabModel> action)
+
+        public WizardTabModel SetAction(Action<UIExecuteMethod, WizardTabModel> action)
         {
 
             this.Tag = action;

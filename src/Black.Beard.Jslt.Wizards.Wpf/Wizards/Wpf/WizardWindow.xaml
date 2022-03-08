@@ -1,9 +1,9 @@
-﻿<Window x:Class="Bb.JsltEvaluator.Wizards.WizardWindow"
+﻿<Window x:Class="Bb.Wizards.Wpf.WizardWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Bb.JsltEvaluator.Wizards"
+        xmlns:local="clr-namespace:Bb.Wizards.Wpf"
         mc:Ignorable="d"
         Title="WizardWindow" Height="530" Width="900">
     <Grid>
@@ -13,7 +13,7 @@
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
 
-        <Image Source="/Wizards/stickers-baguette-magique.jpg"  />
+        <Image Source="/Black.Beard.Wizards.Wpf;component/Wizards/Wpf/stickers-baguette-magique.jpg"  />
 
         <Grid Grid.Column="1">
 

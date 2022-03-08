@@ -12,9 +12,9 @@ namespace Bb.Json.Jslt.Services
 
         public static IEnumerable<FileInfo> Visit(JsltBase self, TranformJsonAstConfiguration configuration)
         {
-            var visitor = new ResolveDependentFilesVisitor() 
+            var visitor = new ResolveDependentFilesVisitor()
             {
-                Configuration = configuration 
+                Configuration = configuration
             };
             self.Accept(visitor);
             return visitor.Files;
@@ -32,9 +32,12 @@ namespace Bb.Json.Jslt.Services
 
             if (node.Value != null && node.Value is string str)
             {
-                var file = this.Configuration.ResolveFile(str);
-                if (file.Exists)
-                    Files.Add(file);
+                if (!string.IsNullOrEmpty(str))
+                {
+                    var file = this.Configuration.ResolveFile(str);
+                    if (file.Exists)
+                        Files.Add(file);
+                }
             }
 
             return node;
