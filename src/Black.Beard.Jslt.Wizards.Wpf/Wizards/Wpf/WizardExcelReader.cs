@@ -1,5 +1,4 @@
 ﻿using ExcelDataReader;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -7,18 +6,12 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace Bb.Jslt.Services.Excels
+namespace Bb.Wizards
 {
-
-    /*
-{ "FirstRowHasColumnName" : true, "HeaderLine" : 4, "Tablename": "Table1", "AddRowNumber": true, "ByPassEmptyObject": true }
-     */
-
-
-    public class ExcelReader
+    public class WizardExcelReader
     {
 
-        public ExcelReader()
+        public WizardExcelReader()
         {
             Columns = new List<Column>();
         }
@@ -31,140 +24,91 @@ namespace Bb.Jslt.Services.Excels
 
         public bool AddRowNumber { get; set; } = true;
 
-        public bool ByPassEmptyObject { get; set; } = true;
-
         public List<Column> Columns { get; set; }
 
-
-        public JArray Read(FileInfo file, out string resultText, out int resultCode)
+        public DataSet Read(FileInfo file)
         {
-
-            JArray array = new JArray();
-
-            if (this._dicColumns == null && this.Columns.Count > 0)
-            {
-                _dicColumns = new Dictionary<int, Column>();
-                foreach (var item in this.Columns)
-                    _dicColumns.Add(item.Index, item);
-            }
-
+            
             using (var stream = file.Open(FileMode.Open, FileAccess.Read))
             using (var reader = ExcelReaderFactory.CreateReader(stream))
             {
 
-                var conf = GetConfiguration();
+                //var conf = GetConfiguration();
 
-                var dataSet = reader.AsDataSet(conf);
-                if (!dataSet.Tables.Contains(Tablename))
-                {
-                    resultText = $"missing table {Tablename}";
-                    resultCode = 2;
-                    return null;
-                }
-                else if (string.IsNullOrEmpty(Tablename))
-                {
-                    if (dataSet.Tables.Count == 1)
-                        Tablename = dataSet.Tables[0].TableName;
-                    else
-                    {
-                        resultText = $"table name not specified and the document has more of one sheet";
-                        resultCode = 3;
-                        return null;
-                    }
-                }
+                var dataSet = reader.AsDataSet(/*conf*/);
+
+                return dataSet;
+
+                //if (!dataSet.Tables.Contains(Tablename))
+                //{
+                //    resultText = $"missing table {Tablename}";
+                //    resultCode = 2;
+                //    return null;
+                //}
+                //else if (string.IsNullOrEmpty(Tablename))
+                //{
+                //    if (dataSet.Tables.Count == 1)
+                //        Tablename = dataSet.Tables[0].TableName;
+                //    else
+                //    {
+                //        resultText = $"table name not specified and the document has more of one sheet";
+                //        resultCode = 3;
+                //        return null;
+                //    }
+                //}
 
 
-                var table = dataSet.Tables[Tablename];
+                //var table = dataSet.Tables[Tablename];
 
-                if (this._dicColumns == null)
-                    try
-                    {
-                        ResolveColumns(table);
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
+                //if (this._dicColumns == null)
+                //    try
+                //    {
+                //        ResolveColumns(table);
+                //    }
+                //    catch (Exception)
+                //    {
+                //        throw;
+                //    }
 
-                int rowLine = 0;
+                //int rowLine = 0;
 
-                foreach (DataRow row in table.Rows)
-                {
+                //foreach (DataRow row in table.Rows)
+                //{
 
-                    if (HeaderLine == -1 || rowLine > HeaderLine)
-                    {
+                //    if (HeaderLine == -1 || rowLine > HeaderLine)
+                //    {
 
-                        var items = row.ItemArray;
-                        var obj = new JObject();
-                        for (int i = 0; i < items.Length; i++)
-                        {
+                //        var items = row.ItemArray;
+                //        var obj = new JObject();
+                //        for (int i = 0; i < items.Length; i++)
+                //        {
 
-                            var column = Columns[i];
-                            var value = GetValue(items[i], column);
+                //            var column = Columns[i];
+                //            var value = GetValue(items[i], column);
 
-                            if (value != null && value != DBNull.Value)
-                                obj.Add(new JProperty(column.Name, value));
+                //            if (value != null && value != DBNull.Value)
+                //                obj.Add(new JProperty(column.Name, value));
 
-                        }
+                //        }
 
-                        if (obj.Properties().Count() > 0 || !ByPassEmptyObject)
-                            array.Add(obj);
+                //        if (obj.Properties().Count() > 0 || !ByPassEmptyObject)
+                //            array.Add(obj);
 
-                        if (AddRowNumber)
-                            obj.Add(new JProperty("$row", rowLine));
+                //        if (AddRowNumber)
+                //            obj.Add(new JProperty("$row", rowLine));
 
-                    }
+                //    }
 
-                    rowLine++;
+                //    rowLine++;
 
-                }
+                //}
 
             }
 
-            resultText = null;
-            resultCode = 0;
-            return array;
 
         }
 
-        private object GetValue(object value, Column column)
-        {
-
-            if (column.Type == typeof(string))
-            {
-
-                if (value is string txt)
-                {
-                    if (column.Trimmed)
-                        txt = txt.Trim();
-                }
-                else
-                    txt = value.ToString();
-
-                if (column.BypassEmptyValue && string.IsNullOrEmpty(txt))
-                    return DBNull.Value;
-
-                value = txt;
-
-            }
-            else if (value.GetType() == column.Type)
-                return value;
-            
-            else
-            {
-                try
-                {
-                    return Convert.ChangeType(value, column.Type);
-                }
-                catch (Exception)
-                {
-
-                }
-            }
-
-            return value;
-
-        }
+        
 
         private void ResolveColumns(DataTable table)
         {
@@ -360,6 +304,22 @@ namespace Bb.Jslt.Services.Excels
         #endregion build
 
         private Dictionary<int, Column> _dicColumns;
+
+
+        public class Column
+        {
+
+            public int Index { get; set; }
+
+            public string Name { get; set; }
+
+            public bool Trimmed { get; set; } = true;
+
+            public Type Type { get; set; } = typeof(string);
+
+            public bool BypassEmptyValue { get; set; } = true;
+
+        }
     }
 
 

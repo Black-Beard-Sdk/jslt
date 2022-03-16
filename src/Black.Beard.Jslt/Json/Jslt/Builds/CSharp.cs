@@ -1,11 +1,9 @@
-﻿using Bb.Compilers;
+﻿using Bb.Builds;
+using Bb.Compilers;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net.Http.Headers;
 using System.Reflection;
-using System.Threading.Tasks;
 
 namespace Bb.Json.Jslt.Builds
 {
@@ -58,7 +56,15 @@ namespace Bb.Json.Jslt.Builds
             if (result.Count == 0 || changed)
             {
 
-                var compiler = new RoslynCompiler(new HashSet<Assembly>(References));
+                var a = new AssemblyReferences();
+                foreach (var item in References)
+                    a.AddRange(item);
+
+                var compiler = new RoslynCompiler(a)
+                {
+                    Debug = true,
+                    ResolveObjects = false,
+                };
 
                 foreach (var item in list)
                     compiler.AddCodeSource(item.Datas, item.Name);

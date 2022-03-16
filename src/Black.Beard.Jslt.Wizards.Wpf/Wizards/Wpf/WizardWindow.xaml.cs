@@ -1,5 +1,4 @@
-﻿using AppJsonEvaluator;
-using System;
+﻿using System;
 using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows;
@@ -20,12 +19,21 @@ namespace Bb.Wizards.Wpf
         public WizardWindow(WizardModel model)
         {
             InitializeComponent();
+
             this._model = model;
             this.DataContext = model;
 
             this.SizeChanged += WizardWindow_SizeChanged;
 
             InitializeChild();
+
+            MajTitle();
+
+        }
+
+        private void MajTitle()
+        {
+            this.Title = $"Wizard ({_model.Index} / {_model.Count})";
         }
 
         public void Cancel(object sender, RoutedEventArgs e)
@@ -33,23 +41,24 @@ namespace Bb.Wizards.Wpf
             this.Close();
         }
 
-
         public void MovePrevious(object sender, RoutedEventArgs e)
         {
             _model.MovePrevious();
             InitializeChild();
             _model.StateChange();
 
-        }
+            MajTitle();
 
+        }
 
         public void MoveNext(object sender, RoutedEventArgs e)
         {
-            Child.ApplyValueToModel();
             _model.MoveNext();
             _model.CleanError();
 
             InitializeChild();
+
+            MajTitle();
 
         }
 
@@ -57,47 +66,20 @@ namespace Bb.Wizards.Wpf
         private void InitializeChild()
         {
 
-            UIMethodWizardBase child = null;
-
-            switch (_model.Current.Template)
-            {
-
-                case TemplateEnum.SelectFolder:
-                    var uc = new UISelectFolder(this._model);
-
-                    child = uc;
-                    break;
-
-                case TemplateEnum.ButtonExecute:
-                    var uc1 = new UIExecuteMethod(this._model)
-                    {
-                        ExecuteButton = (Action<UIExecuteMethod, WizardTabModel>)_model.Current.Tag,
-                    };
-
-                    child = uc1;
-                    break;
-
-
-                case TemplateEnum.Text:
-                    var text = new UIText(this._model);
-
-                    child = text;
-                    break;
-
-
-                default:
-                    break;
-
-            }
-
             if (Child != null && Child is UIMethodWizardBase wizard)
                 wizard.Dispose();
+
+            var child = new UIBlock(this._model.Current);
 
             var w = PointsToPixels(this.Width, LengthDirection.Horizontal);
             var h = PointsToPixels(this.Height, LengthDirection.Vertical);
             child.Size = new System.Drawing.Size(w - 350, h - 330);
 
+            _model.Current.Configure(child);
+
             Child = child;
+
+            this._model.StateChange();
 
         }
 
@@ -120,7 +102,15 @@ namespace Bb.Wizards.Wpf
         }
 
 
-        protected UIMethodWizardBase Child { get => (UIMethodWizardBase)DataTemplate.Child; set => DataTemplate.Child = value; }
+        protected UIBlock Child
+        {
+            get => (UIBlock)DataTemplate.Child;
+            set
+            {
+                DataTemplate.Child = value;
+                _model.CurrentUI = value;
+            }
+        }
 
         public async void Terminate(object sender, RoutedEventArgs e)
         {

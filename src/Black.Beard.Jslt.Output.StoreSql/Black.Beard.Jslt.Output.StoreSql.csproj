@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Black.Beard.Configurations.ConfigurationProvider.SqlServer" Version="1.0.8" />
-    <PackageReference Include="NJsonSchema" Version="10.6.8" />
+    <PackageReference Include="NJsonSchema" Version="10.6.10" />
   </ItemGroup>
 
   <ItemGroup>

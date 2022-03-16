@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Bb.Wizards.Wpf;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,44 +18,54 @@ namespace Bb.Wizards
 
         public WizardModel()
         {
-            this._variables = new Dictionary<string, object>();
+            this.Paths = new HashSet<string>();
+            this.Variables = new VariableWizards();
             this._tabs = new List<WizardTabModel>();
             this._index = 0;
         }
 
-        public object this[string name]
+        #region Properties
+
+        public HashSet<string> Paths { get; set; }
+
+
+        public object Index { get => this._index; }
+
+
+        public object Count { get => this._tabs.Count; }
+
+        public string TabDescription { get => this._tabs[this._index].Description; }
+
+        public string TabErrors { get => this._tabs[this._index].Errors; }
+
+        public string Title { get; private set; }
+
+        public UIBlock CurrentUI { get; internal set; }
+
+        public WizardTabModel Current { get => _tabs[this._index]; }
+
+        public VariableWizards Variables { get; }
+
+        #endregion Properties
+
+        public WizardModel Add(string title, Action<WizardTabModel> configuration)
         {
-            get
-            {
 
-                if (this._variables.TryGetValue(name, out object result))
-                    return result;
+            string description = null;
 
-                var result2 = this._tabs.Where(c => c.Title == name).FirstOrDefault();
-                if (result2 != null)
-                    return result2.Model;
-
-                throw new Exception("missing variable");
-
-            }
-        }
-
-        public WizardModel Add(WizardTabModel tab)
-        {
+            var tab = new WizardTabModel(title, description);
             this._tabs.Add(tab);
             tab.Parent = this;
+
+            configuration(tab);
+
             return this;
+
         }
 
         public WizardModel SetTitle(string title)
         {
             this.Title = title;
-            return this;
-        }
-
-        public WizardModel SetVariable(string variableName, object value)
-        {
-            this._variables.Add(variableName, value);
             return this;
         }
 
@@ -65,6 +77,7 @@ namespace Bb.Wizards
 
         public void MoveNext()
         {
+            this.Current.ExecuteBeforeGoNext(CurrentUI);
             _index++;
             StateChange();
         }
@@ -93,27 +106,10 @@ namespace Bb.Wizards
             }
         }
 
-        public WizardTabModel Current { get => _tabs[this._index]; }
-
         public void ExecuteTerminate()
         {
             _action(this);
         }
-
-        public object CurrentValue
-        {
-            get => _tabs[this._index].Model;
-            set
-            {
-                var old = _tabs[this._index].Model;
-                if (old != value)
-                {
-                    _tabs[this._index].Model = value;
-                    StateChange();
-                }
-            }
-        }
-
 
         public bool CanMoveNext
         {
@@ -123,7 +119,7 @@ namespace Bb.Wizards
                 if (_index < this._tabs.Count - 1)
                     if (this._tabs[_index].Validate())
                         return true;
-
+                
                 return false;
 
             }
@@ -159,18 +155,13 @@ namespace Bb.Wizards
             }
         }
 
-        public string TabDescription { get => this._tabs[this._index].Description; }
-
-        public string TabErrors { get => this._tabs[this._index].Errors; }
-
-        public string Title { get; private set; }
-
         public event PropertyChangedEventHandler PropertyChanged;
+
 
         private readonly List<WizardTabModel> _tabs;
         private int _index;
         private Action<WizardModel> _action;
-        private Dictionary<string, object> _variables;
+
     }
 
 

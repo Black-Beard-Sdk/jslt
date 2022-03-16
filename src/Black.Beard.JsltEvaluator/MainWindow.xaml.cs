@@ -501,7 +501,7 @@ namespace AppJsonEvaluator
 
                 var completions = this._completionProvider.GetCompletions(keys);
 
-                if (completions.Exceptions.Count> 0)
+                if (completions.Exceptions.Count > 0)
                     foreach (var item in completions.Exceptions)
                         Errors.Items.Add(new ErrorModel() { Severity = SeverityEnum.Error, Message = item.Message, Text = item.ToString() });
 
@@ -965,68 +965,78 @@ namespace AppJsonEvaluator
                 scriptName = Path.GetFileName(this.LabelTemplateFile.Content.ToString());
 
 
+            VariableWizard variableTemplateName = null;
+            VariableWizard variableFolderCmd = null;
+
             var model = new WizardModel()
 
                 .SetTitle("Create Command line")
-                .SetVariable("templateContent", TemplateEditor.Text)
 
-                .Add(new WizardTabModel("templateName", "Please give me the name of the script") { }
-                    .IsRequired()
-                    .SetModel(scriptName)
-                    .SetTemplate(TemplateEnum.Text)
-                    )
-
-                .Add(new WizardTabModel("folderCmd", "Please select a folder to store the command line") { }
-                    .IsRequired()
-                    .SetModel(_lastShownFolder)
-                    .SetTemplate(TemplateEnum.SelectFolder)
-                    )
-
-                .Execute(async (model) =>
+                .Add("templateName", (t) =>
                 {
 
+                    t.HasDescription("Please give me the name of the script")
+                     .InitializeUI(c =>
+                     {
+                         c.InitializeVariable("templateName", i => i.IsRequired(), scriptName, out VariableWizard variableTemplateName)
+                          .AppendText(variableTemplateName, string.Empty)
+                         ;
+                     });
 
-                    var folderCmd = model["folderCmd"].ToString();
-                    var templateName = model["templateName"].ToString();
+                })
+
+                .Add("folderCmdTab", (t) =>
+                {
+                    t.HasDescription("Please select a folder to store the command line")
+                    .InitializeUI((c) =>
+                    {
+                        c.InitializeVariable("folderCmd", i => i.IsRequired(), _lastShownFolder, out variableFolderCmd)
+                         .AppendFolderSelector(variableFolderCmd, null, null, true)
+                        ;
+
+                    });
+
+                })
+
+            .Execute(async (model) =>
+            {
+
+                var folderCmd = variableFolderCmd.Value.ToString();
+
+                if (!Directory.Exists(folderCmd))
+                    Directory.CreateDirectory(folderCmd);
+
+                var templateName = Path.GetFileNameWithoutExtension(variableTemplateName.Value.ToString()) + ".json";
+                string folderCli = "cli";
+
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine($"{folderCli}\\json.exe template execute \"{templateName}\" --out \"output.json\"");
+
+                var file = Path.Combine(folderCmd, "run.bat");
+                if (File.Exists(file))
+                    File.Delete(file);
+                Bb.ContentHelper.Save(file, sb.ToString());
 
 
-                    if (!Directory.Exists(folderCmd))
-                        Directory.CreateDirectory(folderCmd);
+                if (files != null)
+                    foreach (var dependancyFile in files)
+                    {
+                        var targetFile = Path.Combine(folderCmd, dependancyFile.Name);
+                        dependancyFile.CopyTo(targetFile);
+                    }
 
+                file = Path.Combine(folderCmd, templateName);
+                if (File.Exists(file))
+                    File.Delete(file);
+                Bb.ContentHelper.Save(file, TemplateEditor.Text.ToString());
 
-                    templateName = Path.GetFileNameWithoutExtension(templateName) + ".json";
-                    string folderCli = "cli";
+                var targetFolder = Path.Combine(folderCmd, folderCli);
+                if (!Directory.Exists(targetFolder))
+                    Directory.CreateDirectory(targetFolder);
 
+                var resultDownload = await DownloadLastversion(targetFolder, "cli.zip", false);
 
-                    StringBuilder sb = new StringBuilder();
-                    sb.AppendLine($"{folderCli}\\json.exe template execute \"{templateName}\" --out \"output.json\"");
-
-
-                    var file = Path.Combine(folderCmd, "run.bat");
-                    if (File.Exists(file))
-                        File.Delete(file);
-                    Bb.ContentHelper.Save(file, sb.ToString());
-
-
-                    if (files != null)
-                        foreach (var dependancyFile in files)
-                        {
-                            var targetFile = Path.Combine(folderCmd, dependancyFile.Name);
-                            dependancyFile.CopyTo(targetFile);
-                        }
-
-                    file = Path.Combine(folderCmd, templateName);
-                    if (File.Exists(file))
-                        File.Delete(file);
-                    Bb.ContentHelper.Save(file, model["templateContent"].ToString());
-
-                    var targetFolder = Path.Combine(folderCmd, folderCli);
-                    if (!Directory.Exists(targetFolder))
-                        Directory.CreateDirectory(targetFolder);
-
-                    var resultDownload = await DownloadLastversion(targetFolder, "cli.zip", false);
-
-                });
+            });
 
             ;
 

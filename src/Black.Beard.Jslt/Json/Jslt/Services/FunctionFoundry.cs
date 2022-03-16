@@ -98,7 +98,7 @@ namespace Bb.Json.Jslt.Services
 
         internal Assembly AddAssemblyName(string assemblyname)
         {
-            Assembly assembly = TypeDiscovery.Instance.AddAssemblyname(assemblyname);
+            Assembly assembly = TypeDiscovery.Instance.AddAssemblyname(assemblyname, true);
             AddAssembly(assembly);
             return assembly;
 

@@ -74,6 +74,8 @@
                     TextChanged="TemplateEditorTextChanged" 
                     Drop="TemplateEditor_Drop" 
                     Keyboard.KeyUp="TemplateEditor_KeyUp" 
+                    VerticalScrollBarVisibility="Auto"
+                    HorizontalScrollBarVisibility="Auto"
                     Grid.ColumnSpan="3" >
 
                 </avalonEdit:TextEditor>

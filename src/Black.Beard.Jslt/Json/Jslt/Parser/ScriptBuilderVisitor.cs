@@ -915,6 +915,10 @@ namespace Bb.Json.Jslt.Parser
                 {
                     _types.Add(typeof(JToken));
                 }
+                else if (item.Value is JsltObject o)
+                {
+                    _types.Add(typeof(JToken));
+                }
                 else
                 {
                     LocalDebug.Stop();

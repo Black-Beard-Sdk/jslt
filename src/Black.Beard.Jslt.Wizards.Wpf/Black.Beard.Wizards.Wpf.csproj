@@ -13,14 +13,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="ExcelDataReader.DataSet" Version="3.6.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Resource Include="Wizards\Wpf\stickers-baguette-magique.jpg" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Wizards\Wpf\UISelectFolder.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Update="Wizards\Wpf\UIExecuteMethod.cs" />
+    <Compile Update="Wizards\Wpf\UIBlock.cs" />
     <Compile Update="Wizards\Wpf\WizardWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>

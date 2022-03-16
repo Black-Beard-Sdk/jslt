@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Bb.Wizards.Wpf"
         mc:Ignorable="d"
-        Title="WizardWindow" Height="530" Width="900">
+        Title="WizardWindow" Height="530" Width="1100">
     <Grid>
 
         <Grid.ColumnDefinitions>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Bb.Wizards.Wpf;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -7,54 +8,138 @@ using System.Text;
 namespace Bb.Wizards
 {
 
+
     [System.Diagnostics.DebuggerDisplay("{Title}")]
-    public class WizardTabModel : INotifyPropertyChanged
+    public class WizardTabModel
     {
 
-
-        public WizardTabModel(string title, string description = null)
+        internal WizardTabModel(string title, string description = null)
         {
             this.Title = title;
             this.Description = description;
-            this.Validators = new List<ValidationAttribute>();
+            this._variables = new Dictionary<string, VariableWizard>();
         }
 
-        public WizardTabModel()
+        public WizardTabModel HasDescription(string description)
         {
-            this.Validators = new List<ValidationAttribute>();
+            this.Description = description;
+            return this;
         }
 
-        public WizardTabModel IsRequired()
+        public WizardTabModel InitializeUI(Action<UIBlock> action)
         {
-            this.Validators.Add(new RequiredAttribute());
+
+            if (action == null)
+                action = (t) => { };
+
+            this._configure = action;
+
             return this;
 
         }
 
-        public WizardTabModel SetModel(object model)
+        public WizardTabModel ExecuteBeforeGoNext(Action<UIBlock> action)
         {
-            this.Model = model;
-            this.Errors = String.Empty;
+
+            if (action == null)
+                throw new NullReferenceException(nameof(action));
+
+            this._executeBeforeNext = action;
+
             return this;
 
         }
 
-        public WizardTabModel SetTemplate(TemplateEnum template)
+        internal void ExecuteBeforeGoNext(UIBlock child)
         {
-            this.Template = template;
-            return this;
-
+            if (this._executeBeforeNext != null)
+                this._executeBeforeNext(child);
         }
 
-        public WizardTabModel SetAllowed()
+        internal void Configure(UIBlock child)
         {
-            this.AllowedDrop = true;
+            if (this._configure != null)
+                this._configure(child);
+        }
+
+        internal bool Validate()
+        {
+            StringBuilder resultSb = new StringBuilder();
+            bool result = true;
+            foreach (var variable in this._variables)
+            {
+                if (!variable.Value.Validate(resultSb))
+                {
+                    result = false;
+                    break;
+                }
+            }
+            return result;
+        }
+
+        internal void VariableToValidate(VariableWizard variable)
+        {
+            if (this._variables.TryGetValue(variable.Key, out var value))
+            {
+                if (value != variable)
+                    throw new InvalidOperationException(variable.Key);
+            }
+            else
+            {
+                this._variables.Add(variable.Key, variable);
+                variable.PropertyChanged += Variable_PropertyChanged;
+            }
+            
+        }
+
+        private void Variable_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            this.Parent.StateChange();
+        }
+
+        public WizardTabModel InitializeVariable(string variableName, Action<VariableWizard>? actionInitializer, out VariableWizard variable)
+        {
+            variable = this.Parent.Variables.SetVariable(variableName, null);
+            if (actionInitializer != null)
+                actionInitializer(variable);
             return this;
         }
 
-        public bool AllowedDrop { get; private set; }
+        public WizardTabModel InitializeVariable(string variableName, Action<VariableWizard>? actionInitializer)
+        {
+            var variable = this.Parent.Variables.SetVariable(variableName, null);
+            if (actionInitializer != null)
+                actionInitializer(variable);
+            return this;
+        }
 
+        public WizardTabModel InitializeVariable(string variableName, Action<VariableWizard>? actionInitializer, object value, out VariableWizard variable)
+        {
+            variable = this.Parent.Variables.SetVariable(variableName, value);
+            if (actionInitializer != null)
+                actionInitializer(variable);
+            return this;
+        }
 
+        public WizardTabModel InitializeVariable(string variableName, Action<VariableWizard>? actionInitializer, object value)
+        {
+            var variable = this.Parent.Variables.SetVariable(variableName, value);
+            if (actionInitializer != null)
+                actionInitializer(variable);
+            return this;
+        }
+
+        internal bool Validate(string variableName, StringBuilder resultSb)
+        {   
+            var v = this.Parent.Variables[variableName];
+            return v.Validate(resultSb);
+        }
+
+        internal bool Validate(string variableName, string data, StringBuilder resultSb)
+        {            
+            var v = this.Parent.Variables[variableName];
+            return v.Validate(data, resultSb);
+        }
 
         public List<ValidationAttribute> Validators { get; }
 
@@ -71,106 +156,10 @@ namespace Bb.Wizards
         public string Errors { get; set; }
 
 
-        public object Model
-        {
-            get
-            {
-                return _model;
-            }
-            set
-            {
-                if (_model != value)
-                {
-                    _model = value;
-                    PropertyHasChanged();
-                }
-            }
-        }
+        private Action<UIBlock> _configure;
+        private Action<UIBlock> _executeBeforeNext;
+        private Dictionary<string, VariableWizard> _variables;
 
-
-        private void PropertyHasChanged()
-        {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(nameof(Model)));
-        }
-
-
-        public TemplateEnum Template { get; private set; }
-
-
-        public bool Validate()
-        {
-
-            bool test = true;
-            StringBuilder sb = new StringBuilder();
-
-            if (this.Model != null)
-            {
-                foreach (var attribute in this.Validators)
-                {
-
-                    var validationContext = new ValidationContext(this.Model, null, null)
-                    {
-                        MemberName = this.Title,
-                    };
-
-                    var result = attribute.GetValidationResult(this.Model, validationContext);
-
-                    if (result != null)
-                    {
-                        sb.AppendLine(result.ErrorMessage);
-                        test = false;
-                    }
-                }
-
-                this.Errors = sb.ToString();
-
-            }
-            else test = false;
-
-            return test;
-
-        }
-
-        public bool TryValidate(object data)
-        {
-
-            bool test = true;
-
-            foreach (var attribute in this.Validators)
-            {
-
-                var validationContext = new ValidationContext(data, null, null)
-                {
-                    MemberName = this.Title,
-                };
-
-                var result = attribute.GetValidationResult(data, validationContext);
-
-                if (result != null)
-                    test = false;
-            }
-
-            return test;
-
-        }
-
-        private object _model;
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        public object Tag { get; private set; }
-
-
-        public WizardTabModel SetAction(Action<UIExecuteMethod, WizardTabModel> action)
-        {
-
-            this.Tag = action;
-
-            return this;
-
-        }
     }
-
 
 }

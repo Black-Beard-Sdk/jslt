@@ -133,12 +133,12 @@ namespace Bb.Json.Jslt.Services
 
             if (_forOutput)
             {
-                Factory<StringBuilder> factory = ObjectCreator.GetActivator<StringBuilder>(service, description);
+                Factory<StringBuilder> factory = ObjectCreator.GetCallMethod<StringBuilder>(service, description);
                 ServiceContainer.AddService(name, factory, true);
             }
             else
             {
-                Factory<JToken> factory = ObjectCreator.GetActivator<JToken>(service, description);
+                Factory<JToken> factory = ObjectCreator.GetCallMethod<JToken>(service, description);
                 ServiceContainer.AddService(name, factory, false);
             }
         }

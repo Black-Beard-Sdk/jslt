@@ -1,22 +1,14 @@
-﻿using Bb.Wizards;
-using Bb.Wizards.Wpf;
-using System;
-using System.Collections.Generic;
+﻿using System;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using Wizards.Commands;
 
 namespace Wizards
 {
+
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -24,56 +16,42 @@ namespace Wizards
     {
         public MainWindow()
         {
-            
-            InitializeComponent();
 
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            string[] args = GetArguments();
 
-            var model = new WizardModel()
+            var cmd = Bb.CommandLine.Run<Command, CommandLine>(args);
 
-                .SetTitle("Resent the codes")
-                //.SetVariable("templateContent", "")
-
-                .Add(new WizardTabModel("CodeToResent", "Please select the file with the code to resent.")
-                .IsRequired()
-                //.SetModel("")
-                .SetTemplate(TemplateEnum.Text))
-
-
-                //.Add(new WizardTabModel("folderCmd", "Please select a folder to store the command line") 
-                //.IsRequired()
-                //.SetTemplate(TemplateEnum.ButtonExecute)
-                //.SetAction((uc, t) =>
-                //{
-                //    //System.Windows.Forms.FolderBrowserDialog folderDialog = new System.Windows.Forms.FolderBrowserDialog()
-                //    //{
-                //    //    InitialDirectory = _lastShownFolder,
-                //    //};
-                //    //var result = folderDialog.ShowDialog();
-                //    //if (result == System.Windows.Forms.DialogResult.OK)
-                //    //{
-                //    //    t.Model = uc.DataText = folderDialog.SelectedPath;
-                //    //    _lastShownFolder = folderDialog.SelectedPath;
-                //    //}
-                //}
-                //))
-
-
-                .Execute(async (model) =>
-                {
-
-                    var folderCmd = model["CodeToResent"].ToString();
-
-                });
-
-            ;
-
-
-            var wizard = new WizardWindow(model);
-
-            wizard.Show();
-
-
+            // Program.Result = cmd.Result;
+            Environment.Exit((int)cmd.Result);
 
         }
+
+        private static string[] GetArguments()
+        {
+
+            var args = Environment.GetCommandLineArgs();
+
+            if (args.Length > 0)
+            {
+
+                var arg1 = args[0];
+
+                var a = Assembly.GetExecutingAssembly();
+                var assemblyName = a.GetName().Name;
+
+                if (arg1 != null && File.Exists(arg1))
+                    if (System.IO.Path.GetFileNameWithoutExtension(arg1) == assemblyName)
+                        args = args.Skip(1).ToArray();
+
+            }
+
+            return args;
+        }
     }
+
 }
+
+
+// https://github.com/toddams/RazorLight
+

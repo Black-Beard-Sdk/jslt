@@ -38,9 +38,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Jslt.Intellisen
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Jslt.Output.StoreSql", "Black.Beard.Jslt.Output.StoreSql\Black.Beard.Jslt.Output.StoreSql.csproj", "{1CEFFAE6-F119-41C7-A9E5-2E39C7065E86}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Black.Beard.Wizards.Wpf", "Black.Beard.Jslt.Wizards.Wpf\Black.Beard.Wizards.Wpf.csproj", "{0B0A12F8-FE8A-4C82-9709-605ED62F79D3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Wizards.Wpf", "Black.Beard.Jslt.Wizards.Wpf\Black.Beard.Wizards.Wpf.csproj", "{0B0A12F8-FE8A-4C82-9709-605ED62F79D3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wizards", "Wizards\Wizards.csproj", "{F6AC5B2A-2EB5-4CB7-891E-780303C6AD89}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wizards", "Wizards\Wizards.csproj", "{F6AC5B2A-2EB5-4CB7-891E-780303C6AD89}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
