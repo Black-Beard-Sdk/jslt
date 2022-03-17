@@ -1,8 +1,10 @@
-﻿using Bb.Wizards;
+﻿using Bb;
+using Bb.Wizards;
 using Bb.Wizards.Wpf;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -50,9 +52,23 @@ namespace Wizards
             foreach (var path in this.Paths)
                 model.Paths.Add(path);
 
+            var file = Path.GetFileNameWithoutExtension(ModelFile) + ".var";
+            var filePath = Path.Combine(ModelDir, file);
+
+            model.Variables.Filepath = filePath;
+            model.Variables.Load();
+
             var wizard = new WizardWindow(model);
 
-            wizard.ShowDialog();
+            if (wizard.ShowDialog().Value)
+            {
+
+                model.Variables.Save();
+
+            }
+
+
+
 
         }
 
@@ -86,6 +102,16 @@ namespace Wizards
 
             }
 
+            var file = new FileInfo(Path.Combine(this.ModelDir, "variablesLastRun.json"));
+            
+            if (file.Exists)
+                file.Delete();
+
+            else if (!file.Directory.Exists)
+                file.Directory.Create();
+
+            file.FullName.Save(variables.ToString(Newtonsoft.Json.Formatting.Indented));
+
             return variables;
         }
 
@@ -93,6 +119,9 @@ namespace Wizards
         private HashSet<Type> _h;
 
         public HashSet<string> Paths { get; }
+        public string ModelFile { get; internal set; }
+        public string ModelDir { get; internal set; }
+
     }
 
 }

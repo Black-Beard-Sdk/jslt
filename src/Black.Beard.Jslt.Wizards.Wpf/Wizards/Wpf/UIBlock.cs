@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
@@ -50,7 +51,6 @@ namespace Bb.Wizards
             }
         }
 
-
         public UIBlock InitializeVariable(string variableName, Action<VariableWizard>? actionInitializer, out VariableWizard variable)
         {
             this.TabModel.InitializeVariable(variableName, actionInitializer, out variable);
@@ -70,8 +70,7 @@ namespace Bb.Wizards
             this.TabModel.InitializeVariable(variableName, actionInitializer, value, out variable);
             return this;
         }
-
-      
+  
         public UIBlock InitializeVariable(string variableName, Action<VariableWizard>? actionInitializer, object value)
         {
             this.TabModel.InitializeVariable(variableName, actionInitializer, value);
@@ -229,7 +228,7 @@ namespace Bb.Wizards
 
         }
 
-        public UIBlock AppendFolderSelector(VariableWizard variable, string? Label, string? initialDirectory, bool allowedDrop = false)
+        public UIBlock AppendFolderSelector(VariableWizard variable, string? Label, string? VariableWizard, bool allowedDrop = false)
         {
 
             this.VariableToValidate(variable);
@@ -282,6 +281,8 @@ namespace Bb.Wizards
                 {
                     InitialDirectory = initialFilename,
                 };
+
+
 
                 var result = folderDialog.ShowDialog();
                 if (result == System.Windows.Forms.DialogResult.OK)
@@ -377,7 +378,7 @@ namespace Bb.Wizards
 
         }
 
-        public UIBlock AppendFileSelector(VariableWizard variable, string? Label, string? initialDirectory, string? filter, bool allowedDrop = false)
+        public UIBlock AppendFileSelector(VariableWizard variable, string? Label, VariableWizard? initialDirectory, string? filter, bool allowedDrop = false)
         {
 
             this.VariableToValidate(variable);
@@ -432,16 +433,27 @@ namespace Bb.Wizards
                  if (!string.IsNullOrEmpty(textBox.Text))
                      openFileDialog.FileName = textBox.Text;
 
-                 if (!string.IsNullOrEmpty(initialDirectory))
-                     openFileDialog.InitialDirectory = initialDirectory;
+                 if (initialDirectory != null)
+                 {
+                     var initial = initialDirectory.Value?.ToString();
+                     if (!string.IsNullOrEmpty(initial))
+                         openFileDialog.InitialDirectory = initial;
+                 }
 
                  if (!string.IsNullOrEmpty(filter))
                      openFileDialog.Filter = filter;
 
                  if (openFileDialog.ShowDialog() == true)
                  {
-                     variable.Value = openFileDialog.FileName;                     
-                     //this.TabModel.Parent.StateChange();
+                     variable.Value = openFileDialog.FileName;
+
+                     if (initialDirectory != null)
+                     {
+                         var f = new FileInfo(openFileDialog.FileName);
+                         if (f.Directory.Exists)
+                             initialDirectory.Value = f.Directory.FullName;
+                     }
+
                  }
 
              };

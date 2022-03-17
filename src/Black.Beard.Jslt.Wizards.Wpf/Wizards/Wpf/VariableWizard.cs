@@ -37,6 +37,7 @@ namespace Bb.Wizards
             }
         }
 
+        public bool IsStored { get; private set; }
 
         public bool Validate(StringBuilder result)
         {
@@ -69,9 +70,16 @@ namespace Bb.Wizards
         }
 
 
-        public void IsRequired()
+        public VariableWizard IsRequired()
         {
             this.AppendValidator(new RequiredAttribute());
+            return this;
+        }
+
+        public VariableWizard MakeStored()
+        {
+            this.IsStored = true;
+            return this;
         }
 
 

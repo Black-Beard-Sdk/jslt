@@ -23,7 +23,7 @@ namespace Wizards
             var cmd = Bb.CommandLine.Run<Command, CommandLine>(args);
 
             // Program.Result = cmd.Result;
-            Environment.Exit((int)cmd.Result);
+            Environment.Exit(cmd.Result.ToValue());
 
         }
 

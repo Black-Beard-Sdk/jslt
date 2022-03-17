@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
+using System.Linq;
 
 namespace Bb.Wizards
 {
@@ -25,6 +28,73 @@ namespace Bb.Wizards
         }
 
 
+        public void Save()
+        {
+
+            if (!string.IsNullOrEmpty(Filepath))
+            {
+
+                var f = new FileInfo(Filepath);
+                if (!f.Directory.Exists)
+                    f.Directory.Create();
+
+                var datas = GetVariables();
+
+                var payload = datas.ToString(Newtonsoft.Json.Formatting.Indented);
+
+                Filepath.Save(payload);
+            }
+        }
+
+        public string Filepath { get; set; }
+
+        public void Load()
+        {
+
+            if (!string.IsNullOrEmpty(Filepath))
+            {
+
+                var f = new FileInfo(Filepath);
+                if (f.Exists)
+                {
+                    var variables = (JObject)Filepath
+                    .LoadContentFromFile()
+                    .ConvertToJson()
+                    ;
+
+                    foreach (var property in variables.Properties())
+                    {
+                        var value = ((JValue)property.Value)?.Value;
+                        var v = SetVariable(property.Name, value);
+                    }
+                }
+
+            }
+
+        }
+
+
+        protected JObject GetVariables()
+        {
+
+            var variables = new JObject();
+
+            foreach (var item in this._variables.Values.Where(c => c.IsStored))
+            {
+
+                var value = item.Value;
+
+                if (value != null)
+                    variables.Add(new JProperty("@" + item.Key, value));
+                else
+                    variables.Add(new JProperty("@" + item.Key, JValue.CreateNull()));
+
+            }
+
+            return variables;
+        }
+
+
         public VariableWizard this[string name]
         {
             get
@@ -39,12 +109,12 @@ namespace Bb.Wizards
         {
 
             if (!this._variables.TryGetValue(variableName, out VariableWizard result))
-                this._variables.Add(variableName, result = new VariableWizard(variableName) 
+                this._variables.Add(variableName, result = new VariableWizard(variableName)
                 {
-                    Value = value 
+                    Value = value
                 });
 
-            if (result.Value != value)
+            if (value != null && result.Value != value)
                 result.Value = value;
 
             return result;

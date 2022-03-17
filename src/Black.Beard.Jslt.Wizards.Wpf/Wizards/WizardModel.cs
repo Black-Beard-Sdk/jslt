@@ -24,6 +24,59 @@ namespace Bb.Wizards
             this._index = 0;
         }
 
+        #region Variables
+
+        public WizardModel InitializeVariable(string variableName, Action<VariableWizard>? actionInitializer, out VariableWizard variable)
+        {
+            variable = this.Variables.SetVariable(variableName, null);
+            if (actionInitializer != null)
+                actionInitializer(variable);
+            return this;
+
+        }
+
+        public WizardModel InitializeVariable(string variableName, Action<VariableWizard>? actionInitializer)
+        {
+            var variable = this.Variables.SetVariable(variableName, null);
+            if (actionInitializer != null)
+                actionInitializer(variable);
+            return this;
+
+        }
+
+        public WizardModel InitializeVariable(string variableName, Action<VariableWizard>? actionInitializer, object value, out VariableWizard variable)
+        {
+            variable = this.Variables.SetVariable(variableName, value);
+            if (actionInitializer != null)
+                actionInitializer(variable);
+            return this;
+        }
+
+
+        public WizardModel InitializeVariable(string variableName, Action<VariableWizard>? actionInitializer, object value)
+        {
+            var variable = this.Variables.SetVariable(variableName, value);
+            if (actionInitializer != null)
+                actionInitializer(variable);
+            return this;
+
+        }
+
+        public WizardModel SetVariable(string varableName, object? value)
+        {
+            this.Variables.SetVariable(varableName, value);
+            return this;
+        }
+
+        public WizardModel SetVariable(string varableName, object? value, out VariableWizard variable)
+        {
+            variable = this.Variables.SetVariable(varableName, value);
+            return this;
+        }
+
+        #endregion Variables
+
+
         #region Properties
 
         public HashSet<string> Paths { get; set; }
@@ -119,7 +172,7 @@ namespace Bb.Wizards
                 if (_index < this._tabs.Count - 1)
                     if (this._tabs[_index].Validate())
                         return true;
-                
+
                 return false;
 
             }

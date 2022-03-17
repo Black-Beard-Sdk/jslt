@@ -1,5 +1,7 @@
 ﻿using Bb.Builds;
 using Bb.CommandLines;
+using Bb.CommandLines.Outs;
+using Bb.CommandLines.Outs.Printings;
 using Bb.CommandLines.Validators;
 using Bb.Compilers;
 using Bb.Wizards;
@@ -49,25 +51,38 @@ namespace Wizards.Commands
 
                 config.OnExecute(() =>
                 {
-                    int errorNum = 0;
 
                     bool debug = Debugger.IsAttached;
                     if (optwithDebug.HasValue())
                         debug = true;
 
-                    
+
                     var fileInfo = new FileInfo(argTemplatePath.Value);
 
                     AssemblyResult assembly = GetCsharpBuilder(fileInfo.FullName);
 
-                    if (!assembly.Success && Debugger.IsAttached)
-                        Debugger.Break();
+                    if (!assembly.Success)
+                    {
 
+                        // compilation error
+                        app.Result = Errors.CompilationError;
+
+                        assembly.Disgnostics
+                        .ConvertList("", c => c.Id, c => c.Message)
+                        .PrintList("Id", "Message");
+                        ;
+
+                        if (!assembly.Success && Debugger.IsAttached)
+                            Debugger.Break();
+
+                    }
                     else
                     {
 
                         Type type = GetTypeToExecute(assembly);
                         var model = Activator.CreateInstance(type) as Model;
+                        model.ModelFile = fileInfo.FullName;
+                        model.ModelDir = fileInfo.Directory.FullName;
                         model.Paths.Add(fileInfo.Directory.FullName);
                         model.Debug = debug;
 
@@ -76,7 +91,8 @@ namespace Wizards.Commands
                     }
 
 
-                    return errorNum;
+                    return app.Result.ToValue();
+
                 });
 
 
@@ -138,7 +154,7 @@ namespace Wizards.Commands
                 typeof(DataSet),
                 typeof(ProcessStartInfo),
                 typeof(Bb.Expressions.LocalMethodCompiler)
-            ) ;
+            );
 
             builder.References.AddAssemblyFile(typeof(DataSet).Assembly.Location);
             builder.References.Add(Assembly.LoadWithPartialName("System.Collections"));
