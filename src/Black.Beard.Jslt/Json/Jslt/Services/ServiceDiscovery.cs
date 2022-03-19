@@ -40,13 +40,18 @@ namespace Bb.Json.Jslt.Services
                             else
                             {
 
-                                var methods = MethodDiscovery.GetMethods(type, BindingFlags.Public | BindingFlags.Static, typeof(JToken)).ToList();
+                                var methods = MethodDiscovery.GetMethods(type, BindingFlags.Public | BindingFlags.Static, null).Where(c =>
+                                {
+                                    var parameters = c.GetParameters();
+                                    return parameters.Length >= 1 && parameters[0].ParameterType == typeof(RuntimeContext);
+                                }).ToList();
+
                                 if (methods.Any())
                                     Append(methods);
 
-                                methods = MethodDiscovery.GetMethods(type, BindingFlags.Public | BindingFlags.Static, typeof(StringBuilder)).ToList();
-                                if (methods.Any())
-                                    Append(methods);
+                                //methods = MethodDiscovery.GetMethods(type, BindingFlags.Public | BindingFlags.Static, typeof(StringBuilder)).ToList();
+                                //if (methods.Any())
+                                //    Append(methods);
 
                             }
 
@@ -63,11 +68,7 @@ namespace Bb.Json.Jslt.Services
             {
                 var attribute = method.GetCustomAttribute<JsltExtensionMethodAttribute>();
                 if (attribute != null)
-                {
-                    var parameters = method.GetParameters();
-                    if (parameters.Length >= 1 && parameters[0].ParameterType == typeof(RuntimeContext))
-                        AddService(method, attribute.Name, attribute.ForOutput);
-                }
+                    AddService(method, attribute.Name, attribute.ForOutput);
             }
         }
 
@@ -99,7 +100,7 @@ namespace Bb.Json.Jslt.Services
                 MethodDescription description = JsltExtensionMethodParameterAttribute.Map(new MethodDescription(name, ctor) { Description = _description });
                 Factory<ITransformJsonService> factory = ObjectCreator.GetActivator<ITransformJsonService>(ctor, description);
 
-                ServiceContainer.AddService(name, factory, false);
+                ServiceContainer.AddService(name, factory, FunctionKindEnum.FunctionStandard);
 
             }
 
@@ -110,11 +111,11 @@ namespace Bb.Json.Jslt.Services
         /// </summary>
         /// <param name="service"></param>
         /// <returns>return the current instance of <see cref="TranformJsonAstConfiguration"/> for using in fluence code.</returns>
-        public void AddService(MethodInfo service, string name = null, bool forOutput = false)
+        public void AddService(MethodInfo service, string name = null, FunctionKindEnum forOutput = FunctionKindEnum.FunctionStandard)
         {
 
             string _description = string.Empty;
-            bool _forOutput = forOutput;
+            FunctionKindEnum _forOutput = forOutput;
 
             if (string.IsNullOrEmpty(name))
             {
@@ -130,19 +131,34 @@ namespace Bb.Json.Jslt.Services
             }
 
             MethodDescription description = JsltExtensionMethodParameterAttribute.Map(new MethodDescription(name, service) { Description = _description });
+            Factory factory = null;
 
-            if (_forOutput)
+            switch (_forOutput)
             {
-                Factory<StringBuilder> factory = ObjectCreator.GetCallMethod<StringBuilder>(service, description);
-                ServiceContainer.AddService(name, factory, true);
+
+                case FunctionKindEnum.Output:
+                    factory = ObjectCreator.GetCallMethod<StringBuilder>(service, description);
+                    break;
+
+                case FunctionKindEnum.Writer:
+                    factory = ObjectCreator.GetCallMethod<object>(service, description);
+                    break;
+
+                case FunctionKindEnum.FunctionStandard:
+                    factory = ObjectCreator.GetCallMethod<JToken>(service, description);
+                    break;
+
+                default:
+                    if (System.Diagnostics.Debugger.IsAttached)
+                        System.Diagnostics.Debugger.Break();
+                    break;
+
             }
-            else
-            {
-                Factory<JToken> factory = ObjectCreator.GetCallMethod<JToken>(service, description);
-                ServiceContainer.AddService(name, factory, false);
-            }
+
+
+            ServiceContainer.AddService(name, factory, _forOutput);
+
         }
-
         public ServiceContainer ServiceContainer { get; }
 
         internal HashSet<string> _assemblies;

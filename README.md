@@ -192,8 +192,8 @@ You can manage any directives
    "imports": ["path of the assembly flie"],
    "output": 
    {
-       "filter": "$.datas", // It is json path for filter just one part of the output document
-       "Mode": to_block()  // Behavior the output serialization
+       "filter": "$.datas",     // It is json path for filter just one part of the output document
+       "mode": to_block(),    // Behavior the output serialization
    }
 }   
 
@@ -237,7 +237,7 @@ the output manage the serialization
 Select just a part of the output document
 
 #### Mode
-Mode is a function that serialize the output document.
+the keyword Mode expect a function that serialize and format the output document.
 
 ##### to_block()
 If the output is an array

@@ -27,7 +27,7 @@ namespace Bb.Json.Jslt.CustomServices
 
         }
 
-        [JsltExtensionMethod("to_sqlserver", ForOutput = true)]
+        [JsltExtensionMethod("to_sqlserver", ForOutput = FunctionKindEnum.Output)]
         public static StringBuilder ExecuteToSqlServer(RuntimeContext ctx, string connection)
         {
 

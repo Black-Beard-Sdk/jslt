@@ -132,7 +132,7 @@ namespace Bb.Json.Commands
 
                     }
                     else
-                        resultPayload.WriteLineStandard();
+                        resultPayload?.ToString().WriteLineStandard();
 
                     return 0;
 

@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text;
 
 namespace Bb.Json.Jslt.Services
 {
@@ -1007,19 +1008,19 @@ namespace Bb.Json.Jslt.Services
 
         #endregion methods called in the expressions
 
-        public static readonly Func<JToken, Type, object> _convertToken;
-        public static readonly Func<RuntimeContext, JToken, Func<RuntimeContext, JToken, JToken>, JToken> _getProjectionFromSource;
-        public static readonly Func<RuntimeContext, JToken, string, JToken> _getContentByJPath;
-        public static readonly Func<RuntimeContext, JToken, ITransformJsonService, JToken> _getContentFromService;
-        public static readonly Func<RuntimeContext, JToken, OperationEnum, JToken> _evaluateUnaryOperator;
-        public static readonly Func<RuntimeContext, object, OperationEnum, object, JToken> _evaluateBinaryOperator;
-        public static readonly Func<RuntimeContext, string, string[], object> _translateVariable;
+        internal static readonly Func<JToken, Type, object> _convertToken;
+        internal static readonly Func<RuntimeContext, JToken, Func<RuntimeContext, JToken, JToken>, JToken> _getProjectionFromSource;
+        internal static readonly Func<RuntimeContext, JToken, string, JToken> _getContentByJPath;
+        internal static readonly Func<RuntimeContext, JToken, ITransformJsonService, JToken> _getContentFromService;
+        internal static readonly Func<RuntimeContext, JToken, OperationEnum, JToken> _evaluateUnaryOperator;
+        internal static readonly Func<RuntimeContext, object, OperationEnum, object, JToken> _evaluateBinaryOperator;
+        internal static readonly Func<RuntimeContext, string, string[], object> _translateVariable;
 
-        public static readonly MethodInfo _addProperty;
-        public static readonly MethodInfo _setVariable;
-        public static readonly MethodInfo _getVariable;
-        public static readonly MethodInfo _DelVariable;
-        public static readonly MethodInfo _convertToBool;
+        internal static readonly MethodInfo _addProperty;
+        internal static readonly MethodInfo _setVariable;
+        internal static readonly MethodInfo _getVariable;
+        internal static readonly MethodInfo _DelVariable;
+        internal static readonly MethodInfo _convertToBool;
 
 
         public JToken TokenSource { get; }
@@ -1034,66 +1035,13 @@ namespace Bb.Json.Jslt.Services
         public TranformJsonAstConfiguration Configuration { get; internal set; }
 
         public bool StopIsActivated { get; set; } = true;
+
         public bool MustoBreak { get; private set; }
 
-
-        //private static (PropertyInfo, Action<object, object>) GetWriter(Type componentType, string propertyName)
-        //{
-
-        //    if (!_properties.TryGetValue(componentType, out Dictionary<string, (PropertyInfo, Action<object, object>)> properties))
-        //        lock (_lock)
-        //            if (!_properties.TryGetValue(componentType, out properties))
-        //                _properties.Add(componentType, properties = new Dictionary<string, (PropertyInfo, Action<object, object>)>());
-
-        //    if (!properties.TryGetValue(propertyName, out (PropertyInfo, Action<object, object>) action))
-        //        lock (_lock)
-        //            if (!properties.TryGetValue(propertyName, out action))
-        //            {
-        //                var ___properties = componentType.GetProperties().Where(c => c.Name.ToLower() == propertyName.ToLower()).ToList();
-        //                var property = ___properties.Count == 1
-        //                    ? ___properties[0]
-        //                    : ___properties.Single(c => c.Name == propertyName)
-        //                    ;
-
-        //                if (property != null && property.CanWrite)
-        //                {
-        //                    var m = property.GetMethod ?? property.SetMethod;
-        //                    var isStatic = m != null ? (m.Attributes & MethodAttributes.Static) == MethodAttributes.Static : false;
-        //                    var targetObjectParameter = Expression.Parameter(typeof(object), "i");
-        //                    var convertedObjectParameter = Expression.ConvertChecked(targetObjectParameter, componentType);
-        //                    var valueParameter = Expression.Parameter(typeof(object), "value");
-        //                    var convertedValueParameter = Expression.ConvertChecked(valueParameter, property.PropertyType);
-        //                    var propertyExpression = Expression.Property(isStatic ? null : convertedObjectParameter, property);
-
-        //                    var assignValue = Expression.Lambda<Action<object, object>>
-        //                    (
-        //                        Expression.Assign
-        //                        (
-        //                            propertyExpression,
-        //                            convertedValueParameter
-        //                        ),
-        //                        targetObjectParameter,
-        //                        valueParameter
-        //                    ).Compile();
-
-        //                    properties.Add(propertyName, action = (property, assignValue));
-
-        //                }
-        //                else
-        //                {
-        //                    properties.Add(propertyName, action = (property, (arg1, arg2) => { }));
-        //                }
-
-        //            }
-
-        //    return action;
-
-        //}
+        public StringBuilder Output { get; internal set; }
 
         private static readonly Dictionary<Type, Dictionary<string, (PropertyInfo, Action<object, object>)>> _properties;
-
         private static object _lock = new object();
-
         private readonly Diagnostics _diagnostics;
 
     }

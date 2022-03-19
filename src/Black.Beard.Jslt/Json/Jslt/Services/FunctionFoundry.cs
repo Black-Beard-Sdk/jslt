@@ -24,7 +24,37 @@ namespace Bb.Json.Jslt.Services
                 ServiceContainer.Common.ServiceDiscovery.AddAssembly(assembly);
         }
 
-       
+
+
+        internal Factory GetServiceWriter(string name, Type[] types, Diagnostics diagnostics, TokenLocation location)
+        {
+
+            var result = this.Services.GetWriterService(name, types);
+            if (result != null)
+                return result;
+
+            result = this.configuration.Services.GetWriterService(name, types);
+            if (result != null)
+                return result;
+
+            var result2 = this.Services.GetWriterService(name);
+            if (result2 != null)
+                diagnostics.AddError(null, location, name, $"Service {name} exists but bad arguments calling");
+
+            else
+            {
+                result2 = this.configuration.Services.GetWriterService(name);
+                if (result2 != null)
+                    diagnostics.AddError(null, location, name, $"Service {name} exists but bad arguments calling");
+
+                else
+                    diagnostics.AddError(null, location, name, $"Service {name} not found");
+
+            }
+
+            return null;
+
+        }
 
         internal Factory GetServiceOutput(string name, Type[] types, Diagnostics diagnostics, TokenLocation location)
         {
@@ -86,8 +116,7 @@ namespace Bb.Json.Jslt.Services
 
         }
 
-        private TranformJsonAstConfiguration configuration;
-        private ServiceContainer Services;
+
 
         internal Assembly AddAssembly(string assemblyFilename)
         {
@@ -120,7 +149,7 @@ namespace Bb.Json.Jslt.Services
         {
 
             string _description = string.Empty;
-            bool _forOutput = false;
+            FunctionKindEnum _kind = FunctionKindEnum.FunctionStandard;
 
             if (string.IsNullOrEmpty(name))
             {
@@ -130,7 +159,7 @@ namespace Bb.Json.Jslt.Services
 
                 name = n.Name;
                 _description = n.Description;
-                _forOutput = n.ForOutput;
+                _kind = n.ForOutput;
 
             }
 
@@ -140,11 +169,15 @@ namespace Bb.Json.Jslt.Services
 
                 MethodDescription description = JsltExtensionMethodParameterAttribute.Map( new MethodDescription(name, ctor) { Description = _description });
                 Factory<ITransformJsonService> factory = ObjectCreator.GetActivator<ITransformJsonService>(ctor, description);
-                Services.AddService(name, factory, _forOutput);
+                Services.AddService(name, factory, _kind);
             }
 
             return this;
         }
+
+
+        private TranformJsonAstConfiguration configuration;
+        private ServiceContainer Services;
 
     }
 }

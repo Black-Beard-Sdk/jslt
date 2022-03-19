@@ -19,6 +19,9 @@ namespace Bb.Json.Jslt.Services
 
         public JsltPath Filter { get; internal set; }
 
+        public JsltBase Writer { get; internal set; }
+
+
     }
 
 

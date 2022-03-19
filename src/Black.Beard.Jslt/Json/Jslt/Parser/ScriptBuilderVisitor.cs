@@ -62,6 +62,9 @@ namespace Bb.Json.Jslt.Parser
                 if (this.OutputConfiguration != null && item == this.OutputConfiguration.Function)
                     service = this._foundry.GetServiceOutput(item.Name, types, this._diagnostics, context.Start.ToLocation());
 
+                else if (this.OutputConfiguration != null && item == this.OutputConfiguration.Writer)
+                    service = this._foundry.GetServiceWriter(item.Name, types, this._diagnostics, context.Start.ToLocation());
+
                 else
                     service = this._foundry.GetService(item.Name, types, this._diagnostics, context.Start.ToLocation());
 
@@ -190,6 +193,7 @@ namespace Bb.Json.Jslt.Parser
                 }
 
             }
+
             return result;
 
         }
@@ -1235,14 +1239,19 @@ namespace Bb.Json.Jslt.Parser
                         if (prop.Value is JsltObject output)
                         {
 
-                            JsltFunctionCall mode = null;
+                            JsltFunctionCall modeFormat = null;
                             JsltPath filter = null;
+                            JsltBase writer = null;
 
                             foreach (JsltProperty prop1 in output.Properties)
                                 switch (prop1.Name.ToLower())
                                 {
                                     case "mode":
-                                        mode = prop1.Value as JsltFunctionCall;
+                                        modeFormat = prop1.Value as JsltFunctionCall;
+                                        break;
+
+                                    case "write":
+                                        writer = prop1.Value;
                                         break;
 
                                     case "filter":
@@ -1254,13 +1263,14 @@ namespace Bb.Json.Jslt.Parser
                                         break;
                                 }
 
-                            if (mode == null)
+                            if (modeFormat == null)
                                 AddError(prop.Start, "syntax", $"The property 'mode' is required and expecte a function (to_json(), ...).");
 
                             this.OutputConfiguration = new OutputModelConfiguration()
                             {
-                                Function = mode,
+                                Function = modeFormat,
                                 Filter = filter,
+                                Writer = writer,
                             };
 
                         }

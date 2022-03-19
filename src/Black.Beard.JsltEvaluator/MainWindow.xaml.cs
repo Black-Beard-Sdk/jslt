@@ -345,7 +345,7 @@ namespace AppJsonEvaluator
                     var src = Sources.GetEmpty();
                     src.Variables.Add(_variableHelper.GetVariables());
                     src.Variables.Add("My value", new JValue(1));
-                    this.TextArea.Text = _template.TransformForOutput(src);
+                    this.TextArea.Text = _template.TransformForOutput(src)?.ToString();
                 }
                 catch (Exception e2)
                 {
@@ -724,7 +724,7 @@ namespace AppJsonEvaluator
 
             };
 
-            textArea.TextChanged += (this.OnTextChanged);
+            // textArea.TextChanged += (this.OnTextChanged);
 
             // STYLING
             InitColors(textArea);
@@ -894,10 +894,10 @@ namespace AppJsonEvaluator
         /// </summary>
         private const bool CODEFOLDING_CIRCULAR = true;
 
-        private void OnTextChanged(object sender, EventArgs e)
-        {
+        //private void OnTextChanged(object sender, EventArgs e)
+        //{
 
-        }
+        //}
 
         private void TextArea_MarginClick(object sender, MarginClickEventArgs e)
         {

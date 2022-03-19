@@ -13,7 +13,7 @@ namespace Bb.Json.Jslt.CustomServices
     public class Outputs
     {
 
-        [JsltExtensionMethod("to_json", ForOutput = true)]
+        [JsltExtensionMethod("to_json", ForOutput = FunctionKindEnum.Output)]
         [JsltExtensionMethodParameter("indented", "serialize json indented if value is true")]
         [JsltExtensionMethodParameter("ignoreNullAndEmptyValue", "remove empty and null value of the output")]
         public static StringBuilder ExecuteToJson(RuntimeContext ctx, bool indented, bool ignoreNullAndEmptyValue)
@@ -85,7 +85,7 @@ namespace Bb.Json.Jslt.CustomServices
         }
 
 
-        [JsltExtensionMethod("to_block", ForOutput = true)]
+        [JsltExtensionMethod("to_block", ForOutput = FunctionKindEnum.Output)]
         public static StringBuilder ExecuteToBlock(RuntimeContext ctx)
         {
 
@@ -99,33 +99,6 @@ namespace Bb.Json.Jslt.CustomServices
             else if (source is JArray a)
                 foreach (var item in a)
                     result.AppendLine(item.ToString(Newtonsoft.Json.Formatting.None));
-
-            return result;
-
-        }
-
-        [JsltExtensionMethod("to_blockfile", ForOutput = true)]
-        [JsltExtensionMethodParameter("filename", "filename where the datas will be streamed")]
-        public static StringBuilder ExecuteToBlockFile(RuntimeContext ctx, string filename)
-        {
-
-            var file = ctx.Configuration.ResolveFile(filename);
-            
-            if (!file.Directory.Exists)
-                file.Directory.Create();
-
-            var source = ctx.TokenResult;
-
-            var result = new StringBuilder();
-
-            if (source is JObject o)
-                result.AppendLine(o.ToString(Newtonsoft.Json.Formatting.None));
-
-            else if (source is JArray a)
-                foreach (var item in a)
-                    result.AppendLine(item.ToString(Newtonsoft.Json.Formatting.None));
-
-            File.AppendAllText(file.FullName, result.ToString());
 
             return result;
 

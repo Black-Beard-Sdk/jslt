@@ -22,11 +22,12 @@ namespace Bb.Json.Attributes
             this.Description = description;
         }
 
+
         public string Name { get; }
 
         public string Description { get; }
 
-        public bool ForOutput { get; set; }
+        public FunctionKindEnum ForOutput { get; set; } = FunctionKindEnum.FunctionStandard;
 
         public static JsltExtensionMethodAttribute GetAttribute(MemberInfo method)
         {
@@ -37,5 +38,14 @@ namespace Bb.Json.Attributes
 
 
     }
+
+
+    public enum FunctionKindEnum
+    {
+        Output,
+        Writer,
+        FunctionStandard
+    }
+
 
 }

@@ -4,6 +4,32 @@
 { "result" : method(arg1, arg2, ...) }
 ``` 
 
+## **Distinct**
+Return a unique list in the source that match withe the pattern
+```JSON
+{ "result" : distinct("source", "json path to match" @string) }
+``` 
+
+## **Group**
+Return group from list a unique list in the source that match withe the pattern
+```JSON
+{ "result" : group("$.source", [ "$.pattern1" @string ]) }
+``` 
+
+```JSON
+{ "result" : [ 
+    {
+        "Label" : "Item1", 
+        "Items" : [ 
+          { 
+            "pattern1" : "Item1",
+            <object> 
+          } 
+        ]
+    }
+]
+``` 
+
 ## **loadjson**  
 ```JSON
 { "result" : loadjson("path to json document") }
@@ -137,7 +163,7 @@ return the hash of Sha256 algorithm
 ## **Sha512**  
 return the hash of Sha512 algorithm
 ```JSON
-"Syntax" :  .sha512("") }
+"Syntax" :  sha512("") }
 ```
 
 ## **SubStr**  

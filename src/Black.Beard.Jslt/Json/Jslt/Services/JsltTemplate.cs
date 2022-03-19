@@ -36,14 +36,15 @@ namespace Bb.Json.Jslt.Services
 
         public OutputSerializationRule RuleOutput { get; internal set; }
 
-        public string TransformForOutput(Sources sources, RuntimeContext ctx = null)
+        public StringBuilder TransformForOutput(Sources sources, RuntimeContext ctx = null)
         {
             RuntimeContext result = this.Transform(sources, ctx);
             return ApplyOutput(result);
         }
 
-        public string ApplyOutput(RuntimeContext result)
+        public StringBuilder ApplyOutput(RuntimeContext result)
         {
+
             var resultTokens = result.TokenResult;
 
             if (RuleOutput != null)
@@ -70,14 +71,20 @@ namespace Bb.Json.Jslt.Services
 
                     result.TokenResult = resultTokens;
 
-                    var sb = RuleOutput.Rule(result, null);
-                    return sb.ToString();
+                    var sb = RuleOutput.Rule(result);
+                    result.Output = sb;
+
+                    if (RuleOutput.Writer != null)
+                        RuleOutput.Writer(result);
+
+                    return result.Output;
 
                 }
 
             }
 
-            return resultTokens.ToString();
+            return new StringBuilder( resultTokens.ToString());
+
         }
 
         public RuntimeContext Transform(Sources sources, RuntimeContext ctx = null)

@@ -57,7 +57,8 @@ namespace Bb.Json.Jslt.Services
             }
 
             Func<RuntimeContext, JToken, JToken> rules = null;
-            Func<RuntimeContext, JToken, StringBuilder> ruleOutput = null;
+            Func<RuntimeContext, StringBuilder> ruleOutput = null;
+            Func<RuntimeContext, object> ruleWriter = null;
 
             if (_errors.Success)
             {
@@ -70,6 +71,13 @@ namespace Bb.Json.Jslt.Services
                 {
                     var codeName = Path.GetFileNameWithoutExtension(filepathCode) + "_output" + Path.GetExtension(filepathCode);
                     ruleOutput = GetOutput(outputConfiguration.Function, _foundry, _errors, codeName, withDebug);
+
+                    if (outputConfiguration.Writer != null)
+                    {
+                        ruleWriter = GetWriter(outputConfiguration.Writer, _foundry, _errors, codeName, withDebug);
+
+                    }
+
                 }
 
             }
@@ -83,6 +91,7 @@ namespace Bb.Json.Jslt.Services
                 {
                     Filter = outputConfiguration?.Filter?.Value,
                     Rule = ruleOutput,
+                    Writer = ruleWriter,
                 },
                 Tree = tree,
                 Culture = culture,
@@ -127,10 +136,10 @@ namespace Bb.Json.Jslt.Services
 
         }
 
-        private Func<RuntimeContext, JToken, StringBuilder> GetOutput(JsltBase tree, FunctionFoundry foundry, Diagnostics _errors, string filepathCode, bool withDebug)
+        private Func<RuntimeContext, StringBuilder> GetOutput(JsltBase tree, FunctionFoundry foundry, Diagnostics _errors, string filepathCode, bool withDebug)
         {
 
-            Func<RuntimeContext, JToken, StringBuilder> fnc;
+            Func<RuntimeContext, StringBuilder> fnc;
 
             if (tree != null)
             {
@@ -148,7 +157,7 @@ namespace Bb.Json.Jslt.Services
             {
                 var arg = Expression.Parameter(typeof(RuntimeContext), "arg0");
                 var arg1 = Expression.Parameter(typeof(JToken), "arg1");
-                var lbd = Expression.Lambda<Func<RuntimeContext, JToken, StringBuilder>>(arg1, arg, arg1);
+                var lbd = Expression.Lambda<Func<RuntimeContext, StringBuilder>>(arg1, arg, arg1);
 
                 if (lbd.CanReduce)
                     lbd.ReduceAndCheck();
@@ -160,6 +169,38 @@ namespace Bb.Json.Jslt.Services
 
         }
 
+        private Func<RuntimeContext, object> GetWriter(JsltBase tree, FunctionFoundry foundry, Diagnostics _errors, string filepathCode, bool withDebug)
+        {
+
+            Func<RuntimeContext, object> fnc;
+
+            if (tree != null)
+            {
+
+                var sourceCompiler = new LocalMethodCompiler(withDebug)
+                {
+                    OutputPath = this._configuration.OutputPath,
+                };
+
+                var builder = new SaveExpressionBuilder(_errors, sourceCompiler) { Configuration = this._configuration, EmbbededFunctions = foundry };
+                fnc = builder.GenerateLambdaWriter(tree, filepathCode);
+
+            }
+            else // Template empty
+            {
+                var arg = Expression.Parameter(typeof(RuntimeContext), "arg0");
+                var arg1 = Expression.Parameter(typeof(JToken), "arg1");
+                var lbd = Expression.Lambda<Func<RuntimeContext, object>>(arg1, arg, arg1);
+
+                if (lbd.CanReduce)
+                    lbd.ReduceAndCheck();
+
+                fnc = lbd.Compile();
+            }
+
+            return fnc;
+
+        }
 
         private TranformJsonAstConfiguration _configuration;
 

@@ -4,6 +4,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace Wizards
 {
@@ -50,7 +51,7 @@ namespace Wizards
                 src.Variables.Add(_variables);
 
                 var ctx = _template.Transform(src);
-                string result = _template.ApplyOutput(ctx);
+                StringBuilder result = _template.ApplyOutput(ctx);
 
                 return result;
 

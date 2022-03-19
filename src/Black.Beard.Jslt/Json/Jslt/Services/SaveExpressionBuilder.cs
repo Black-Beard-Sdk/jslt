@@ -13,11 +13,11 @@ namespace Bb.Json.Jslt.Services
 {
 
 
-    internal class OutputExpressionBuilder : IJsltJsonVisitor
+    internal class SaveExpressionBuilder : IJsltJsonVisitor
     {
 
 
-        static OutputExpressionBuilder()
+        static SaveExpressionBuilder()
         {
 
             ConverterHelper.ResolveConverter(typeof(InternalConverters), (m) => true);
@@ -41,7 +41,7 @@ namespace Bb.Json.Jslt.Services
         }
 
 
-        public OutputExpressionBuilder(Diagnostics diagnostics, MethodCompiler compiler)
+        public SaveExpressionBuilder(Diagnostics diagnostics, MethodCompiler compiler)
         {
 
             PrivatedIndex.Reset();
@@ -61,7 +61,8 @@ namespace Bb.Json.Jslt.Services
             });
 
         }
-        internal Func<RuntimeContext, StringBuilder> GenerateLambdaOutput(JsltBase tree, string filepathCode)
+
+        internal Func<RuntimeContext, object> GenerateLambdaWriter(JsltBase tree, string filepathCode)
         {
 
             // Start parsing
@@ -72,11 +73,12 @@ namespace Bb.Json.Jslt.Services
 
             _compiler.Add(e);
 
-            var result = _compiler.Compile<Func<RuntimeContext, StringBuilder>>(filepathCode);
+            var result = _compiler.Compile<Func<RuntimeContext, object>>(filepathCode);
 
             return result;
 
-        }             
+        }
+                
 
         public object VisitArray(JsltArray node1)
         {
@@ -366,15 +368,17 @@ namespace Bb.Json.Jslt.Services
 
                 List<Expression> args = new List<Expression>();
 
-                if (!node.ServiceProvider.IsCtor)
+
+                // Le premier parametre des methodes est toujours le context.
+                if (!node.ServiceProvider.IsCtor) 
                     args.Add(ctx.Current.Context);
 
+                // Les arguments sont ceux passé dans le script.
                 foreach (var property in node.Arguments)
                 {
-
-                    Type targetType = node.ParameterTypes[args.Count];
+                    Type targetType = node.ParameterTypes[args.Count]; // Get expected target type
                     var argSourceValue = ((Expression)property.Value.Accept(this))
-                        .ConvertIfDifferent(targetType);
+                        .ConvertIfDifferent(targetType); // Make conversion
 
                     args.Add(argSourceValue);
 
@@ -397,6 +401,7 @@ namespace Bb.Json.Jslt.Services
                     result = Expression.Call(RuntimeContext._getContentFromService.Method, ctx.Current.Context, src, result);
 
                 }
+
                 return result;
 
             }
