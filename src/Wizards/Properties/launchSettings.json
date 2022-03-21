@@ -2,7 +2,7 @@
   "profiles": {
     "Wizards": {
       "commandName": "Project",
-      "commandLineArgs": "play \"C:\\Users\\g.beard\\Desktop\\Docs\\consignes\\test\\Test1\\ImplementationModel.cs\" --debug"
+      "commandLineArgs": "explore \"C:\\Users\\g.beard\\Desktop\\Docs\\TesWizard\""
     }
   }
 }

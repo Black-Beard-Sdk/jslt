@@ -18,6 +18,9 @@ using System.Reflection;
 
 namespace Wizards.Commands
 {
+
+    // play "C:\Users\g.beard\Desktop\Docs\TesWizard\Locker team\Avisages\Resent codes.cs" --debug
+
     /// <summary>
     /// 
     /// </summary>
@@ -29,7 +32,7 @@ namespace Wizards.Commands
             .exe template execute "<template file>" --source:"value source" --debug
         */
 
-        public CommandLineApplication CommandExecute(CommandLine app)
+        public CommandLineApplication CommandPlay(CommandLine app)
         {
 
             // The syntax start with template.

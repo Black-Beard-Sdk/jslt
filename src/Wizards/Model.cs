@@ -47,6 +47,7 @@ namespace Wizards
                     System.Diagnostics.Debugger.Break();
             }
 
+
             var model = Initialize_Impl();
 
             foreach (var path in this.Paths)

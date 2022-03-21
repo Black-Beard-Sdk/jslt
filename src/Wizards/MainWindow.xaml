@@ -5,8 +5,47 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Wizards"
         mc:Ignorable="d"
-        Title="MainWindow" Height="10" Width="10">
+        Title="Wizard toolbox" 
+        Height="600" 
+        Width="600" 
+        WindowStyle="ToolWindow" 
+        WindowStartupLocation="CenterScreen"
+        >
+
     <Grid>
 
+        <ScrollViewer x:Name="scrollBar" VerticalScrollBarVisibility="Auto" Margin="10">
+
+            <ListView 
+                Margin="5"
+                Name="lvDataBinding"                 
+                ItemsSource="{Binding .}" 
+                Height="230" 
+                ScrollViewer.CanContentScroll="True"
+                ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                BorderThickness="0"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Stretch"
+                VerticalAlignment="Top"
+                >
+
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Button 
+                            Content="{Binding Label}" 
+                            Height="50" 
+                            Click="Button_Click" 
+                            FontSize="20" 
+                        />
+
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+
+            </ListView>
+
+        </ScrollViewer>
+
     </Grid>
+
+
 </Window>
