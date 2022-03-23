@@ -18,6 +18,32 @@ namespace Bb.Json.Jslt.CustomServices
     public static partial class Services
     {
 
+        [JsltExtensionMethod("union")]
+        [JsltExtensionMethodParameter("source", "array that contains all sources to merge.")]
+        public static JToken ExecuteUnion(RuntimeContext ctx, JArray source)
+        {
+
+            var resultValue = new JArray();
+
+            if (source != null)
+            {
+
+                foreach (JToken token in source)
+                    if (token is JArray a1)
+                    {
+                        foreach (var token2 in a1)
+                            resultValue.Add(token2);
+                    }
+                    else
+                        resultValue.Add(token);
+               
+            }
+
+            return resultValue;
+
+        }
+
+
 
         [JsltExtensionMethod("group")]
         [JsltExtensionMethodParameter("source", "Json source.")]

@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Bb.Json.Jslt.CustomServices
 {
@@ -110,6 +111,115 @@ namespace Bb.Json.Jslt.CustomServices
 
             return new JValue(token.ToString());
         }
+
+        [JsltExtensionMethod("regexismatch", "Make a regular expression matches that return true or false")]
+        [JsltExtensionMethodParameter("token", "")]
+        [JsltExtensionMethodParameter("pattern", "pattern")]
+        public static JToken ExecuteRegexMatch(RuntimeContext ctx, JToken token, string pattern)
+        {
+
+            if (token is JValue v)
+            {
+
+                var _culture = CultureInfo.InvariantCulture;
+
+                var datas = string.Empty;
+
+                if (v.Type == JTokenType.Integer)
+                {
+                    var i = v.Value<int>();
+                    datas = i.ToString(_culture);
+                }
+                else if (v.Type == JTokenType.Float)
+                {
+                    var i = v.Value<double>();
+                    datas = i.ToString(_culture);
+                }
+                else if (v.Type == JTokenType.Date)
+                {
+                    var i = v.Value<DateTime>();
+                    datas = i.ToString(_culture);
+                }
+                else if (v.Type == JTokenType.TimeSpan)
+                {
+                    var i = v.Value<TimeSpan>();
+                    datas = i.ToString();
+                }
+                else if (v.Type == JTokenType.Guid)
+                {
+                    var i = v.Value<Guid>();
+                    datas = i.ToString();
+                }
+                else
+                    datas = v.Value.ToString();
+
+                var reg = new Regex(pattern);
+
+                return new JValue(reg.IsMatch(datas));
+
+            }
+
+            return JValue.CreateNull();
+
+        }
+
+        [JsltExtensionMethod("regexmatches", "Make a regular expression matches that return the list of matches")]
+        [JsltExtensionMethodParameter("token", "")]
+        [JsltExtensionMethodParameter("pattern", "pattern")]
+        public static JToken ExecuteRegexMatches(RuntimeContext ctx, JToken token, string pattern)
+        {
+
+            if (token is JValue v)
+            {
+
+                var _culture = CultureInfo.InvariantCulture;
+
+                var datas = string.Empty;
+
+                if (v.Type == JTokenType.Integer)
+                {
+                    var i = v.Value<int>();
+                    datas = i.ToString(_culture);
+                }
+                else if (v.Type == JTokenType.Float)
+                {
+                    var i = v.Value<double>();
+                    datas = i.ToString(_culture);
+                }
+                else if (v.Type == JTokenType.Date)
+                {
+                    var i = v.Value<DateTime>();
+                    datas = i.ToString(_culture);
+                }
+                else if (v.Type == JTokenType.TimeSpan)
+                {
+                    var i = v.Value<TimeSpan>();
+                    datas = i.ToString();
+                }
+                else if (v.Type == JTokenType.Guid)
+                {
+                    var i = v.Value<Guid>();
+                    datas = i.ToString();
+                }
+                else
+                    datas = v.Value.ToString();
+
+                var reg = new Regex(pattern);
+
+                var o = reg.Matches(datas);
+
+                var result = new JArray(o.Count);
+                foreach (Match item in o)
+                    result.Add(new JValue(item.Value));
+
+                return result;
+
+            }
+
+            return JValue.CreateNull();
+
+        }
+
 
         [JsltExtensionMethod("stringlenght")]
         [JsltExtensionMethodParameter("token", "string value")]
@@ -352,6 +462,7 @@ namespace Bb.Json.Jslt.CustomServices
             return new JArray();
 
         }
+
 
     }
 

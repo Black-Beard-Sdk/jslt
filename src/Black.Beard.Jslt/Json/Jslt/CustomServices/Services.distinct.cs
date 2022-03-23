@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -16,6 +17,60 @@ namespace Bb.Json.Jslt.CustomServices
 
     public static partial class Services
     {
+
+        [JsltExtensionMethod("select")]
+        [JsltExtensionMethodParameter("source", "source of data")]
+        [JsltExtensionMethodParameter("sourcePath", "filter")]
+        public static JToken ExecuteSelectOne(RuntimeContext ctx, JToken source, string filter)
+        {
+
+            if (source != null)
+                return source.SelectToken(filter);
+
+            return JValue.CreateNull();
+
+        }
+
+        [JsltExtensionMethod("selectmany")]
+        [JsltExtensionMethodParameter("source", "source of data")]
+        [JsltExtensionMethodParameter("sourcePath", "filter")]
+        public static JToken ExecuteSelectMany(RuntimeContext ctx, JToken source, string filter)
+        {
+
+            var resultValue = new JArray();
+
+            if (source != null)
+            {
+                var items = source.SelectTokens(filter);
+                foreach (var item in items)
+                    resultValue.Add(item);
+            }
+
+            return resultValue;
+
+        }
+
+        [JsltExtensionMethod("limit")]
+        [JsltExtensionMethodParameter("source", "source of data")]
+        [JsltExtensionMethodParameter("max", "max item to result")]
+        public static JToken ExecuteLimit(RuntimeContext ctx, JToken source, int max)
+        {
+
+            var resultValue = new JArray();
+
+            if (source != null && source is JArray a)
+            {
+                foreach (var item in a.Take(max))
+                    resultValue.Add(item);
+
+                return resultValue;
+
+            }
+
+            return source;
+
+        }
+
 
 
         [JsltExtensionMethod("distinct")]

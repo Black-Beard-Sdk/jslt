@@ -40,6 +40,10 @@ namespace AppJsonEvaluator
         {
 
             InitializeComponent();
+
+            var mo = 1048576;
+            _max = mo * 50;
+
             this._parsers = new Parsers();
 
             InitializeTextMarkerService();
@@ -345,7 +349,11 @@ namespace AppJsonEvaluator
                     var src = Sources.GetEmpty();
                     src.Variables.Add(_variableHelper.GetVariables());
                     src.Variables.Add("My value", new JValue(1));
-                    this.TextArea.Text = _template.TransformForOutput(src)?.ToString();
+                    StringBuilder sb = _template.TransformForOutput(src);
+                    if (sb.Length < _max)
+                        this.TextArea.Text = sb.ToString();
+                    else
+                        this.TextArea.Text = sb.ToString().Substring(0, _max);
                 }
                 catch (Exception e2)
                 {
@@ -567,6 +575,9 @@ namespace AppJsonEvaluator
         private readonly BraceFoldingStrategy _foldingStrategy;
         private readonly FoldingManager _templateFoldingManager;
         private VariableHelper _variableHelper;
+
+        public int _max { get; }
+
         private readonly Parsers _parsers;
         private Timer _timerMajDiagnostic;
         private Timer _timerMajUpdateTemplate;

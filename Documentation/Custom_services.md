@@ -30,6 +30,30 @@ Return group from list a unique list in the source that match withe the pattern
 ]
 ``` 
 
+## **Union**
+Return an unified list of specified items
+```JSON
+{ "result" : union([ [<array 1>], [<array 2>], {<object 1>}  ]) }
+``` 
+
+## **select**
+Return a single selection specified by the json path
+```JSON
+{ "result" : select( {<object>}, "json path" @string ) }
+``` 
+
+## **select**
+Return a many selection specified by the json path
+```JSON
+{ "result" : selectmany( {<object>}, "json path" @string ) }
+``` 
+
+## **limit**
+Return a list of x items
+```JSON
+{ "result" : limit( [<items>], 10 }
+``` 
+
 ## **loadjson**  
 ```JSON
 { "result" : loadjson("path to json document") }
@@ -165,6 +189,18 @@ return the hash of Sha512 algorithm
 ```JSON
 "Syntax" :  sha512("") }
 ```
+
+## **regexismatch**
+Make a regular expression matches that return true or false
+```JSON
+{ "result" : regexismatch( "<data to evaluate>", "<pattern>" }
+``` 
+
+## **regexmatches**
+Make a regular expression matches that return the list of matches
+```JSON
+{ "result" : regexismatch( "<data to evaluate>", "<pattern>" }
+``` 
 
 ## **SubStr**  
 Retrieves a substring from this instance. The substring starts at a specified character position and has a specified length. A string that is equivalent to the substring of length length that begins at startIndex in this instance, or System.String.Empty if startIndex is equal to the length of this instance and length is zero.
