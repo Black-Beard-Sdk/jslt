@@ -2,8 +2,9 @@
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Wizards
+namespace Wizards.Actions
 {
+
     public class ParserObbjectEventArgs : EventArgs
     {
 

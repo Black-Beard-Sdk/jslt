@@ -19,8 +19,6 @@ using System.Reflection;
 namespace Wizards.Commands
 {
 
-    // play "C:\Users\g.beard\Desktop\Docs\TesWizard\Locker team\Avisages\Resent codes.cs" --debug
-
     /// <summary>
     /// 
     /// </summary>
@@ -83,16 +81,21 @@ namespace Wizards.Commands
                     {
 
                         Type type = GetTypeToExecute(assembly);
-                        var model = Activator.CreateInstance(type) as Model;
-                        model.ModelFile = fileInfo.FullName;
-                        model.ModelDir = fileInfo.Directory.FullName;
-                        model.Paths.Add(fileInfo.Directory.FullName);
-                        model.Debug = debug;
+                        if (type != null)
+                        {
+                            var model = Activator.CreateInstance(type) as Model;
+                            model.ModelFile = fileInfo.FullName;
+                            model.ModelDir = fileInfo.Directory.FullName;
+                            model.Paths.Add(fileInfo.Directory.FullName);
+                            model.Debug = debug;
 
-                        model.Execute();
+                            model.Execute();
+                        }
+                        else
+                        {
 
+                        }
                     }
-
 
                     return app.Result.ToValue();
 
@@ -108,6 +111,7 @@ namespace Wizards.Commands
 
         private static Type GetTypeToExecute(Bb.Compilers.AssemblyResult assembly)
         {
+
             // Resolve the name of objects
             List<CodeObject> _items = new List<CodeObject>();
             foreach (Microsoft.CodeAnalysis.SyntaxTree item in assembly.Codes)
@@ -121,8 +125,14 @@ namespace Wizards.Commands
                 if (_items.Any(c => c.Evaluate(item)))
                     types.Add(item);
 
-            var type = types[0];
-            return type;
+            if (types.Any())
+            {
+                var type = types[0];
+                return type;
+            }
+
+            return null;
+
         }
 
         private static Bb.Compilers.AssemblyResult GetCsharpBuilder(string filepathCode)

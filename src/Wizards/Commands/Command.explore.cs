@@ -24,10 +24,6 @@ namespace Wizards.Commands
     public partial class Command : Command<CommandLine>
     {
 
-        /*
-            Syntax
-            .exe explore "C:\Users\g.beard\Desktop\Docs\TesWizard"
-        */
 
         public CommandLineApplication CommandExplore(CommandLine app)
         {
@@ -45,14 +41,29 @@ namespace Wizards.Commands
                     , ValidatorExtension.EvaluateDirectoryPathIsValid
                     , ValidatorExtension.EvaluateRequired
                 );
-           
+
+                // Add option
+                var optwithDebug = validator.OptionNoValue("--debug", "activate debug mode");
+
+
                 config.OnExecute(() =>
                 {
 
-               
+
+                    if (optwithDebug.HasValue())
+                    {
+                        if (Debugger.IsAttached)
+                            Debugger.Break();
+                        else
+                        {
+                            Debugger.Launch();
+                            Debugger.Break();
+                        }
+                    }
+
                     var fileInfo = new DirectoryInfo(argTemplatePath.Value);
 
-                    var main = new MainWindow(fileInfo);
+                    var main = new MainWindow(fileInfo, optwithDebug.HasValue());
 
                     var result =main.ShowDialog();
 

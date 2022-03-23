@@ -1,8 +1,9 @@
 ﻿using System;
 
-namespace Wizards
+namespace Wizards.Actions
 {
 
+    [System.Diagnostics.DebuggerDisplay("{Label}")]
     public class ParserObject
     {
 

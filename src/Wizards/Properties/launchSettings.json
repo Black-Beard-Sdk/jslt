@@ -2,7 +2,7 @@
   "profiles": {
     "Wizards": {
       "commandName": "Project",
-      "commandLineArgs": "explore \"C:\\Users\\g.beard\\Desktop\\Docs\\TesWizard\""
+      "commandLineArgs": "explore \"C:\\Users\\g.beard\\Desktop\\Docs\\TestWizardGit\\ToolboxLockerTeam\""
     }
   }
 }

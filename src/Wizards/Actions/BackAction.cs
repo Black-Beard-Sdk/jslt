@@ -1,7 +1,6 @@
-﻿using System;
-
-namespace Wizards
+﻿namespace Wizards.Actions
 {
+
     public class BackAction : ParserObject
     {
 
