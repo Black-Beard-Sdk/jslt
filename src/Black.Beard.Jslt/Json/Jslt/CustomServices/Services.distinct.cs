@@ -50,6 +50,7 @@ namespace Bb.Json.Jslt.CustomServices
 
         }
 
+
         [JsltExtensionMethod("selectany", "return true if the filter matches")]
         [JsltExtensionMethodParameter("source", "source of data")]
         [JsltExtensionMethodParameter("sourcePath", "filter")]
@@ -66,6 +67,14 @@ namespace Bb.Json.Jslt.CustomServices
 
             return new JValue(false);
 
+        }
+
+        [JsltExtensionMethod("any", "return true if source is not null")]
+        [JsltExtensionMethodParameter("source", "source of data")]
+        public static JToken ExecuteAny(RuntimeContext ctx, JToken source)
+        {
+            var items = source != null;
+            return new JValue(items);
         }
 
         [JsltExtensionMethod("limit")]
