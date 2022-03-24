@@ -50,6 +50,24 @@ namespace Bb.Json.Jslt.CustomServices
 
         }
 
+        [JsltExtensionMethod("selectany", "return true if the filter matches")]
+        [JsltExtensionMethodParameter("source", "source of data")]
+        [JsltExtensionMethodParameter("sourcePath", "filter")]
+        public static JToken ExecuteSelectAny(RuntimeContext ctx, JToken source, string filter)
+        {
+
+            var resultValue = new JArray();
+
+            if (source != null)
+            {
+                var items = source.SelectTokens(filter).Any();
+                return new JValue(items);
+            }
+
+            return new JValue(false);
+
+        }
+
         [JsltExtensionMethod("limit")]
         [JsltExtensionMethodParameter("source", "source of data")]
         [JsltExtensionMethodParameter("max", "max item to result")]
@@ -70,7 +88,6 @@ namespace Bb.Json.Jslt.CustomServices
             return source;
 
         }
-
 
 
         [JsltExtensionMethod("distinct")]
