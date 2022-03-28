@@ -74,7 +74,7 @@ namespace Bb.Json.Commands
                         if (Getfile(optconfig, out string fileConfig) == 1)
                             return 1;
 
-                        reader = fileConfig.LoadContentFromFile().Deserialize<ExcelReader>();
+                        reader = fileConfig.LoadFromFile().Deserialize<ExcelReader>();
 
                     }
                     else

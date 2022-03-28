@@ -28,7 +28,7 @@ namespace Bb.Elasticsearch.Configurations
         public static ConfigurationList Load(string path)
         {
             var file = new FileInfo(path);
-            var payload = file.LoadContentFromFile();
+            var payload = file.LoadFromFile();
             var instance = JsonConvert.DeserializeObject<ConfigurationList>(payload, _setting);
             instance.Filename = file.FullName;
             return instance;

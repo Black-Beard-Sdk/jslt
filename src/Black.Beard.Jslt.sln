@@ -42,6 +42,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Wizards.Wpf", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wizards", "Wizards\Wizards.csproj", "{F6AC5B2A-2EB5-4CB7-891E-780303C6AD89}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Jslt.Output.StoreSql.XUnitTests", "Black.Beard.Jslt.Output.StoreSql.XUnitTests\Black.Beard.Jslt.Output.StoreSql.XUnitTests.csproj", "{8D51B8A3-764C-42F5-8743-CFBDE652709C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -115,6 +117,12 @@ Global
 		{F6AC5B2A-2EB5-4CB7-891E-780303C6AD89}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F6AC5B2A-2EB5-4CB7-891E-780303C6AD89}.Signed|Any CPU.ActiveCfg = Debug|Any CPU
 		{F6AC5B2A-2EB5-4CB7-891E-780303C6AD89}.Signed|Any CPU.Build.0 = Debug|Any CPU
+		{8D51B8A3-764C-42F5-8743-CFBDE652709C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D51B8A3-764C-42F5-8743-CFBDE652709C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D51B8A3-764C-42F5-8743-CFBDE652709C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D51B8A3-764C-42F5-8743-CFBDE652709C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D51B8A3-764C-42F5-8743-CFBDE652709C}.Signed|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D51B8A3-764C-42F5-8743-CFBDE652709C}.Signed|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

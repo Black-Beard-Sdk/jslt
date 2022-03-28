@@ -47,7 +47,7 @@ namespace Bb.Json.Jslt.Builds
                 if (src.HasUpdated())
                     changed = true;
                 list.Add(src);
-                key ^= filename.Calculate();
+                key ^= filename.CalculateCrc32();
             }
 
             if (!_compiledAssemblies.TryGetValue(key, out List<AssemblyResult> result))

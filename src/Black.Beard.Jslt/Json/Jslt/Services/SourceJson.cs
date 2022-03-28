@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using System;
 using System.IO;
 using System.Text;
 
@@ -29,7 +30,7 @@ namespace Bb.Json.Jslt.Services
             if (!filePathSource.Exists)
                 throw new FileNotFoundException(filePathSource.FullName);
 
-            var getDatas = GetDatas(filename.LoadContentFromFile());
+            var getDatas = GetDatas(filename.LoadFromFile());
 
             return new SourceJson(getDatas, name);
 
@@ -45,7 +46,7 @@ namespace Bb.Json.Jslt.Services
             if (!file.Exists)
                 throw new FileNotFoundException(file.FullName);
 
-            var getDatas = GetDatas(file.LoadContentFromFile());
+            var getDatas = GetDatas(file.LoadFromFile());
 
             return new SourceJson(getDatas, name);
 
@@ -53,7 +54,16 @@ namespace Bb.Json.Jslt.Services
 
         public static SourceJson GetFromText(StringBuilder payload, string name = null)
         {
+            if (payload == null)
+                throw new NullReferenceException(nameof(payload));
+
             var getDatas = GetDatas(payload.ToString());
+            return new SourceJson(getDatas, name);
+        }
+
+        public static SourceJson GetEmpty(string name = null)
+        {
+            var getDatas = GetDatas(String.Empty);
             return new SourceJson(getDatas, name);
         }
 

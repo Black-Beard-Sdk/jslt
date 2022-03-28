@@ -100,8 +100,12 @@ namespace Bb.Json.Jslt.Services
 
         }
 
-        public RuntimeContext GetContext(Sources sources)
+        public RuntimeContext GetContext(Sources? sources)
         {
+
+            if (sources == null)
+                sources = new Sources(SourceJson.GetEmpty());
+
             return new RuntimeContext(sources, this.Diagnostics)
             {
                 Configuration = this.Configuration,

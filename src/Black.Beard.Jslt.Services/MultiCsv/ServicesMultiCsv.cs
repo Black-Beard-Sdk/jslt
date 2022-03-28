@@ -1,7 +1,6 @@
 ﻿using Bb.Json.Attributes;
 using Bb.Json.Jslt.Services;
 using Newtonsoft.Json.Linq;
-using NJsonSchema;
 using System.Collections.Generic;
 
 namespace Bb.Jslt.Services.MultiCsv

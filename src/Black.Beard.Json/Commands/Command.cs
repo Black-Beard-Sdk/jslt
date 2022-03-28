@@ -69,7 +69,7 @@ namespace Bb.Json.Commands
 
                 var s = argSource.Value();
                 source = s.TrimPath()
-                         .LoadContentFromFile()
+                         .LoadFromFile()
                          .ConvertToJson();
 
                 targetName = Path.GetFileNameWithoutExtension(s);
@@ -106,7 +106,7 @@ namespace Bb.Json.Commands
             var builder = new BuildSchema();
 
             var template = argTemplatePath.Value.TrimPath()
-                .LoadContentFromFile()
+                .LoadFromFile()
                 .ConvertToJson();
 
             var parser = builder.ParseTemplate(template);

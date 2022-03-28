@@ -19,7 +19,7 @@ namespace Wizards
         /// <returns></returns>
         public static JsltTemplate LoadTemplate(this FileInfo file, bool withDebug, string[] paths, params Type[] services)
         {
-            var content = file.FullName.LoadFile();
+            var content = file.FullName.LoadFromFile();
             StringBuilder sb = new StringBuilder(content);
             var _template = sb.GetTransformProvider(withDebug, file.FullName, paths, services);
             return _template;

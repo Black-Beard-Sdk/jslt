@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Bb.Json.Jslt.CustomServices
+namespace Bb.Jslt.Output.StoreSql
 {
 
     public class Outputs
@@ -34,11 +34,12 @@ namespace Bb.Json.Jslt.CustomServices
             var source = ctx.TokenResult;
             var result = new StringBuilder();
 
-            var schemaObject = JsonSchema.FromSampleJson(source.ToString());
-            var datasPayload = schemaObject.ToJson();
-            var datas = JObject.Parse(datasPayload);
+            JsonSchema schemaObject = JsonSchema.FromSampleJson(source.ToString());
+            //var datasPayload = schemaObject.ToJson();
+            //var datas = JObject.Parse(datasPayload);
 
-
+            //var visitor = new JsonSchemaVisitor();
+            //visitor.Visit(schemaObject);
 
 
             return result;

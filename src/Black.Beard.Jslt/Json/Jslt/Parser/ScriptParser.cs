@@ -29,7 +29,7 @@ namespace Bb.Json.Jslt.Parser
             {
                 File = sourceFile ?? string.Empty,
                 Content = source,
-                Crc = Crc32.Calculate(source),
+                Crc = source.CalculateCrc32(),
             };
             parser.ParseCharStream(stream);
             return parser;
@@ -46,14 +46,14 @@ namespace Bb.Json.Jslt.Parser
         public static ScriptParser ParsePath(string source, TextWriter output = null, TextWriter outputError = null)
         {
 
-            var payload = source.LoadContentFromFile();
+            var payload = source.LoadFromFile();
             ICharStream stream = CharStreams.fromString(payload.ToString());
 
             var parser = new ScriptParser(output, outputError)
             {
                 File = source,
                 Content = new StringBuilder(payload),
-                Crc = Crc32.Calculate(payload),
+                Crc = payload.CalculateCrc32(),
             };
 
             parser.ParseCharStream(stream);

@@ -30,8 +30,8 @@
 
 	<ItemGroup>
 		<PackageReference Include="Antlr4.Runtime.Standard" Version="4.9.3" />
-		<PackageReference Include="Black.Beard.Helpers.ContentLoaders" Version="1.0.8" />
-		<PackageReference Include="Black.Beard.Roslyn" Version="1.0.10" />
+		<PackageReference Include="Black.Beard.Helpers.ContentLoaders" Version="1.0.10" />
+		<PackageReference Include="Black.Beard.Roslyn" Version="1.0.12" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 		<PackageReference Include="System.CodeDom" Version="6.0.0" />
 	</ItemGroup>

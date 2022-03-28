@@ -25,7 +25,7 @@ namespace Bb.Jslt.Services.Excels
             ExcelReader reader = null;
             var fileconfig = ctx.Configuration.ResolveFile(configPath);
             if (fileconfig.Exists)
-                reader = fileconfig.FullName.LoadContentFromFile().Deserialize<ExcelReader>();
+                reader = fileconfig.FullName.LoadFromFile().Deserialize<ExcelReader>();
             
             else
                 throw new Exception($"missing configuration file {fileconfig.FullName}");

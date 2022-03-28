@@ -33,7 +33,7 @@ namespace Wizards
 
             if (file.Exists)
             {
-                Parameters = file.LoadContentFromFile().Deserialize<Parameters>();
+                Parameters = file.LoadFromFile().Deserialize<Parameters>();
                 Parameters._file = file;
             }
             else

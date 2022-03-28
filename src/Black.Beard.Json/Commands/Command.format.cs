@@ -61,7 +61,7 @@ namespace Bb.Json.Commands
                     {
 
                         if (optSource.HasValue())
-                            token = optSource.Value().TrimPath().LoadContentFromFile().ConvertToJson();
+                            token = optSource.Value().TrimPath().LoadFromFile().ConvertToJson();
 
                         else
                         {

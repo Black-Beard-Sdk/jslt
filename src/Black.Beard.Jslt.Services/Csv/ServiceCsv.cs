@@ -73,7 +73,7 @@ namespace Bb.Jslt.Services.Csv
 
             var _file = new FileInfo(filename);
 
-            var text = _file.FullName.LoadContentFromFile();
+            var text = _file.FullName.LoadFromFile();
 
             using (var _txt = new StringReader(text))
             using (CsvReader csv = new CsvReader(_txt, hasHeader, separator[0], quote[0], escape[0], '#', ValueTrimmingOptions.All, (int)_file.Length))

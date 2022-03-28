@@ -79,7 +79,7 @@ namespace Bb.Json.Commands
                     TemplateTransformProvider Templateprovider = new TemplateTransformProvider(configuration);
 
                     var path = new FileInfo(argTemplatePath.Value.TrimPath());
-                    var sb = new StringBuilder(path.LoadContentFromFile());
+                    var sb = new StringBuilder(path.LoadFromFile());
                     JsltTemplate template = Templateprovider.GetTemplate(sb, withDebug, path.FullName);
 
                     JToken result;

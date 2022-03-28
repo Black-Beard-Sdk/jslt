@@ -48,7 +48,7 @@ namespace Bb.Elastic.Parser
         public static SourceParser ParsePath(string source, TextWriter output = null, TextWriter outputError = null)
         {
 
-            var payload = new StringBuilder(source.LoadContentFromFile());
+            var payload = new StringBuilder(source.LoadFromFile());
             ICharStream stream = CharStreams.fromString(payload.ToString());
 
             var parser = new SourceParser(output, outputError)

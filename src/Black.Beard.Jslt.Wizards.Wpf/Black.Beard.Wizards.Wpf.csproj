@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Black.Beard.Helpers.ContentLoaders" Version="1.0.8" />
+    <PackageReference Include="Black.Beard.Helpers.ContentLoaders" Version="1.0.10" />
     <PackageReference Include="ExcelDataReader.DataSet" Version="3.6.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>

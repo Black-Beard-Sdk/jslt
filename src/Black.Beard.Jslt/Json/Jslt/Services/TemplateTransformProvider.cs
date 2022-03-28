@@ -62,7 +62,7 @@ namespace Bb.Json.Jslt.Services
 
             if (_errors.Success)
             {
-                var crc = sb.Calculate().ToString();
+                var crc = sb.CalculateCrc32().ToString();
                 filepathCode = crc + ".cs";
                 // Transform the template
                 rules = Get(tree, _foundry, _errors, filepathCode, withDebug);

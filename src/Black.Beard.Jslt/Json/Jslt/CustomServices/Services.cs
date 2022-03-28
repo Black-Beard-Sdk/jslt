@@ -24,7 +24,7 @@ namespace Bb.Json.Jslt.CustomServices
 
             if (file.Exists)
                 return file.FullName
-                    .LoadContentFromFile()
+                    .LoadFromFile()
                     .ConvertToJson();
             else
             {

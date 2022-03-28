@@ -72,7 +72,7 @@ namespace Bb.Parsers.Intellisense
 
         public void ParsePath(string source)
         {
-            var payload = new StringBuilder(source.LoadContentFromFile());
+            var payload = new StringBuilder(source.LoadFromFile());
             ParseString(payload, source);
         }
 

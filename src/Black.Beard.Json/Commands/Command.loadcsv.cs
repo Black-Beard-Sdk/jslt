@@ -114,7 +114,7 @@ namespace Bb.Json.Commands
 
             var _file = new FileInfo(filename);
 
-            var text = _file.FullName.LoadContentFromFile();
+            var text = _file.FullName.LoadFromFile();
 
             using (var _txt = new StringReader(text))
             {

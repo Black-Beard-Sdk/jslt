@@ -27,10 +27,8 @@ namespace Bb.Json.Jslt.CustomServices
 
             if (token != null)
             {
-
                 var r = token.ToString();
-                return new JValue(Crc32.Calculate(r));
-
+                return new JValue(r.CalculateCrc32());
             }
 
             return new JValue(0);

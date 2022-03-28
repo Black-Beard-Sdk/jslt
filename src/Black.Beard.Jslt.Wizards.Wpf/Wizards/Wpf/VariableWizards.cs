@@ -58,7 +58,7 @@ namespace Bb.Wizards
                 if (f.Exists)
                 {
                     var variables = (JObject)Filepath
-                    .LoadContentFromFile()
+                    .LoadFromFile()
                     .ConvertToJson()
                     ;
 
