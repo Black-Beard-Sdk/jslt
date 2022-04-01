@@ -60,7 +60,18 @@ jsonValueNumber : NUMBER jsonType?;
 jsonValueInteger : INT jsonType?;
 jsonValueBoolean : (TRUE | FALSE) jsonType?;
 jsonValueNull : NULL;
-jsonType : (URI_TYPE | TIME_TYPE | DATETIME_TYPE | STRING_TYPE | GUID_TYPE | INTEGER_TYPE | DECIMAL_TYPE | CURRENT_VALUE IDLOWCASE);
+jsonType 
+   : BOOLEAN_TYPE 
+   | URI_TYPE 
+   | TIME_TYPE 
+   | DATETIME_TYPE 
+   | STRING_TYPE 
+   | GUID_TYPE 
+   | INTEGER_TYPE 
+   | DECIMAL_TYPE 
+   
+   | CURRENT_VALUE IDLOWCASE
+   ;
 
 jsonLtOperation :
      jsonLtItem
@@ -76,6 +87,8 @@ jsonLtItem :
    | jsonValueInteger
    | jsonValueNumber
    | jsonValueNull
+   | dotnotation_jsonpath
+   | VARIABLE_NAME
    ;
 
 operation : 
@@ -99,3 +112,31 @@ jsonfunctionName :
 jsonValueList : 
    jsonValue (COMMA jsonValue)*
    ;
+
+// Json path
+dotnotation_jsonpath 
+   : DOLLAR_DOT dotnotation_expr (SUBSCRIPT dotnotation_expr)*
+   ;
+
+dotnotation_expr 
+   : identifierWithQualifier
+   | INDENTIFIER_JSONPATH
+   ;
+
+identifierWithQualifier 
+   : INDENTIFIER_JSONPATH BRACKET_LEFT INT? BRACKET_RIGHT
+   | INDENTIFIER_JSONPATH BRACKET_LEFT QUESTION_PAREN_LEFT query_expr PAREN_RIGHT BRACKET_RIGHT
+   ;
+
+query_expr 
+   : query_expr (AND_EXCLUSIVE query_expr)+
+   | query_expr (OR_EXCLUSIVE query_expr)+
+   | WILDCARD_SUBSCRIPT
+   | CURRENT_INDENTIFIER_JSONPATH
+   | CURRENT_INDENTIFIER_JSONPATH GT INT
+   | CURRENT_INDENTIFIER_JSONPATH LT INT
+   | CURRENT_LENGTH INT
+   | CURRENT_INDENTIFIER_JSONPATH EQ INT
+   | CURRENT_INDENTIFIER_JSONPATH EQ SINGLE_QUOTE_STRING
+   ;
+

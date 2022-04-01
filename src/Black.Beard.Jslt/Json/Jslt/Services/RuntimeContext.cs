@@ -31,6 +31,7 @@ namespace Bb.Json.Jslt.Services
             _setVariable = typeof(RuntimeContext).GetMethod(nameof(RuntimeContext.SetVariable), new Type[] { typeof(RuntimeContext), typeof(string), typeof(object) });
             _DelVariable = typeof(RuntimeContext).GetMethod(nameof(RuntimeContext.DelVariable), new Type[] { typeof(RuntimeContext), typeof(string) });
 
+            _TraceLocation = typeof(RuntimeContext).GetMethod(nameof(RuntimeContext.TraceLocation), new Type[] { typeof(RuntimeContext), typeof(int), typeof(int), typeof(int), typeof(int), typeof(Func<object>) });
 
         }
 
@@ -44,6 +45,24 @@ namespace Bb.Json.Jslt.Services
             _diagnostics = d;
         }
 
+        public static object TraceLocation(RuntimeContext ctx, int line, int column, int position, int positionEnd, Func<object> func)
+        {
+
+            ctx.Line = line;
+            ctx.Column = column;
+            ctx.Position = position;
+            ctx.PositionEnd = position;
+
+            var result = func();
+
+            return result;
+        
+        }
+
+        public TokenLocation GetCurrentLocation()
+        {
+            return new TokenLocation(this.Position, this.PositionEnd, this.Line, this.Column);
+        }
 
         #region methods called in the expressions
 
@@ -455,7 +474,7 @@ namespace Bb.Json.Jslt.Services
             return false;
 
         }
-
+        
         private static object Modulo(object l, object r)
         {
 
@@ -847,7 +866,7 @@ namespace Bb.Json.Jslt.Services
         {
             ctx.SubSources.Variables.Add(name, value);
             if (value == null)
-                ctx.Diagnostics.AddError(string.Empty, null, name, $"the key '{name}' is setted with null value.");
+                ctx.Diagnostics.AddError(string.Empty, ctx.GetCurrentLocation(), name, $"the key '{name}' is setted with null value.");
         }
 
         public static void DelVariable(RuntimeContext ctx, string name)
@@ -881,7 +900,7 @@ namespace Bb.Json.Jslt.Services
 
                 else
                 {
-                    ctx.Diagnostics.AddError(string.Empty, null, d, $"the key '{item}' can't be resolved.");
+                    ctx.Diagnostics.AddError(string.Empty, ctx.GetCurrentLocation(), d, $"the key '{item}' can't be resolved.");
                     d = d.Replace(item, string.Empty);
                 }
             }
@@ -892,7 +911,7 @@ namespace Bb.Json.Jslt.Services
             }
             catch (Exception)
             {
-                ctx.Diagnostics.AddError(string.Empty, null, d, $"'d' can't be converted in jvalue");
+                ctx.Diagnostics.AddError(string.Empty, ctx.GetCurrentLocation(), d, $"'d' can't be converted in jvalue");
                 throw;
             }
 
@@ -1020,6 +1039,7 @@ namespace Bb.Json.Jslt.Services
         internal static readonly MethodInfo _setVariable;
         internal static readonly MethodInfo _getVariable;
         internal static readonly MethodInfo _DelVariable;
+        internal static readonly MethodInfo _TraceLocation;
         internal static readonly MethodInfo _convertToBool;
 
 
@@ -1039,6 +1059,10 @@ namespace Bb.Json.Jslt.Services
         public bool MustoBreak { get; private set; }
 
         public StringBuilder Output { get; internal set; }
+        public int Line { get; private set; }
+        public int Column { get; private set; }
+        public int Position { get; private set; }
+        public int PositionEnd { get; private set; }
 
         private static readonly Dictionary<Type, Dictionary<string, (PropertyInfo, Action<object, object>)>> _properties;
         private static object _lock = new object();

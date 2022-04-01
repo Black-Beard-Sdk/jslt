@@ -264,10 +264,11 @@ namespace Bb.Json.Jslt.Parser
             JsltBase result = null;
             Type type = null;
 
+            #region 
+
             var txt = context.STRING().GetText()?.Trim() ?? string.Empty;
             if (txt.StartsWith(@"""") && txt.EndsWith(@""""))
                 txt = txt.Substring(1, txt.Length - 2);
-
 
             StringBuilder sb = new StringBuilder(txt.Length + 10);
             for (int i = 0; i < txt.Length; i++)
@@ -317,14 +318,7 @@ namespace Bb.Json.Jslt.Parser
 
             txt = sb.ToString();
 
-            //txt = txt.
-            //          
-            //         .Replace(@"\""", @"""")
-            //         .Replace(@"\t", "\t")
-            //         .Replace(@"\r", "\r")
-            //         .Replace(@"\n", "\n")
-            ;
-
+            #endregion 
 
             var containsVariable = txt.Contains("@@");
 
@@ -814,6 +808,7 @@ namespace Bb.Json.Jslt.Parser
             switch (name.ToLower())
             {
 
+                case "switch":
                 case "when":
                     if (obj == null)
                         AddError(context.Start.ToLocation(), string.Empty, $"missing case");

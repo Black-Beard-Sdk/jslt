@@ -1,6 +1,8 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Bb.Expressions;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace Bb.Json.Jslt.Services
@@ -9,6 +11,39 @@ namespace Bb.Json.Jslt.Services
     public static class InternalConverters
     {
 
+        public static bool ToBoolean(JValue self)
+        {
+
+            if (self == null)
+                return false;
+
+            var value = self.Value;
+            
+            if (value is Boolean valueB)
+                return valueB;
+
+            var targetType = typeof(bool);
+          
+            var result = ConverterHelper.ToObject(value, targetType);
+
+            return (bool)result;
+
+        }
+
+
+        public static bool ToBoolean(string self)
+        {
+            var v1 = self.Trim().ToLower();
+            var value = v1.Equals("true") || v1.Equals("1") || v1.Equals("vrai");
+            return value;
+        }
+
+        public static bool ToBoolean(int self)
+        {
+            var v1 = self.ToString().Trim('-');
+            var value = v1.Equals("true") || v1.Equals("1") || v1.Equals("vrai");
+            return value;
+        }
 
         public static string ToString(JToken self)
         {
@@ -70,7 +105,6 @@ namespace Bb.Json.Jslt.Services
         {
             return new JValue(self);
         }
-
 
         public static JToken ToJToken(short self)
         {

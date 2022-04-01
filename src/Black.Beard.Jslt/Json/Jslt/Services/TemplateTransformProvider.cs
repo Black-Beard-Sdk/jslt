@@ -116,7 +116,7 @@ namespace Bb.Json.Jslt.Services
                     OutputPath = this._configuration.OutputPath,
                 };
 
-                var builder = new TemplateWithExpressionBuilder(_errors, sourceCompiler) { Configuration = this._configuration, EmbbededFunctions = foundry };
+                var builder = new TemplateWithExpressionBuilder(_errors, sourceCompiler, withDebug) { Configuration = this._configuration, EmbbededFunctions = foundry };
                 fnc = builder.GenerateLambda(tree, filepathCode);
 
             }

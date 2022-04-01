@@ -3,6 +3,7 @@
 namespace Bb.Jslt.Services.Excels
 {
 
+    [System.Diagnostics.DebuggerDisplay("{Name} {Index}")]
     public class Column
     {
 

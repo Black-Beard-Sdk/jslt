@@ -140,5 +140,29 @@ public interface IJsltParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitJsonValueList([NotNull] JsltParser.JsonValueListContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="JsltParser.dotnotation_jsonpath"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitDotnotation_jsonpath([NotNull] JsltParser.Dotnotation_jsonpathContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="JsltParser.dotnotation_expr"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitDotnotation_expr([NotNull] JsltParser.Dotnotation_exprContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="JsltParser.identifierWithQualifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitIdentifierWithQualifier([NotNull] JsltParser.IdentifierWithQualifierContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="JsltParser.query_expr"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitQuery_expr([NotNull] JsltParser.Query_exprContext context);
 }
 } // namespace Bb.Json.Jslt.Parser

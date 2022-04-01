@@ -217,7 +217,6 @@ namespace Bb.Expressions
 
                 else
                 {
-
                     var method = ConverterHelper.GetConvertMethod(sourceType, targetType);
                     if (method != null)
                     {
@@ -226,9 +225,7 @@ namespace Bb.Expressions
                             throw new InvalidCastException($"no method for convert {sourceType} in {targetType}. please use ConverterHelper forregister a custom method");
 
                     }
-
                 }
-
 
             }
             else
@@ -239,6 +236,7 @@ namespace Bb.Expressions
                 LocalDebug.Stop();
                 throw new Exception($"missing converter for convert {sourceType} to {targetType}");
             }
+
             return result;
 
         }

@@ -40,50 +40,75 @@ namespace Bb.Expressions
                 "ChangeType",
             };
 
-            var ms = typeof(Convert).GetMethods(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
+            var ms = typeof(Convert).GetMethods(BindingFlags.Static | BindingFlags.Public);
+            
             foreach (var item in ms)
-            {
-                if (!_names.Contains(item.Name))
-                    continue;
-
-                var p = item.GetParameters();
-                if ((p.Length == 1 || p.Length == 2) && p[0].ParameterType != item.ReturnType)
+                if (_names.Contains(item.Name))
                 {
-                    if (!_dicConverters.TryGetValue(p[0].ParameterType, out Dictionary<Type, MethodBase> dic2))
-                        _dicConverters.Add(p[0].ParameterType, dic2 = new Dictionary<Type, MethodBase>());
-
-                    if (!dic2.ContainsKey(item.ReturnType))
-                        dic2.Add(item.ReturnType, item);
-
-                    else
-                    {
-
-                    }
+                    var p = item.GetParameters();
+                    if ((p.Length == 1 || p.Length == 2) && p[0].ParameterType != item.ReturnType)
+                        Register(p[0].ParameterType, item.ReturnType, item);
                 }
+
+        }
+
+        private static void Register(Type sourceType, Type targetType, MethodBase methodConverter)
+        {
+
+            if (!_dicConverters.TryGetValue(sourceType, out Dictionary<Type, MethodBase> dicSource))
+                _dicConverters.Add(sourceType, dicSource = new Dictionary<Type, MethodBase>());
+
+            if (dicSource.ContainsKey(targetType))
+                dicSource[targetType] = methodConverter;
+
+            else
+                dicSource.Add(targetType, methodConverter);
+
+        }
+
+        public static object ToObject(object self, Type targetType)
+        {
+
+            if (self == null)
+                return null;
+
+            var sourceType = self.GetType();          
+
+            if (!_dic.TryGetValue(sourceType, out var dic2))
+                _dic.Add(sourceType, dic2 = new Dictionary<Type, Func<object, object>>());
+
+            if (!dic2.TryGetValue(targetType, out var function))
+            {
+
+                var source = Expression.Parameter(typeof(object));
+
+                var e = source.ConvertIfDifferent(sourceType);
+                e = e.ConvertIfDifferent(targetType);
+                e = e.ConvertIfDifferent(typeof(object));
+
+                var lbd = Expression.Lambda<Func<object, object>>(e, source);
+
+                dic2.Add(targetType, function = lbd.Compile());
+
             }
+
+            var result = function(self);
+
+            return result;
 
         }
 
         public static void ResolveConverter(Type type, Func<MethodInfo, bool> toOverride)
         {
 
-            MethodInfo[] ms = type.GetMethods(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
+            MethodInfo[] ms = type.GetMethods(BindingFlags.Static | BindingFlags.Public);
             foreach (var item in ms)
             {
 
                 var p = item.GetParameters();
                 if ((p.Length == 1 || p.Length == 2) && p[0].ParameterType != item.ReturnType)
-                {
-                    if (!_dicConverters.TryGetValue(p[0].ParameterType, out Dictionary<Type, MethodBase> dic2))
-                        _dicConverters.Add(p[0].ParameterType, dic2 = new Dictionary<Type, MethodBase>());
+                    Register(p[0].ParameterType, item.ReturnType, item);
 
-                    if (!dic2.ContainsKey(item.ReturnType))
-                        dic2.Add(item.ReturnType, item);
-
-                    else if (dic2.ContainsKey(item.ReturnType) && toOverride(item))
-                        dic2[item.ReturnType] = item;
-
-                }
             }
 
         }
@@ -92,15 +117,8 @@ namespace Bb.Expressions
         {
 
             GetConvertMethod(sourceType, targetType);
-
             // already registered
-            if (_dicConverters.TryGetValue(sourceType, out Dictionary<Type, MethodBase> dicSource))
-                if (dicSource.TryGetValue(targetType, out MethodBase method))
-                {
-                    dicSource[targetType] = methodConverter;
-                }
-                else
-                    dicSource.Add(targetType, methodConverter);
+            Register(sourceType, targetType, methodConverter);
 
         }
 
@@ -130,15 +148,10 @@ namespace Bb.Expressions
         {
 
             var ctor = LookInCtors(sourceType, targetType);
+
             if (ctor != null)
-            {
+                Register(sourceType, targetType, ctor);
 
-                if (!_dicConverters.TryGetValue(sourceType, out Dictionary<Type, MethodBase> dicSource))
-                    _dicConverters.Add(sourceType, dicSource = new Dictionary<Type, MethodBase>());
-
-                dicSource.Add(targetType, ctor);
-
-            }
         }
 
         private static void RegisterOperators(Type targetType)
@@ -146,15 +159,7 @@ namespace Bb.Expressions
 
             // Try to looking for in implicit and explicit operators
             foreach (var item in SearchConvertOperator(targetType))
-            {
-
-                if (!_dicConverters.TryGetValue(item.Item2, out Dictionary<Type, MethodBase> dicSource1))
-                    _dicConverters.Add(item.Item2, (dicSource1 = new Dictionary<Type, MethodBase>()));
-
-                if (!dicSource1.TryGetValue(item.Item1.ReturnType, out MethodBase method))
-                    dicSource1.Add(item.Item1.ReturnType, item.Item1);
-
-            }
+                Register(item.Item2, targetType, item.Item1);
 
         }
 
@@ -238,6 +243,7 @@ namespace Bb.Expressions
 
         }
 
+        private static Dictionary<Type, Dictionary<Type, Func<object, object>>> _dic = new Dictionary<Type, Dictionary<Type, Func<object, object>>>();
         private static Dictionary<Type, Dictionary<Type, MethodBase>> _dicConverters = new Dictionary<Type, Dictionary<Type, MethodBase>>();
         private static readonly HashSet<string> _names;
     }

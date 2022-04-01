@@ -90,8 +90,8 @@ namespace Bb.Jslt.Services.Excels
 
                 foreach (DataRow row in table.Rows)
                 {
-
-                    if (HeaderLine == -1 || rowLine > HeaderLine)
+           
+                    if (HeaderLine == 0 || rowLine > HeaderLine)
                     {
 
                         var items = row.ItemArray;

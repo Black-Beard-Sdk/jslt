@@ -89,7 +89,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition />
                     <RowDefinition Height="3" />
-                    <RowDefinition x:Name="RowErrors" MaxHeight="150" />
+                    <RowDefinition x:Name="RowErrors" MaxHeight="250" />
                 </Grid.RowDefinitions>
 
                 <Grid Grid.Row="0" x:Name="gridRender">

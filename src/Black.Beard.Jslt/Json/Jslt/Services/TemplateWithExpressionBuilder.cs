@@ -38,17 +38,18 @@ namespace Bb.Json.Jslt.Services
             _ctorJValueUri = typeof(JValue).GetConstructor(new Type[] { typeof(Uri) });
             _ctorJValueTimeSpan = typeof(JValue).GetConstructor(new Type[] { typeof(TimeSpan) });
             _jValueGetNull = typeof(JValue).GetMethod("CreateNull");
+
         }
 
 
-        public TemplateWithExpressionBuilder(Diagnostics diagnostics, MethodCompiler compiler)
+        public TemplateWithExpressionBuilder(Diagnostics diagnostics, MethodCompiler compiler, bool debug)
         {
 
             PrivatedIndex.Reset();
             _resultReset = new List<MethodCallExpression>();
             this._diagnostics = diagnostics;
             this._indexMethod = 0;
-
+            this._debug = debug;
             this._compiler = compiler;
 
             var Context = this._compiler.AddParameter(typeof(RuntimeContext), "argContext");
@@ -63,22 +64,6 @@ namespace Bb.Json.Jslt.Services
                 Source = this._compiler
 
             });
-
-        }
-        internal Func<RuntimeContext, StringBuilder> GenerateLambdaOutput(JsltBase tree, string filepathCode)
-        {
-
-            // Start parsing
-            Expression e = tree.Accept(this) as Expression;
-
-            foreach (var item in _resultReset)
-                _compiler.Add(item);
-
-            _compiler.Add(e);
-
-            var result = _compiler.Compile<Func<RuntimeContext, StringBuilder>>(filepathCode);
-
-            return result;
 
         }
 
@@ -99,6 +84,41 @@ namespace Bb.Json.Jslt.Services
 
         }
 
+        private Expression TracePosition(JsltBase item, Expression result)
+        {
+            if (this._debug)
+            {
+
+                var r = result.ConvertIfDifferent(typeof(object));
+                var type = typeof(Func<>).MakeGenericType(result.Type);
+                var method = Expression.Lambda(r).ConvertIfDifferent(type);
+
+                var current = CurrentCtx();
+                SourceCode source = current.Source;
+                ParameterExpression ctx = current.Context;
+
+                int line = item.Start.Line;
+                int column = item.Start.Column;
+                int startIndex = item.Start.StartIndex;
+                int endIndex = item.Stop.StopIndex;
+
+                source.Add(ExpressionHelper.Call
+                (
+                    RuntimeContext._TraceLocation, 
+                    ctx, 
+                    line.AsConstant(), 
+                    column.AsConstant(), 
+                    startIndex.AsConstant(), 
+                    endIndex.AsConstant(), 
+                    method
+                ));
+
+            }
+
+            return result;
+
+        }
+
         public object VisitArray(JsltArray node1)
         {
 
@@ -110,14 +130,12 @@ namespace Bb.Json.Jslt.Services
                 var targetArray = src.AddVar(typeof(JArray), src.GetUniqueVariableName("resultArray"), typeof(JArray).CreateObject());
                 ctx.Current.RootTarget = targetArray;
 
+
                 foreach (var node in node1.Items)
                 {
 
-
                     if (node.Source != null)
                     {
-
-
                         var resultToken = src.AddVar((typeof(JToken)), src.GetUniqueVariableName("source"), (Expression)node.Source.Accept(this));
                         node.Source = null;
 
@@ -196,7 +214,6 @@ namespace Bb.Json.Jslt.Services
 
             using (CurrentContext ctx = this.NewContext())
             {
-
                 var srcRoot = ctx.Current.Source;
 
                 var v1 = ctx.Current.Source.AddVar(typeof(JObject), null, _ctorJObject.CreateObject());
@@ -206,25 +223,8 @@ namespace Bb.Json.Jslt.Services
                 {
 
                     var src = ctx.Current.Source;
-
                     var resultToken = src.AddVar((typeof(JToken)), null, (Expression)node.Source.Accept(this));
                     ctx.Current.RootSource = resultToken;
-
-                    //foreach (var item in node.Properties)
-                    //{
-                    //    var prop = (Expression)item.Accept(this);
-                    //    if (prop != null)
-                    //    {
-                    //        var call = RuntimeContext._addProperty.Call(v1, prop);
-                    //        if (call != null)
-                    //            ctx.Current.Source.Add(call);
-                    //        else
-                    //        {
-                    //            _diagnostics.AddError("template builder", item.Start, string.Empty, $"value missing on property {item.Name}");
-                    //        }
-                    //    }
-                    //}
-
                 }
 
                 BuildVariables(node, srcRoot);
@@ -380,7 +380,7 @@ namespace Bb.Json.Jslt.Services
 
             using (CurrentContext ctx = NewContext())
             {
-
+                
                 List<Expression> args = new List<Expression>();
 
                 if (!node.ServiceProvider.IsCtor)
@@ -414,6 +414,9 @@ namespace Bb.Json.Jslt.Services
                     result = Expression.Call(RuntimeContext._getContentFromService.Method, ctx.Current.Context, src, result);
 
                 }
+
+                //result = TracePosition(node, result);
+
                 return result;
 
             }
@@ -481,7 +484,7 @@ namespace Bb.Json.Jslt.Services
         {
             using (CurrentContext ctx = NewContext())
             {
-
+                
                 var nextBlock = ctx.Current.Source;
 
                 var l = node.Left;
@@ -526,7 +529,6 @@ namespace Bb.Json.Jslt.Services
 
         public object VisitArgument(JsltArgument node)
         {
-            var ctx = BuildCtx;
             var value = (Expression)node.Value.Accept(this);
             return value;
             // return Expression.Call(ctx.Context, null, Expression.Constant(node.Name), value);
@@ -546,8 +548,6 @@ namespace Bb.Json.Jslt.Services
 
             }
 
-
-
             return result;
 
         }
@@ -557,17 +557,15 @@ namespace Bb.Json.Jslt.Services
 
             using (CurrentContext ctx = NewContext())
             {
-
                 ctx.Current.RootSource = Expression.Call(RuntimeContext._getContentByJPath.Method, ctx.Current.Context, ctx.Current.RootSource, Expression.Constant(node.Value));
                 return ctx.Current.RootSource;
-
             }
 
         }
 
         public object VisitSwitch(JsltSwitch node)
         {
-
+            
             SourceCode nextBlock;
 
             using (CurrentContext ctx = NewContext())
@@ -612,9 +610,7 @@ namespace Bb.Json.Jslt.Services
 
             using (CurrentContext ctx = NewContext())
             {
-
                 return node.Block.Accept(this);
-
             }
 
         }
@@ -729,9 +725,7 @@ namespace Bb.Json.Jslt.Services
         private static readonly ConstructorInfo _ctorJValueGuid;
         private static readonly ConstructorInfo _ctorJValueTimeSpan;
         private static readonly ConstructorInfo _ctorJValueDateTime;
-
-
-
+        private readonly bool _debug;
     }
 
 }

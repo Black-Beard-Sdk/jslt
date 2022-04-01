@@ -72,6 +72,11 @@ namespace Bb.Expressions.CsharpGenerators
 
         }
 
+        public static CodeThisReferenceExpression This()
+        {
+            return new CodeThisReferenceExpression();
+        }
+
         public static CodeTypeReferenceExpression ToRefExpression(this Type returnType, HashSet<string> usings)
         {
             return new CodeTypeReferenceExpression(returnType.ToRefType(usings));

@@ -67,6 +67,7 @@ for cast a value you must use this syntax '@type'
 * @guid
 * @integer 
 * @decimal
+* @boolean
 
 ### Custom services
 the customs services are used to extend the feature of the Sdk. You can create your own customs services.

@@ -1,4 +1,5 @@
-﻿using Bb.Json.Attributes;
+﻿using Bb.Expressions;
+using Bb.Json.Attributes;
 using Bb.Json.Jslt.Services;
 using Newtonsoft.Json.Linq;
 using System;
@@ -6,6 +7,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
+using System.Linq.Expressions;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -84,32 +86,43 @@ namespace Bb.Json.Jslt.CustomServices
         public static JToken ExecuteConvert(RuntimeContext ctx, JToken token, Type targetType)
         {
 
-            try
-            {
-
-                if (token is JValue v)
-                    return new JValue(Convert.ChangeType(v.Value, targetType));
-
-                else if (token is JArray a)
+            if (token != null)
+                try
                 {
-                    if (targetType.IsArray)
+
+                    if (token is JValue v)
                     {
-                        List<JToken> tokens = new List<JToken>(a.Count);
-                        foreach (var item in a)
-                            tokens.Add(ExecuteConvert(ctx, item, targetType));
-                        return new JArray(tokens);
+                        object value = ConverterHelper.ToObject(v.Value, targetType);
+                        return new JValue(value);
                     }
+
+                    else if (token is JArray a)
+                    {
+                        if (targetType.IsArray)
+                        {
+                            List<JToken> tokens = new List<JToken>(a.Count);
+                            foreach (var item in a)
+                                tokens.Add(ExecuteConvert(ctx, item, targetType));
+                            return new JArray(tokens);
+                        }
+                    }
+
+                    else
+                    {
+                        LocalDebug.Stop();
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    ctx.Diagnostics.AddError(string.Empty, null, $"convert method {token} to {targetType}", ex.Message);
                 }
 
-            }
-            catch (Exception ex)
-            {
-                ctx.Diagnostics.AddError(string.Empty, null, $"convert method {token} to {targetType}", ex.Message);
-            }
 
             return new JValue(targetType.GetDefaultValue());
 
         }
+
 
         [JsltExtensionMethod("isnull")]
         [JsltExtensionMethodParameter("token", "token to evaluate")]

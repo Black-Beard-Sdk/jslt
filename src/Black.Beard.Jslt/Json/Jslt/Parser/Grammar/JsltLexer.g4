@@ -28,6 +28,7 @@ URI_TYPE : '@uri';
 TIME_TYPE : '@time';
 DATETIME_TYPE : '@datetime';
 STRING_TYPE : '@string';
+BOOLEAN_TYPE : '@boolean';
 GUID_TYPE : '@uuid';
 WHEN_TYPE : '@when';
 INTEGER_TYPE : '@integer';
@@ -67,16 +68,18 @@ BRACKET_LEFT : '[' ;
 BRACKET_RIGHT : ']' ;
 
 COMMA : ',' ;
+QUESTION_PAREN_LEFT : '?(';
 PAREN_LEFT : '(' ;
 PAREN_RIGHT : ')' ;
+DOLLAR_DOT : '$.';
 
 STRING
-   : '"' (ESC | SAFECODEPOINT)* '"'
+   : ('"' | '$"') (ESC | SAFECODEPOINT)* '"'
    ;
 
 MULTI_LINE_COMMENT : '/*' .*? '*/' -> skip;
 //CODE_STRING :        QUOTE_CODE_STRING .*? QUOTE_CODE_STRING;
-//QUOTE_CODE_STRING :  '\'\'\'';
+SINGLE_QUOTE_CODE_STRING :  '\'';
 
 fragment ESC
    : '\\' (["\\/bfnrt] | UNICODE)
@@ -116,10 +119,17 @@ WS
 ID
    : [_A-Za-z] [_A-Za-z0-9]*
    ;
-// DOT_ID
-//   : '.' [_A-Za-z]+ [_A-Za-z0-9]*
-//   ;
+
+VARIABLE_NAME : '@' [_A-Za-z] [_A-Za-z0-9]*;
 
 IDLOWCASE
    : [_a-z] [_a-z0-9]*
    ;
+
+INDENTIFIER_JSONPATH : [a-zA-Z][a-zA-Z0-9]* ;
+
+SINGLE_QUOTE_STRING : '\''[a-zA-Z][a-zA-Z0-9]*'\'';
+
+CURRENT_INDENTIFIER_JSONPATH : '@.' INDENTIFIER_JSONPATH;
+
+CURRENT_LENGTH : '@.length-';
