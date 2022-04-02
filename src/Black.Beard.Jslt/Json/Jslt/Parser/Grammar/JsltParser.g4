@@ -19,8 +19,8 @@
 parser grammar JsltParser;
 
 options { 
-    // memoize=True;
-    tokenVocab=JsltLexer;
+      // memoize=True;
+      tokenVocab=JsltLexer;
     }
 
 script :
@@ -87,8 +87,8 @@ jsonLtItem :
    | jsonValueInteger
    | jsonValueNumber
    | jsonValueNull
-   | dotnotation_jsonpath
-   | VARIABLE_NAME
+   | jsonpath
+   | variable
    ;
 
 operation : 
@@ -97,6 +97,10 @@ operation :
    | CHAIN
    | AND | OR | AND_EXCLUSIVE | OR_EXCLUSIVE
    | COALESCE
+   ;
+
+variable 
+   : VARIABLE_NAME jsonType? 
    ;
 
 // ---------------------------- extended json ----------------------------
@@ -113,19 +117,23 @@ jsonValueList :
    jsonValue (COMMA jsonValue)*
    ;
 
-// Json path
-dotnotation_jsonpath 
-   : DOLLAR_DOT dotnotation_expr (SUBSCRIPT dotnotation_expr)*
-   ;
 
-dotnotation_expr 
-   : identifierWithQualifier
-   | INDENTIFIER_JSONPATH
+// -----------   Json path   -----------
+
+jsonpath 
+   : dotnotation_jsonpath jsonType?
+   ;
+dotnotation_jsonpath 
+   : DOLLAR (SUBSCRIPT+ identifierWithQualifier (SUBSCRIPT+ identifierWithQualifier)*)?
    ;
 
 identifierWithQualifier 
-   : INDENTIFIER_JSONPATH BRACKET_LEFT INT? BRACKET_RIGHT
-   | INDENTIFIER_JSONPATH BRACKET_LEFT QUESTION_PAREN_LEFT query_expr PAREN_RIGHT BRACKET_RIGHT
+   : ID (BRACKET_LEFT identifierWithQualifierSub? BRACKET_RIGHT)?
+   ;
+
+identifierWithQualifierSub
+   : INT
+   | QUESTION_PAREN_LEFT query_expr PAREN_RIGHT
    ;
 
 query_expr 

@@ -23,7 +23,7 @@ In this case the result is exactly what you have in the template, because you ha
 ## Case 2 ##
 In this case, the value is a json path. Json path is a query language for JSON, similar to XPath for XML. The implementation of JsonPath is did by newtonsoft. [SelectToken] by the method (https://www.newtonsoft.com/json/help/html/SelectToken.htm).
 ```JSON
-    { "name" : "$.n" }
+    { "name" : $.n }
 ```
 
 The result will be an object with a property named "name" and the value will be the properties "n" at the root of the source json. The value '$..n' is a valid json path implemented by newtonsoft. 
@@ -33,7 +33,7 @@ you can use functions for extend the process.
 
 Like that
 ```JSON
-    "property name": .mymethod( "$.property", arg2, ...)
+    "property name": .mymethod( $.property, arg2, ...)
 ```
 
 **'mymethod'** is the name of the service you want to call. The sdk provide another keys like sum or distinct. the list is available [here](Documentation/Custom_services.md).
@@ -45,7 +45,7 @@ A sample for call the method
 { "prices": [{"n" : 1}, {"n" : 2}, {"n" : 3}] }
 
 // Template
-{ "prices": sum("$..n") } // sum method is a service registered in the services list.
+{ "prices": sum($..n) } // sum method is a service registered in the service's list.
 
 // Result
 { "prices":  6 }
@@ -55,11 +55,11 @@ A sample for call the method
 if the string start with '\$' the value is automatically convert in json path. if the method expect a string you must cast the value.
 
 ```JSON
-{ "prices": method("$..n" @string) } 
+{ "prices": method($..n) } 
 ```  
 
 ### cast
-for cast a value you must use this syntax '@type'
+for cast a value you must use this syntax '@type' after expression
 * @uri
 * @time
 * @datetime
@@ -115,7 +115,7 @@ the method when is very usefull. it is a switch case.
 
 ```JSON
 {
-    "prices": when("$.prop1" @string) 
+    "prices": when($.prop1) 
     {
         "case1": { /* structure to inject if the value of '$.prop1' is equal to 'case1' */ }
     }
@@ -193,7 +193,7 @@ You can manage any directives
    "imports": ["path of the assembly flie"],
    "output": 
    {
-       "filter": "$.datas",     // It is json path for filter just one part of the output document
+       "filter": $.datas,     // It is json path for filter just one part of the output document
        "mode": to_block(),    // Behavior the output serialization
    }
 }   

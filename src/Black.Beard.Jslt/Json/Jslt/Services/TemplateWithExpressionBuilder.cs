@@ -84,6 +84,7 @@ namespace Bb.Json.Jslt.Services
 
         }
 
+
         private Expression TracePosition(JsltBase item, Expression result)
         {
             if (this._debug)
@@ -317,7 +318,7 @@ namespace Bb.Json.Jslt.Services
                 else
                 {
                     var getValue = (Expression)node.Value.Accept(this);
-                    return RuntimeContext._setVariable.Call(ctx.Current.Context, name, getValue);
+                    return RuntimeContext._setVariable.Call(ctx.Current.Context, name, getValue, node.GetLocation().AsConstant());
                 }
 
             }
@@ -337,14 +338,16 @@ namespace Bb.Json.Jslt.Services
                     (
                         ctx.Current.Context,
                         Expression.Constant(p.Value),
-                        Expression.Constant(node.VariableNames.ToArray())
+                        Expression.Constant(node.VariableNames.ToArray()),
+                        node.GetLocation().AsConstant()
                     );
 
                     ctx.Current.RootSource = RuntimeContext._getContentByJPath.Method.Call
                     (
                         ctx.Current.Context,
                         ctx.Current.RootSource,
-                        txt
+                        txt,
+                        node.GetLocation().AsConstant()
                     );
 
                 }
@@ -365,7 +368,8 @@ namespace Bb.Json.Jslt.Services
                     (
                         ctx.Current.Context,
                         Expression.Constant(value),
-                        Expression.Constant(node.VariableNames.ToArray())
+                        Expression.Constant(node.VariableNames.ToArray()),
+                        node.GetLocation().AsConstant()
                     );
                 }
 
@@ -411,7 +415,7 @@ namespace Bb.Json.Jslt.Services
                     if (node.ArgumentsBis.Count > 0)
                         src = (Expression)node.ArgumentsBis[0].Accept(this);
 
-                    result = Expression.Call(RuntimeContext._getContentFromService.Method, ctx.Current.Context, src, result);
+                    result = Expression.Call(RuntimeContext._getContentFromService.Method, ctx.Current.Context, src, result, node.GetLocation().AsConstant(),  node.Name.AsConstant());
 
                 }
 
@@ -557,7 +561,14 @@ namespace Bb.Json.Jslt.Services
 
             using (CurrentContext ctx = NewContext())
             {
-                ctx.Current.RootSource = Expression.Call(RuntimeContext._getContentByJPath.Method, ctx.Current.Context, ctx.Current.RootSource, Expression.Constant(node.Value));
+                ctx.Current.RootSource = Expression.Call
+                (
+                    RuntimeContext._getContentByJPath.Method, 
+                    ctx.Current.Context, 
+                    ctx.Current.RootSource, 
+                    Expression.Constant(node.Value),
+                    node.GetLocation().AsConstant()
+                );
                 return ctx.Current.RootSource;
             }
 

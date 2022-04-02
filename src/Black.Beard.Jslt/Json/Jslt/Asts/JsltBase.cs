@@ -20,6 +20,17 @@ namespace Bb.Json.Jslt.Asts
 
         public TokenLocation Stop { get; set; }
 
+        public TokenLocation GetLocation()
+        {
+
+            int line = this.Start.Line;
+            int column = this.Start.Column;
+            int startIndex = this.Start.StartIndex;
+            int endIndex = this.Stop.StopIndex;
+
+            return new TokenLocation(startIndex, endIndex, line, column);
+        }
+
 
     }
 

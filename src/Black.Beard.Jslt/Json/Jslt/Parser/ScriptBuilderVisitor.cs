@@ -258,6 +258,21 @@ namespace Bb.Json.Jslt.Parser
 
         }
 
+        public override object VisitVariable([NotNull] JsltParser.VariableContext context)
+        {
+
+            var txt = context.GetText();
+            var type = typeof(string);
+
+            var jsonType = context.jsonType();
+            if (jsonType != null)
+                type = ((JsltConstant)jsonType.Accept(this)).Value as Type;
+
+            var result = new JsltTranslateVariable(GetConstant(txt, type, context));
+
+            return result;
+        }
+
         public override object VisitJsonValueString([NotNull] JsltParser.JsonValueStringContext context)
         {
 
@@ -375,7 +390,7 @@ namespace Bb.Json.Jslt.Parser
 
         }
 
-        private JsltConstant GetConstant(string txt, Type type, JsltParser.JsonValueStringContext context)
+        private JsltConstant GetConstant(string txt, Type type, ParserRuleContext context)
         {
 
             JsltConstant result;
@@ -396,11 +411,11 @@ namespace Bb.Json.Jslt.Parser
                 result = new JsltConstant() { Value = Guid.Parse(txt), Kind = JsltKind.Guid, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
 
             else if (type == typeof(bool))
-                result = new JsltConstant() { Value = Guid.Parse(txt), Kind = JsltKind.Guid, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+                result = new JsltConstant() { Value = InternalConverters.ToBoolean(txt), Kind = JsltKind.Guid, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
 
             else
                 result = new JsltConstant() { Value = txt, Kind = JsltKind.String, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
-
+            
             return result;
 
         }
@@ -655,7 +670,8 @@ namespace Bb.Json.Jslt.Parser
                 }
             }
 
-            left = GetConverter(context.jsonType(), left, out Type type);
+            var typeConverter = context.jsonType();
+            left = GetConverter(typeConverter, left, out Type type);
 
             return left;
 
@@ -771,6 +787,14 @@ namespace Bb.Json.Jslt.Parser
             var _null = context.jsonValueNull();
             if (_null != null)
                 return _null.Accept(this);
+
+            var _jsonpath = context.jsonpath();
+            if (_jsonpath != null)
+                return _jsonpath.Accept(this);
+
+            var _variable = context.variable();
+            if (_variable != null)
+                return _variable.Accept(this);
 
             LocalDebug.Stop();
 
@@ -945,47 +969,54 @@ namespace Bb.Json.Jslt.Parser
 
         #endregion Jsonslt
 
-        #region not implemented
-
-        ///// <summary>
-        ///// jsonValue :
-        /////       STRING
-        /////     | NUMBER
-        /////     | obj
-        /////     | array
-        /////     | TRUE
-        /////     | FALSE
-        /////     | NULL
-        /////     
-        /////     /* extension */
-        /////     | jsonpath
-        /////     | jsonCtor
-        /////     
-        /////     ;
-        ///// </summary>
-        ///// <param name="context"></param>
-        ///// <returns></returns>
-        //public override object VisitJsonValue([NotNull] JsltParser.JsonValueContext context)
-        //{
-        //    return base.VisitJsonValue(context);
-        //}
-
-        #endregion
 
         #region Jsonpath
 
+        public override object VisitJsonpath([NotNull] JsltParser.JsonpathContext context)
+        {
+            
+            var result = (JsltBase)context.dotnotation_jsonpath().Accept(this);
+
+            var jsonType = context.jsonType();
+            if (jsonType != null)
+                result = GetConverter(jsonType, result, out Type type);
+
+            return result;
+
+        }
+
         public override object VisitDotnotation_jsonpath([NotNull] JsltParser.Dotnotation_jsonpathContext context)
         {
-
+                     
             var txt = context.GetText();
 
-            return base.VisitDotnotation_jsonpath(context);
+            JsltBase result = new JsltPath() { Value = txt, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+
+            var containsVariable = txt.Contains("@@");
+            
+            if (containsVariable)
+                result = new JsltTranslateVariable(result);
+
+            return result;
+
         }
 
-        public override object VisitIdentifierWithQualifier([NotNull] JsltParser.IdentifierWithQualifierContext context)
-        {
-            return base.VisitIdentifierWithQualifier(context);
-        }
+        ///// <summary>
+        /////  : INDENTIFIER_JSONPATH (BRACKET_LEFT identifierWithQualifierSub? BRACKET_RIGHT)?
+        ///// </summary>
+        ///// <param name="context"></param>
+        ///// <returns></returns>
+        //public override object VisitIdentifierWithQualifier([NotNull] JsltParser.IdentifierWithQualifierContext context)
+        //{
+
+        //    var t = context.GetText();
+
+        //    var o = context.ID();
+
+        //    var txt = context.identifierWithQualifierSub();
+
+        //    return base.VisitIdentifierWithQualifier(context);
+        //}
 
         #endregion Jsonpath
 

@@ -28,7 +28,7 @@ namespace Bb.Json.Jslt.Services
             _convertToken = RuntimeContext.ConvertTo;
             _translateVariable = RuntimeContext.Translate;
 
-            _setVariable = typeof(RuntimeContext).GetMethod(nameof(RuntimeContext.SetVariable), new Type[] { typeof(RuntimeContext), typeof(string), typeof(object) });
+            _setVariable = typeof(RuntimeContext).GetMethod(nameof(RuntimeContext.SetVariable), new Type[] { typeof(RuntimeContext), typeof(string), typeof(object), typeof(TokenLocation) });
             _DelVariable = typeof(RuntimeContext).GetMethod(nameof(RuntimeContext.DelVariable), new Type[] { typeof(RuntimeContext), typeof(string) });
 
             _TraceLocation = typeof(RuntimeContext).GetMethod(nameof(RuntimeContext.TraceLocation), new Type[] { typeof(RuntimeContext), typeof(int), typeof(int), typeof(int), typeof(int), typeof(Func<object>) });
@@ -862,11 +862,11 @@ namespace Bb.Json.Jslt.Services
 
         #region Variables
 
-        public static void SetVariable(RuntimeContext ctx, string name, object value)
+        public static void SetVariable(RuntimeContext ctx, string name, object value, TokenLocation trace)
         {
             ctx.SubSources.Variables.Add(name, value);
             if (value == null)
-                ctx.Diagnostics.AddError(string.Empty, ctx.GetCurrentLocation(), name, $"the key '{name}' is setted with null value.");
+                ctx.Diagnostics.AddWarning(string.Empty, trace, name, $"the key '{name}' is setted with null value.");
         }
 
         public static void DelVariable(RuntimeContext ctx, string name)
@@ -874,7 +874,7 @@ namespace Bb.Json.Jslt.Services
             ctx.SubSources.Variables.Del(name);
         }
 
-        public static JToken Translate(RuntimeContext ctx, string text, string[] keys)
+        public static JToken Translate(RuntimeContext ctx, string text, string[] keys, TokenLocation trace)
         {
 
             if (text == null)
@@ -900,7 +900,7 @@ namespace Bb.Json.Jslt.Services
 
                 else
                 {
-                    ctx.Diagnostics.AddError(string.Empty, ctx.GetCurrentLocation(), d, $"the key '{item}' can't be resolved.");
+                    ctx.Diagnostics.AddError(string.Empty, trace, d, $"the key '{item}' can't be resolved.");
                     d = d.Replace(item, string.Empty);
                 }
             }
@@ -911,7 +911,7 @@ namespace Bb.Json.Jslt.Services
             }
             catch (Exception)
             {
-                ctx.Diagnostics.AddError(string.Empty, ctx.GetCurrentLocation(), d, $"'d' can't be converted in jvalue");
+                ctx.Diagnostics.AddError(string.Empty, trace, d, $"'d' can't be converted in jvalue");
                 throw;
             }
 
@@ -928,12 +928,24 @@ namespace Bb.Json.Jslt.Services
 
         }
 
-        public static JToken GetContentFromService(RuntimeContext ctx, JToken token, ITransformJsonService service)
+        public static JToken GetContentFromService(RuntimeContext ctx, JToken token, ITransformJsonService service, TokenLocation trace, string serviceName)
         {
-            return service.Execute(ctx, token);
+
+            try
+            {
+                return service.Execute(ctx, token);
+            }
+            catch (Exception ex)
+            {
+                LocalDebug.Stop();
+                ctx.Diagnostics.AddError(string.Empty, trace, $"failed to run function {serviceName}", ex.Message);
+            }
+
+            return JValue.CreateNull();
+
         }
 
-        public static JToken GetContentByJPath(RuntimeContext ctx, JToken token, string path)
+        public static JToken GetContentByJPath(RuntimeContext ctx, JToken token, string path, TokenLocation trace)
         {
 
             JToken result = null;
@@ -942,7 +954,7 @@ namespace Bb.Json.Jslt.Services
             {
 
                 if (token == null)
-                    Trace.WriteLine($"the token is null. the filter '{path}' can't be apply");
+                    ctx.Diagnostics.AddError(string.Empty, trace, String.Empty, $"the token is null. the filter '{path}' can't be apply");
 
                 else
                 {
@@ -981,11 +993,10 @@ namespace Bb.Json.Jslt.Services
                     }
 
                 }
-                // {"Unexpected character while parsing path query: N"}
             }
             catch (Newtonsoft.Json.JsonException e)
             {
-                throw new Exception($"invalid json path '{path}'." + e.Message, e);
+                ctx.Diagnostics.AddError(string.Empty, trace, $"invalid json path '{path}'." + e.Message, e.Message);
             }
 
             return result;
@@ -1029,11 +1040,11 @@ namespace Bb.Json.Jslt.Services
 
         internal static readonly Func<JToken, Type, object> _convertToken;
         internal static readonly Func<RuntimeContext, JToken, Func<RuntimeContext, JToken, JToken>, JToken> _getProjectionFromSource;
-        internal static readonly Func<RuntimeContext, JToken, string, JToken> _getContentByJPath;
-        internal static readonly Func<RuntimeContext, JToken, ITransformJsonService, JToken> _getContentFromService;
+        internal static readonly Func<RuntimeContext, JToken, string, TokenLocation, JToken> _getContentByJPath;
+        internal static readonly Func<RuntimeContext, JToken, ITransformJsonService, TokenLocation, string, JToken> _getContentFromService;
         internal static readonly Func<RuntimeContext, JToken, OperationEnum, JToken> _evaluateUnaryOperator;
         internal static readonly Func<RuntimeContext, object, OperationEnum, object, JToken> _evaluateBinaryOperator;
-        internal static readonly Func<RuntimeContext, string, string[], object> _translateVariable;
+        internal static readonly Func<RuntimeContext, string, string[], TokenLocation, object> _translateVariable;
 
         internal static readonly MethodInfo _addProperty;
         internal static readonly MethodInfo _setVariable;

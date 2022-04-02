@@ -71,7 +71,7 @@ COMMA : ',' ;
 QUESTION_PAREN_LEFT : '?(';
 PAREN_LEFT : '(' ;
 PAREN_RIGHT : ')' ;
-DOLLAR_DOT : '$.';
+DOLLAR : '$';
 
 STRING
    : ('"' | '$"') (ESC | SAFECODEPOINT)* '"'
@@ -120,13 +120,11 @@ ID
    : [_A-Za-z][_A-Za-z0-9]*
    ;
 
-VARIABLE_NAME : '@' [_A-Za-z][_A-Za-z0-9]*;
+VARIABLE_NAME : '@@' [_A-Za-z][_A-Za-z0-9]*;
 
 IDLOWCASE
    : [_a-z] [_a-z0-9]*
    ;
-
-INDENTIFIER_JSONPATH : [a-zA-Z][a-zA-Z0-9]* ;
 
 SINGLE_QUOTE_STRING : '\''[@a-zA-Z][a-zA-Z0-9]*'\'';
 

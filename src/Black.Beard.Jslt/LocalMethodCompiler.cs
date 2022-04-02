@@ -37,7 +37,7 @@ namespace Bb.Expressions
                 if (!Directory.Exists(path))
                     Directory.CreateDirectory(path);
                 string file = Path.Combine(path, filepathCode);
-                var code = SourceCodeDomGenerator.GetCode(lbd, $"N_{name}", "Myclass", _withDebug, _u);
+                var code = SourceCodeDomGenerator.GetCode(lbd, $"N_{name}", "Myclass", "MyMethod", _withDebug, _u);
                 System.CodeDom.CodeCompileUnit compileUnit = new System.CodeDom.CodeCompileUnit();
                 compileUnit.Namespaces.Add(code);
                 LocalCodeGenerator.GenerateCsharpCode(compileUnit, file);

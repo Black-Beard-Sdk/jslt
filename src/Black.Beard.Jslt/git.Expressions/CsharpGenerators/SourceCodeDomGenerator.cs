@@ -14,10 +14,11 @@ namespace Bb.Expressions.CsharpGenerators
     public class SourceCodeDomGenerator
     {
 
-        private SourceCodeDomGenerator(string @namespace, string classname, string[] usings, bool withDebug)
+        private SourceCodeDomGenerator(string @namespace, string classname, string methodname, string[] usings, bool withDebug)
         {
 
             this._withDebug = withDebug;
+            this._methodname = methodname;
             this._fields = new Dictionary<object, CodeMemberField>();
 
             this._namespaceRoot = new CodeNamespace(@namespace);
@@ -33,17 +34,12 @@ namespace Bb.Expressions.CsharpGenerators
 
         }
 
-        public static CodeNamespace GetCode(Expression e, string @namespace, string classname, bool withDebug, params string[] usings)
+        public static CodeNamespace GetCode(Expression e, string @namespace, string classname, string methodname, bool withDebug, params string[] usings)
         {
-            SourceCodeDomGenerator s = new SourceCodeDomGenerator(@namespace, classname, usings, withDebug);
+            SourceCodeDomGenerator s = new SourceCodeDomGenerator(@namespace, classname, methodname, usings, withDebug);
             s.Visit(e);
             s.CreatePrivateMethod();
             return s._namespaceRoot;
-        }
-
-        private string GetMethodName()
-        {
-            return $"Method{++countMethod}";
         }
 
         protected object Visit(Expression e)
@@ -381,23 +377,20 @@ namespace Bb.Expressions.CsharpGenerators
         protected object VisitLambda(LambdaExpression node)
         {
 
-            var methodName = GetMethodName();
-
-            var _methodRoot = new CodeMemberMethod() { Name = methodName, ReturnType = node.ReturnType.ToRefType(_usings), Attributes = MemberAttributes.Public };
-            this._typeRoot.Members.Add(_methodRoot);
+            this._methodRoot = new CodeMemberMethod() { Name = this._methodname, ReturnType = node.ReturnType.ToRefType(_usings), Attributes = MemberAttributes.Public };
+            this._typeRoot.Members.Add(this._methodRoot);
 
             foreach (var item in node.Parameters)
-                _methodRoot.Parameters.Add(item.ToParameter(_usings));
+                this._methodRoot.Parameters.Add(item.ToParameter(_usings));
 
             if (this._withDebug)
             {
                 var stop = new CodeMethodInvokeExpression(new CodeVariableReferenceExpression("argContext"), "Stop");
-                _methodRoot.Statements.Add(stop);
+                this._methodRoot.Statements.Add(stop);
             }
 
             if (node.Body is BlockExpression b)
             {
-
                 var block = VisitBlock(b);
 
                 if (node.ReturnType != typeof(void))
@@ -419,7 +412,7 @@ namespace Bb.Expressions.CsharpGenerators
                     }
                 }
 
-                _methodRoot.Add(block);
+                this._methodRoot.Add(block);
 
             }
             else
@@ -431,7 +424,7 @@ namespace Bb.Expressions.CsharpGenerators
                     if (node.ReturnType != typeof(void))
                     {
                         if (e is CodeExpression expression)
-                            _methodRoot.Add(new CodeMethodReturnStatement(expression));
+                            this._methodRoot.Add(new CodeMethodReturnStatement(expression));
 
                         else
                         {
@@ -449,23 +442,22 @@ namespace Bb.Expressions.CsharpGenerators
             int index = 0;
             foreach (var item in this._fields)
             {
-                if (!this._typeRoot.Members.Contains(item.Value))
-                {
-                    this._typeRoot.Members.Add(item.Value);
-                    var left = item.Value.GetReference();
-                    var right = new CodeArrayIndexerExpression(args, index.ToPrimitive());
-                    ctor.Statements.Add(left.AssignFrom(new CodeCastExpression(item.Value.Type, right)));
-                    index++;
-                }
+                this._typeRoot.Members.Add(item.Value);
+                var left = item.Value.GetReference();
+                var right = new CodeArrayIndexerExpression(args, index.ToPrimitive());
+                ctor.Statements.Add(left.AssignFrom(new CodeCastExpression(item.Value.Type, right)));
+
+                index++;
+
             }
 
-            return _methodRoot;
+            return this._methodRoot;
 
         }
 
         protected List<CodeStatement> VisitBlock(BlockExpression node)
         {
-            
+
             List<CodeStatement> list = new List<CodeStatement>(node.Expressions.Count);
 
             foreach (var item in node.Variables)
@@ -583,13 +575,9 @@ namespace Bb.Expressions.CsharpGenerators
 
             if (node.Value.GetType().IsValueType)
                 return node.ToPrimitive();
-            
-            var key = node.Value;
-            if (key is string[] array)
-                key = array[0];
 
-            if (!_fields.TryGetValue(key, out CodeMemberField field))
-                _fields.Add(key, (field = new CodeMemberField(node.Type.ToRefType(_usings), $"srv_{this._fields.Count}") { Attributes = MemberAttributes.Private }));
+            if (!_fields.TryGetValue(node.Value, out CodeMemberField field))
+                _fields.Add(node.Value, (field = new CodeMemberField(node.Type.ToRefType(_usings), $"srv_{this._fields.Count}") { Attributes = MemberAttributes.Private }));
 
             return new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), field.Name);
 
@@ -597,34 +585,12 @@ namespace Bb.Expressions.CsharpGenerators
 
         private object VisitConvert(UnaryExpression e)
         {
-
-            var operande = Visit(e.Operand);
+            var o = (CodeExpression)Visit(e.Operand);
 
             if (e.Type.IsAssignableFrom(e.Operand.Type))
-                return operande;
-
-            CodeExpression o = null;
-            if (operande is CodeExpression o2)
-            {
-                o = o2;
-            }
-            else if (operande is CodeMemberMethod m)
-            {
-
-                var parameters = VariableCollectorVisitor.GetParameters(e.Operand);
-
-                var call = new CodeMethodInvokeExpression(SourceCodeDomGeneratorExtension.This(), m.Name);
-                o = call;
-
-            }
-            else
-            {
-
-                LocalDebug.Stop();
-            }
+                return o;
 
             return new CodeCastExpression(e.Type.ToRefType(_usings), o);
-
         }
 
         private object VisitAssign(BinaryExpression e)
@@ -785,6 +751,9 @@ namespace Bb.Expressions.CsharpGenerators
             return result;
         }
 
+
+
+
         protected object VisitGoto(GotoExpression node)
         {
             LocalDebug.Stop();
@@ -895,15 +864,18 @@ namespace Bb.Expressions.CsharpGenerators
             return node;
         }
 
-        private int countMethod = 0;
+
+
+
         private readonly CodeNamespace _namespaceRoot;
+        private readonly string _methodname;
         private readonly CodeTypeDeclaration _typeRoot;
         private readonly HashSet<string> _usings;
         private readonly bool _withDebug;
 
         private Dictionary<object, string> _variables = new Dictionary<object, string>();
 
-        //private CodeMemberMethod _methodRoot;
+        private CodeMemberMethod _methodRoot;
         private Dictionary<object, CodeMemberField> _fields;
         private CodeStatement _last;
 
