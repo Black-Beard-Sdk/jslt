@@ -663,7 +663,7 @@ namespace Bb.Json.Jslt.Services
 
         public object VisitComment(Comment comment)
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         private class CurrentContext : IDisposable
