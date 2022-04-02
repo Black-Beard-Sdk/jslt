@@ -661,6 +661,11 @@ namespace Bb.Json.Jslt.Services
             return ctx;
         }
 
+        public object VisitComment(Comment comment)
+        {
+            throw new NotImplementedException();
+        }
+
         private class CurrentContext : IDisposable
         {
 

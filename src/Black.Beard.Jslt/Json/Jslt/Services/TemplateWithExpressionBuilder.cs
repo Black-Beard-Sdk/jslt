@@ -84,42 +84,6 @@ namespace Bb.Json.Jslt.Services
 
         }
 
-
-        private Expression TracePosition(JsltBase item, Expression result)
-        {
-            if (this._debug)
-            {
-
-                var r = result.ConvertIfDifferent(typeof(object));
-                var type = typeof(Func<>).MakeGenericType(result.Type);
-                var method = Expression.Lambda(r).ConvertIfDifferent(type);
-
-                var current = CurrentCtx();
-                SourceCode source = current.Source;
-                ParameterExpression ctx = current.Context;
-
-                int line = item.Start.Line;
-                int column = item.Start.Column;
-                int startIndex = item.Start.StartIndex;
-                int endIndex = item.Stop.StopIndex;
-
-                source.Add(ExpressionHelper.Call
-                (
-                    RuntimeContext._TraceLocation, 
-                    ctx, 
-                    line.AsConstant(), 
-                    column.AsConstant(), 
-                    startIndex.AsConstant(), 
-                    endIndex.AsConstant(), 
-                    method
-                ));
-
-            }
-
-            return result;
-
-        }
-
         public object VisitArray(JsltArray node1)
         {
 
@@ -669,6 +633,11 @@ namespace Bb.Json.Jslt.Services
         {
             var ctx = _stack.Peek();
             return ctx;
+        }
+
+        public object VisitComment(Comment comment)
+        {
+            throw new NotImplementedException();
         }
 
         private class CurrentContext : IDisposable

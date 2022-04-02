@@ -26,6 +26,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using Bb.Wizards.Wpf;
+using Bb.JsltEvaluator.AvalonEdit;
 
 namespace AppJsonEvaluator
 {
@@ -45,7 +46,7 @@ namespace AppJsonEvaluator
             _max = mo * 50;
 
             this._parsers = new Parsers();
-
+            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
             InitializeTextMarkerService();
             TemplateEditor.TextArea.TextEntering += textEditor_TextArea_TextEntering;
             this._foldingStrategy = new BraceFoldingStrategy();
@@ -120,12 +121,20 @@ namespace AppJsonEvaluator
         private void TimerProc2(object state)
         {
             if (!this._undoTimer)
-            {
-                if (this._timerMajUpdateTemplate != null)
-                    this._timerMajUpdateTemplate.Dispose();
-                this._timerMajUpdateTemplate = new Timer(this.TimerProc2);
-                this.Dispatcher.BeginInvoke(new Action(() => UpdateTemplate()));
-            }
+                lock (_lock)
+                    if (!this._undoTimer)
+                    {
+
+                        this._undoTimer = true;
+
+                        if (this._timerMajUpdateTemplate != null)
+                            this._timerMajUpdateTemplate.Dispose();
+                        this._timerMajUpdateTemplate = new Timer(this.TimerProc2);
+                        this.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            UpdateTemplate();
+                        }));
+                    }
         }
 
         private void InitializeCompletion()
@@ -219,8 +228,6 @@ namespace AppJsonEvaluator
         void InitializeTextMarkerService()
         {
 
-            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
-
             var textMarkerService = new TextMarkerService(TemplateEditor.Document);
             TemplateEditor.TextArea.TextView.BackgroundRenderers.Add(textMarkerService);
             TemplateEditor.TextArea.TextView.LineTransformers.Add(textMarkerService);
@@ -263,6 +270,8 @@ namespace AppJsonEvaluator
 
             _timerMajUpdateTemplate.Change(600, 100);
 
+            this._undoTimer = false;
+
         }
 
         private void UpdateTemplate()
@@ -282,6 +291,11 @@ namespace AppJsonEvaluator
                 var filename = this._parameters.TemplateFile;
 
                 _template = text.GetTransformProvider(debug, filename, _path);
+
+                var colorize = new ColorizeFromTreeVisitor(textMarkerService, TemplateEditor) { Configuration = _template.Configuration };
+
+                colorize.Apply(_template.Tree);
+
                 if (this._timerMajDiagnostic != null)
                     this._timerMajDiagnostic.Change(400, 0);
 
@@ -712,6 +726,7 @@ namespace AppJsonEvaluator
         private string _lastShownFolder;
         private CompletionDataProvider _completionProvider;
         private bool _undoTimer;
+        private volatile object _lock = new object();
 
         #endregion Search
 

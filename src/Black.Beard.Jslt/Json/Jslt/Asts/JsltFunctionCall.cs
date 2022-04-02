@@ -12,7 +12,6 @@ namespace Bb.Json.Jslt.Asts
     public class JsltFunctionCall : JsltBase
     {
 
-
         public JsltFunctionCall(string name, List<JsltBase> arguments)
         {
 

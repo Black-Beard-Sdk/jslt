@@ -4,6 +4,7 @@ using Bb.Json.Jslt.Parser;
 using Bb.JSon;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq.Expressions;
@@ -26,7 +27,7 @@ namespace Bb.Json.Jslt.Services
 
         public JsltTemplate GetTemplate(StringBuilder sb, bool withDebug, string filename, Diagnostics diagnostics = null)
         {
-               
+
             if (string.IsNullOrEmpty(this._configuration.OutputPath) && !string.IsNullOrEmpty(filename))
                 this._configuration.OutputPath = new FileInfo(filename).Directory.FullName;
 
@@ -44,6 +45,39 @@ namespace Bb.Json.Jslt.Services
                     var parser = ScriptParser.ParseString(sb);
                     var visitor = new ScriptBuilderVisitor(this._configuration, parser.Parser, _errors, filename);
                     tree = (JsltBase)parser.Visit(visitor);
+
+                    Comment comment = null;
+                    List<Comment> _comments = new List<Comment>();
+                    bool inComment = false;
+
+                    for (int i = 0; i < sb.Length; i++)
+                    {
+                        var c = sb[i];
+                        if (inComment)
+                        {
+                            if (c == '*' && sb[i + 1] == '/')
+                            {
+                                comment.Stop = new TokenLocation(i + 1, 0, 0, 0);
+                                inComment = false;
+                            }
+                        }
+                        else
+                        {
+                            if (c == '/' && sb[i + 1] == '*')
+                            {
+                                comment = new Comment()
+                                {
+                                    Start = new TokenLocation(i, 0, 0, 0),
+                                };
+                                _comments.Add(comment);
+                                inComment = true;
+                            }
+
+                        }
+                    }
+
+                    tree.AddComments(_comments);
+
                     _foundry = visitor.Foundry;
                     culture = visitor.Culture;
                     outputConfiguration = visitor.OutputConfiguration;
@@ -205,5 +239,7 @@ namespace Bb.Json.Jslt.Services
         private TranformJsonAstConfiguration _configuration;
 
     }
+
+
 
 }

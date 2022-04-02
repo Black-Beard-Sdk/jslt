@@ -27,21 +27,27 @@ namespace AppJsonEvaluator
 		}
 
 		#region ITextMarkerService
+
 		public ITextMarker Create(int startOffset, int length)
 		{
+
 			if (markers == null)
 				throw new InvalidOperationException("Cannot create a marker when not attached to a document");
 
 			int textLength = document.TextLength;
+			
 			if (startOffset < 0 || startOffset > textLength)
 				throw new ArgumentOutOfRangeException("startOffset", startOffset, "Value must be between 0 and " + textLength);
+			
 			if (length < 0 || startOffset + length > textLength)
 				throw new ArgumentOutOfRangeException("length", length, "length must not be negative and startOffset+length must not be after the end of the document");
 
 			TextMarker m = new TextMarker(this, startOffset, length);
 			markers.Add(m);
+
 			// no need to mark segment for redraw: the text marker is invisible until a property is set
 			return m;
+
 		}
 
 		public IEnumerable<ITextMarker> GetMarkersAtOffset(int offset)
@@ -97,9 +103,11 @@ namespace AppJsonEvaluator
 		}
 
 		public event EventHandler RedrawRequested;
+
 		#endregion
 
 		#region DocumentColorizingTransformer
+
 		protected override void ColorizeLine(DocumentLine line)
 		{
 			if (markers == null)
@@ -133,9 +141,11 @@ namespace AppJsonEvaluator
 				);
 			}
 		}
+		
 		#endregion
 
 		#region IBackgroundRenderer
+
 		public KnownLayer Layer
 		{
 			get
@@ -228,6 +238,7 @@ namespace AppJsonEvaluator
 			for (int i = 0; i < count; i++)
 				yield return new Point(start.X + i * offset, start.Y - ((i + 1) % 2 == 0 ? offset : 0));
 		}
+
 		#endregion
 
 		#region ITextViewConnect
@@ -251,5 +262,6 @@ namespace AppJsonEvaluator
 			}
 		}
 		#endregion
+	
 	}
 }

@@ -43,13 +43,13 @@ namespace Bb.Json.Jslt.Parser
             this.StopIndex = location.EndCharacter;
         }
 
-        public int Line { get; }
+        public int Line { get; internal set; }
 
-        public int Column { get; }
+        public int Column { get; internal set; }
 
-        public int StartIndex { get; }
+        public int StartIndex { get; internal set; }
 
-        public int StopIndex { get; }
+        public int StopIndex { get; internal set; }
 
         public TokenLocation Clone()
         {
