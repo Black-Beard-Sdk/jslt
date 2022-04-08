@@ -297,3 +297,10 @@ The result is an array
 ```JSON
 { "Syntax" : split("<value>", "<charset for split>") }
 ```
+
+## **concatpath**  
+concat items for create a file path
+The result is an string
+```JSON
+{ "Syntax" : concatpath([]"<value of path>", "..."]) }
+```
