@@ -270,7 +270,7 @@ namespace Bb.Json.Jslt.Services
 
         }
 
-        public object VisitComment(Comment comment)
+        public object VisitComment(JsltComment comment)
         {
             throw new System.NotImplementedException();
         }

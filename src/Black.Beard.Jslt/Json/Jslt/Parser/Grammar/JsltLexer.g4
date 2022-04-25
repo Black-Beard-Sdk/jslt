@@ -23,6 +23,7 @@ WILDCARD_SUBSCRIPT : '*' ;
 CURRENT_VALUE : '@' ;
 COLON : ':';
 SHARP : '#';
+RECURSIVE_DESCENT : '..' ;
 
 URI_TYPE : '@uri';
 TIME_TYPE : '@time';
@@ -34,6 +35,15 @@ WHEN_TYPE : '@when';
 INTEGER_TYPE : '@integer';
 DECIMAL_TYPE : '@decimal';
 
+IN : 'in';
+NIN : 'nin';
+SUBSETOF : 'subsetof';
+CONTAINS : 'contains';
+SIZE : 'size';
+EMPTY : 'empty';
+
+TRUE : 'true' ;
+FALSE : 'false' ;
 DEFAULT : 'default';
 
 EQ : '==' ;
@@ -58,8 +68,6 @@ COALESCE : '??';
 
 CHAIN : '->';
 
-TRUE : 'true' ;
-FALSE : 'false' ;
 NULL : 'null' ;
 
 BRACE_LEFT : '{' ;
@@ -72,10 +80,16 @@ QUESTION_PAREN_LEFT : '?(';
 PAREN_LEFT : '(' ;
 PAREN_RIGHT : ')' ;
 DOLLAR : '$';
+QUESTION : '?' ;
 
 STRING
-   : ('"' | '$"') (ESC | SAFECODEPOINT)* '"'
+   : ('"') (ESC | SAFECODEPOINT)* '"'
    ;
+
+STRING2
+   : ('$"') (ESC | SAFECODEPOINT)* '"'
+   ;
+
 
 MULTI_LINE_COMMENT : '/*' .*? '*/' -> skip;
 //CODE_STRING :        QUOTE_CODE_STRING .*? QUOTE_CODE_STRING;
@@ -118,6 +132,10 @@ WS
 
 ID
    : [_A-Za-z][_A-Za-z0-9]*
+   ;
+
+IDQUOTED
+   : '\'' ID '\''
    ;
 
 VARIABLE_NAME : '@@' [_A-Za-z][_A-Za-z0-9]*;

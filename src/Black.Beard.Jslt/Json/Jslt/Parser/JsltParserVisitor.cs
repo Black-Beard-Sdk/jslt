@@ -57,6 +57,12 @@ public interface IJsltParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitPair([NotNull] JsltParser.PairContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="JsltParser.string"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitString([NotNull] JsltParser.StringContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="JsltParser.array"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
@@ -147,34 +153,106 @@ public interface IJsltParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitJsonValueList([NotNull] JsltParser.JsonValueListContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="JsltParser.jsltJsonpath"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitJsltJsonpath([NotNull] JsltParser.JsltJsonpathContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="JsltParser.jsonpath"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitJsonpath([NotNull] JsltParser.JsonpathContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="JsltParser.dotnotation_jsonpath"/>.
+	/// Visit a parse tree produced by <see cref="JsltParser.jsonpath_"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitDotnotation_jsonpath([NotNull] JsltParser.Dotnotation_jsonpathContext context);
+	Result VisitJsonpath_([NotNull] JsltParser.Jsonpath_Context context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="JsltParser.identifierWithQualifier"/>.
+	/// Visit a parse tree produced by <see cref="JsltParser.jsonpath__"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitIdentifierWithQualifier([NotNull] JsltParser.IdentifierWithQualifierContext context);
+	Result VisitJsonpath__([NotNull] JsltParser.Jsonpath__Context context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="JsltParser.identifierWithQualifierSub"/>.
+	/// Visit a parse tree produced by <see cref="JsltParser.jsonpath_subscript"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitIdentifierWithQualifierSub([NotNull] JsltParser.IdentifierWithQualifierSubContext context);
+	Result VisitJsonpath_subscript([NotNull] JsltParser.Jsonpath_subscriptContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="JsltParser.query_expr"/>.
+	/// Visit a parse tree produced by <see cref="JsltParser.subscriptables"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitQuery_expr([NotNull] JsltParser.Query_exprContext context);
+	Result VisitSubscriptables([NotNull] JsltParser.SubscriptablesContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="JsltParser.subscriptableArguments"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitSubscriptableArguments([NotNull] JsltParser.SubscriptableArgumentsContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="JsltParser.subscriptableBareword"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitSubscriptableBareword([NotNull] JsltParser.SubscriptableBarewordContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="JsltParser.jsonPath_identifier"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitJsonPath_identifier([NotNull] JsltParser.JsonPath_identifierContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="JsltParser.subscriptable"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitSubscriptable([NotNull] JsltParser.SubscriptableContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="JsltParser.sliceable"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitSliceable([NotNull] JsltParser.SliceableContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="JsltParser.sliceableLeft"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitSliceableLeft([NotNull] JsltParser.SliceableLeftContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="JsltParser.sliceableRight"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitSliceableRight([NotNull] JsltParser.SliceableRightContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="JsltParser.sliceableBinary"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitSliceableBinary([NotNull] JsltParser.SliceableBinaryContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="JsltParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitExpression([NotNull] JsltParser.ExpressionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="JsltParser.binaryOperator"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitBinaryOperator([NotNull] JsltParser.BinaryOperatorContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="JsltParser.value"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitValue([NotNull] JsltParser.ValueContext context);
 }
 } // namespace Bb.Json.Jslt.Parser

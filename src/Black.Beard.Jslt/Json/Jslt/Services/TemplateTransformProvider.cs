@@ -46,8 +46,8 @@ namespace Bb.Json.Jslt.Services
                     var visitor = new ScriptBuilderVisitor(this._configuration, parser.Parser, _errors, filename);
                     tree = (JsltBase)parser.Visit(visitor);
 
-                    Comment comment = null;
-                    List<Comment> _comments = new List<Comment>();
+                    JsltComment comment = null;
+                    List<JsltComment> _comments = new List<JsltComment>();
                     bool inComment = false;
 
                     for (int i = 0; i < sb.Length; i++)
@@ -65,7 +65,7 @@ namespace Bb.Json.Jslt.Services
                         {
                             if (c == '/' && sb[i + 1] == '*')
                             {
-                                comment = new Comment()
+                                comment = new JsltComment()
                                 {
                                     Start = new TokenLocation(i, 0, 0, 0),
                                 };

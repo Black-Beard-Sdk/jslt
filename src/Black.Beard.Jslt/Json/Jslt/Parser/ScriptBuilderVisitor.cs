@@ -273,6 +273,26 @@ namespace Bb.Json.Jslt.Parser
             return result;
         }
 
+        public override object VisitString([NotNull] JsltParser.StringContext context)
+        {
+            ITerminalNode str = context.STRING();
+            if (str != null)
+            {
+                var txt = str.GetText()?.Trim() ?? string.Empty;
+                return txt;
+            }
+
+            var str2 = context.STRING2();
+            if (str2 != null)
+            {
+                var txt = str2.GetText()?.Trim() ?? string.Empty;
+                return txt;
+            }
+
+            return string.Empty;
+
+        }
+
         public override object VisitJsonValueString([NotNull] JsltParser.JsonValueStringContext context)
         {
 
@@ -282,7 +302,7 @@ namespace Bb.Json.Jslt.Parser
 
             #region 
 
-            var txt = context.STRING().GetText()?.Trim() ?? string.Empty;
+            var txt = (string)VisitString(context.@string());
 
             if (txt.StartsWith(@"$"""))
             {
@@ -469,8 +489,8 @@ namespace Bb.Json.Jslt.Parser
         public override object VisitPair([NotNull] JsltParser.PairContext context)
         {
 
-            var txt = context.STRING();
-            var name = txt?.GetText().Trim().Trim('\"');
+            var txt = (string)VisitString(context.@string());
+            var name = txt?.Trim().Trim('\"');
 
             if (!string.IsNullOrEmpty(name))
             {
@@ -788,7 +808,7 @@ namespace Bb.Json.Jslt.Parser
             if (_null != null)
                 return _null.Accept(this);
 
-            var _jsonpath = context.jsonpath();
+            var _jsonpath = context.jsltJsonpath();
             if (_jsonpath != null)
                 return _jsonpath.Accept(this);
 
@@ -972,10 +992,10 @@ namespace Bb.Json.Jslt.Parser
 
         #region Jsonpath
 
-        public override object VisitJsonpath([NotNull] JsltParser.JsonpathContext context)
+        public override object VisitJsltJsonpath([NotNull] JsltParser.JsltJsonpathContext context)
         {
-            
-            var result = (JsltBase)context.dotnotation_jsonpath().Accept(this);
+
+            var result = (JsltBase)context.jsonpath().Accept(this);
 
             var jsonType = context.jsonType();
             if (jsonType != null)
@@ -985,37 +1005,40 @@ namespace Bb.Json.Jslt.Parser
 
         }
 
-        public override object VisitDotnotation_jsonpath([NotNull] JsltParser.Dotnotation_jsonpathContext context)
+        public override object VisitJsonpath([NotNull] JsltParser.JsonpathContext context)
         {
-                     
+
             var txt = context.GetText();
 
             JsltBase result = new JsltPath() { Value = txt, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
 
             var containsVariable = txt.Contains("@@");
-            
+
             if (containsVariable)
                 result = new JsltTranslateVariable(result);
 
             return result;
 
+
         }
 
         ///// <summary>
-        /////  : INDENTIFIER_JSONPATH (BRACKET_LEFT identifierWithQualifierSub? BRACKET_RIGHT)?
+        /////    : ROOT_VALUE subscript? EOF
         ///// </summary>
         ///// <param name="context"></param>
         ///// <returns></returns>
-        //public override object VisitIdentifierWithQualifier([NotNull] JsltParser.IdentifierWithQualifierContext context)
+        //public override object VisitJsonpath([NotNull] JsltParser.JsonpathContext context)
         //{
 
-        //    var t = context.GetText();
+        //    var result = new JPathRootValue(context.Start.ToLocation());
 
-        //    var o = context.ID();
+        //    var subscript = context.jsonpath_subscript();
 
-        //    var txt = context.identifierWithQualifierSub();
+        //    if (subscript != null)
+        //        result.AppendEnd((JPathSubscript)VisitJsonpath_subscript(subscript));
 
-        //    return base.VisitIdentifierWithQualifier(context);
+        //    return result;
+
         //}
 
         #endregion Jsonpath

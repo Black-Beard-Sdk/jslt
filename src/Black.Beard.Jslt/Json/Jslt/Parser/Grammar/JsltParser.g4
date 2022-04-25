@@ -41,8 +41,10 @@ obj :
    ;
 
 pair : 
-   STRING COLON jsonValue
+   string COLON jsonValue
    ;
+
+string : STRING | STRING2;
 
 array :
      BRACKET_LEFT jsonValue ( COMMA jsonValue )* BRACKET_RIGHT
@@ -55,7 +57,7 @@ jsonValue :
    | jsonLtOperation
    ;
 
-jsonValueString : STRING jsonType?;
+jsonValueString : string jsonType?;
 jsonValueNumber : NUMBER jsonType?;
 jsonValueInteger : INT jsonType?;
 jsonValueBoolean : (TRUE | FALSE) jsonType?;
@@ -87,7 +89,7 @@ jsonLtItem :
    | jsonValueInteger
    | jsonValueNumber
    | jsonValueNull
-   | jsonpath
+   | jsltJsonpath
    | variable
    ;
 
@@ -120,31 +122,113 @@ jsonValueList :
 
 // -----------   Json path   -----------
 
-jsonpath 
-   : dotnotation_jsonpath jsonType?
-   ;
-dotnotation_jsonpath 
-   : DOLLAR (SUBSCRIPT+ identifierWithQualifier (SUBSCRIPT+ identifierWithQualifier)*)?
+jsltJsonpath
+   : jsonpath jsonType?
    ;
 
-identifierWithQualifier 
-   : ID (BRACKET_LEFT identifierWithQualifierSub? BRACKET_RIGHT)?
+jsonpath
+   : DOLLAR jsonpath_subscript? //EOF
    ;
 
-identifierWithQualifierSub
-   : INT
-   | QUESTION_PAREN_LEFT query_expr PAREN_RIGHT
+jsonpath_
+   : ( DOLLAR | CURRENT_VALUE) jsonpath_subscript?
    ;
 
-query_expr 
-   : query_expr (AND_EXCLUSIVE query_expr)+
-   | query_expr (OR_EXCLUSIVE query_expr)+
+jsonpath__
+   : jsonpath_
+   | value
+   ;
+
+jsonpath_subscript
+   : RECURSIVE_DESCENT ( subscriptableBareword | subscriptables ) jsonpath_subscript?
+   | SUBSCRIPT subscriptableBareword jsonpath_subscript?
+   | subscriptables jsonpath_subscript?
+   ;
+
+subscriptables
+   : BRACKET_LEFT subscriptable ( COMMA subscriptable )* BRACKET_RIGHT
+   ;
+
+subscriptableArguments
+   : PAREN_LEFT ( jsonpath__ ( COMMA jsonpath__ )* )? PAREN_RIGHT
+   ;
+
+subscriptableBareword
+   : jsonPath_identifier subscriptableArguments?
    | WILDCARD_SUBSCRIPT
-   | CURRENT_INDENTIFIER_JSONPATH
-   | CURRENT_INDENTIFIER_JSONPATH GT INT
-   | CURRENT_INDENTIFIER_JSONPATH LT INT
-   | CURRENT_LENGTH INT
-   | CURRENT_INDENTIFIER_JSONPATH EQ INT
-   | CURRENT_INDENTIFIER_JSONPATH EQ SINGLE_QUOTE_STRING
    ;
 
+jsonPath_identifier
+   : ID
+   | IN
+   | NIN
+   | SUBSETOF
+   | CONTAINS
+   | SIZE
+   | EMPTY
+   | TRUE
+   | FALSE
+   ;
+
+subscriptable
+   : STRING
+   | sliceable
+   | WILDCARD_SUBSCRIPT
+   | QUESTION PAREN_LEFT expression PAREN_RIGHT
+   | jsonpath_
+   | IDQUOTED subscriptableArguments?
+   ;
+
+sliceable
+   : NUMBER
+   | sliceableLeft
+   | sliceableRight
+   | sliceableBinary
+   ;
+
+sliceableLeft
+   : NUMBER COLON
+   ;
+
+sliceableRight
+   : COLON NUMBER
+   ;
+
+sliceableBinary
+   : NUMBER COLON NUMBER
+   ;
+
+expression
+   : jsonpath__
+   | NT expression
+   | PAREN_LEFT expression PAREN_RIGHT   
+   | expression (binaryOperator expression)+
+   ;
+
+binaryOperator
+   : AND 
+   | OR 
+   | EQ 
+   | NE 
+   | LT 
+   | LE 
+   | GT 
+   | GE  
+   | IN
+   | NIN
+   | SUBSETOF
+   | CONTAINS
+   | SIZE
+   | EMPTY  
+   ;
+
+value
+   : STRING
+   | IDQUOTED
+   | NUMBER  
+   | TRUE
+   | FALSE
+   | NULL
+   | obj
+   | array
+   ;

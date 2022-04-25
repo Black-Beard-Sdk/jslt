@@ -5,28 +5,12 @@ using System.Collections.Generic;
 namespace Bb.Json.Jslt.Asts
 {
 
-
-    public class Comment : JsltBase
-    {
-
-        public Comment()
-        {
-
-        }
-
-        public override object Accept(IJsltJsonVisitor visitor)
-        {
-            return visitor.VisitComment(this);
-        }
-
-    }
-
     public abstract class JsltBase
     {
 
         public JsltBase()
         {
-            this._comments = new List<Comment>();
+            this._comments = new List<JsltComment>();
         }
 
         public JsltKind Kind { get; internal set; }
@@ -51,15 +35,15 @@ namespace Bb.Json.Jslt.Asts
         }
 
 
-        public IEnumerable<Comment> Comments { get => this._comments; }
+        public IEnumerable<JsltComment> Comments { get => this._comments; }
 
 
-        internal void AddComments(IEnumerable<Comment> comments)
+        internal void AddComments(IEnumerable<JsltComment> comments)
         {
             _comments.AddRange(comments);
         }
 
-        private List<Comment> _comments;
+        private List<JsltComment> _comments;
 
 
     }

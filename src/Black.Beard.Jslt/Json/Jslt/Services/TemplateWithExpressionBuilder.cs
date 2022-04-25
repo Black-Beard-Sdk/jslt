@@ -635,7 +635,7 @@ namespace Bb.Json.Jslt.Services
             return ctx;
         }
 
-        public object VisitComment(Comment comment)
+        public object VisitComment(JsltComment comment)
         {
             return null;
         }

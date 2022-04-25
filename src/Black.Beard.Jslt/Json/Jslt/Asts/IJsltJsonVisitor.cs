@@ -12,7 +12,7 @@ namespace Bb.Json.Jslt.Asts
         object VisitArray(JsltArray node);
 
         object VisitConstant(JsltConstant node);
-        object VisitComment(Comment comment);
+        object VisitComment(JsltComment comment);
         object VisitObject(JsltObject node);
 
         object VisitDirective(JsltDirective node);

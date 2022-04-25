@@ -246,7 +246,7 @@ namespace Bb.JsltEvaluator.AvalonEdit
             return node;
         }
 
-        public object VisitComment(Comment node)
+        public object VisitComment(JsltComment node)
         {
             var start = node.Start.StartIndex;
             var lenght = node.Stop.StartIndex - start;
