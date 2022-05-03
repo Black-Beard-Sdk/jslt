@@ -29,9 +29,6 @@ namespace Bb.Jslt.Services.Csv
             if (string.IsNullOrEmpty(separator))
                 separator = ";";
 
-            if (string.IsNullOrEmpty(quote))
-                quote = "\"";
-
             if (string.IsNullOrEmpty(escape))
                 escape = "\\";
 
@@ -39,22 +36,24 @@ namespace Bb.Jslt.Services.Csv
             if (file.Exists)
             {
 
-                var result = ReadCsv(
-                        file.FullName,
-                        hasHeader,
-                        separator,
-                        quote,
-                        escape
-                        );
+                var result = ReadCsv
+                (
+                    file.FullName,
+                    hasHeader,
+                    separator,
+                    quote,
+                    escape
+                );
 
                 return result;
+
             }
 
             throw new Exception($"missing file {file.FullName}");
 
         }
 
-        private static JArray ReadCsv(string filename, bool hasHeader, string charsetSeparator, string quoteCharset, string escapeCharset)
+        private static JArray ReadCsv(string filename, bool hasHeader, string? charsetSeparator, string? quoteCharset, string escapeCharset)
         {
 
             JArray result = new JArray();
@@ -63,9 +62,11 @@ namespace Bb.Jslt.Services.Csv
             if (separator.Length == 3)
                 separator = separator.Trim(separator[0]);
 
-            var quote = quoteCharset;
-            if (quote.Length == 3)
-                quote = quote.Trim(quote[0]);
+            char? quote = null;
+            if (quoteCharset?.Length > 0)
+            {
+                quote = quoteCharset[0];
+            }
 
             var escape = escapeCharset;
             if (escape.Length == 3)
@@ -76,7 +77,7 @@ namespace Bb.Jslt.Services.Csv
             var text = _file.FullName.LoadFromFile();
 
             using (var _txt = new StringReader(text))
-            using (CsvReader csv = new CsvReader(_txt, hasHeader, separator[0], quote[0], escape[0], '#', ValueTrimmingOptions.All, (int)_file.Length))
+            using (CsvReader csv = new CsvReader(_txt, hasHeader, separator[0], quote, escape[0], '#', ValueTrimmingOptions.All, (int)_file.Length))
             {
 
                 System.Data.IDataReader reader = csv;
@@ -87,28 +88,44 @@ namespace Bb.Jslt.Services.Csv
 
                     line++;
 
-                    var o = new JObject();
-
-                    for (int i = 0; i < reader.FieldCount; i++)
+                    try
                     {
 
-                        var n = reader.GetName(i);
-                        string name = hasHeader
-                            ? ServicesSql.GetLabel(n)
-                            : "Column" + i.ToString();
+                        var o = new JObject();
 
-                        var value = reader.GetValue(i);
+                        for (int i = 0; i < reader.FieldCount; i++)
+                        {
 
-                        o.Add(new JProperty(name, value));
+                            var n = reader.GetName(i);
+                            string name = hasHeader
+                                ? ServicesSql.GetLabel(n)
+                                : "Column" + i.ToString();
+
+                            try
+                            {
+                                var value = reader.GetValue(i);
+                                o.Add(new JProperty(name, value));
+                            }
+                            catch (Exception ex)
+                            {
+
+                            }
+
+                        }
+
+                        result.Add(o);
 
                     }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
 
-                    result.Add(o);
+
 
                 }
 
             }
-
 
             return result;
 

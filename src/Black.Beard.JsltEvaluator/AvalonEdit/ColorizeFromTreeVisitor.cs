@@ -28,11 +28,15 @@ namespace Bb.JsltEvaluator.AvalonEdit
 
         internal void Apply(JsltBase tree)
         {
-            tree.Accept(this);
+            if (tree != null)
+            {
 
-            foreach (var item in tree.Comments)
-                item.Accept(this);
+                tree.Accept(this);
 
+                foreach (var item in tree.Comments)
+                    item.Accept(this);
+            
+            }
         }
 
         public object VisitArgument(JsltArgument node)
