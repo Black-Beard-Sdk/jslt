@@ -219,6 +219,12 @@ public interface IJsltParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitSliceable([NotNull] JsltParser.SliceableContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="JsltParser.signedNumber"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitSignedNumber([NotNull] JsltParser.SignedNumberContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="JsltParser.sliceableLeft"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

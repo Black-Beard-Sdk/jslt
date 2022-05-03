@@ -58,7 +58,7 @@ jsonValue :
    ;
 
 jsonValueString : string jsonType?;
-jsonValueNumber : NUMBER jsonType?;
+jsonValueNumber : SIGNED_NUMBER jsonType?;
 jsonValueInteger : INT jsonType?;
 jsonValueBoolean : (TRUE | FALSE) jsonType?;
 jsonValueNull : NULL;
@@ -119,19 +119,13 @@ jsonValueList :
    jsonValue (COMMA jsonValue)*
    ;
 
+jsltJsonpath : jsonpath jsonType?;
+jsonpath : DOLLAR jsonpath_subscript?;
 
 // -----------   Json path   -----------
 
-jsltJsonpath
-   : jsonpath jsonType?
-   ;
-
-jsonpath
-   : DOLLAR jsonpath_subscript? //EOF
-   ;
-
 jsonpath_
-   : ( DOLLAR | CURRENT_VALUE) jsonpath_subscript?
+   : (DOLLAR | CURRENT_VALUE) jsonpath_subscript?
    ;
 
 jsonpath__
@@ -175,27 +169,29 @@ subscriptable
    | sliceable
    | WILDCARD_SUBSCRIPT
    | QUESTION PAREN_LEFT expression PAREN_RIGHT
-   | jsonpath_
+   | jsonpath_ ((PLUS | MINUS)? NUMBER)?
    | IDQUOTED subscriptableArguments?
    ;
 
 sliceable
-   : NUMBER
+   : signedNumber
    | sliceableLeft
    | sliceableRight
    | sliceableBinary
    ;
 
+signedNumber : SIGNED_NUMBER | NUMBER;
+
 sliceableLeft
-   : NUMBER COLON
+   : signedNumber COLON
    ;
 
 sliceableRight
-   : COLON NUMBER
+   : COLON signedNumber
    ;
 
 sliceableBinary
-   : NUMBER COLON NUMBER
+   : signedNumber COLON signedNumber
    ;
 
 expression
@@ -225,7 +221,7 @@ binaryOperator
 value
    : STRING
    | IDQUOTED
-   | NUMBER  
+   | signedNumber
    | TRUE
    | FALSE
    | NULL

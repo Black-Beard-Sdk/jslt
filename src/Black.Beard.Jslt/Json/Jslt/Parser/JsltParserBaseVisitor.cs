@@ -345,6 +345,16 @@ public partial class JsltParserBaseVisitor<Result> : AbstractParseTreeVisitor<Re
 	/// <return>The visitor result.</return>
 	public virtual Result VisitSliceable([NotNull] JsltParser.SliceableContext context) { return VisitChildren(context); }
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="JsltParser.signedNumber"/>.
+	/// <para>
+	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
+	/// on <paramref name="context"/>.
+	/// </para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	public virtual Result VisitSignedNumber([NotNull] JsltParser.SignedNumberContext context) { return VisitChildren(context); }
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="JsltParser.sliceableLeft"/>.
 	/// <para>
 	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>

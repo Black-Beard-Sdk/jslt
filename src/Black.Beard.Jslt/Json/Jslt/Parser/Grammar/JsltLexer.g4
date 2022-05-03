@@ -106,13 +106,17 @@ fragment UNICODE
 fragment HEX
    : [0-9a-fA-F]
    ;
+
 fragment SAFECODEPOINT
    : ~ ["\\\u0000-\u001F]
    ;
 
 NUMBER
-   : '-'? INT ('.' [0-9] +)? EXP?
+   : INT ('.' [0-9] +)? EXP?
    ;
+
+SIGNED_NUMBER
+   : ('-'|'+') INT ('.' [0-9] +)? EXP?;
 
 INT
    : '0' | [1-9] [0-9]*
