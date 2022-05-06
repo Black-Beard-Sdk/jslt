@@ -69,11 +69,11 @@ namespace Bb.Json.Jslt.CustomServices
 
         }
 
-        [JsltExtensionMethod("any", "return true if source is not null")]
+        [JsltExtensionMethod("any", "return true if source is not null and contains one or more items")]
         [JsltExtensionMethodParameter("source", "source of data")]
         public static JToken ExecuteAny(RuntimeContext ctx, JToken source)
         {
-            var items = source != null;
+            var items = source != null && source is JArray a && a.Count > 0;
             return new JValue(items);
         }
 
@@ -100,7 +100,7 @@ namespace Bb.Json.Jslt.CustomServices
 
 
         [JsltExtensionMethod("distinct")]
-        [JsltExtensionMethodParameter("source", "Json array that contains duplicate datas.")]
+        [JsltExtensionMethodParameter("source", "Json array that contains duplicated datas.")]
         [JsltExtensionMethodParameter("sourcePath", "json path that select the unique key")]
         public static JToken Executedistinct(RuntimeContext ctx, JToken source, string sourcePath)
         {

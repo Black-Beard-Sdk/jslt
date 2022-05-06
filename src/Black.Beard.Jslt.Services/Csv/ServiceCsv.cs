@@ -101,15 +101,8 @@ namespace Bb.Jslt.Services.Csv
                                 ? ServicesSql.GetLabel(n)
                                 : "Column" + i.ToString();
 
-                            try
-                            {
-                                var value = reader.GetValue(i);
-                                o.Add(new JProperty(name, value));
-                            }
-                            catch (Exception ex)
-                            {
-
-                            }
+                            var value = reader.GetValue(i);
+                            o.Add(new JProperty(name, value));
 
                         }
 

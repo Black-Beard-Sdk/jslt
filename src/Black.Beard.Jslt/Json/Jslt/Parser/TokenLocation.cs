@@ -51,9 +51,12 @@ namespace Bb.Json.Jslt.Parser
 
         public int StopIndex { get; internal set; }
 
+        public string Function { get; set; }
+        public string ScriptFile { get; internal set; }
+
         public TokenLocation Clone()
         {
-            return new TokenLocation(this.StartIndex, this.StopIndex);
+            return new TokenLocation(this.StartIndex, this.StopIndex, this.Line, this.Column) { Function = this.Function };
         }
 
     }

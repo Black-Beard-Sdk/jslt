@@ -211,11 +211,11 @@ namespace Bb.Json.Jslt.Parser
 
         public bool Success { get => !this._list.Any(c => c.Severity == SeverityEnum.Error); }
 
-        public int Count => throw new NotImplementedException();
+        public int Count => _list.Count;
 
-        public bool IsReadOnly => throw new NotImplementedException();
+        public bool IsReadOnly => false;
 
-        public ErrorModel this[int index] { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public ErrorModel this[int index] { get => _list[index]; set => _list[index] = value; }
 
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 

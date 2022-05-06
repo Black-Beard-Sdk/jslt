@@ -7,7 +7,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Evaluator jslt" Height="450" Width="1000" Loaded="Window_Loaded">
+        Title="Evaluator jslt" Height="450" Width="1000" Loaded="Window_Loaded" SizeChanged="WindowSizeChanged">
     <Grid>
 
         <Grid.RowDefinitions>

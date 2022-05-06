@@ -42,10 +42,23 @@ Return a single selection specified by the json path
 { "result" : select( {<object>}, "json path" @string ) }
 ``` 
 
-## **select**
+## **selectmany**
 Return a many selection specified by the json path
 ```JSON
-{ "result" : selectmany( {<object>}, "json path" @string ) }
+{ "result" : selectmany( {<object>}, $"json path" ) }
+``` 
+
+## **selectany**
+return true if the filter matches
+```JSON
+{ "result" : selectany( {<object>}, $"json path" ) }
+``` 
+
+
+## **any**
+return true if source is not null and contains one or more items
+```JSON
+{ "result" : selectany( {<object>}, $"json path" ) }
 ``` 
 
 ## **limit**

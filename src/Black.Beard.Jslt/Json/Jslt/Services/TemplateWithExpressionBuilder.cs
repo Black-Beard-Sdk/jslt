@@ -39,6 +39,8 @@ namespace Bb.Json.Jslt.Services
             _ctorJValueTimeSpan = typeof(JValue).GetConstructor(new Type[] { typeof(TimeSpan) });
             _jValueGetNull = typeof(JValue).GetMethod("CreateNull");
 
+
+
         }
 
 
@@ -69,6 +71,11 @@ namespace Bb.Json.Jslt.Services
 
         internal Func<RuntimeContext, JToken, JToken> GenerateLambda(JsltBase tree, string filepathCode)
         {
+
+            var s = _stack.Peek();
+            var s1 = Expression.Assign(Expression.Property(s.Context, RuntimeContext._ScriptProperty), Expression.Constant(this.ScriptPath));
+
+            _compiler.Add(s1);
 
             // Start parsing
             Expression e = tree.Accept(this) as Expression;
@@ -210,7 +217,6 @@ namespace Bb.Json.Jslt.Services
                     }
                 }
 
-
                 RemoveVariables(node, srcRoot);
 
                 return v1;
@@ -348,26 +354,39 @@ namespace Bb.Json.Jslt.Services
 
             using (CurrentContext ctx = NewContext())
             {
-                
+
                 List<Expression> args = new List<Expression>();
 
                 if (!node.ServiceProvider.IsCtor)
-                    args.Add(ctx.Current.Context);
+                {
+                    var s = node.Start;
+                    var c = Expression
+                        .Call(null, RuntimeContext._TraceLocation
+                        , ctx.Current.Context
+                        , Expression.Constant(node.Name)
+                        , Expression.Constant(s.Line)
+                        , Expression.Constant(s.Column)
+                        , Expression.Constant(s.StartIndex)
+                        , Expression.Constant(s.StopIndex)
+                        );
+                    args.Add(c);
+                }
 
                 foreach (var property in node.Arguments)
                 {
-
                     Type targetType = node.ParameterTypes[args.Count];
                     var argSourceValue = ((Expression)property.Value.Accept(this))
                         .ConvertIfDifferent(targetType);
-
                     args.Add(argSourceValue);
-
                 }
+           
                 var arguments = typeof(object).NewArray(args.ToArray());
                 var keyMethod = Expression.Constant($"service_{this._indexMethod++}");
 
+
                 Expression result = Expression.Constant(node.ServiceProvider).Call(node.ServiceProvider.MethodCall, keyMethod, arguments);
+                if (!node.ServiceProvider.IsCtor)
+                    result = Expression.Call(null, RuntimeContext._ExitLocation, ctx.Current.Context, result);
 
                 _resultReset.Add(Expression.Constant(node.ServiceProvider).Call(node.ServiceProvider.MethodReset));
 
@@ -379,7 +398,7 @@ namespace Bb.Json.Jslt.Services
                     if (node.ArgumentsBis.Count > 0)
                         src = (Expression)node.ArgumentsBis[0].Accept(this);
 
-                    result = Expression.Call(RuntimeContext._getContentFromService.Method, ctx.Current.Context, src, result, node.GetLocation().AsConstant(),  node.Name.AsConstant());
+                    result = Expression.Call(RuntimeContext._getContentFromService.Method, ctx.Current.Context, src, result, node.GetLocation().AsConstant(), node.Name.AsConstant());
 
                 }
 
@@ -452,7 +471,7 @@ namespace Bb.Json.Jslt.Services
         {
             using (CurrentContext ctx = NewContext())
             {
-                
+
                 var nextBlock = ctx.Current.Source;
 
                 var l = node.Left;
@@ -527,9 +546,9 @@ namespace Bb.Json.Jslt.Services
             {
                 ctx.Current.RootSource = Expression.Call
                 (
-                    RuntimeContext._getContentByJPath.Method, 
-                    ctx.Current.Context, 
-                    ctx.Current.RootSource, 
+                    RuntimeContext._getContentByJPath.Method,
+                    ctx.Current.Context,
+                    ctx.Current.RootSource,
                     Expression.Constant(node.Value),
                     node.GetLocation().AsConstant()
                 );
@@ -540,7 +559,7 @@ namespace Bb.Json.Jslt.Services
 
         public object VisitSwitch(JsltSwitch node)
         {
-            
+
             SourceCode nextBlock;
 
             using (CurrentContext ctx = NewContext())
@@ -603,6 +622,7 @@ namespace Bb.Json.Jslt.Services
         }
 
         public FunctionFoundry EmbbededFunctions { get; internal set; }
+        public string ScriptPath { get; internal set; }
 
         private CurrentContext NewContext()
         {

@@ -933,10 +933,14 @@ namespace Bb.Sdk.Csv
         /// </summary>
         /// <remarks>Used for exception handling purpose.</remarks>
         /// <returns>The current raw CSV data.</returns>
-        public string GetCurrentRawData()
+        public string GetCurrentRawData(int startIndex = 0, int lenght = -1)
         {
+
+            if (lenght == -1)
+                lenght = _bufferLength;
+
             if (_buffer != null && _bufferLength > 0)
-                return new string(_buffer, 0, _bufferLength);
+                return new string(_buffer, startIndex, lenght);
             else
                 return string.Empty;
         }
@@ -1440,7 +1444,7 @@ namespace Bb.Sdk.Csv
 
                             // If no delimiter is present after the quoted field and it is not the last field, then it is a parsing error
                             if (!delimiterSkipped && !_eof && !(_eol || IsNewLine(_nextFieldStart)))
-                                HandleParseError(new MalformedCsvException(GetCurrentRawData(), _nextFieldStart, Math.Max(0, _currentRecordIndex), index), ref _nextFieldStart);
+                                HandleParseError(new MalformedCsvException(GetCurrentRawData(Math.Max(0, _nextFieldStart - 20), Math.Min(_bufferLength, 100)), _nextFieldStart, Math.Max(0, _currentRecordIndex), index), ref _nextFieldStart);
                         }
 
                         if (!discardValue)

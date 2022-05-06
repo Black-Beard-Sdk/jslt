@@ -165,7 +165,7 @@ namespace Bb.Expressions
         }
 
 
-        public static int CanBeConverted(this Type sourceType, Type targetType)
+        public static int CanBeConverted(this Type targetType, Type sourceType)
         {
 
             if (sourceType == targetType)

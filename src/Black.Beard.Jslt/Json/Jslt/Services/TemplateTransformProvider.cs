@@ -86,7 +86,7 @@ namespace Bb.Json.Jslt.Services
             }
             catch (Exception e)
             {
-                LocalDebug.Stop();
+                //LocalDebug.Stop();
                 throw new ParsingJsonException("Failed to parse Json. " + e.Message, e);
             }
 
@@ -99,7 +99,7 @@ namespace Bb.Json.Jslt.Services
                 var crc = sb.CalculateCrc32().ToString();
                 filepathCode = crc + ".cs";
                 // Transform the template
-                rules = Get(tree, _foundry, _errors, filepathCode, withDebug);
+                rules = Get(tree, _foundry, _errors, filepathCode, filename, withDebug);
 
                 if (outputConfiguration != null && outputConfiguration.Function != null)
                 {
@@ -137,7 +137,7 @@ namespace Bb.Json.Jslt.Services
 
         }
 
-        private Func<RuntimeContext, JToken, JToken> Get(JsltBase tree, FunctionFoundry foundry, Diagnostics _errors, string filepathCode, bool withDebug)
+        private Func<RuntimeContext, JToken, JToken> Get(JsltBase tree, FunctionFoundry foundry, Diagnostics _errors, string filepathCode, string scriptPath, bool withDebug)
         {
 
             Func<RuntimeContext, JToken, JToken> fnc;
@@ -150,7 +150,11 @@ namespace Bb.Json.Jslt.Services
                     OutputPath = this._configuration.OutputPath,
                 };
 
-                var builder = new TemplateWithExpressionBuilder(_errors, sourceCompiler, withDebug) { Configuration = this._configuration, EmbbededFunctions = foundry };
+                var builder = new TemplateWithExpressionBuilder(_errors, sourceCompiler, withDebug) 
+                {
+                    ScriptPath = scriptPath,
+                    Configuration = this._configuration, EmbbededFunctions = foundry 
+                };
                 fnc = builder.GenerateLambda(tree, filepathCode);
 
             }

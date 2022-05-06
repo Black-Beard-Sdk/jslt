@@ -1,4 +1,5 @@
 ﻿using Bb.Exceptions;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -41,7 +42,7 @@ namespace Bb.Expressions
             };
 
             var ms = typeof(Convert).GetMethods(BindingFlags.Static | BindingFlags.Public);
-            
+
             foreach (var item in ms)
                 if (_names.Contains(item.Name))
                 {
@@ -72,7 +73,7 @@ namespace Bb.Expressions
             if (self == null)
                 return null;
 
-            var sourceType = self.GetType();          
+            var sourceType = self.GetType();
 
             if (!_dic.TryGetValue(sourceType, out var dic2))
                 _dic.Add(sourceType, dic2 = new Dictionary<Type, Func<object, object>>());
@@ -138,11 +139,32 @@ namespace Bb.Expressions
             RegisterOperators(targetType);
             registerCtors(sourceType, targetType);
 
-            dicSource.TryGetValue(targetType, out method);
+            if (!dicSource.TryGetValue(targetType, out method))
+            {
+                if (sourceType == typeof(Newtonsoft.Json.Linq.JObject) && targetType.IsClass)
+                {
+                    var o = typeof(ConverterHelper).GetMethod(nameof(ConverterHelper.ConvertToObject), BindingFlags.Static | BindingFlags.NonPublic);
+                    method = o.MakeGenericMethod(targetType);
+                    Register(sourceType, targetType, method);
+                }
+                else if (sourceType == typeof(Newtonsoft.Json.Linq.JArray) && targetType.IsArray)
+                {
+                    var o = typeof(ConverterHelper).GetMethod(nameof(ConverterHelper.ConvertToObject), BindingFlags.Static | BindingFlags.NonPublic);
+                    method = o.MakeGenericMethod(targetType);
+                    Register(sourceType, targetType, method);
+                }
+            }
 
             return method;
 
         }
+
+        private static object ConvertToObject<T>(Newtonsoft.Json.Linq.JToken self)
+        {
+            var result = self.ToObject<T>();
+            return result;
+        }
+
 
         private static void registerCtors(Type sourceType, Type targetType)
         {
@@ -215,7 +237,11 @@ namespace Bb.Expressions
                 {
 
                     var type1 = p[0].ParameterType;
-                    if (type1 != sourceType || !typeof(IFormatProvider).IsAssignableFrom(type1))
+                    if (type1 == sourceType)
+                    {
+
+                    }
+                    else if (!typeof(IFormatProvider).IsAssignableFrom(type1))
                         test = false;
 
                 }
@@ -223,11 +249,15 @@ namespace Bb.Expressions
                 {
 
                     var type1 = p[0].ParameterType;
-                    if (type1 != sourceType || !typeof(IFormatProvider).IsAssignableFrom(type1))
+                    if (type1 == sourceType)
+                    {
+
+                    }
+                    else if (!typeof(IFormatProvider).IsAssignableFrom(type1))
                         test = false;
 
                     var type2 = p[1].ParameterType;
-                    if (type2 != sourceType || !typeof(IFormatProvider).IsAssignableFrom(type2))
+                    if (!typeof(IFormatProvider).IsAssignableFrom(type2))
                         test = false;
 
                 }

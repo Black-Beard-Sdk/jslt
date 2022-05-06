@@ -31,7 +31,10 @@ namespace Bb.Json.Jslt.Services
             _setVariable = typeof(RuntimeContext).GetMethod(nameof(RuntimeContext.SetVariable), new Type[] { typeof(RuntimeContext), typeof(string), typeof(object), typeof(TokenLocation) });
             _DelVariable = typeof(RuntimeContext).GetMethod(nameof(RuntimeContext.DelVariable), new Type[] { typeof(RuntimeContext), typeof(string) });
 
-            _TraceLocation = typeof(RuntimeContext).GetMethod(nameof(RuntimeContext.TraceLocation), new Type[] { typeof(RuntimeContext), typeof(int), typeof(int), typeof(int), typeof(int), typeof(Func<object>) });
+            _TraceLocation = typeof(RuntimeContext).GetMethod(nameof(RuntimeContext.TraceLocation), new Type[] { typeof(RuntimeContext), typeof(string), typeof(int), typeof(int), typeof(int), typeof(int) });
+            _ExitLocation = typeof(RuntimeContext).GetMethod(nameof(RuntimeContext.ExitLocation), new Type[] { typeof(RuntimeContext), typeof(object) });
+
+            _ScriptProperty = typeof(RuntimeContext).GetProperty(nameof(RuntimeContext.ScriptFile));
 
         }
 
@@ -39,29 +42,67 @@ namespace Bb.Json.Jslt.Services
         {
 
             var d = diagnostic ?? new Diagnostics();
+            this._watch = new Stopwatch();
 
             TokenSource = sources.Source.Datas;
             SubSources = sources;
             _diagnostics = d;
+
+            this._stack = new Stack<MethodContext>();
+
         }
 
-        public static object TraceLocation(RuntimeContext ctx, int line, int column, int position, int positionEnd, Func<object> func)
+
+        public static object ExitLocation(RuntimeContext ctx, object result)
         {
 
-            ctx.Line = line;
-            ctx.Column = column;
-            ctx.Position = position;
-            ctx.PositionEnd = position;
+            if (ctx._stack.Count > 0)
+            {
+                var e = ctx._stack.Pop();
+                e.Watch.Stop();
 
-            var result = func();
+                ctx.Diagnostics.AddInformation(ctx.ScriptFile, e.Trace, "Diagnostic", $"Elapsed time in {e.Trace.Function} seconde(s) {Math.Round(e.Watch.Elapsed.TotalSeconds, 4)}");
+
+            }
+
+            if (ctx._stack.Count > 0)
+            {
+                var p = ctx._stack.Peek();
+                p.Watch.Stop();
+                p.Watch.Restart();
+            }
 
             return result;
-        
+
         }
+
+
+        public static RuntimeContext TraceLocation(RuntimeContext ctx, string functionName, int line, int column, int position, int positionEnd)
+        {
+            var e = new MethodContext()
+            {
+                Trace = new TokenLocation(position, positionEnd, line, column)
+                {
+                    Function = functionName,
+                    ScriptFile = ctx.ScriptFile,
+                }
+            };
+            ctx._stack.Push(e);
+
+            e.Watch.Start();
+
+            return ctx;
+        }
+
+        public string ScriptFile { get; private set; }
 
         public TokenLocation GetCurrentLocation()
         {
-            return new TokenLocation(this.Position, this.PositionEnd, this.Line, this.Column);
+            if (this._stack.Count > 0)
+                return this._stack.Peek().Trace;
+
+            return new TokenLocation(0, 0, 0, 0);
+
         }
 
         #region methods called in the expressions
@@ -136,16 +177,16 @@ namespace Bb.Json.Jslt.Services
 
             if (leftToken == null)
                 l = null;
-            
+
             else if (leftToken is JToken tokenLeft)
                 l = GetValue(tokenLeft);
-            
+
             else
                 l = leftToken;
 
             if (rightToken == null)
                 r = null;
-            
+
             else if (rightToken is JToken tokenRight)
                 r = GetValue(tokenRight);
 
@@ -474,7 +515,7 @@ namespace Bb.Json.Jslt.Services
             return false;
 
         }
-        
+
         private static object Modulo(object l, object r)
         {
 
@@ -888,14 +929,15 @@ namespace Bb.Json.Jslt.Services
 
                 if (ctx.SubSources.Variables.Get(item.Substring(2), out object r))
                 {
-                    
+
                     if (keys.Length == 1 && t1)
                     {
 
-                        if (r is JObject || r is JArray)
+                        if (r is JObject || r is JArray || r is JDictionaryValue)
                             return (JToken)r;
+
                     }
-                        d = d.Replace(item, r?.ToString() ?? String.Empty);
+                    d = d.Replace(item, r?.ToString() ?? String.Empty);
                 }
 
                 else
@@ -1051,8 +1093,10 @@ namespace Bb.Json.Jslt.Services
         internal static readonly MethodInfo _getVariable;
         internal static readonly MethodInfo _DelVariable;
         internal static readonly MethodInfo _TraceLocation;
+        internal static readonly MethodInfo _ExitLocation;
+        internal static readonly PropertyInfo _ScriptProperty;
         internal static readonly MethodInfo _convertToBool;
-
+        private readonly Stopwatch _watch;
 
         public JToken TokenSource { get; }
 
@@ -1070,14 +1114,26 @@ namespace Bb.Json.Jslt.Services
         public bool MustoBreak { get; private set; }
 
         public StringBuilder Output { get; internal set; }
-        public int Line { get; private set; }
-        public int Column { get; private set; }
-        public int Position { get; private set; }
-        public int PositionEnd { get; private set; }
 
         private static readonly Dictionary<Type, Dictionary<string, (PropertyInfo, Action<object, object>)>> _properties;
         private static object _lock = new object();
         private readonly Diagnostics _diagnostics;
+        private readonly Stack<MethodContext> _stack;
+
+
+        private class MethodContext
+        {
+
+            public MethodContext()
+            {
+                this.Watch = new Stopwatch();
+            }
+
+            public TokenLocation Trace { get; internal set; }
+
+            public Stopwatch Watch { get; }
+
+        }
 
     }
 

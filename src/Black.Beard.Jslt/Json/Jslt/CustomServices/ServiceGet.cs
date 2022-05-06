@@ -16,7 +16,7 @@ namespace Bb.Json.Jslt.CustomServices
     {
 
         [JsltExtensionMethodParameter("sourceName", "source name")]
-        [JsltExtensionMethodParameter("jpathFilter", "json path")]
+        [JsltExtensionMethodParameter("jpathFilter", "json path or key if the source is index")]
         public ServiceGet(object sourceName, string jpathFilter)
         {
             this._sourceName = sourceName;
@@ -47,12 +47,24 @@ namespace Bb.Json.Jslt.CustomServices
 
             }
             else if (this._sourceName is JToken t)
+            {
                 datas = t;
+            }
 
             if (datas != null)
             {
                 try
                 {
+
+                    if (datas is JDictionaryValue dic)
+                    {
+
+                        if (dic.TryGetValue(this.jpathFilter, out datas))
+                            return datas;
+
+                        return JValue.CreateNull();
+
+                    }
 
                     var result = datas.SelectTokens(this.jpathFilter).ToList();
 

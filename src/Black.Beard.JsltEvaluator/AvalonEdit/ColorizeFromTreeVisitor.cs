@@ -253,7 +253,7 @@ namespace Bb.JsltEvaluator.AvalonEdit
         public object VisitComment(JsltComment node)
         {
             var start = node.Start.StartIndex;
-            var lenght = node.Stop.StartIndex - start;
+            var lenght = node.Stop != null ?  node.Stop.StartIndex - start : this._document.TextLength - start; 
             ApplyMarker(start, lenght, TextMarkerTypes.None, Colors.White, Colors.LightGray, Colors.White);
             return node;
         }
