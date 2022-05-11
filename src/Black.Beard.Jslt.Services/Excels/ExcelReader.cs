@@ -39,7 +39,7 @@ namespace Bb.Jslt.Services.Excels
         public JArray Read(FileInfo file, out string resultText, out int resultCode)
         {
 
-            JArray array = new JArray();
+            List<JToken> tokens = new List<JToken>((int)(file.Length / 100));
 
             if (this._dicColumns == null && this.Columns.Count > 0)
             {
@@ -65,6 +65,7 @@ namespace Bb.Jslt.Services.Excels
                 {
                     if (dataSet.Tables.Count == 1)
                         Tablename = dataSet.Tables[0].TableName;
+
                     else
                     {
                         resultText = $"table name not specified and the document has more of one sheet";
@@ -108,7 +109,7 @@ namespace Bb.Jslt.Services.Excels
                         }
 
                         if (obj.Properties().Count() > 0 || !ByPassEmptyObject)
-                            array.Add(obj);
+                            tokens.Add(obj);
 
                         if (AddRowNumber)
                             obj.Add(new JProperty("$row", rowLine));
@@ -123,7 +124,8 @@ namespace Bb.Jslt.Services.Excels
 
             resultText = null;
             resultCode = 0;
-            return array;
+            return new JArray(tokens);
+            
 
         }
 

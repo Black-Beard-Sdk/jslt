@@ -98,7 +98,7 @@ namespace Bb.Json.Commands
 
         private static JArray ReadCsv(string filename, bool hasHeader, string charsetSeparator, string quoteCharset, string escapeCharset)
         {
-            JArray result = new JArray();
+
 
             var separator = charsetSeparator;
             if (separator.Length == 3)
@@ -113,60 +113,58 @@ namespace Bb.Json.Commands
                 escape = escape.Trim(escape[0]);
 
             var _file = new FileInfo(filename);
-
+            var result = new List<JToken>((int)(_file.Length / 100));
             var text = _file.FullName.LoadFromFile();
 
             using (var _txt = new StringReader(text))
+            using (CsvReader csv = new CsvReader(_txt, hasHeader, separator[0], quote[0], escape[0], '#', ValueTrimmingOptions.All, (int)_file.Length))
             {
 
-                using (CsvReader csv = new CsvReader(_txt, hasHeader, separator[0], quote[0], escape[0], '#', ValueTrimmingOptions.All, (int)_file.Length))
+                System.Data.IDataReader reader = csv;
+                int line = 0;
+                try
                 {
 
-                    System.Data.IDataReader reader = csv;
-                    int line = 0;
-                    try
+                    while (reader.Read())
                     {
 
-                        while (reader.Read())
+                        line++;
+
+                        var o = new JObject();
+
+                        for (int i = 0; i < reader.FieldCount; i++)
                         {
 
-                            line++;
+                            var n = reader.GetName(i);
+                            string name = hasHeader
+                                ? ServicesSql.GetLabel(n)
+                                : "Column" + i.ToString();
 
-                            var o = new JObject();
+                            var value = reader.GetValue(i);
 
-                            for (int i = 0; i < reader.FieldCount; i++)
-                            {
-
-                                var n = reader.GetName(i);
-                                string name = hasHeader
-                                    ? ServicesSql.GetLabel(n)
-                                    : "Column" + i.ToString();
-
-                                var value = reader.GetValue(i);
-
-                                o.Add(new JProperty(name, value));
-
-                            }
-
-                            result.Add(o);
+                            o.Add(new JProperty(name, value));
 
                         }
 
-                    }
-                    catch (Exception)
-                    {
-                        Output.WriteLineError($"Failed to read after {result.Last.ToString(Formatting.Indented)}");
-                        throw;
+                        result.Add(o);
+
                     }
 
+                }
+                catch (Exception)
+                {
+                    Output.WriteLineError($"Failed to read after {result.LastOrDefault()?.ToString(Formatting.Indented)}");
+                    throw;
                 }
 
             }
 
-            return result;
+
+
+            return new JArray(result);
 
         }
-       
+
 
     }
 }

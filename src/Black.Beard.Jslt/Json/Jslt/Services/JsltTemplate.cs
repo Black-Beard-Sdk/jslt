@@ -36,9 +36,15 @@ namespace Bb.Json.Jslt.Services
 
         public OutputSerializationRule RuleOutput { get; internal set; }
 
-        public StringBuilder TransformForOutput(Sources sources, RuntimeContext ctx = null)
+        public StringBuilder TransformForOutput(Sources sources)
         {
-            RuntimeContext result = this.Transform(sources, ctx);
+            RuntimeContext result = this.Transform(sources);
+            return ApplyOutput(result);
+        }
+
+        public StringBuilder TransformForOutput(RuntimeContext ctx)
+        {
+            RuntimeContext result = this.Transform(ctx);
             return ApplyOutput(result);
         }
 
@@ -60,9 +66,7 @@ namespace Bb.Json.Jslt.Services
                         resultTokens = new JArray(selects);
 
                     else
-                    {
                         resultTokens = JValue.CreateNull();
-                    }
 
                 }
 
@@ -83,17 +87,28 @@ namespace Bb.Json.Jslt.Services
 
             }
 
-            return new StringBuilder( resultTokens.ToString());
+            var resultText = new StringBuilder(resultTokens.ToString());
+
+            return resultText;
 
         }
 
-        public RuntimeContext Transform(Sources sources, RuntimeContext ctx = null)
+        public RuntimeContext Transform(Sources sources)
+        {
+            RuntimeContext ctx = GetContext(sources);
+            ctx.Configuration = this.Configuration;
+
+            ctx.TokenResult = Rules(ctx, ctx.TokenSource);
+            return ctx;
+
+        }
+
+        public RuntimeContext Transform(RuntimeContext ctx)
         {
             if (ctx == null)
-                ctx = GetContext(sources);
+                throw new ArgumentNullException(nameof(ctx));
 
-            else
-                ctx.Configuration = this.Configuration;
+            ctx.Configuration = this.Configuration;
 
             ctx.TokenResult = Rules(ctx, ctx.TokenSource);
             return ctx;

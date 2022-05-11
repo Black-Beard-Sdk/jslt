@@ -100,11 +100,12 @@ namespace Bb.Elastic.Runtimes.Models
         {
 
             var result = base.Serialize();
-            var a = new JArray();
-            result.Add(new JProperty("Indices", a));
+            var list = new List<JToken>(this._items.Count);
 
             foreach (var item in this._items)
-                a.Add( item.Serialize());
+                list.Add( item.Serialize());
+
+            result.Add(new JProperty("Indices", new JArray(list)));
 
             return result;
 

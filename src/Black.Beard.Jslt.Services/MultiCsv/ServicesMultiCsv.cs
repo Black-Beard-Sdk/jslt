@@ -2,6 +2,7 @@
 using Bb.Json.Jslt.Services;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Bb.Jslt.Services.MultiCsv
 {
@@ -14,8 +15,8 @@ namespace Bb.Jslt.Services.MultiCsv
         [JsltExtensionMethodParameter("rulePayload", "rule for resolve tree of data")]
         public static JToken LoadMultiCsv(RuntimeContext ctx, string sourcePath, string rulePayload)
         {
-
-            List<JToken> datas = new List<JToken>();
+            var _file = new FileInfo(sourcePath);
+            List<JToken> datas = new List<JToken>((int)(_file.Length / 100));
 
             var file = ctx.Configuration.ResolveFile(sourcePath);
             if (file.Exists)

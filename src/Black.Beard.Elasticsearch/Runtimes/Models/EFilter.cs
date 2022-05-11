@@ -17,7 +17,7 @@ namespace Bb.Elastic.Runtimes.Models
         public override JToken Serialize()
         {
 
-            List<JToken> lst = new List<JToken>();
+            List<JToken> lst = new List<JToken>(Items.Count);
 
             foreach (var item in Items)
                 lst.Add(item.Serialize());

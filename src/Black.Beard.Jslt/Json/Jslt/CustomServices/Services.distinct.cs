@@ -37,16 +37,10 @@ namespace Bb.Json.Jslt.CustomServices
         public static JToken ExecuteSelectMany(RuntimeContext ctx, JToken source, string filter)
         {
 
-            var resultValue = new JArray();
-
             if (source != null)
-            {
-                var items = source.SelectTokens(filter);
-                foreach (var item in items)
-                    resultValue.Add(item);
-            }
+                return new JArray(source.SelectTokens(filter));
 
-            return resultValue;
+            return new JArray();
 
         }
 
@@ -56,8 +50,6 @@ namespace Bb.Json.Jslt.CustomServices
         [JsltExtensionMethodParameter("sourcePath", "filter")]
         public static JToken ExecuteSelectAny(RuntimeContext ctx, JToken source, string filter)
         {
-
-            var resultValue = new JArray();
 
             if (source != null)
             {
@@ -83,14 +75,16 @@ namespace Bb.Json.Jslt.CustomServices
         public static JToken ExecuteLimit(RuntimeContext ctx, JToken source, int max)
         {
 
-            var resultValue = new JArray();
 
             if (source != null && source is JArray a)
             {
+
+                var resultValue = new List<JToken>(max);
+
                 foreach (var item in a.Take(max))
                     resultValue.Add(item);
 
-                return resultValue;
+                return new JArray(resultValue);
 
             }
 
@@ -105,26 +99,27 @@ namespace Bb.Json.Jslt.CustomServices
         public static JToken Executedistinct(RuntimeContext ctx, JToken source, string sourcePath)
         {
 
-            var resultValue = new JArray();
+            List<JToken> resultValue = null;
             HashSet<object> _index = new HashSet<object>();
 
             if (source != null)
             {
                 if (source is JArray a)
                 {
+                    resultValue = new List<JToken>(a.Count);
                     ExecuteDistinct(a, sourcePath, resultValue, _index);
                 }
                 else
                 {
-
+                    LocalDebug.Stop();
                 }
             }
 
-            return resultValue;
+            return new JArray(resultValue);
 
         }
 
-        private static void ExecuteDistinct(JArray a, string sourcePath, JArray resultValue, HashSet<object> _index)
+        private static void ExecuteDistinct(JArray a, string sourcePath, List<JToken> resultValue, HashSet<object> _index)
         {
             foreach (var item in a)
             {
@@ -143,12 +138,12 @@ namespace Bb.Json.Jslt.CustomServices
                         case JTokenType.Float:
                         case JTokenType.Date:
                         case JTokenType.String:
+
                         case JTokenType.Bytes:
                             var v2 = result as JValue;
                             if (_index.Add(v2.Value))
-                            {
                                 resultValue.Add(item);
-                            }
+
                             break;
 
                         case JTokenType.Array:

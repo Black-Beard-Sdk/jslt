@@ -52,12 +52,12 @@ namespace Bb.Elastic.Runtimes.Models
         public virtual JArray Serialize()
         {
 
-            var a = new JArray();
+            var list = new List<JToken>(this._items.Count);
 
             foreach (var item in this._items)
-            {
-                a.Add(item.Serialize());
-            }
+                list.Add(item.Serialize());
+
+            var a = new JArray(list);
 
             return a;
 

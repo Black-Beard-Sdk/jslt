@@ -23,7 +23,7 @@ namespace Bb.Json.Jslt.CustomServices
         public static JToken ExecuteUnion(RuntimeContext ctx, JArray source)
         {
 
-            var resultValue = new JArray();
+            var resultValue = new List<JToken>(500);
 
             if (source != null)
             {
@@ -39,7 +39,7 @@ namespace Bb.Json.Jslt.CustomServices
 
             }
 
-            return resultValue;
+            return new JArray(resultValue);
 
         }
 
@@ -50,7 +50,7 @@ namespace Bb.Json.Jslt.CustomServices
         public static JToken ExecuteJoin(RuntimeContext ctx, JArray sourceLeft, string keyLeft, bool cleanSource, RightJoins rights)
         {
 
-            var resultValue = new JArray();
+            var list = new List<JToken>(sourceLeft.Count);
 
             if (sourceLeft != null)
             {
@@ -61,7 +61,7 @@ namespace Bb.Json.Jslt.CustomServices
                 {
 
                     var current = item.DeepClone();
-                    resultValue.Add(current);
+                    list.Add(current);
 
                     var k = item.SelectToken(keyLeft);
                     if (k is JValue v)
@@ -83,7 +83,7 @@ namespace Bb.Json.Jslt.CustomServices
 
             rights.Clear();
 
-            return resultValue;
+            return new JArray(list);
 
         }
 
@@ -116,6 +116,8 @@ namespace Bb.Json.Jslt.CustomServices
                     }
                     else
                         ctx.Diagnostics.AddWarning(ctx.ScriptFile, ctx.GetCurrentLocation(), String.Empty, $"the {item.Key} have not {right.Name}.");
+
+                    l.Clear();
 
                 }
 
@@ -151,7 +153,7 @@ namespace Bb.Json.Jslt.CustomServices
         public static JToken ExecuteGroup(RuntimeContext ctx, JArray source, JArray groupPath)
         {
 
-            var resultValue = new JArray();
+            var resultValue = new List<JObject>();
 
             if (source != null)
             {
@@ -199,7 +201,7 @@ namespace Bb.Json.Jslt.CustomServices
                 }
             }
 
-            return resultValue;
+            return new JArray(resultValue);
 
         }
 
@@ -307,7 +309,7 @@ namespace Bb.Json.Jslt.CustomServices
 
         }
 
-        internal JArray Collect()
+        internal List<JObject> Collect()
         {
 
             var r = new List<JObject>();
@@ -320,11 +322,7 @@ namespace Bb.Json.Jslt.CustomServices
                     )
                 );
 
-            var result = new JArray(r);
-
-            r.Clear();
-
-            return result;
+            return r;
 
         }
 

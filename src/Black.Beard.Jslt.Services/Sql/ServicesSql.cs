@@ -30,7 +30,7 @@ namespace Bb.Jslt.Services.Sql
         private static JArray ReadSql(RuntimeContext ctx, System.Data.SqlClient.SqlClientFactory factory, string connexion, string sql)
         {
 
-            var resultValue = new JArray();
+            List<JToken> list = new List<JToken>(500);
 
             using (var cnx = factory.CreateConnection())
             {
@@ -44,7 +44,7 @@ namespace Bb.Jslt.Services.Sql
                 catch (Exception)
                 {
                     ctx.Diagnostics.AddError(String.Empty, null, connexion, $"the connection '{connexion}' can't be resolved.");
-                    return resultValue;
+                    return new JArray();
                 }
 
                 using (var cmd = factory.CreateCommand())
@@ -75,7 +75,7 @@ namespace Bb.Jslt.Services.Sql
 
                             }
 
-                            resultValue.Add(o);
+                            list.Add(o);
 
                         }
 
@@ -85,7 +85,7 @@ namespace Bb.Jslt.Services.Sql
 
             }
 
-            return resultValue;
+            return new JArray(list);
 
         }
 

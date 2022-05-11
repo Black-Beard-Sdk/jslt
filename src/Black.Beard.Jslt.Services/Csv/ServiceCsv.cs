@@ -23,7 +23,8 @@ namespace Bb.Jslt.Services.Csv
         [JsltExtensionMethodParameter("separator", "separator charset. If null the value is ';'")]
         [JsltExtensionMethodParameter("quote", "quote charset. If null the value is '\"'")]
         [JsltExtensionMethodParameter("escape", "quote charset. If null the value is '\"'")]
-        public static JToken ExecuteLoadCsvSource(RuntimeContext ctx, string sourcePath, bool hasHeader, string separator, string quote, string escape)
+        [JsltExtensionMethodParameter("excludedColumns", "List of column to exclude form reading")]
+        public static JToken ExecuteLoadCsvSource(RuntimeContext ctx, string sourcePath, bool hasHeader, string separator, string quote, string escape, string excludedColumns)
         {
 
             if (string.IsNullOrEmpty(separator))
@@ -42,7 +43,8 @@ namespace Bb.Jslt.Services.Csv
                     hasHeader,
                     separator,
                     quote,
-                    escape
+                    escape,
+                    excludedColumns
                 );
 
                 return result;
@@ -53,10 +55,8 @@ namespace Bb.Jslt.Services.Csv
 
         }
 
-        private static JArray ReadCsv(string filename, bool hasHeader, string? charsetSeparator, string? quoteCharset, string escapeCharset)
+        private static JArray ReadCsv(string filename, bool hasHeader, string? charsetSeparator, string? quoteCharset, string escapeCharset, string excludedColumns)
         {
-
-            JArray result = new JArray();
 
             var separator = charsetSeparator;
             if (separator.Length == 3)
@@ -76,6 +76,18 @@ namespace Bb.Jslt.Services.Csv
 
             var text = _file.FullName.LoadFromFile();
 
+            var cnt = (int)(_file.Length / 100);
+
+            List<JObject> result = new List<JObject>(cnt);
+
+            var toExclude = new HashSet<string>();
+            if (!string.IsNullOrEmpty(excludedColumns))
+            {
+                var e = excludedColumns.Split(separator[0]);
+                foreach (var item in e)
+                    toExclude.Add(item);
+            }
+
             using (var _txt = new StringReader(text))
             using (CsvReader csv = new CsvReader(_txt, hasHeader, separator[0], quote, escape[0], '#', ValueTrimmingOptions.All, (int)_file.Length))
             {
@@ -92,21 +104,26 @@ namespace Bb.Jslt.Services.Csv
                     {
 
                         var o = new JObject();
-
+                        bool t = false;
                         for (int i = 0; i < reader.FieldCount; i++)
                         {
 
                             var n = reader.GetName(i);
-                            string name = hasHeader
-                                ? ServicesSql.GetLabel(n)
-                                : "Column" + i.ToString();
+                            if (!toExclude.Contains(n))
+                            {
+                                t = true;
+                                string name = hasHeader
+                                    ? ServicesSql.GetLabel(n)
+                                    : "Column" + i.ToString();
 
-                            var value = reader.GetValue(i);
-                            o.Add(new JProperty(name, value));
+                                var value = reader.GetValue(i);
+                                o.Add(new JProperty(name, value));
+                            }
 
                         }
 
-                        result.Add(o);
+                        if (t)
+                            result.Add(o);
 
                     }
                     catch (Exception)
@@ -114,13 +131,15 @@ namespace Bb.Jslt.Services.Csv
                         throw;
                     }
 
-
-
                 }
 
             }
 
-            return result;
+            var r = new JArray(result);
+
+            result.Clear();
+
+            return r;
 
         }
 

@@ -27,6 +27,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using Bb.Wizards.Wpf;
 using Bb.JsltEvaluator.AvalonEdit;
+using System.Diagnostics;
 
 namespace AppJsonEvaluator
 {
@@ -348,6 +349,7 @@ namespace AppJsonEvaluator
                         }
                     }
 
+
                 }
             }
 
@@ -367,14 +369,29 @@ namespace AppJsonEvaluator
 
                 try
                 {
+
+                    var st = new Stopwatch();
+
+                    st.Start();
+
                     var src = Sources.GetEmpty();
                     src.Variables.Add(_variableHelper.GetVariables());
                     src.Variables.Add("My value", new JValue(1));
-                    StringBuilder sb = _template.TransformForOutput(src);
+
+                    var ctx = _template.GetContext(src);
+                    StringBuilder sb = _template.TransformForOutput(ctx);
+
+                    st.Stop();
+
+                    _template.Diagnostics.AddInformation(this._template.Filename, new TokenLocation(), st.Elapsed.TotalSeconds.ToString(), $"running in {st.Elapsed.TotalSeconds} seconds");
+
                     if (sb.Length < _max)
                         this.TextArea.Text = sb.ToString();
                     else
                         this.TextArea.Text = sb.ToString().Substring(0, _max);
+
+                    ctx.TokenResult = null;
+
                 }
                 catch (Exception e2)
                 {

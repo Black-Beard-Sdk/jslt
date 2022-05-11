@@ -46,13 +46,13 @@ namespace Bb.Elastic.Runtimes.Models
 
         public JArray Serialize()
         {
-            JArray a = new JArray();
+            var list = new List<JToken>(_items.Count);
+            
             foreach (var item in _items)
-            {
-                a.Add(item.Serialize());
-            }
+                list.Add(item.Serialize());
 
-            return a;
+            return new JArray(list);
+            
         }
 
         public void Load()
