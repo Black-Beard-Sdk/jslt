@@ -1,5 +1,5 @@
 ﻿using Elasticsearch.Net;
-using Newtonsoft.Json.Linq;
+using Oldtonsoft.Json.Linq;
 using System;
 
 namespace Bb.Elastic.Runtimes.Models

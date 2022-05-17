@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Oldtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -16,8 +16,8 @@ namespace Bb.Elastic.Runtimes
         {
 
             var formatting = System.Diagnostics.Debugger.IsAttached
-                ? Newtonsoft.Json.Formatting.Indented
-                : Newtonsoft.Json.Formatting.None;
+                ? Oldtonsoft.Json.Formatting.Indented
+                : Oldtonsoft.Json.Formatting.None;
 
             this._parent = parent;
             this._references = new List<Reference>();

@@ -1,20 +1,11 @@
 ﻿
 using Bb.CommandLines;
-using Bb.CommandLines.Ins;
 using Bb.CommandLines.Outs;
 using Bb.CommandLines.Validators;
-using Bb.Sdk.Csv;
 using Bb.Jslt.Services.Excels;
-using ExcelDataReader;
 using Microsoft.Extensions.CommandLineUtils;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Data;
+using Oldtonsoft.Json;
 using System.IO;
-using System.Linq;
-using System.Text;
 
 namespace Bb.Json.Commands
 {
@@ -110,7 +101,7 @@ namespace Bb.Json.Commands
                         if (File.Exists(o))
                             File.Delete(o);
 
-                        ContentHelper.Save(o, result);
+                        ContentHelperFiles.Save(o, result);
 
                     }
                     else

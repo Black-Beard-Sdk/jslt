@@ -1,9 +1,8 @@
 ﻿using Bb.CommandLines;
-using Bb.CommandLines.Ins;
 using Bb.CommandLines.Validators;
 using Bb.ConvertToDatables;
 using Microsoft.Extensions.CommandLineUtils;
-using Newtonsoft.Json.Linq;
+using Oldtonsoft.Json.Linq;
 using System;
 using System.Data;
 using System.IO;

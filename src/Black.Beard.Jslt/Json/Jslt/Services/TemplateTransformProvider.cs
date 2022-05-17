@@ -2,7 +2,7 @@
 using Bb.Json.Jslt.Asts;
 using Bb.Json.Jslt.Parser;
 using Bb.JSon;
-using Newtonsoft.Json.Linq;
+using Oldtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -96,7 +96,7 @@ namespace Bb.Json.Jslt.Services
 
             if (_errors.Success)
             {
-                var crc = sb.CalculateCrc32().ToString();
+                var crc = Crc32.CalculateCrc32(sb).ToString();
                 filepathCode = crc + ".cs";
                 // Transform the template
                 rules = Get(tree, _foundry, _errors, filepathCode, filename, withDebug);
@@ -150,10 +150,11 @@ namespace Bb.Json.Jslt.Services
                     OutputPath = this._configuration.OutputPath,
                 };
 
-                var builder = new TemplateWithExpressionBuilder(_errors, sourceCompiler, withDebug) 
+                var builder = new TemplateWithExpressionBuilder(_errors, sourceCompiler, withDebug)
                 {
                     ScriptPath = scriptPath,
-                    Configuration = this._configuration, EmbbededFunctions = foundry 
+                    Configuration = this._configuration,
+                    EmbbededFunctions = foundry
                 };
                 fnc = builder.GenerateLambda(tree, filepathCode);
 

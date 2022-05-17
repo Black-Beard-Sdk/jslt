@@ -1,7 +1,7 @@
 ﻿using Bb.Elastic.Parser;
 using Elasticsearch.Net;
 using Elasticsearch.Net.Specification.CatApi;
-using Newtonsoft.Json.Linq;
+using Oldtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;

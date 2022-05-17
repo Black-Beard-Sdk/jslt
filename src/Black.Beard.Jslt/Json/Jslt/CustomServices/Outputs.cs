@@ -1,7 +1,7 @@
 ﻿using Bb.Json.Attributes;
 using Bb.Json.Jslt.Services;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using Oldtonsoft.Json;
+using Oldtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -94,11 +94,11 @@ namespace Bb.Json.Jslt.CustomServices
             var result = new StringBuilder();
 
             if (source is JObject o)
-                result.AppendLine(o.ToString(Newtonsoft.Json.Formatting.None));
+                result.AppendLine(o.ToString(Oldtonsoft.Json.Formatting.None));
 
             else if (source is JArray a)
                 foreach (var item in a)
-                    result.AppendLine(item.ToString(Newtonsoft.Json.Formatting.None));
+                    result.AppendLine(item.ToString(Oldtonsoft.Json.Formatting.None));
 
             return result;
 

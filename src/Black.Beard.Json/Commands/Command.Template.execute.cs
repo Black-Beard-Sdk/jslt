@@ -4,10 +4,7 @@ using Bb.CommandLines.Outs;
 using Bb.CommandLines.Validators;
 using Bb.Json.Jslt.Services;
 using Microsoft.Extensions.CommandLineUtils;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
+using Oldtonsoft.Json.Linq;
 using System.IO;
 using System.Text;
 
@@ -128,7 +125,7 @@ namespace Bb.Json.Commands
                         if (File.Exists(@out))
                             File.Delete(@out);
 
-                        ContentHelper.Save(@out, resultPayload);
+                        ContentHelperFiles.Save(@out, resultPayload);
 
                     }
                     else

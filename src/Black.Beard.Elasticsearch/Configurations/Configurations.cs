@@ -1,5 +1,5 @@
 ﻿using Bb.Elastic.Runtimes.Models;
-using Newtonsoft.Json;
+using Oldtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -20,7 +20,7 @@ namespace Bb.Elasticsearch.Configurations
 
             };
 
-            _setting.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
+            _setting.Converters.Add(new Oldtonsoft.Json.Converters.StringEnumConverter());
             //  "GCvjqei110If3GmRG26O12YGNwV3ynOCLTDaliWttiwG"
 
         }

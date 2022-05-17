@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Oldtonsoft.Json.Linq;
 
 namespace Bb.Elastic.Runtimes.Models
 {
@@ -11,7 +11,7 @@ namespace Bb.Elastic.Runtimes.Models
 
         public override string ToString()
         {
-            return Serialize().ToString(Newtonsoft.Json.Formatting.None);
+            return Serialize().ToString(Oldtonsoft.Json.Formatting.None);
         }
 
     }

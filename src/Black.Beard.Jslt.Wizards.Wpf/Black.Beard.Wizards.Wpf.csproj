@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0-windows</TargetFramework>
@@ -13,9 +13,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Black.Beard.Helpers.ContentLoaders" Version="1.0.10" />
     <PackageReference Include="ExcelDataReader.DataSet" Version="3.6.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Black.Beard.Jslt\Black.Beard.Jslt.csproj" />
   </ItemGroup>
 
   <ItemGroup>

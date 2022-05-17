@@ -2,6 +2,7 @@ using Bb.Json.Jslt.Parser;
 using Bb.Json.Jslt.Services;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
+using Oldtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -24,7 +25,7 @@ namespace Black.Beard.Jslt.UnitTests
 
             var src = new SourceJson[] { SourceJson.GetFromText(source) };
             RuntimeContext result = Test(expected, src);
-            var o2 = result.TokenResult as JObject;
+            var o2 = result.TokenResult;
 
             Assert.AreEqual(o2["propertyName"], "toto");
 
@@ -39,7 +40,7 @@ namespace Black.Beard.Jslt.UnitTests
 
             var src = new SourceJson[] { SourceJson.GetFromText(source) };
             RuntimeContext result = Test(expected, src);
-            var o2 = result.TokenResult as JObject;
+            var o2 = result.TokenResult;
 
             Assert.AreEqual(o2["propertyName"], 6L);
 
@@ -54,7 +55,7 @@ namespace Black.Beard.Jslt.UnitTests
 
             var src = new SourceJson[] { SourceJson.GetFromText(source) };
             RuntimeContext result = Test(expected, src);
-            var o2 = result.TokenResult as JObject;
+            var o2 = result.TokenResult;
 
             Assert.AreEqual(o2["propertyName"], 6.7D);
 
@@ -77,7 +78,7 @@ namespace Black.Beard.Jslt.UnitTests
         public void TestMObjectWithFunctionStatic()
         {
 
-            var expected = "{ 'propertyName': .crc32('test') }".Replace("'", "\"");
+            var expected = "{ 'propertyName': crc32('test') }".Replace("'", "\"");
             var source = "{ }";
 
             var src = new SourceJson[] { SourceJson.GetFromText(source) };
@@ -90,7 +91,7 @@ namespace Black.Beard.Jslt.UnitTests
         public void TestMObjectWithFunction()
         {
 
-            var expected = "{ 'propertyName': .myMethod(6.6, 'test') }".Replace("'", "\"");
+            var expected = "{ 'propertyName': myMethod(6.6, 'test') }".Replace("'", "\"");
             var source = "{ }";
 
             var src = new SourceJson[] { SourceJson.GetFromText(source) };
@@ -210,7 +211,7 @@ namespace Black.Beard.Jslt.UnitTests
             var expected = @"
 {
 
-    'propertyName': .when('$.prop1') 
+    'propertyName': when('$.prop1') 
                     {
                         '1' : { 'sub1' : 11 },
                         '3' : { 'sub1' : 22 }
@@ -233,7 +234,7 @@ namespace Black.Beard.Jslt.UnitTests
 
     '$functions': ['DataClass2.cs'],
 
-    'propertyName': .mult('$.prop1', 2)
+    'propertyName': mult('$.prop1', 2)
 
 }".Replace("'", "\"")
  .Replace("`", "'")
@@ -266,7 +267,7 @@ namespace Black.Beard.Jslt.UnitTests
             var expected = @"
 { 
     '@var1' : '$.prop1', 
-    'propertyName': .get('src2', '$[?(@.Id == @@var1)]' @string)
+    'propertyName': get('src2', '$[?(@.Id == @@var1)]' @string)
 
 }".Replace("'", "\"")
  .Replace("`", "'")
@@ -283,7 +284,7 @@ namespace Black.Beard.Jslt.UnitTests
         public void TestSum()
         {
             var expected = @"
-{ 'prices': .sum('$..n') } 
+{ 'prices': sum('$..n') } 
 ".Replace("'", "\"")
  .Replace("`", "'")
 ;
@@ -299,7 +300,7 @@ namespace Black.Beard.Jslt.UnitTests
         public void Testconcat()
         {
             var expected = @"
-{ 'result': .concat('$..n', null, null) } 
+{ 'result': concat('$..n', null, null) } 
 ".Replace("'", "\"")
  .Replace("`", "'")
 ;
@@ -314,7 +315,7 @@ namespace Black.Beard.Jslt.UnitTests
         public void TestCrc32()
         {
             var expected = @"
-{ 'result': .crc32('toto') } 
+{ 'result': crc32('toto') } 
 ".Replace("'", "\"")
  .Replace("`", "'")
 ;
@@ -329,7 +330,7 @@ namespace Black.Beard.Jslt.UnitTests
         public void TestId()
         {
             var expected = @"
-{ 'result': .uuid() } 
+{ 'result': uuid() } 
 ".Replace("'", "\"")
  .Replace("`", "'")
 ;
@@ -346,7 +347,7 @@ namespace Black.Beard.Jslt.UnitTests
         {
 
             var expected = @"
-{ 'result': .format(103254895, 'C', 'fr-FR') } 
+{ 'result': format(103254895, 'C', 'fr-FR') } 
 ".Replace("'", "\"")
  .Replace("`", "'")
 ;
@@ -362,7 +363,7 @@ namespace Black.Beard.Jslt.UnitTests
         {
 
             var expected = @"
-{ 'result': .parsedate('Freitag, 31. Oktober 2008', 'de-DE') } 
+{ 'result': parsedate('Freitag, 31. Oktober 2008', 'de-DE') } 
 ".Replace("'", "\"")
  .Replace("`", "'")
 ;
@@ -378,7 +379,7 @@ namespace Black.Beard.Jslt.UnitTests
         {
 
             var expected = @"
-{ 'result': .tobase64('test') } 
+{ 'result': tobase64('test') } 
 ".Replace("'", "\"")
  .Replace("`", "'")
 ;
@@ -394,7 +395,7 @@ namespace Black.Beard.Jslt.UnitTests
         {
 
             var expected = @"
-{ 'result': .Frombase64('dGVzdA==') } 
+{ 'result': Frombase64('dGVzdA==') } 
 ".Replace("'", "\"")
  .Replace("`", "'")
 ;
@@ -410,7 +411,7 @@ namespace Black.Beard.Jslt.UnitTests
         {
 
             var expected = @"
-{ 'result': .now(false) } 
+{ 'result': now(false) } 
 ".Replace("'", "\"")
  .Replace("`", "'")
 ;
@@ -420,7 +421,7 @@ namespace Black.Beard.Jslt.UnitTests
             var src = new SourceJson[] { SourceJson.GetFromText(source1) };
             RuntimeContext result = Test(expected, src);
 
-            var dte = ((JValue)result.TokenResult["result"]).Value<DateTime>();
+            var dte = (result.TokenResult["result"]).Value<DateTime>();
 
             Assert.AreEqual(dte>dte1, true);
         }
@@ -430,7 +431,7 @@ namespace Black.Beard.Jslt.UnitTests
         {
 
             var expected = @"
-{ 'result': .distinct('$') } 
+{ 'result': distinct('$') } 
 ".Replace("'", "\"")
  .Replace("`", "'")
 ;

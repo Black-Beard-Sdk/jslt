@@ -1,9 +1,8 @@
 ﻿using Bb.Json.Attributes;
 using Bb.Json.Jslt.Services;
 using Bb.Sql;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using NJsonSchema;
+using Oldtonsoft.Json;
+using Oldtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -34,7 +33,7 @@ namespace Bb.Jslt.Output.StoreSql
             var source = ctx.TokenResult;
             var result = new StringBuilder();
 
-            JsonSchema schemaObject = JsonSchema.FromSampleJson(source.ToString());
+            //JsonSchema schemaObject = JsonSchema.FromSampleJson(source.ToString());
             //var datasPayload = schemaObject.ToJson();
             //var datas = JObject.Parse(datasPayload);
 

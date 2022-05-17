@@ -6,13 +6,12 @@ using Bb.CommandLines.Validators;
 using Bb.Jslt.Services.Sql;
 using Bb.Sdk.Csv;
 using Microsoft.Extensions.CommandLineUtils;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using Oldtonsoft.Json;
+using Oldtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace Bb.Json.Commands
 {
@@ -80,7 +79,7 @@ namespace Bb.Json.Commands
                         if (File.Exists(o))
                             File.Delete(o);
 
-                        ContentHelper.Save(o, result);
+                        ContentHelperFiles.Save(o, result);
 
                     }
                     else

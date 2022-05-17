@@ -1,5 +1,5 @@
 ﻿using Bb.Exceptions;
-using Newtonsoft.Json;
+using Oldtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -141,13 +141,13 @@ namespace Bb.Expressions
 
             if (!dicSource.TryGetValue(targetType, out method))
             {
-                if (sourceType == typeof(Newtonsoft.Json.Linq.JObject) && targetType.IsClass)
+                if (sourceType == typeof(Oldtonsoft.Json.Linq.JObject) && targetType.IsClass)
                 {
                     var o = typeof(ConverterHelper).GetMethod(nameof(ConverterHelper.ConvertToObject), BindingFlags.Static | BindingFlags.NonPublic);
                     method = o.MakeGenericMethod(targetType);
                     Register(sourceType, targetType, method);
                 }
-                else if (sourceType == typeof(Newtonsoft.Json.Linq.JArray) && targetType.IsArray)
+                else if (sourceType == typeof(Oldtonsoft.Json.Linq.JArray) && targetType.IsArray)
                 {
                     var o = typeof(ConverterHelper).GetMethod(nameof(ConverterHelper.ConvertToObject), BindingFlags.Static | BindingFlags.NonPublic);
                     method = o.MakeGenericMethod(targetType);
@@ -159,7 +159,7 @@ namespace Bb.Expressions
 
         }
 
-        private static object ConvertToObject<T>(Newtonsoft.Json.Linq.JToken self)
+        private static object ConvertToObject<T>(Oldtonsoft.Json.Linq.JToken self)
         {
             var result = self.ToObject<T>();
             return result;

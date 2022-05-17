@@ -1,5 +1,5 @@
 ﻿using Bb.Json.Jslt.Parser;
-using Newtonsoft.Json.Linq;
+using Oldtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -1036,7 +1036,7 @@ namespace Bb.Json.Jslt.Services
 
                 }
             }
-            catch (Newtonsoft.Json.JsonException e)
+            catch (Oldtonsoft.Json.JsonException e)
             {
                 ctx.Diagnostics.AddError(string.Empty, trace, $"invalid json path '{path}'." + e.Message, e.Message);
             }

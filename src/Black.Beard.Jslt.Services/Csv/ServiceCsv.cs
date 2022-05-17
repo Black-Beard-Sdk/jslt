@@ -2,11 +2,12 @@
 using Bb.Json.Attributes;
 using Bb.Json.Jslt.Services;
 using Bb.Sdk.Csv;
-using Newtonsoft.Json.Linq;
+using Oldtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -76,7 +77,7 @@ namespace Bb.Jslt.Services.Csv
 
             var text = _file.FullName.LoadFromFile();
 
-            var cnt = (int)(_file.Length / 100);
+            var cnt = (int)( text.Count(c => c == '\r' ));
 
             List<JObject> result = new List<JObject>(cnt);
 
@@ -116,8 +117,14 @@ namespace Bb.Jslt.Services.Csv
                                     ? ServicesSql.GetLabel(n)
                                     : "Column" + i.ToString();
 
-                                var value = reader.GetValue(i);
+                                var raw = reader.GetValue(i);
+                                
+                                var value = raw == null || raw == System.DBNull.Value
+                                    ? JValue.CreateNull() 
+                                    : new JValue(raw);
+
                                 o.Add(new JProperty(name, value));
+
                             }
 
                         }

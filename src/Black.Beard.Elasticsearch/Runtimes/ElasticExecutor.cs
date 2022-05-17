@@ -3,7 +3,7 @@ using Bb.Elastic.Runtimes.Models;
 using Bb.Elastic.Runtimes.Visitors;
 using Bb.Elastic.SqlParser.Models;
 using Elasticsearch.Net;
-using Newtonsoft.Json.Linq;
+using Oldtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;

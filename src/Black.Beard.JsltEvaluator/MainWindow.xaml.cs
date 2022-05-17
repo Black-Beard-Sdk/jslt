@@ -10,8 +10,8 @@ using ICSharpCode.AvalonEdit.CodeCompletion;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Folding;
 using Microsoft.Win32;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using Oldtonsoft.Json;
+using Oldtonsoft.Json.Linq;
 using ScintillaNET;
 using System;
 using System.Collections.Generic;
@@ -1067,7 +1067,7 @@ namespace AppJsonEvaluator
                 var file = Path.Combine(folderCmd, "run.bat");
                 if (File.Exists(file))
                     File.Delete(file);
-                Bb.ContentHelper.Save(file, sb.ToString());
+                Bb.ContentHelperFiles.Save(file, sb.ToString());
 
 
                 if (files != null)
@@ -1080,7 +1080,7 @@ namespace AppJsonEvaluator
                 file = Path.Combine(folderCmd, templateName);
                 if (File.Exists(file))
                     File.Delete(file);
-                Bb.ContentHelper.Save(file, TemplateEditor.Text.ToString());
+                Bb.ContentHelperFiles.Save(file, TemplateEditor.Text.ToString());
 
                 var targetFolder = Path.Combine(folderCmd, folderCli);
                 if (!Directory.Exists(targetFolder))

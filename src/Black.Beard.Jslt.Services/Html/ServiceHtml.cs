@@ -1,7 +1,7 @@
 ﻿using Bb.Json.Attributes;
 using Bb.Json.Jslt.Services;
 using HtmlAgilityPack;
-using Newtonsoft.Json.Linq;
+using Oldtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

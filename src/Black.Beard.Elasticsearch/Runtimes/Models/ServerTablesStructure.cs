@@ -1,5 +1,5 @@
 ﻿using Bb;
-using Newtonsoft.Json.Linq;
+using Oldtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -61,7 +61,7 @@ namespace Bb.Elastic.Runtimes.Models
             if (string.IsNullOrEmpty(this.Filename))
                 throw new InvalidOperationException("missing name for loading");
 
-            var sb = ContentHelper.LoadFromFile(this.Filename);
+            var sb = ContentHelperFiles.LoadFromFile(this.Filename);
             JArray a = JArray.Parse(sb.ToString());
 
             this.Deserialize(a);

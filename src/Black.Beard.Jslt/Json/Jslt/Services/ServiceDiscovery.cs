@@ -1,7 +1,7 @@
 ﻿using Bb.ComponentModel;
 using Bb.ComponentModel.Factories;
 using Bb.Json.Attributes;
-using Newtonsoft.Json.Linq;
+using Oldtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;

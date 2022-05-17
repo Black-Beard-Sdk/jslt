@@ -1,6 +1,6 @@
 ﻿using Elasticsearch.Net;
 using Elasticsearch.Net.Specification.IndicesApi;
-using Newtonsoft.Json.Linq;
+using Oldtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 
