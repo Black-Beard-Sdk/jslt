@@ -73,9 +73,7 @@ namespace Bb.Json.Jslt.CustomServices
 
                 foreach (var right in rights)
                 {
-
                     ExecuteJoin(ctx, _items, right);
-
                     if (cleanSource)
                     {
                         right.Source = null;
@@ -158,8 +156,15 @@ namespace Bb.Json.Jslt.CustomServices
             foreach (JToken item in source)
             {
                 JToken k = item.SelectToken(groupPath);
-                var key = k.Value<string>();
-                _list.Add(new KeyValuePair<string, JToken>(key, item));
+                if (k != null)
+                {
+                    var key = k.Value<string>();
+                    _list.Add(new KeyValuePair<string, JToken>(key, item));
+                }
+                else
+                {
+
+                }
             }
 
             var result = _list.ToLookup(c => c.Key, c => c.Value);

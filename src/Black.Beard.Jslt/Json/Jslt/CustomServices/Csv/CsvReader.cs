@@ -203,6 +203,7 @@ namespace Bb.Json.Jslt.CustomServices.Csv
         /// A null value indicates that the field have not been parsed.
         /// </summary>
         private string[] _fields;
+        private int[] _positions;
 
         /// <summary>
         /// Contains the maximum number of fields to retrieve for each record.
@@ -1246,14 +1247,12 @@ namespace Bb.Json.Jslt.CustomServices.Csv
                                 if (c == _delimiter)
                                 {
                                     _nextFieldStart = pos + 1;
-
                                     break;
                                 }
                                 else if (c == '\r' || c == '\n')
                                 {
                                     _nextFieldStart = pos;
                                     _eol = true;
-
                                     break;
                                 }
                                 else
@@ -1262,6 +1261,7 @@ namespace Bb.Json.Jslt.CustomServices.Csv
 
                             if (pos < _bufferLength)
                                 break;
+
                             else
                             {
                                 if (!discardValue)
@@ -1293,8 +1293,9 @@ namespace Bb.Json.Jslt.CustomServices.Csv
                                         pos--;
                                     pos++;
 
-                                    if (pos > 0)
+                                    if (pos > 0)                                    
                                         value += new string(_buffer, start, pos - start);
+                                    
                                 }
                                 else
                                     pos = -1;
@@ -1335,7 +1336,10 @@ namespace Bb.Json.Jslt.CustomServices.Csv
                         }
 
                         if (!discardValue)
+                        {
                             _fields[index] = value;
+                            _positions[index] = start;
+                        }
                     }
                     else
                     {
@@ -1451,6 +1455,7 @@ namespace Bb.Json.Jslt.CustomServices.Csv
                                 value = string.Empty;
 
                             _fields[index] = value;
+                            _positions[index] = pos;
                             this._lastReadedText = value;
                         }
                     }
@@ -1547,6 +1552,7 @@ namespace Bb.Json.Jslt.CustomServices.Csv
 
                 _fieldCount = 0;
                 _fields = new string[16];
+                _positions = new int[16];
 
                 while (ReadField(_fieldCount, true, false) != null)
                 {
@@ -1562,7 +1568,10 @@ namespace Bb.Json.Jslt.CustomServices.Csv
                         _fieldCount++;
 
                         if (_fieldCount == _fields.Length)
+                        {
                             Array.Resize<string>(ref _fields, (_fieldCount + 1) * 2);
+                            Array.Resize<int>(ref _positions, (_fieldCount + 1) * 2);
+                        }
                     }
                 }
 
@@ -1571,7 +1580,10 @@ namespace Bb.Json.Jslt.CustomServices.Csv
                 _fieldCount++;
 
                 if (_fields.Length != _fieldCount)
+                {
                     Array.Resize<string>(ref _fields, _fieldCount);
+                    Array.Resize<int>(ref _positions, _fieldCount);
+                }
 
                 _initialized = true;
 
@@ -1607,6 +1619,7 @@ namespace Bb.Json.Jslt.CustomServices.Csv
                             return false;
 
                         Array.Clear(_fields, 0, _fields.Length);
+                        Array.Clear(_positions, 0, _fields.Length);
                         _nextFieldIndex = 0;
                         _eol = false;
 
@@ -2392,6 +2405,8 @@ namespace Bb.Json.Jslt.CustomServices.Csv
         {
             get { return _isDisposed; }
         }
+
+        public int[] Position { get => _positions; }
 
         /// <summary>
         /// Raises the <see cref="M:Disposed"/> event.

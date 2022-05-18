@@ -1,5 +1,6 @@
 ﻿using Bb.Json.Attributes;
 using Bb.Json.Jslt.Services;
+using Oldtonsoft.Json;
 using Oldtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,8 @@ namespace Bb.Json.Jslt.CustomServices.Csv
         [JsltExtensionMethodParameter("quote", "quote charset. If null the value is '\"'")]
         [JsltExtensionMethodParameter("escape", "quote charset. If null the value is '\"'")]
         [JsltExtensionMethodParameter("excludedColumns", "List of column to exclude form reading")]
-        public static JToken ExecuteLoadCsvSource(RuntimeContext ctx, string sourcePath, bool hasHeader, string separator, string quote, string escape, string excludedColumns)
+        [JsltExtensionMethodParameter("excludeNullAndEmpty", "bypass null and empty values")]
+        public static JToken ExecuteLoadCsvSource(RuntimeContext ctx, string sourcePath, bool hasHeader, string separator, string quote, string escape, string excludedColumns, bool excludeNullAndEmpty)
         {
 
             if (string.IsNullOrEmpty(separator))
@@ -40,7 +42,8 @@ namespace Bb.Json.Jslt.CustomServices.Csv
                     separator,
                     quote,
                     escape,
-                    excludedColumns
+                    excludedColumns,
+                    excludeNullAndEmpty
                 );
 
                 return result;
@@ -51,7 +54,7 @@ namespace Bb.Json.Jslt.CustomServices.Csv
 
         }
 
-        private static JArray ReadCsv(string filename, bool hasHeader, string? charsetSeparator, string? quoteCharset, string escapeCharset, string excludedColumns)
+        private static JArray ReadCsv(string filename, bool hasHeader, string? charsetSeparator, string? quoteCharset, string escapeCharset, string excludedColumns, bool excludeNullAndEmpty)
         {
 
             var separator = charsetSeparator;
@@ -94,11 +97,15 @@ namespace Bb.Json.Jslt.CustomServices.Csv
                 System.Data.IDataReader reader = csv;
                 int line = 0;
 
+                if (hasHeader)
+                    line++;
+
                 List<JToken> properties = new List<JToken>(100);
                 while (reader.Read())
                 {
 
                     line++;
+                    var lastPosition = csv.CurrentPosition;
 
                     try
                     {
@@ -115,12 +122,15 @@ namespace Bb.Json.Jslt.CustomServices.Csv
                                     : "Column" + i.ToString();
 
                                 var raw = reader.GetValue(i);
+                                var value = GetValue(raw, excludeNullAndEmpty);
 
-                                var value = raw == null || raw == System.DBNull.Value
-                                    ? JValue.CreateNull()
-                                    : GetValue(raw);
-
-                                properties.Add(new JProperty(name, value));
+                                if (value != null)
+                                {
+                                    int position = csv.Position[i];
+                                    var p = new JProperty(name, value);
+                                    p.SetLineInfo(line, position);
+                                    properties.Add(p);
+                                }
 
                             }
 
@@ -128,7 +138,9 @@ namespace Bb.Json.Jslt.CustomServices.Csv
 
                         if (properties.Count > 0)
                         {
-                            result.Add(new JObject(properties));
+                            var o = new JObject(properties);
+                            o.SetLineInfo(line, lastPosition);
+                            result.Add(o);
                             properties.Clear();
                         }
 
@@ -150,13 +162,31 @@ namespace Bb.Json.Jslt.CustomServices.Csv
 
         }
 
-        private static JValue GetValue(object value)
+        private static JValue GetValue(object value, bool excludeNullAndEmpty)
         {
+
+            if (value == null || value == System.DBNull.Value)
+            {
+                if (excludeNullAndEmpty)
+                    return null;
+
+                else
+                    return JValue.CreateNull();
+            }
 
             if (value is string v)
             {
 
                 v = v.Trim().ToLower();
+
+                if (string.IsNullOrWhiteSpace(v))
+                {
+                    if (excludeNullAndEmpty)
+                        return null;
+                    else
+                        return new JValue(string.Empty);
+                }
+
 
                 if (v == "true")
                     return new JValue(true);
