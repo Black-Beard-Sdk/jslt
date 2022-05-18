@@ -58,7 +58,6 @@ namespace Bb.Elastic.Runtimes.Models
                 list.Add(item.Serialize());
 
             var a = new JArray(list);
-
             return a;
 
         }

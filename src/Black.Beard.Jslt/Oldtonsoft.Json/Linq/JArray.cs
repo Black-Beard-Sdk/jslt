@@ -87,17 +87,7 @@ namespace Oldtonsoft.Json.Linq
         public JArray(object content)
         {
             Add(content);
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="JArray"/> class with the specified content.
-        /// </summary>
-        /// <param name="content">The contents of the array.</param>
-        public JArray(List<JToken> content)
-        {
-            _values = content;
-        }
-
+        }   
 
         internal override bool DeepEquals(JToken node)
         {

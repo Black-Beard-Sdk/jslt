@@ -4,7 +4,7 @@ using Bb.CommandLines.Ins;
 using Bb.CommandLines.Outs;
 using Bb.CommandLines.Validators;
 using Bb.Jslt.Services.Sql;
-using Bb.Sdk.Csv;
+using Bb.Json.Jslt.CustomServices.Csv;
 using Microsoft.Extensions.CommandLineUtils;
 using Oldtonsoft.Json;
 using Oldtonsoft.Json.Linq;
@@ -136,7 +136,7 @@ namespace Bb.Json.Commands
 
                             var n = reader.GetName(i);
                             string name = hasHeader
-                                ? ServicesSql.GetLabel(n)
+                                ? ServiceCsv.GetLabel(n)
                                 : "Column" + i.ToString();
 
                             var value = reader.GetValue(i);

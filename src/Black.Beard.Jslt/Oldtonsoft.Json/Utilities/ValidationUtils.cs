@@ -34,9 +34,7 @@ namespace Oldtonsoft.Json.Utilities
         public static void ArgumentNotNull([NotNull]object? value, string parameterName)
         {
             if (value == null)
-            {
                 throw new ArgumentNullException(parameterName);
-            }
         }
     }
 }

@@ -51,8 +51,8 @@ namespace Bb.Elastic.Runtimes.Models
             foreach (var item in _items)
                 list.Add(item.Serialize());
 
-            return new JArray(list);
-            
+            var result = new JArray(list);
+            return result;
         }
 
         public void Load()

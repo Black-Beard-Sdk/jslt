@@ -98,6 +98,15 @@ namespace Oldtonsoft.Json.Linq
             Add(content);
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JObject"/> class with the specified content.
+        /// </summary>
+        /// <param name="content">The contents of the object.</param>
+        public JObject(JPropertyKeyedCollection content)
+        {
+            this._properties = content;
+        }
+
         internal override bool DeepEquals(JToken node)
         {
             if (!(node is JObject t))
@@ -190,30 +199,6 @@ namespace Oldtonsoft.Json.Linq
             }
 
             return false;
-        }
-
-        internal void InternalPropertyChanged(JProperty childProperty)
-        {
-            OnPropertyChanged(childProperty.Name);
-#if HAVE_COMPONENT_MODEL
-            if (_listChanged != null)
-            {
-                OnListChanged(new ListChangedEventArgs(ListChangedType.ItemChanged, IndexOfItem(childProperty)));
-            }
-#endif
-#if HAVE_INOTIFY_COLLECTION_CHANGED
-            if (_collectionChanged != null)
-            {
-                OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, childProperty, childProperty, IndexOfItem(childProperty)));
-            }
-#endif
-        }
-
-        internal void InternalPropertyChanging(JProperty childProperty)
-        {
-#if HAVE_INOTIFY_PROPERTY_CHANGING
-            OnPropertyChanging(childProperty.Name);
-#endif
         }
 
         internal override JToken CloneToken()

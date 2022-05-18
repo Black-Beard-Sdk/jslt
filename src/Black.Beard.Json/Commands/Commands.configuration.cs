@@ -1,30 +1,10 @@
 ﻿
 using Bb.CommandLines;
-using Bb.CommandLines.Ins;
-using Bb.CommandLines.Outs;
-using Bb.CommandLines.Validators;
-//using Bb.Maj;
-using Bb.Sdk.Csv;
 using Microsoft.Extensions.CommandLineUtils;
-using Oldtonsoft.Json;
-using Oldtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 
 namespace Bb.Json.Commands
 {
 
-
-
-
-    /// <summary>
-    /// 
-    /// </summary>
     public partial class Command : Command<CommandLine>
     {
 

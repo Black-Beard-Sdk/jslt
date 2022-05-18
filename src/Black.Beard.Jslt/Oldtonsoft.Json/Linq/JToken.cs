@@ -89,9 +89,7 @@ namespace Oldtonsoft.Json.Linq
             get
             {
                 if (_equalityComparer == null)
-                {
                     _equalityComparer = new JTokenEqualityComparer();
-                }
 
                 return _equalityComparer;
             }
@@ -118,14 +116,10 @@ namespace Oldtonsoft.Json.Linq
             {
                 JContainer? parent = Parent;
                 if (parent == null)
-                {
                     return this;
-                }
 
                 while (parent.Parent != null)
-                {
                     parent = parent.Parent;
-                }
 
                 return parent;
             }
@@ -186,10 +180,9 @@ namespace Oldtonsoft.Json.Linq
         {
             get
             {
+                
                 if (Parent == null)
-                {
                     return string.Empty;
-                }
 
                 List<JsonPosition> positions = new List<JsonPosition>();
                 JToken? previous = null;
@@ -236,9 +229,7 @@ namespace Oldtonsoft.Json.Linq
         public void AddAfterSelf(object? content)
         {
             if (_parent == null)
-            {
                 throw new InvalidOperationException("The parent is missing.");
-            }
 
             int index = _parent.IndexOfItem(this);
             _parent.TryAddInternal(index + 1, content, false);
@@ -251,9 +242,7 @@ namespace Oldtonsoft.Json.Linq
         public void AddBeforeSelf(object? content)
         {
             if (_parent == null)
-            {
                 throw new InvalidOperationException("The parent is missing.");
-            }
 
             int index = _parent.IndexOfItem(this);
             _parent.TryAddInternal(index, content, false);
@@ -292,14 +281,11 @@ namespace Oldtonsoft.Json.Linq
         public IEnumerable<JToken> AfterSelf()
         {
             if (Parent == null)
-            {
                 yield break;
-            }
 
             for (JToken? o = Next; o != null; o = o.Next)
-            {
                 yield return o;
-            }
+        
         }
 
         /// <summary>
@@ -309,14 +295,11 @@ namespace Oldtonsoft.Json.Linq
         public IEnumerable<JToken> BeforeSelf()
         {
             if (Parent == null)
-            {
                 yield break;
-            }
 
             for (JToken? o = Parent.First; o != this && o != null; o = o.Next)
-            {
                 yield return o;
-            }
+
         }
 
         /// <summary>
@@ -390,11 +373,10 @@ namespace Oldtonsoft.Json.Linq
         public void Remove()
         {
             if (_parent == null)
-            {
                 throw new InvalidOperationException("The parent is missing.");
-            }
 
             _parent.RemoveItem(this);
+        
         }
 
         /// <summary>
@@ -403,12 +385,12 @@ namespace Oldtonsoft.Json.Linq
         /// <param name="value">The value.</param>
         public void Replace(JToken value)
         {
+            
             if (_parent == null)
-            {
                 throw new InvalidOperationException("The parent is missing.");
-            }
 
             _parent.ReplaceItem(this, value);
+        
         }
 
         /// <summary>
@@ -449,24 +431,22 @@ namespace Oldtonsoft.Json.Linq
                 WriteTo(jw, converters);
 
                 return sw.ToString();
+            
             }
         }
 
         private static JValue? EnsureValue(JToken value)
         {
             if (value == null)
-            {
                 throw new ArgumentNullException(nameof(value));
-            }
 
             if (value is JProperty property)
-            {
                 value = property.Value;
-            }
 
             JValue? v = value as JValue;
 
             return v;
+        
         }
 
         private static string GetType(JToken token)
@@ -474,11 +454,10 @@ namespace Oldtonsoft.Json.Linq
             ValidationUtils.ArgumentNotNull(token, nameof(token));
 
             if (token is JProperty p)
-            {
                 token = p.Value;
-            }
 
             return token.Type.ToString();
+
         }
 
         private static bool ValidateToken(JToken o, JTokenType[] validTypes, bool nullable)
@@ -496,15 +475,11 @@ namespace Oldtonsoft.Json.Linq
         {
             JValue? v = EnsureValue(value);
             if (v == null || !ValidateToken(v, BooleanTypes, false))
-            {
                 throw new ArgumentException("Can not convert {0} to Boolean.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
 #if HAVE_BIG_INTEGER
             if (v.Value is BigInteger integer)
-            {
                 return Convert.ToBoolean((int)integer);
-            }
 #endif
 
             return Convert.ToBoolean(v.Value, CultureInfo.InvariantCulture);
@@ -520,19 +495,13 @@ namespace Oldtonsoft.Json.Linq
         {
             JValue? v = EnsureValue(value);
             if (v == null || !ValidateToken(v, DateTimeTypes, false))
-            {
                 throw new ArgumentException("Can not convert {0} to DateTimeOffset.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
             if (v.Value is DateTimeOffset offset)
-            {
                 return offset;
-            }
 
             if (v.Value is string s)
-            {
                 return DateTimeOffset.Parse(s, CultureInfo.InvariantCulture);
-            }
 
             return new DateTimeOffset(Convert.ToDateTime(v.Value, CultureInfo.InvariantCulture));
         }
@@ -546,21 +515,16 @@ namespace Oldtonsoft.Json.Linq
         public static explicit operator bool?(JToken? value)
         {
             if (value == null)
-            {
                 return null;
-            }
 
             JValue? v = EnsureValue(value);
+
             if (v == null || !ValidateToken(v, BooleanTypes, true))
-            {
                 throw new ArgumentException("Can not convert {0} to Boolean.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
 #if HAVE_BIG_INTEGER
             if (v.Value is BigInteger integer)
-            {
                 return Convert.ToBoolean((int)integer);
-            }
 #endif
 
             return (v.Value != null) ? (bool?)Convert.ToBoolean(v.Value, CultureInfo.InvariantCulture) : null;
@@ -575,15 +539,11 @@ namespace Oldtonsoft.Json.Linq
         {
             JValue? v = EnsureValue(value);
             if (v == null || !ValidateToken(v, NumberTypes, false))
-            {
                 throw new ArgumentException("Can not convert {0} to Int64.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
 #if HAVE_BIG_INTEGER
             if (v.Value is BigInteger integer)
-            {
                 return (long)integer;
-            }
 #endif
 
             return Convert.ToInt64(v.Value, CultureInfo.InvariantCulture);
@@ -597,21 +557,15 @@ namespace Oldtonsoft.Json.Linq
         public static explicit operator DateTime?(JToken? value)
         {
             if (value == null)
-            {
                 return null;
-            }
 
             JValue? v = EnsureValue(value);
             if (v == null || !ValidateToken(v, DateTimeTypes, true))
-            {
                 throw new ArgumentException("Can not convert {0} to DateTime.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
 #if HAVE_DATE_TIME_OFFSET
             if (v.Value is DateTimeOffset offset)
-            {
                 return offset.DateTime;
-            }
 #endif
 
             return (v.Value != null) ? (DateTime?)Convert.ToDateTime(v.Value, CultureInfo.InvariantCulture) : null;
@@ -626,29 +580,19 @@ namespace Oldtonsoft.Json.Linq
         public static explicit operator DateTimeOffset?(JToken? value)
         {
             if (value == null)
-            {
                 return null;
-            }
 
             JValue? v = EnsureValue(value);
             if (v == null || !ValidateToken(v, DateTimeTypes, true))
-            {
                 throw new ArgumentException("Can not convert {0} to DateTimeOffset.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
             if (v.Value == null)
-            {
                 return null;
-            }
             if (v.Value is DateTimeOffset offset)
-            {
                 return offset;
-            }
 
             if (v.Value is string s)
-            {
                 return DateTimeOffset.Parse(s, CultureInfo.InvariantCulture);
-            }
 
             return new DateTimeOffset(Convert.ToDateTime(v.Value, CultureInfo.InvariantCulture));
         }
@@ -662,21 +606,15 @@ namespace Oldtonsoft.Json.Linq
         public static explicit operator decimal?(JToken? value)
         {
             if (value == null)
-            {
                 return null;
-            }
 
             JValue? v = EnsureValue(value);
             if (v == null || !ValidateToken(v, NumberTypes, true))
-            {
                 throw new ArgumentException("Can not convert {0} to Decimal.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
 #if HAVE_BIG_INTEGER
             if (v.Value is BigInteger integer)
-            {
                 return (decimal?)integer;
-            }
 #endif
 
             return (v.Value != null) ? (decimal?)Convert.ToDecimal(v.Value, CultureInfo.InvariantCulture) : null;
@@ -690,21 +628,15 @@ namespace Oldtonsoft.Json.Linq
         public static explicit operator double?(JToken? value)
         {
             if (value == null)
-            {
                 return null;
-            }
 
             JValue? v = EnsureValue(value);
             if (v == null || !ValidateToken(v, NumberTypes, true))
-            {
                 throw new ArgumentException("Can not convert {0} to Double.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
 #if HAVE_BIG_INTEGER
             if (v.Value is BigInteger integer)
-            {
                 return (double?)integer;
-            }
 #endif
 
             return (v.Value != null) ? (double?)Convert.ToDouble(v.Value, CultureInfo.InvariantCulture) : null;
@@ -718,21 +650,15 @@ namespace Oldtonsoft.Json.Linq
         public static explicit operator char?(JToken? value)
         {
             if (value == null)
-            {
                 return null;
-            }
 
             JValue? v = EnsureValue(value);
             if (v == null || !ValidateToken(v, CharTypes, true))
-            {
                 throw new ArgumentException("Can not convert {0} to Char.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
 #if HAVE_BIG_INTEGER
             if (v.Value is BigInteger integer)
-            {
                 return (char?)integer;
-            }
 #endif
 
             return (v.Value != null) ? (char?)Convert.ToChar(v.Value, CultureInfo.InvariantCulture) : null;
@@ -747,15 +673,11 @@ namespace Oldtonsoft.Json.Linq
         {
             JValue? v = EnsureValue(value);
             if (v == null || !ValidateToken(v, NumberTypes, false))
-            {
                 throw new ArgumentException("Can not convert {0} to Int32.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
 #if HAVE_BIG_INTEGER
             if (v.Value is BigInteger integer)
-            {
                 return (int)integer;
-            }
 #endif
 
             return Convert.ToInt32(v.Value, CultureInfo.InvariantCulture);
@@ -770,15 +692,11 @@ namespace Oldtonsoft.Json.Linq
         {
             JValue? v = EnsureValue(value);
             if (v == null || !ValidateToken(v, NumberTypes, false))
-            {
                 throw new ArgumentException("Can not convert {0} to Int16.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
 #if HAVE_BIG_INTEGER
             if (v.Value is BigInteger integer)
-            {
                 return (short)integer;
-            }
 #endif
 
             return Convert.ToInt16(v.Value, CultureInfo.InvariantCulture);
@@ -794,15 +712,11 @@ namespace Oldtonsoft.Json.Linq
         {
             JValue? v = EnsureValue(value);
             if (v == null || !ValidateToken(v, NumberTypes, false))
-            {
                 throw new ArgumentException("Can not convert {0} to UInt16.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
 #if HAVE_BIG_INTEGER
             if (v.Value is BigInteger integer)
-            {
                 return (ushort)integer;
-            }
 #endif
 
             return Convert.ToUInt16(v.Value, CultureInfo.InvariantCulture);
@@ -818,15 +732,11 @@ namespace Oldtonsoft.Json.Linq
         {
             JValue? v = EnsureValue(value);
             if (v == null || !ValidateToken(v, CharTypes, false))
-            {
                 throw new ArgumentException("Can not convert {0} to Char.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
 #if HAVE_BIG_INTEGER
             if (v.Value is BigInteger integer)
-            {
                 return (char)integer;
-            }
 #endif
 
             return Convert.ToChar(v.Value, CultureInfo.InvariantCulture);
@@ -841,15 +751,11 @@ namespace Oldtonsoft.Json.Linq
         {
             JValue? v = EnsureValue(value);
             if (v == null || !ValidateToken(v, NumberTypes, false))
-            {
                 throw new ArgumentException("Can not convert {0} to Byte.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
 #if HAVE_BIG_INTEGER
             if (v.Value is BigInteger integer)
-            {
                 return (byte)integer;
-            }
 #endif
 
             return Convert.ToByte(v.Value, CultureInfo.InvariantCulture);
@@ -865,15 +771,11 @@ namespace Oldtonsoft.Json.Linq
         {
             JValue? v = EnsureValue(value);
             if (v == null || !ValidateToken(v, NumberTypes, false))
-            {
                 throw new ArgumentException("Can not convert {0} to SByte.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
 #if HAVE_BIG_INTEGER
             if (v.Value is BigInteger integer)
-            {
                 return (sbyte)integer;
-            }
 #endif
 
             return Convert.ToSByte(v.Value, CultureInfo.InvariantCulture);
@@ -887,21 +789,15 @@ namespace Oldtonsoft.Json.Linq
         public static explicit operator int?(JToken? value)
         {
             if (value == null)
-            {
                 return null;
-            }
 
             JValue? v = EnsureValue(value);
             if (v == null || !ValidateToken(v, NumberTypes, true))
-            {
                 throw new ArgumentException("Can not convert {0} to Int32.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
 #if HAVE_BIG_INTEGER
             if (v.Value is BigInteger integer)
-            {
                 return (int?)integer;
-            }
 #endif
 
             return (v.Value != null) ? (int?)Convert.ToInt32(v.Value, CultureInfo.InvariantCulture) : null;
@@ -915,21 +811,15 @@ namespace Oldtonsoft.Json.Linq
         public static explicit operator short?(JToken? value)
         {
             if (value == null)
-            {
                 return null;
-            }
 
             JValue? v = EnsureValue(value);
             if (v == null || !ValidateToken(v, NumberTypes, true))
-            {
                 throw new ArgumentException("Can not convert {0} to Int16.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
 #if HAVE_BIG_INTEGER
             if (v.Value is BigInteger integer)
-            {
                 return (short?)integer;
-            }
 #endif
 
             return (v.Value != null) ? (short?)Convert.ToInt16(v.Value, CultureInfo.InvariantCulture) : null;
@@ -944,21 +834,15 @@ namespace Oldtonsoft.Json.Linq
         public static explicit operator ushort?(JToken? value)
         {
             if (value == null)
-            {
                 return null;
-            }
 
             JValue? v = EnsureValue(value);
             if (v == null || !ValidateToken(v, NumberTypes, true))
-            {
                 throw new ArgumentException("Can not convert {0} to UInt16.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
 #if HAVE_BIG_INTEGER
             if (v.Value is BigInteger integer)
-            {
                 return (ushort?)integer;
-            }
 #endif
 
             return (v.Value != null) ? (ushort?)Convert.ToUInt16(v.Value, CultureInfo.InvariantCulture) : null;
@@ -972,21 +856,15 @@ namespace Oldtonsoft.Json.Linq
         public static explicit operator byte?(JToken? value)
         {
             if (value == null)
-            {
                 return null;
-            }
 
             JValue? v = EnsureValue(value);
             if (v == null || !ValidateToken(v, NumberTypes, true))
-            {
                 throw new ArgumentException("Can not convert {0} to Byte.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
 #if HAVE_BIG_INTEGER
             if (v.Value is BigInteger integer)
-            {
                 return (byte?)integer;
-            }
 #endif
 
             return (v.Value != null) ? (byte?)Convert.ToByte(v.Value, CultureInfo.InvariantCulture) : null;
@@ -1001,21 +879,15 @@ namespace Oldtonsoft.Json.Linq
         public static explicit operator sbyte?(JToken? value)
         {
             if (value == null)
-            {
                 return null;
-            }
 
             JValue? v = EnsureValue(value);
             if (v == null || !ValidateToken(v, NumberTypes, true))
-            {
                 throw new ArgumentException("Can not convert {0} to SByte.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
 #if HAVE_BIG_INTEGER
             if (v.Value is BigInteger integer)
-            {
                 return (sbyte?)integer;
-            }
 #endif
 
             return (v.Value != null) ? (sbyte?)Convert.ToSByte(v.Value, CultureInfo.InvariantCulture) : null;
@@ -1030,15 +902,11 @@ namespace Oldtonsoft.Json.Linq
         {
             JValue? v = EnsureValue(value);
             if (v == null || !ValidateToken(v, DateTimeTypes, false))
-            {
                 throw new ArgumentException("Can not convert {0} to DateTime.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
 #if HAVE_DATE_TIME_OFFSET
             if (v.Value is DateTimeOffset offset)
-            {
                 return offset.DateTime;
-            }
 #endif
 
             return Convert.ToDateTime(v.Value, CultureInfo.InvariantCulture);
@@ -1052,21 +920,15 @@ namespace Oldtonsoft.Json.Linq
         public static explicit operator long?(JToken? value)
         {
             if (value == null)
-            {
                 return null;
-            }
 
             JValue? v = EnsureValue(value);
             if (v == null || !ValidateToken(v, NumberTypes, true))
-            {
                 throw new ArgumentException("Can not convert {0} to Int64.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
 #if HAVE_BIG_INTEGER
             if (v.Value is BigInteger integer)
-            {
                 return (long?)integer;
-            }
 #endif
 
             return (v.Value != null) ? (long?)Convert.ToInt64(v.Value, CultureInfo.InvariantCulture) : null;
@@ -1080,21 +942,15 @@ namespace Oldtonsoft.Json.Linq
         public static explicit operator float?(JToken? value)
         {
             if (value == null)
-            {
                 return null;
-            }
 
             JValue? v = EnsureValue(value);
             if (v == null || !ValidateToken(v, NumberTypes, true))
-            {
                 throw new ArgumentException("Can not convert {0} to Single.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
 #if HAVE_BIG_INTEGER
             if (v.Value is BigInteger integer)
-            {
                 return (float?)integer;
-            }
 #endif
 
             return (v.Value != null) ? (float?)Convert.ToSingle(v.Value, CultureInfo.InvariantCulture) : null;
@@ -1109,15 +965,11 @@ namespace Oldtonsoft.Json.Linq
         {
             JValue? v = EnsureValue(value);
             if (v == null || !ValidateToken(v, NumberTypes, false))
-            {
                 throw new ArgumentException("Can not convert {0} to Decimal.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
 #if HAVE_BIG_INTEGER
             if (v.Value is BigInteger integer)
-            {
                 return (decimal)integer;
-            }
 #endif
 
             return Convert.ToDecimal(v.Value, CultureInfo.InvariantCulture);
@@ -1132,21 +984,15 @@ namespace Oldtonsoft.Json.Linq
         public static explicit operator uint?(JToken? value)
         {
             if (value == null)
-            {
                 return null;
-            }
 
             JValue? v = EnsureValue(value);
             if (v == null || !ValidateToken(v, NumberTypes, true))
-            {
                 throw new ArgumentException("Can not convert {0} to UInt32.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
 #if HAVE_BIG_INTEGER
             if (v.Value is BigInteger integer)
-            {
                 return (uint?)integer;
-            }
 #endif
 
             return (v.Value != null) ? (uint?)Convert.ToUInt32(v.Value, CultureInfo.InvariantCulture) : null;
@@ -1161,21 +1007,15 @@ namespace Oldtonsoft.Json.Linq
         public static explicit operator ulong?(JToken? value)
         {
             if (value == null)
-            {
                 return null;
-            }
 
             JValue? v = EnsureValue(value);
             if (v == null || !ValidateToken(v, NumberTypes, true))
-            {
                 throw new ArgumentException("Can not convert {0} to UInt64.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
 #if HAVE_BIG_INTEGER
             if (v.Value is BigInteger integer)
-            {
                 return (ulong?)integer;
-            }
 #endif
 
             return (v.Value != null) ? (ulong?)Convert.ToUInt64(v.Value, CultureInfo.InvariantCulture) : null;
@@ -1190,15 +1030,11 @@ namespace Oldtonsoft.Json.Linq
         {
             JValue? v = EnsureValue(value);
             if (v == null || !ValidateToken(v, NumberTypes, false))
-            {
                 throw new ArgumentException("Can not convert {0} to Double.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
 #if HAVE_BIG_INTEGER
             if (v.Value is BigInteger integer)
-            {
                 return (double)integer;
-            }
 #endif
 
             return Convert.ToDouble(v.Value, CultureInfo.InvariantCulture);
@@ -1213,15 +1049,11 @@ namespace Oldtonsoft.Json.Linq
         {
             JValue? v = EnsureValue(value);
             if (v == null || !ValidateToken(v, NumberTypes, false))
-            {
                 throw new ArgumentException("Can not convert {0} to Single.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
 #if HAVE_BIG_INTEGER
             if (v.Value is BigInteger integer)
-            {
                 return (float)integer;
-            }
 #endif
 
             return Convert.ToSingle(v.Value, CultureInfo.InvariantCulture);
@@ -1235,31 +1067,21 @@ namespace Oldtonsoft.Json.Linq
         public static explicit operator string?(JToken? value)
         {
             if (value == null)
-            {
                 return null;
-            }
 
             JValue? v = EnsureValue(value);
             if (v == null || !ValidateToken(v, StringTypes, true))
-            {
                 throw new ArgumentException("Can not convert {0} to String.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
             if (v.Value == null)
-            {
                 return null;
-            }
 
             if (v.Value is byte[] bytes)
-            {
                 return Convert.ToBase64String(bytes);
-            }
 
 #if HAVE_BIG_INTEGER
             if (v.Value is BigInteger integer)
-            {
                 return integer.ToString(CultureInfo.InvariantCulture);
-            }
 #endif
 
             return Convert.ToString(v.Value, CultureInfo.InvariantCulture);
@@ -1275,15 +1097,11 @@ namespace Oldtonsoft.Json.Linq
         {
             JValue? v = EnsureValue(value);
             if (v == null || !ValidateToken(v, NumberTypes, false))
-            {
                 throw new ArgumentException("Can not convert {0} to UInt32.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
 #if HAVE_BIG_INTEGER
             if (v.Value is BigInteger integer)
-            {
                 return (uint)integer;
-            }
 #endif
 
             return Convert.ToUInt32(v.Value, CultureInfo.InvariantCulture);
@@ -1299,15 +1117,11 @@ namespace Oldtonsoft.Json.Linq
         {
             JValue? v = EnsureValue(value);
             if (v == null || !ValidateToken(v, NumberTypes, false))
-            {
                 throw new ArgumentException("Can not convert {0} to UInt64.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
 #if HAVE_BIG_INTEGER
             if (v.Value is BigInteger integer)
-            {
                 return (ulong)integer;
-            }
 #endif
 
             return Convert.ToUInt64(v.Value, CultureInfo.InvariantCulture);
@@ -1321,31 +1135,21 @@ namespace Oldtonsoft.Json.Linq
         public static explicit operator byte[]?(JToken? value)
         {
             if (value == null)
-            {
                 return null;
-            }
 
             JValue? v = EnsureValue(value);
             if (v == null || !ValidateToken(v, BytesTypes, false))
-            {
                 throw new ArgumentException("Can not convert {0} to byte array.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
             if (v.Value is string)
-            {
                 return Convert.FromBase64String(Convert.ToString(v.Value, CultureInfo.InvariantCulture));
-            }
 #if HAVE_BIG_INTEGER
             if (v.Value is BigInteger integer)
-            {
                 return integer.ToByteArray();
-            }
 #endif
 
             if (v.Value is byte[] bytes)
-            {
                 return bytes;
-            }
 
             throw new ArgumentException("Can not convert {0} to byte array.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
         }
@@ -1359,14 +1163,10 @@ namespace Oldtonsoft.Json.Linq
         {
             JValue? v = EnsureValue(value);
             if (v == null || !ValidateToken(v, GuidTypes, false))
-            {
                 throw new ArgumentException("Can not convert {0} to Guid.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
             if (v.Value is byte[] bytes)
-            {
                 return new Guid(bytes);
-            }
 
             return (v.Value is Guid guid) ? guid : new Guid(Convert.ToString(v.Value, CultureInfo.InvariantCulture));
         }
@@ -1379,25 +1179,17 @@ namespace Oldtonsoft.Json.Linq
         public static explicit operator Guid?(JToken? value)
         {
             if (value == null)
-            {
                 return null;
-            }
 
             JValue? v = EnsureValue(value);
             if (v == null || !ValidateToken(v, GuidTypes, true))
-            {
                 throw new ArgumentException("Can not convert {0} to Guid.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
             if (v.Value == null)
-            {
                 return null;
-            }
 
             if (v.Value is byte[] bytes)
-            {
                 return new Guid(bytes);
-            }
 
             return (v.Value is Guid guid) ? guid : new Guid(Convert.ToString(v.Value, CultureInfo.InvariantCulture));
         }
@@ -1411,9 +1203,7 @@ namespace Oldtonsoft.Json.Linq
         {
             JValue? v = EnsureValue(value);
             if (v == null || !ValidateToken(v, TimeSpanTypes, false))
-            {
                 throw new ArgumentException("Can not convert {0} to TimeSpan.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
             return (v.Value is TimeSpan span) ? span : ConvertUtils.ParseTimeSpan(Convert.ToString(v.Value, CultureInfo.InvariantCulture));
         }
@@ -1426,20 +1216,14 @@ namespace Oldtonsoft.Json.Linq
         public static explicit operator TimeSpan?(JToken? value)
         {
             if (value == null)
-            {
                 return null;
-            }
 
             JValue? v = EnsureValue(value);
             if (v == null || !ValidateToken(v, TimeSpanTypes, true))
-            {
                 throw new ArgumentException("Can not convert {0} to TimeSpan.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
             if (v.Value == null)
-            {
                 return null;
-            }
 
             return (v.Value is TimeSpan span) ? span : ConvertUtils.ParseTimeSpan(Convert.ToString(v.Value, CultureInfo.InvariantCulture));
         }
@@ -1452,20 +1236,14 @@ namespace Oldtonsoft.Json.Linq
         public static explicit operator Uri?(JToken? value)
         {
             if (value == null)
-            {
                 return null;
-            }
 
             JValue? v = EnsureValue(value);
             if (v == null || !ValidateToken(v, UriTypes, true))
-            {
                 throw new ArgumentException("Can not convert {0} to Uri.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
             if (v.Value == null)
-            {
                 return null;
-            }
 
             return (v.Value is Uri uri) ? uri : new Uri(Convert.ToString(v.Value, CultureInfo.InvariantCulture));
         }
@@ -1475,9 +1253,7 @@ namespace Oldtonsoft.Json.Linq
         {
             JValue? v = EnsureValue(value);
             if (v == null || !ValidateToken(v, BigIntegerTypes, false))
-            {
                 throw new ArgumentException("Can not convert {0} to BigInteger.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
             return ConvertUtils.ToBigInteger(v.Value!);
         }
@@ -1486,14 +1262,10 @@ namespace Oldtonsoft.Json.Linq
         {
             JValue? v = EnsureValue(value);
             if (v == null || !ValidateToken(v, BigIntegerTypes, true))
-            {
                 throw new ArgumentException("Can not convert {0} to BigInteger.".FormatWith(CultureInfo.InvariantCulture, GetType(value)));
-            }
 
             if (v.Value == null)
-            {
                 return null;
-            }
 
             return ConvertUtils.ToBigInteger(v.Value);
         }

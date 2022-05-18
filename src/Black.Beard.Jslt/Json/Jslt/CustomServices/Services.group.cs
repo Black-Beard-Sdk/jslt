@@ -60,30 +60,38 @@ namespace Bb.Json.Jslt.CustomServices
                 foreach (var item in sourceLeft)
                 {
 
-                    var current = item.DeepClone();
-                    list.Add(current);
+                    list.Add(item);
 
                     var k = item.SelectToken(keyLeft);
                     if (k is JValue v)
                     {
                         string keyValue = v.Value?.ToString();
-                        _items.Add(new KeyValuePair<string, JToken>(keyValue, current));
+                        _items.Add(new KeyValuePair<string, JToken>(keyValue, item));
                     }
 
                 }
 
                 foreach (var right in rights)
                 {
+
                     ExecuteJoin(ctx, _items, right);
+
                     if (cleanSource)
-                        right.Source.Clear();
+                    {
+                        right.Source = null;
+                        GC.Collect();
+                    }
                 }
+
+                _items.Clear();
+                rights.Clear();
+
+                return sourceLeft;
 
             }
 
             rights.Clear();
-
-            return new JArray(list);
+            return JValue.CreateNull();
 
         }
 
@@ -99,7 +107,24 @@ namespace Bb.Json.Jslt.CustomServices
                 foreach (var item in left)
                 {
 
-                    var l = i[item.Key].ToList();
+                    var l1 = i[item.Key].ToList();
+
+                    var l = new List<JToken>(l1.Count);
+                    foreach (var item2 in l1)
+                    {
+                        var item3 = item2.CloneToken();
+                        var p = item3.SelectToken(right.Key);
+                        if (p.Parent is JProperty p2)
+                            p.Parent.Parent.RemoveItem(p.Parent);
+
+                        else
+                        {
+
+                        }
+
+                        l.Add(item3);
+                    }
+                    l1.Clear();
 
                     if (l.Any())
                     {
@@ -114,14 +139,12 @@ namespace Bb.Json.Jslt.CustomServices
                                 o.Add(new JProperty(right.Name, d));
                         }
                     }
-                    else
-                        ctx.Diagnostics.AddWarning(ctx.ScriptFile, ctx.GetCurrentLocation(), String.Empty, $"the {item.Key} have not {right.Name}.");
-
+                 
                     l.Clear();
 
                 }
 
-                GC.SuppressFinalize(i);
+                i = null;
 
             }
 

@@ -38,6 +38,7 @@ using System.Linq;
 
 namespace Oldtonsoft.Json.Linq
 {
+
     /// <summary>
     /// Represents a token that can contain other tokens.
     /// </summary>
@@ -658,14 +659,13 @@ namespace Oldtonsoft.Json.Linq
                         break;
                     case JsonToken.PropertyName:
                         JProperty? property = ReadProperty(r, settings, lineInfo, parent);
+                        
                         if (property != null)
-                        {
                             parent = property;
-                        }
+                        
                         else
-                        {
                             r.Skip();
-                        }
+
                         break;
                     default:
                         throw new InvalidOperationException("The JsonReader should not be on a token of type {0}.".FormatWith(CultureInfo.InvariantCulture, r.TokenType));

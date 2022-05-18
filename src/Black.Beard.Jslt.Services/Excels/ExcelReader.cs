@@ -124,8 +124,9 @@ namespace Bb.Jslt.Services.Excels
 
             resultText = null;
             resultCode = 0;
-            return new JArray(tokens);
-            
+            var result = new JArray(tokens);
+
+            return result;
 
         }
 

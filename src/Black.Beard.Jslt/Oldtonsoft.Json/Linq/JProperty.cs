@@ -97,17 +97,13 @@ namespace Oldtonsoft.Json.Linq
             public void Insert(int index, JToken item)
             {
                 if (index == 0)
-                {
                     _token = item;
-                }
             }
 
             public void RemoveAt(int index)
             {
                 if (index == 0)
-                {
                     _token = null;
-                }
             }
 
             public JToken this[int index]
@@ -115,9 +111,7 @@ namespace Oldtonsoft.Json.Linq
                 get
                 {
                     if (index != 0)
-                    {
                         throw new IndexOutOfRangeException();
-                    }
 
                     MiscellaneousUtils.Assert(_token != null);
                     return _token;
@@ -125,14 +119,13 @@ namespace Oldtonsoft.Json.Linq
                 set
                 {
                     if (index != 0)
-                    {
                         throw new IndexOutOfRangeException();
-                    }
 
                     _token = value;
                 }
             }
         }
+
         #endregion
 
         private readonly JPropertyList _content = new JPropertyList();
@@ -199,11 +192,8 @@ namespace Oldtonsoft.Json.Linq
             if (IsTokenUnchanged(Value, item))
                 return;
 
-            ((JObject?)Parent)?.InternalPropertyChanging(this);
-
             base.SetItem(0, item);
 
-            ((JObject?)Parent)?.InternalPropertyChanged(this);
         }
 
         internal override bool RemoveItem(JToken? item)
@@ -218,10 +208,9 @@ namespace Oldtonsoft.Json.Linq
 
         internal override int IndexOfItem(JToken? item)
         {
+
             if (item == null)
-            {
                 return -1;
-            }
 
             return _content.IndexOf(item);
         }
@@ -303,6 +292,7 @@ namespace Oldtonsoft.Json.Linq
         /// <param name="content">The property content.</param>
         public JProperty(string name, object? content)
         {
+
             ValidationUtils.ArgumentNotNull(name, nameof(name));
 
             _name = name;

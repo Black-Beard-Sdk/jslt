@@ -28,6 +28,7 @@ using System.Windows.Media;
 using Bb.Wizards.Wpf;
 using Bb.JsltEvaluator.AvalonEdit;
 using System.Diagnostics;
+using Bb;
 
 namespace AppJsonEvaluator
 {
@@ -384,6 +385,14 @@ namespace AppJsonEvaluator
                     st.Stop();
 
                     _template.Diagnostics.AddInformation(this._template.Filename, new TokenLocation(), st.Elapsed.TotalSeconds.ToString(), $"running in {st.Elapsed.TotalSeconds} seconds");
+
+
+                    var p2 = Path.Combine(this._template.Configuration.OutputPath, Path.GetFileNameWithoutExtension(this._template.Filename) + "_result.json");
+                    if (File.Exists(p2))
+                        File.Delete(p2);
+
+                    p2.Save(sb);
+
 
                     if (sb.Length < _max)
                         this.TextArea.Text = sb.ToString();
