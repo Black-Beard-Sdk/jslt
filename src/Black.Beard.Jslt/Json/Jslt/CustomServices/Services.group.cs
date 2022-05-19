@@ -137,7 +137,7 @@ namespace Bb.Json.Jslt.CustomServices
                                 o.Add(new JProperty(right.Name, d));
                         }
                     }
-                 
+
                     l.Clear();
 
                 }
@@ -233,6 +233,26 @@ namespace Bb.Json.Jslt.CustomServices
 
         }
 
+        [JsltExtensionMethod("index")]
+        [JsltExtensionMethodParameter("indexName", "index to use")]
+        [JsltExtensionMethodParameter("key", "to search in index")]
+        public static JToken ExecuteIndex(RuntimeContext ctx, JToken index, string key)
+        {
+                        
+            if (index != null && index is JDictionaryValue dic)
+            {
+
+                if (dic.TryGetValue(key, out var dicValue))
+                {
+                    return dicValue;
+                }
+
+            }
+
+            return JValue.CreateNull();
+
+        }
+
         [JsltExtensionMethod("createindex")]
         [JsltExtensionMethodParameter("name", "name of the index.")]
         [JsltExtensionMethodParameter("source", "Json source")]
@@ -270,10 +290,10 @@ namespace Bb.Json.Jslt.CustomServices
                     if (k is JValue v)
                         keyValue = v.Value?.ToString();
 
-                    else
-                    {
-                        LocalDebug.Stop();
-                    }
+                    //else
+                    //{
+                    //    //LocalDebug.Stop();
+                    //}
 
                     if (keyValue != null)
                     {

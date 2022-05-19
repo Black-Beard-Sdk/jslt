@@ -29,6 +29,7 @@ using Bb.Wizards.Wpf;
 using Bb.JsltEvaluator.AvalonEdit;
 using System.Diagnostics;
 using Bb;
+using Bb.Expressions;
 
 namespace AppJsonEvaluator
 {
@@ -294,6 +295,17 @@ namespace AppJsonEvaluator
             catch (ArgumentOutOfRangeException)
             {
 
+            }
+            catch (CompilationException e2)
+            {
+                foreach (var item in e2.AssemblyResult.Disgnostics)
+                    if (item.Severity == "Error")
+                        Errors.Items.Add(new ErrorModel() { Severity = SeverityEnum.Error, Message = item.Message });
+            
+                    else
+                    {
+
+                    }
             }
             catch (Exception e1)
             {

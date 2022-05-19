@@ -31,7 +31,7 @@ namespace Bb.Expressions
                 var constants = visitor._list;
 
                 // generate csharp code
-                var _u = new string[] { "Newtonsoft.Json.Linq", "Bb.ComponentModel.Factories", "Bb.Json.Jslt.Services" };
+                var _u = new string[] { "Oldtonsoft.Json.Linq", "Bb.ComponentModel.Factories", "Bb.Json.Jslt.Services" };
                 string name = Path.GetFileNameWithoutExtension(filepathCode);
                 string path = Path.Combine(this.OutputPath, "_temps");
                 if (!Directory.Exists(path))
@@ -45,35 +45,39 @@ namespace Bb.Expressions
                 // Build assembly
                 BuildCSharp build = new BuildCSharp()
                 {
-                    OutputPath = path
+                    OutputPath = path,
                 };
                 build.Sources.Add(file);
                 var assembly = build.Build(name);
 
-
                 if (!assembly.Success && System.Diagnostics.Debugger.IsAttached)
+                {
                     System.Diagnostics.Debugger.Break();
+                    throw new CompilationException(assembly);
+                }
+                else
+                {
 
-                var ass = assembly.LoadAssembly();
+                    var ass = assembly.LoadAssembly();
 
-                var type = ass.GetType($"N_{name}." + "Myclass");
-                var method = type.GetMethod("MyMethod");
+                    var type = ass.GetType($"N_{name}." + "Myclass");
+                    var method = type.GetMethod("MyMethod");
 
-                // var a = constants.Select(c => Expression.Convert(Expression.Constant(c), typeof(object))).ToArray();
+                    var ctor = type.GetConstructor(new Type[] { typeof(object[]) });
 
-                var ctor = type.GetConstructor(new Type[] { typeof(object[]) });
+                    var a = constants.Select(c => (object)c).ToArray();
+                    var instance = ctor.Invoke(new object[] { a });
 
-                var a = constants.Select(c => (object)c).ToArray();
-                var instance = ctor.Invoke(new object[] { a });
+                    var args = Parameters.ToArray();
+                    var l = Expression.Lambda
+                    (
+                        Expression.Call(Expression.Constant(instance), method, args),
+                        args
+                    );
 
-                var args = Parameters.ToArray();
-                var l = Expression.Lambda
-                (
-                    Expression.Call(Expression.Constant(instance), method, args),
-                    args
-                );
+                    return (TDelegate)(object)l.Compile();
 
-                return (TDelegate)(object)l.Compile();
+                }
 
             }
 
@@ -109,6 +113,29 @@ namespace Bb.Expressions
         }
 
         private readonly bool _withDebug;
+
+    }
+
+
+    [Serializable]
+    public class CompilationException : Exception
+    {
+
+        public CompilationException(Compilers.AssemblyResult assemblyResult)
+            : base(assemblyResult.Disgnostics.First(c => c.Severity == "Error").Message)
+        {
+            this.AssemblyResult = assemblyResult;
+        }
+
+        public CompilationException(string message) : base(message) { }
+        
+        public CompilationException(string message, Exception inner) : base(message, inner) { }
+        
+        protected CompilationException(
+          System.Runtime.Serialization.SerializationInfo info,
+          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+
+        public Compilers.AssemblyResult AssemblyResult { get; }
 
     }
 

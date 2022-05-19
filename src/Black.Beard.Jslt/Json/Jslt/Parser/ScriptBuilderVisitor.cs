@@ -522,7 +522,7 @@ namespace Bb.Json.Jslt.Parser
                             ParseDirectives(directives);
                             return new JsltDirective() { Name = name, Value = value, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
                         }
-                        else if (name.StartsWith("$") && name != "$")
+                        else if (name.StartsWith("$") && name != "$" &&  name != "$where")
                         {
                             AddWarning(value.Start, "syntax", $"{name} is not reconized.");
                         }

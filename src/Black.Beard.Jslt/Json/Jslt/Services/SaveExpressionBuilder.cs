@@ -74,11 +74,10 @@ namespace Bb.Json.Jslt.Services
             _compiler.Add(e);
 
             var result = _compiler.Compile<Func<RuntimeContext, object>>(filepathCode);
-
             return result;
 
         }
-                
+
 
         public object VisitArray(JsltArray node1)
         {
@@ -179,7 +178,7 @@ namespace Bb.Json.Jslt.Services
             {
 
                 var srcRoot = ctx.Current.Source;
-              
+
                 var v1 = ctx.Current.Source.AddVar(typeof(JObject), null, _ctorJObject.CreateObject());
                 ctx.Current.RootTarget = v1;
 
@@ -373,7 +372,7 @@ namespace Bb.Json.Jslt.Services
 
 
                 // Le premier parametre des methodes est toujours le context.
-                if (!node.ServiceProvider.IsCtor) 
+                if (!node.ServiceProvider.IsCtor)
                     args.Add(ctx.Current.Context);
 
                 // Les arguments sont ceux passé dans le script.
@@ -551,9 +550,9 @@ namespace Bb.Json.Jslt.Services
 
                 ctx.Current.RootSource = Expression.Call
                 (
-                    RuntimeContext._getContentByJPath.Method, 
-                    ctx.Current.Context, 
-                    ctx.Current.RootSource, 
+                    RuntimeContext._getContentByJPath.Method,
+                    ctx.Current.Context,
+                    ctx.Current.RootSource,
                     Expression.Constant(node.Value),
                     node.GetLocation().AsConstant()
                 );

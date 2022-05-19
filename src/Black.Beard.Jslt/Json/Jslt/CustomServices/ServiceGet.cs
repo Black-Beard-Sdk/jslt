@@ -53,38 +53,29 @@ namespace Bb.Json.Jslt.CustomServices
 
             if (datas != null)
             {
-                try
+
+                if (datas is JDictionaryValue dic)
                 {
 
-                    if (datas is JDictionaryValue dic)
-                    {
+                    if (dic.TryGetValue(this.jpathFilter, out datas))
+                        return datas;
 
-                        if (dic.TryGetValue(this.jpathFilter, out datas))
-                            return datas;
-
-                        return JValue.CreateNull();
-
-                    }
-
-                    var result = datas.SelectTokens(this.jpathFilter).ToList();
-
-                    if (result.Count == 1)
-                        return result[0];
-
-                    if (result.Count == 0)
-                        return JValue.CreateNull();
-
-                    else
-                    {
-                        var a = new JArray(result);
-                        return a;
-                    }
+                    return JValue.CreateNull();
 
                 }
-                catch (System.Exception ex)
+
+                var result = datas.SelectTokens(this.jpathFilter).ToList();
+
+                if (result.Count == 1)
+                    return result[0];
+
+                if (result.Count == 0)
+                    return JValue.CreateNull();
+
+                else
                 {
-                    ctx.Diagnostics.AddError(string.Empty, null, this.jpathFilter, "json path is invalid filter in the method 'get'. " + ex.Message);
-                    ctx.Break();
+                    var a = new JArray(result);
+                    return a;
                 }
 
             }

@@ -86,7 +86,6 @@ namespace Bb.Json.Jslt.Services
             _compiler.Add(e);
 
             var result = _compiler.Compile<Func<RuntimeContext, JToken, JToken>>(filepathCode);
-
             return result;
 
         }
@@ -379,7 +378,7 @@ namespace Bb.Json.Jslt.Services
                         .ConvertIfDifferent(targetType);
                     args.Add(argSourceValue);
                 }
-           
+
                 var arguments = typeof(object).NewArray(args.ToArray());
                 var keyMethod = Expression.Constant($"service_{this._indexMethod++}");
 

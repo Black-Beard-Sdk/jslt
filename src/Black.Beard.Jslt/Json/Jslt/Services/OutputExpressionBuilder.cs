@@ -71,10 +71,9 @@ namespace Bb.Json.Jslt.Services
                 _compiler.Add(item);
 
             _compiler.Add(e);
-
-            var result = _compiler.Compile<Func<RuntimeContext, StringBuilder>>(filepathCode);
-
-            return result;
+            
+                var result = _compiler.Compile<Func<RuntimeContext, StringBuilder>>(filepathCode);
+                return result;
 
         }             
 

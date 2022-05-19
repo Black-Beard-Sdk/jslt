@@ -53,6 +53,16 @@ namespace Bb.Json.Jslt.Services
         }
 
 
+        public static bool IsTrace(RuntimeContext ctx, TokenLocation trace)
+        {
+
+            if (ctx._stack.Count > 0)
+                return ctx._stack.Peek().Trace == trace;
+
+            return false;
+
+        }
+
         public static object ExitLocation(RuntimeContext ctx, object result)
         {
 
@@ -77,6 +87,19 @@ namespace Bb.Json.Jslt.Services
         }
 
 
+        public static RuntimeContext TraceLocation(RuntimeContext ctx, string functionName, TokenLocation token)
+        {
+            var e = new MethodContext()
+            {
+                Trace = token,
+            };
+            ctx._stack.Push(e);
+
+            e.Watch.Start();
+
+            return ctx;
+        }
+
         public static RuntimeContext TraceLocation(RuntimeContext ctx, string functionName, int line, int column, int position, int positionEnd)
         {
             var e = new MethodContext()
@@ -94,7 +117,7 @@ namespace Bb.Json.Jslt.Services
             return ctx;
         }
 
-        public string ScriptFile { get; private set; }
+        public string ScriptFile { get; set; }
 
         public TokenLocation GetCurrentLocation()
         {
@@ -118,11 +141,6 @@ namespace Bb.Json.Jslt.Services
             if (StopIsActivated && System.Diagnostics.Debugger.IsAttached)
                 System.Diagnostics.Debugger.Break();
 
-        }
-
-        internal void Break()
-        {
-            this.MustoBreak = true;
         }
 
         #region Operators
@@ -973,19 +991,33 @@ namespace Bb.Json.Jslt.Services
         public static JToken GetContentFromService(RuntimeContext ctx, JToken token, ITransformJsonService service, TokenLocation trace, string serviceName)
         {
 
+            TraceLocation(ctx, serviceName, trace);
+
             try
             {
                 return service.Execute(ctx, token);
             }
             catch (Exception ex)
-            {
-                LocalDebug.Stop();
+            {                
                 ctx.Diagnostics.AddError(string.Empty, trace, $"failed to run function {serviceName}", ex.Message);
+                ctx.Break();
+            }
+            finally
+            {
+
+                if (IsTrace(ctx, trace))
+                    ExitLocation(ctx, null);
+
             }
 
             return JValue.CreateNull();
 
         }
+
+
+        public bool MustoBreak { get; private set; }
+
+        public void Break() { MustoBreak = true; }
 
         public static JToken GetContentByJPath(RuntimeContext ctx, JToken token, string path, TokenLocation trace)
         {
@@ -1110,8 +1142,6 @@ namespace Bb.Json.Jslt.Services
         public TranformJsonAstConfiguration Configuration { get; internal set; }
 
         public bool StopIsActivated { get; set; } = true;
-
-        public bool MustoBreak { get; private set; }
 
         public StringBuilder Output { get; internal set; }
 
