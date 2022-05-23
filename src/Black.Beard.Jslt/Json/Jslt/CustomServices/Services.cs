@@ -30,7 +30,7 @@ namespace Bb.Json.Jslt.CustomServices
                     .ConvertToJson();
             else
             {
-                ctx.Diagnostics.AddDiagnostic(Parser.SeverityEnum.Warning, string.Empty, new Parser.TokenLocation(), "file.FullName", $"file '{file.FullName}' not found");
+                ctx.Diagnostics.AddDiagnostic(Parser.SeverityEnum.Warning, string.Empty, ctx.GetCurrentLocation(), "file.FullName", $"file '{file.FullName}' not found");
             }
 
             return JValue.CreateNull();

@@ -54,7 +54,7 @@ array :
 jsonValue :
      obj
    | array
-   | jsonLtOperation
+   | jsonLtOperations
    ;
 
 jsonValueString : string jsonType?;
@@ -70,16 +70,19 @@ jsonType
    | STRING_TYPE 
    | GUID_TYPE 
    | INTEGER_TYPE 
-   | DECIMAL_TYPE 
-   
+   | DECIMAL_TYPE    
    | CURRENT_VALUE IDLOWCASE
+   ;
+
+jsonLtOperations :
+     NT? jsonLtOperation (operation jsonLtOperation)*
+   | PAREN_LEFT jsonLtOperation PAREN_RIGHT jsonType? 
    ;
 
 jsonLtOperation :
      jsonLtItem
    | NT jsonLtOperation
    | PAREN_LEFT jsonLtOperation PAREN_RIGHT jsonType? 
-   | jsonLtOperation operation jsonLtOperation
    ;
 
 jsonLtItem : 

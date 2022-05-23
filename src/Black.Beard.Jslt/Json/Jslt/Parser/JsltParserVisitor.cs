@@ -111,6 +111,12 @@ public interface IJsltParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitJsonType([NotNull] JsltParser.JsonTypeContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="JsltParser.jsonLtOperations"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitJsonLtOperations([NotNull] JsltParser.JsonLtOperationsContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="JsltParser.jsonLtOperation"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
