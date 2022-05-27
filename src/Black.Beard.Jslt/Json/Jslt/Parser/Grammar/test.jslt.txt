@@ -1,35 +1,30 @@
 {
 
-    "$culture" : "fr-fr",
+    "v2" : unique($..toto),
 
-    "$funcs" : [ "file.cs" ],
-    "$imports" : [ "file.dll" ],
+    "v3" : get("doc source name", $"$.id", $"$.toto"),
 
-    "v2" : .unique("$..toto"),
+    "v4" : mymethod("$.id", "sourceName", "$..toto"),
 
-    "v3" : .get("doc source name", "$.id", "$.toto"),
+    '@var1' : $.prop1, 
+    'v4': get("src2", "$[?(@.Id == @@var1)]" @string),
 
-    "v4" : .mymethod("$.id", "sourceName", "$..toto"),
-
-    '@var1' : '$.prop1', 
-    'v4': .get("src2", "$[?(@.Id == @@var1)]" @string),
-
-    "v5" : .when("doc source name")
+    "v5" : when("doc source name")
     {
         "case1": 2
     },
 
-    "v6" : .if("toto" == "titi")
+    "v6" : if("toto" == "titi")
     {
         "then": 2,
         "else": 3
     },
 
     // test
-    "$where" : .unique($.uniqueKey),
+    "$where" : unique($.uniqueKey),
 
     // reposition la source d'info sur le bloque
-    "$source" : .unique($.uniqueKey),
+    "$source" : unique($.uniqueKey),
 
 
 }

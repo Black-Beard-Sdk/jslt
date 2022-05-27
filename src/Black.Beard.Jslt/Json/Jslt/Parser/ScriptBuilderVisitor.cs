@@ -631,11 +631,6 @@ namespace Bb.Json.Jslt.Parser
             else if (subOperation != null)
                 left = (JsltBase)subOperation.Accept(this);
 
-            else
-            {
-
-            }
-
             if (context.NT() != null)
                 left = new JsltOperator(left, OperationEnum.Not) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
 

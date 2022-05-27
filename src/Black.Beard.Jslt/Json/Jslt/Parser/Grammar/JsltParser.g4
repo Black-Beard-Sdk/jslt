@@ -21,7 +21,7 @@ parser grammar JsltParser;
 options { 
       // memoize=True;
       tokenVocab=JsltLexer;
-    }
+    } 
 
 script :
     json
@@ -58,7 +58,7 @@ jsonValue :
    ;
 
 jsonValueString : string jsonType?;
-jsonValueNumber : SIGNED_NUMBER jsonType?;
+jsonValueNumber : (signedNumber | signedInt) jsonType?;
 jsonValueInteger : INT jsonType?;
 jsonValueBoolean : (TRUE | FALSE) jsonType?;
 jsonValueNull : NULL;
@@ -143,7 +143,7 @@ jsonpath_subscript
    ;
 
 subscriptables
-   : BRACKET_LEFT subscriptable ( COMMA subscriptable )* BRACKET_RIGHT
+   : BRACKET_LEFT subscriptable  BRACKET_RIGHT
    ;
 
 subscriptableArguments
@@ -171,7 +171,7 @@ subscriptable
    : STRING
    | sliceable
    | WILDCARD_SUBSCRIPT
-   | QUESTION PAREN_LEFT expression PAREN_RIGHT
+   | QUESTION PAREN_LEFT expressions PAREN_RIGHT
    | jsonpath_ ((PLUS | MINUS)? NUMBER)?
    | IDQUOTED subscriptableArguments?
    ;
@@ -185,6 +185,8 @@ sliceable
 
 signedNumber : SIGNED_NUMBER | NUMBER;
 
+signedInt : SIGNED_INT | INT;
+
 sliceableLeft
    : signedNumber COLON
    ;
@@ -197,12 +199,17 @@ sliceableBinary
    : signedNumber COLON signedNumber
    ;
 
+expressions
+   : NT? expression (binaryOperator expression)+
+   | PAREN_LEFT expression PAREN_RIGHT   
+   ;
+
 expression
    : jsonpath__
    | NT expression
    | PAREN_LEFT expression PAREN_RIGHT   
-   | expression (binaryOperator expression)+
    ;
+
 
 binaryOperator
    : AND 

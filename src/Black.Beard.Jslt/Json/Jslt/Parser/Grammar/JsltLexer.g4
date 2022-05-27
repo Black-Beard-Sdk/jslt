@@ -76,7 +76,7 @@ BRACKET_LEFT : '[' ;
 BRACKET_RIGHT : ']' ;
 
 COMMA : ',' ;
-QUESTION_PAREN_LEFT : '?(';
+// QUESTION_PAREN_LEFT : '?(';
 PAREN_LEFT : '(' ;
 PAREN_RIGHT : ')' ;
 DOLLAR : '$';
@@ -112,17 +112,19 @@ fragment SAFECODEPOINT
    ;
 
 NUMBER
-   : INT ('.' [0-9] +)? EXP?
+   : INT ('.' INT +)? EXP?
    ;
 
 SIGNED_NUMBER
-   : ('-'|'+') INT ('.' [0-9] +)? EXP?;
+   : ('-'|'+')? INT ('.' INT +)? EXP?;
 
 INT
    : '0' | [1-9] [0-9]*
    ;
 
-// no leading zeros
+SIGNED_INT
+   : ('-'|'+')? ('0' | [1-9] [0-9]*)
+   ;
 
 fragment EXP
    : [Ee] [+\-]? INT
@@ -130,9 +132,9 @@ fragment EXP
 
 // \- since - means "range" inside [...]
 
-WS
-   : [ \t\n\r]+ -> skip
-   ;
+// WS
+//    : [ \t\n\r]+ -> skip
+//    ;
 
 ID
    : [_A-Za-z][_A-Za-z0-9]*
@@ -148,8 +150,8 @@ IDLOWCASE
    : [_a-z] [_a-z0-9]*
    ;
 
-SINGLE_QUOTE_STRING : '\''[@a-zA-Z][a-zA-Z0-9]*'\'';
+//SINGLE_QUOTE_STRING : '\''[@a-zA-Z][a-zA-Z0-9]*'\'';
 
-CURRENT_INDENTIFIER_JSONPATH : '@.' [a-zA-Z][a-zA-Z0-9]*;
+//CURRENT_INDENTIFIER_JSONPATH : '@.' [a-zA-Z][a-zA-Z0-9]*;
 
-CURRENT_LENGTH : '@.length-';
+//CURRENT_LENGTH : '@.length-';

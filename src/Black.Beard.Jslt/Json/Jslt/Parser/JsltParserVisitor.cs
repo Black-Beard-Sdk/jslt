@@ -231,6 +231,12 @@ public interface IJsltParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitSignedNumber([NotNull] JsltParser.SignedNumberContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="JsltParser.signedInt"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitSignedInt([NotNull] JsltParser.SignedIntContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="JsltParser.sliceableLeft"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
@@ -248,6 +254,12 @@ public interface IJsltParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitSliceableBinary([NotNull] JsltParser.SliceableBinaryContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="JsltParser.expressions"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitExpressions([NotNull] JsltParser.ExpressionsContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="JsltParser.expression"/>.
 	/// </summary>

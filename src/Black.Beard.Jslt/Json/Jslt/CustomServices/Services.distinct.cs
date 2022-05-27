@@ -69,6 +69,28 @@ namespace Bb.Json.Jslt.CustomServices
             return new JValue(items);
         }
 
+        [JsltExtensionMethod("contains", "return true if source contains the specified item")]
+        [JsltExtensionMethodParameter("source", "source of data")]
+        [JsltExtensionMethodParameter("toMatch", "source of data")]
+        public static JToken ExecuteContains(RuntimeContext ctx, JToken source, JToken toMatch)
+        {
+            if (source is JArray a)
+            {
+                foreach (var item in a)
+                {
+                    var p = (JValue)RuntimeContext.EvaluateBinaryOperator(ctx, item, Parser.OperationEnum.Equal, toMatch);
+                    if (object.Equals(p.Value, true))
+                        return true;
+                }
+            }
+            else
+            {
+                LocalDebug.Stop();
+            }
+
+            return new JValue(false);
+        }
+
         [JsltExtensionMethod("limit")]
         [JsltExtensionMethodParameter("source", "source of data")]
         [JsltExtensionMethodParameter("max", "max item to result")]

@@ -1,0 +1,3 @@
+{
+    "parentOk" : contains(["Leclerc", "Orange", "SEPHORA"],	$.Parent.Name)
+}
