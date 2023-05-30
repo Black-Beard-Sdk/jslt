@@ -339,7 +339,8 @@ namespace Black.Beard.Jslt.UnitTests
             var src = new SourceJson[] { SourceJson.GetFromText(source1) };
             RuntimeContext result = Test(expected, src);
             var g = (Guid)result.TokenResult["result"];
-            Assert.AreNotEqual(g, null);
+            Guid dright = default;
+            Assert.AreNotEqual(g, dright);
         }
 
         [TestMethod]
