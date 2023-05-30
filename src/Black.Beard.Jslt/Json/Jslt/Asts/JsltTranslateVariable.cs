@@ -1,4 +1,5 @@
-﻿using Bb.Json.Jslt.Services;
+﻿using Bb.Asts;
+using Bb.Json.Jslt.Services;
 using System.Collections.Generic;
 
 namespace Bb.Json.Jslt.Asts
@@ -45,6 +46,11 @@ namespace Bb.Json.Jslt.Asts
         public override object Accept(IJsltJsonVisitor visitor)
         {
             return visitor.VisitTranslateVariable(this);
+        }
+
+        public override bool ToString(Writer writer, StrategySerializationItem strategy)
+        {
+            throw new System.NotImplementedException();
         }
 
     }

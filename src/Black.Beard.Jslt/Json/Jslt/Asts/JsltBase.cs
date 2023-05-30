@@ -1,11 +1,12 @@
-﻿using Bb.Json.Jslt.Parser;
+﻿using Bb.Asts;
+using Bb.Json.Jslt.Parser;
 using System;
 using System.Collections.Generic;
 
 namespace Bb.Json.Jslt.Asts
 {
 
-    public abstract class JsltBase
+    public abstract class JsltBase : IWriter
     {
 
         public JsltBase()
@@ -37,6 +38,16 @@ namespace Bb.Json.Jslt.Asts
 
         public IEnumerable<JsltComment> Comments { get => this._comments; }
 
+        public virtual string RuleName => GetType().Name;
+
+        public override string ToString()
+        {
+            Writer writer = new Writer();
+            writer.ToString(this);
+            return writer.ToString();
+        }
+
+        public abstract bool ToString(Writer writer, StrategySerializationItem strategy);
 
         internal void AddComments(IEnumerable<JsltComment> comments)
         {

@@ -1,4 +1,5 @@
-﻿using Oldtonsoft.Json.Linq;
+﻿using Bb.Asts;
+using Oldtonsoft.Json.Linq;
 using System.Security.Principal;
 using System.Threading;
 using System.Xml;
@@ -20,6 +21,12 @@ namespace Bb.Json.Jslt.Asts
         public override object Accept(IJsltJsonVisitor visitor)
         {
             return visitor.VisitJPath(this);
+        }
+
+        public override bool ToString(Writer writer, StrategySerializationItem strategy)
+        {
+            writer.Append(Value);
+            return true;
         }
 
     }

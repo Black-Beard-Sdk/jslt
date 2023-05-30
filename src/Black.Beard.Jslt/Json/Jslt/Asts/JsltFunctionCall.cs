@@ -1,4 +1,5 @@
-﻿using Bb.ComponentModel.Factories;
+﻿using Bb.Asts;
+using Bb.ComponentModel.Factories;
 using Bb.Json.Jslt.Services;
 using Oldtonsoft.Json.Linq;
 using System;
@@ -8,9 +9,21 @@ using System.Linq;
 namespace Bb.Json.Jslt.Asts
 {
 
-   [System.Diagnostics.DebuggerDisplay("call {Name}")]
+    [System.Diagnostics.DebuggerDisplay("call {Name}")]
     public class JsltFunctionCall : JsltBase
     {
+
+        public JsltFunctionCall(string name, params JsltBase[] arguments) : this(name, arguments.ToList())
+        {
+
+
+        }
+
+        public JsltFunctionCall(string name, IEnumerable<JsltBase> arguments) : this(name, arguments.ToList())
+        {
+
+
+        }
 
         public JsltFunctionCall(string name, List<JsltBase> arguments)
         {
@@ -28,8 +41,8 @@ namespace Bb.Json.Jslt.Asts
                 {
                     Name = argName,
                     Value = item,
-                    Start = item.Start.Clone(),
-                    Stop = item.Stop.Clone(),
+                    Start = item?.Start?.Clone(),
+                    Stop = item?.Stop?.Clone(),
                 });
             }
 
@@ -38,12 +51,12 @@ namespace Bb.Json.Jslt.Asts
         public void Inject(JsltBase argument, int position)
         {
 
-            _items2.Insert(position, new JsltArgument() 
+            _items2.Insert(position, new JsltArgument()
             {
-                Name = string.Empty, 
-                Value = argument, 
+                Name = string.Empty,
+                Value = argument,
                 Start = argument.Start.Clone(),
-                Stop = argument.Stop.Clone() 
+                Stop = argument.Stop.Clone()
             });
 
             int index = 0;
@@ -70,6 +83,31 @@ namespace Bb.Json.Jslt.Asts
         public override object Accept(IJsltJsonVisitor visitor)
         {
             return visitor.VisitFunction(this);
+        }
+
+        public override bool ToString(Writer writer, StrategySerializationItem strategy)
+        {
+            
+            writer.Append(Name);
+            writer.Append("(");
+
+            if (this._items.Count > 0)
+            {
+
+                writer.ToString(_items[0]);
+
+                for (int i = 1; i < _items.Count; i++)
+                {
+                    writer.Append(", ");
+                    writer.ToString(_items[i]);
+                }
+
+            }
+
+            writer.Append(")");
+
+            return true;
+
         }
 
         private readonly List<JsltArgument> _items;

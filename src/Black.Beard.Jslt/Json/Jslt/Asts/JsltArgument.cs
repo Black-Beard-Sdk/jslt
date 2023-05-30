@@ -1,4 +1,6 @@
-﻿namespace Bb.Json.Jslt.Asts
+﻿using Bb.Asts;
+
+namespace Bb.Json.Jslt.Asts
 {
 
     [System.Diagnostics.DebuggerDisplay("arg {Name}={Value}")]
@@ -17,6 +19,11 @@
         public override object Accept(IJsltJsonVisitor visitor)
         {
             return visitor.VisitArgument(this);
+        }
+
+        public override bool ToString(Writer writer, StrategySerializationItem strategy)
+        {
+            return writer.ToString(Value);
         }
 
     }

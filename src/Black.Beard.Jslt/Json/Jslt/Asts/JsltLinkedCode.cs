@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Bb.Asts;
+using System.Collections.Generic;
 
 namespace Bb.Json.Jslt.Asts
 {
@@ -23,6 +24,10 @@ namespace Bb.Json.Jslt.Asts
 
         public IEnumerable<JsltBase> Items { get => _items; }
 
+        public override bool ToString(Writer writer, StrategySerializationItem strategy)
+        {
+            throw new System.NotImplementedException();
+        }
 
         private readonly List<JsltBase> _items;
 

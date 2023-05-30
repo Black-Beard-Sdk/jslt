@@ -53,7 +53,7 @@ namespace Wizards
 
         public void Save()
         {
-            this._file.FullName.Save(this.Serialize(Newtonsoft.Json.Formatting.Indented));
+            this._file.FullName.Save(this.Serialize(true));
         }
 
         public static string Encrypt(string payload)

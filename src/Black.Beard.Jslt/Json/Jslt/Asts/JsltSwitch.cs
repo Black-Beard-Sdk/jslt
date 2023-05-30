@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Antlr4.Runtime.Misc;
+using Bb.Asts;
+using Bb.Json.Jslt.CustomServices.MultiCsv;
+using System.Collections.Generic;
 
 namespace Bb.Json.Jslt.Asts
 {
@@ -23,9 +26,31 @@ namespace Bb.Json.Jslt.Asts
             return visitor.VisitSwitch(this);
         }
 
-        public override string ToString()
+        public override bool ToString(Writer writer, StrategySerializationItem strategy)
         {
-            return "switch " + Expression.ToString();
+
+            Expression.ToString(writer, strategy);
+
+            if (Cases.Count > 0)
+            {
+                Cases[0].ToString(writer, strategy);
+                for (int i = 1; i < Cases.Count; i++)
+                {
+                    writer.AppendEndLine(",");
+                    Cases[i].ToString(writer, strategy);
+                }
+            }
+
+            if (Default != null)
+            {
+                if (Cases.Count > 0)
+                    writer.AppendEndLine(",");
+                writer.Append("default");
+                Default.ToString(writer, strategy);
+            }
+            return true;
+
+
         }
 
     }

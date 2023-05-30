@@ -1,4 +1,6 @@
-﻿namespace Bb.Json.Jslt.Asts
+﻿using Bb.Asts;
+
+namespace Bb.Json.Jslt.Asts
 {
 
     [System.Diagnostics.DebuggerDisplay("case {RightExpression}")]
@@ -19,10 +21,16 @@
         {
             return visitor.VisitCase(this);
         }
-
-        public override string ToString()
+        
+        public override bool ToString(Writer writer, StrategySerializationItem strategy)
         {
-            return "Case " + RightExpression.ToString();
+
+            RightExpression.ToString(writer, strategy);
+            writer.Append(" : ");
+            Block.ToString(writer, strategy);
+
+            return true;
+
         }
 
     }

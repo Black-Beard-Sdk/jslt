@@ -1,7 +1,9 @@
-﻿using Bb.Json.Jslt.Services;
+﻿using Bb.Asts;
+using Bb.Json.Jslt.Services;
 using Oldtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Bb.Json.Jslt.Asts
 {
@@ -17,7 +19,7 @@ namespace Bb.Json.Jslt.Asts
             this._varItems = new Dictionary<string, JsltVariable>();
         }
 
-        internal void Append(JsltProperty property)
+        public void Append(JsltProperty property)
         {
 
             if (property is JsltVariable v)
@@ -54,6 +56,53 @@ namespace Bb.Json.Jslt.Asts
         {
             this._items.Add(prop.Name, prop);
         }
+
+        public override bool ToString(Writer writer, StrategySerializationItem strategy)
+        {
+
+            writer.Append("{");
+
+            using (writer.Indent())
+            {
+                writer.AppendEndLine();
+
+                var variables = this.Variables.ToList();
+
+                if (variables.Count > 0)
+                {
+                    writer.ToString(variables[0]);
+                    if (_items.Count > 0)
+                        for (int i = 1; i < variables.Count; i++)
+                        {
+                            writer.AppendEndLine(",");
+                            writer.ToString(variables[i]);
+                        }
+                }
+
+
+                var properties = this.Properties.ToList();
+                if (properties.Count > 0)
+                {
+                    if (variables.Count > 0)
+                        writer.AppendEndLine(",");
+
+                    writer.ToString(properties[0]);
+                    if (_items.Count > 0)
+                        for (int i = 1; i < properties.Count; i++)
+                        {
+                            writer.AppendEndLine(",");
+                            writer.ToString(properties[i]);
+                        }
+                }
+
+            }
+            writer.AppendEndLine();
+            writer.Append("}");
+
+            return true;
+
+        }
+
 
     }
 

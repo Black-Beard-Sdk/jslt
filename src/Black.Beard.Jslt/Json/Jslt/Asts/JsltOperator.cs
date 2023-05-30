@@ -1,4 +1,5 @@
-﻿using Bb.Json.Jslt.Parser;
+﻿using Bb.Asts;
+using Bb.Json.Jslt.Parser;
 
 namespace Bb.Json.Jslt.Asts
 {
@@ -21,6 +22,74 @@ namespace Bb.Json.Jslt.Asts
         public override object Accept(IJsltJsonVisitor visitor)
         {
             return visitor.VisitUnaryOperator(this);
+        }
+
+        public override bool ToString(Writer writer, StrategySerializationItem strategy)
+        {
+
+            if (Left != null)
+                Left.ToString(writer, strategy);
+
+            switch (Kind)
+            {
+                case JsltKind.Object:
+                    break;
+                case JsltKind.Property:
+                    break;
+                case JsltKind.Array:
+                    break;
+                case JsltKind.TimeSpan:
+                    break;
+                case JsltKind.Uri:
+                    break;
+                case JsltKind.Guid:
+                    break;
+                case JsltKind.Bytes:
+                    break;
+                case JsltKind.Date:
+                    break;
+                case JsltKind.Null:
+                    break;
+                case JsltKind.Boolean:
+                    break;
+                case JsltKind.String:
+                    break;
+                case JsltKind.Float:
+                    break;
+                case JsltKind.Integer:
+                    break;
+                case JsltKind.Path:
+                    break;
+                case JsltKind.Function:
+                    break;
+                case JsltKind.PathParent:
+                    break;
+                case JsltKind.PathKey:
+                    break;
+                case JsltKind.PathCoalesce:
+                    break;
+                case JsltKind.Jpath:
+                    break;
+                case JsltKind.PathIndice:
+                    break;
+                case JsltKind.Type:
+                    break;
+                case JsltKind.Operator:
+                    break;
+                case JsltKind.JVariable:
+                    break;
+                case JsltKind.JTranslateVariable:
+                    break;
+                default:
+                    break;
+            }
+            writer.Append("");
+
+            //if (Right != null)
+            //    Right.ToString(writer, strategy);
+
+            return true;
+
         }
 
     }

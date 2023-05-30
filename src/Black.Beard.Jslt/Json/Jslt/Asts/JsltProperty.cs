@@ -1,4 +1,5 @@
-﻿using Oldtonsoft.Json.Linq;
+﻿using Bb.Asts;
+using Oldtonsoft.Json.Linq;
 using System.Collections.Generic;
 
 namespace Bb.Json.Jslt.Asts
@@ -37,6 +38,30 @@ namespace Bb.Json.Jslt.Asts
                 return false;
             
             _metadatas.Add(metadataName, metadataValue);
+
+            return true;
+
+        }
+
+        public override bool ToString(Writer writer, StrategySerializationItem strategy)
+        {
+
+            writer.Append($"\"{Name}\" : ");
+
+            if (Value != null)
+            {
+                
+                if (Value is JsltObject)
+                    writer.AppendEndLine();
+
+                else if (Value is JsltArray)
+                    writer.AppendEndLine();
+
+                writer.ToString(Value);
+
+            }
+            else
+                writer.Append("null");
 
             return true;
 
