@@ -29,8 +29,8 @@ namespace Bb.Json.Jslt.CustomServices
         public static JToken GetRandomInteger(RuntimeContext ctx, decimal? minimum, bool? exclusiveMinimum, decimal? maximum, bool? exclusiveMaximum)
         {
 
-            int min = minimum.HasValue ? Math.Min((int)minimum.Value, int.MinValue) : 0;
-            int max = maximum.HasValue ? Math.Max((int)maximum.Value, int.MaxValue) : 0;
+            int min = minimum.HasValue ? Math.Min((int)minimum.Value, int.MaxValue) : 0;
+            int max = maximum.HasValue ? Math.Max((int)maximum.Value, 1) : 0;
 
             if (exclusiveMinimum.HasValue && exclusiveMinimum.Value && min > int.MinValue)
                 min--;
@@ -61,8 +61,8 @@ namespace Bb.Json.Jslt.CustomServices
         public static JToken GetRandombyte(RuntimeContext ctx, byte? minimum, bool? exclusiveMinimum, byte? maximum, bool? exclusiveMaximum)
         {
 
-            byte min = minimum.HasValue ? Math.Min(minimum.Value, byte.MinValue) : (byte)0;
-            byte max = maximum.HasValue ? Math.Max(maximum.Value, byte.MaxValue) : (byte)0;
+            byte min = minimum.HasValue ? Math.Min(minimum.Value, byte.MaxValue) : (byte)0;
+            byte max = maximum.HasValue ? Math.Max(maximum.Value, (byte)1) : (byte)0;
 
             if (exclusiveMinimum.HasValue && exclusiveMinimum.Value && min > int.MinValue)
                 min--;
@@ -93,8 +93,8 @@ namespace Bb.Json.Jslt.CustomServices
         public static JToken GetRandomDouble(RuntimeContext ctx, double? minimum, bool? exclusiveMinimum, double? maximum, bool? exclusiveMaximum)
         {
 
-            double min = minimum.HasValue ? Math.Min(minimum.Value, double.MinValue) : 0;
-            double max = maximum.HasValue ? Math.Max(maximum.Value, double.MaxValue) : 0;
+            double min = minimum.HasValue ? Math.Min(minimum.Value, double.MaxValue) : 0;
+            double max = maximum.HasValue ? Math.Max(maximum.Value, 1) : 0;
 
             if (exclusiveMinimum.HasValue && exclusiveMinimum.Value && min > int.MinValue)
                 min--;
@@ -125,8 +125,8 @@ namespace Bb.Json.Jslt.CustomServices
         public static JToken GetRandomFloat(RuntimeContext ctx, float? minimum, bool? exclusiveMinimum, float? maximum, bool? exclusiveMaximum)
         {
 
-            float min = minimum.HasValue ? Math.Min(minimum.Value, float.MinValue) : 0;
-            float max = maximum.HasValue ? Math.Max(maximum.Value, float.MaxValue) : 0;
+            float min = minimum.HasValue ? Math.Min(minimum.Value, float.MaxValue) : 0;
+            float max = maximum.HasValue ? Math.Max(maximum.Value, 1) : 0;
 
             if (exclusiveMinimum.HasValue && exclusiveMinimum.Value && min > int.MinValue)
                 min--;
@@ -157,8 +157,8 @@ namespace Bb.Json.Jslt.CustomServices
         public static JToken GetRandomLong(RuntimeContext ctx, long? minimum, bool? exclusiveMinimum, long? maximum, bool? exclusiveMaximum)
         {
 
-            long min = minimum.HasValue ? Math.Min(minimum.Value, long.MinValue) : 0;
-            long max = maximum.HasValue ? Math.Max(maximum.Value, long.MaxValue) : 0;
+            long min = minimum.HasValue ? Math.Min(minimum.Value, long.MaxValue) : 0;
+            long max = maximum.HasValue ? Math.Max(maximum.Value, 1) : 0;
 
             if (exclusiveMinimum.HasValue && exclusiveMinimum.Value && min > int.MinValue)
                 min--;
@@ -189,8 +189,8 @@ namespace Bb.Json.Jslt.CustomServices
         public static JToken GetRandomShort(RuntimeContext ctx, short? minimum, bool? exclusiveMinimum, short? maximum, bool? exclusiveMaximum)
         {
 
-            short min = minimum.HasValue ? Math.Min(minimum.Value, short.MinValue) : (short)0;
-            short max = maximum.HasValue ? Math.Max(maximum.Value, short.MaxValue) : (short)256;
+            short min = minimum.HasValue ? Math.Min(minimum.Value, short.MaxValue) : (short)0;
+            short max = maximum.HasValue ? Math.Max(maximum.Value, (short)1) : (short)256;
 
             if (exclusiveMinimum.HasValue && exclusiveMinimum.Value && min > int.MinValue)
                 min--;
@@ -236,8 +236,8 @@ namespace Bb.Json.Jslt.CustomServices
 
             var options2 = new FieldOptionsText()
             {
-                Min = minLength.HasValue ? Math.Min((int)minLength.Value, int.MinValue) : 1,
-                Max = maxLength.HasValue ? Math.Max((int)maxLength.Value, int.MaxValue) : 200,
+                Min = minLength.HasValue ? Math.Min((int)minLength.Value, 1) : 1,
+                Max = maxLength.HasValue ? Math.Max((int)maxLength.Value,1) :1,
                 UseLetter = true,
                 UseLowercase = true,
                 UseUppercase = true,
@@ -337,8 +337,8 @@ namespace Bb.Json.Jslt.CustomServices
 
             var options = new FieldOptionsBytes()
             {
-                Min = minLength.HasValue ? Math.Min((int)minLength.Value, int.MinValue) : 0,
-                Max = maxLength.HasValue ? Math.Max((int)maxLength.Value, int.MaxValue) : 0,
+                Min = minLength.HasValue ? Math.Min((int)minLength.Value, int.MaxValue) : 0,
+                Max = maxLength.HasValue ? Math.Max((int)maxLength.Value, 1) : 0,
                 ValueAsString = true,
             };
             var randomizer = new RandomizerBytes(options);

@@ -2,6 +2,7 @@
 using Oldtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
@@ -9,7 +10,6 @@ using System.Reflection;
 
 namespace Bb.Expressions
 {
-
 
     /// <summary>
     /// build lanbda and compile for ActionResult 
@@ -51,6 +51,13 @@ namespace Bb.Expressions
                         Register(p[0].ParameterType, item.ReturnType, item);
                 }
 
+            ms = typeof(CustomConverter).GetMethods(BindingFlags.Static | BindingFlags.Public);
+            foreach (var item in ms)
+                {
+                    var p = item.GetParameters();
+                    if ((p.Length == 1 || p.Length == 2) && p[0].ParameterType != item.ReturnType)
+                        Register(p[0].ParameterType, item.ReturnType, item);
+                }
         }
 
         private static void Register(Type sourceType, Type targetType, MethodBase methodConverter)
