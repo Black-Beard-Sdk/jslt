@@ -26,16 +26,16 @@ namespace Bb.Json.Jslt.CustomServices
         [JsltExtensionMethodParameter("exclusiveMinimum", "specify if the minimum value is include")]
         [JsltExtensionMethodParameter("maximum", "specify the maximum value")]
         [JsltExtensionMethodParameter("exclusiveMaximum", "specify if the maximum value is include")]
-        public static JToken GetRandomInteger(RuntimeContext ctx, decimal? minimum, bool exclusiveMinimum, decimal? maximum, bool exclusiveMaximum)
+        public static JToken GetRandomInteger(RuntimeContext ctx, decimal? minimum, bool? exclusiveMinimum, decimal? maximum, bool? exclusiveMaximum)
         {
 
             int min = minimum.HasValue ? Math.Min((int)minimum.Value, int.MinValue) : 0;
             int max = maximum.HasValue ? Math.Max((int)maximum.Value, int.MaxValue) : 0;
 
-            if (exclusiveMinimum && min > int.MinValue)
+            if (exclusiveMinimum.HasValue && exclusiveMinimum.Value && min > int.MinValue)
                 min--;
 
-            if (exclusiveMaximum && max < int.MaxValue)
+            if (exclusiveMaximum.HasValue && exclusiveMaximum.Value && max < int.MaxValue)
                 max++;
 
             var options = new FieldOptionsInteger()
@@ -58,16 +58,16 @@ namespace Bb.Json.Jslt.CustomServices
         [JsltExtensionMethodParameter("exclusiveMinimum", "specify if the minimum value is include")]
         [JsltExtensionMethodParameter("maximum", "specify the maximum value")]
         [JsltExtensionMethodParameter("exclusiveMaximum", "specify if the maximum value is include")]
-        public static JToken GetRandombyte(RuntimeContext ctx, byte? minimum, bool exclusiveMinimum, byte? maximum, bool exclusiveMaximum)
+        public static JToken GetRandombyte(RuntimeContext ctx, byte? minimum, bool? exclusiveMinimum, byte? maximum, bool? exclusiveMaximum)
         {
 
             byte min = minimum.HasValue ? Math.Min(minimum.Value, byte.MinValue) : (byte)0;
             byte max = maximum.HasValue ? Math.Max(maximum.Value, byte.MaxValue) : (byte)0;
 
-            if (exclusiveMinimum && min > byte.MinValue)
+            if (exclusiveMinimum.HasValue && exclusiveMinimum.Value && min > int.MinValue)
                 min--;
 
-            if (exclusiveMaximum && max < byte.MaxValue)
+            if (exclusiveMaximum.HasValue && exclusiveMaximum.Value && max < int.MaxValue)
                 max++;
 
             var options = new FieldOptionsInteger()
@@ -90,16 +90,16 @@ namespace Bb.Json.Jslt.CustomServices
         [JsltExtensionMethodParameter("exclusiveMinimum", "specify if the minimum value is include")]
         [JsltExtensionMethodParameter("maximum", "specify the maximum value")]
         [JsltExtensionMethodParameter("exclusiveMaximum", "specify if the maximum value is include")]
-        public static JToken GetRandomDouble(RuntimeContext ctx, double? minimum, bool exclusiveMinimum, double? maximum, bool exclusiveMaximum)
+        public static JToken GetRandomDouble(RuntimeContext ctx, double? minimum, bool? exclusiveMinimum, double? maximum, bool? exclusiveMaximum)
         {
 
             double min = minimum.HasValue ? Math.Min(minimum.Value, double.MinValue) : 0;
             double max = maximum.HasValue ? Math.Max(maximum.Value, double.MaxValue) : 0;
 
-            if (exclusiveMinimum && min > double.MinValue)
+            if (exclusiveMinimum.HasValue && exclusiveMinimum.Value && min > int.MinValue)
                 min--;
 
-            if (exclusiveMaximum && max < double.MaxValue)
+            if (exclusiveMaximum.HasValue && exclusiveMaximum.Value && max < int.MaxValue)
                 max++;
 
             var options = new FieldOptionsDouble()
@@ -122,16 +122,16 @@ namespace Bb.Json.Jslt.CustomServices
         [JsltExtensionMethodParameter("exclusiveMinimum", "specify if the minimum value is include")]
         [JsltExtensionMethodParameter("maximum", "specify the maximum value")]
         [JsltExtensionMethodParameter("exclusiveMaximum", "specify if the maximum value is include")]
-        public static JToken GetRandomFloat(RuntimeContext ctx, float? minimum, bool exclusiveMinimum, float? maximum, bool exclusiveMaximum)
+        public static JToken GetRandomFloat(RuntimeContext ctx, float? minimum, bool? exclusiveMinimum, float? maximum, bool? exclusiveMaximum)
         {
 
             float min = minimum.HasValue ? Math.Min(minimum.Value, float.MinValue) : 0;
             float max = maximum.HasValue ? Math.Max(maximum.Value, float.MaxValue) : 0;
 
-            if (exclusiveMinimum && min > float.MinValue)
+            if (exclusiveMinimum.HasValue && exclusiveMinimum.Value && min > int.MinValue)
                 min--;
 
-            if (exclusiveMaximum && max < float.MaxValue)
+            if (exclusiveMaximum.HasValue && exclusiveMaximum.Value && max < int.MaxValue)
                 max++;
 
             var options = new FieldOptionsFloat()
@@ -154,16 +154,16 @@ namespace Bb.Json.Jslt.CustomServices
         [JsltExtensionMethodParameter("exclusiveMinimum", "specify if the minimum value is include")]
         [JsltExtensionMethodParameter("maximum", "specify the maximum value")]
         [JsltExtensionMethodParameter("exclusiveMaximum", "specify if the maximum value is include")]
-        public static JToken GetRandomLong(RuntimeContext ctx, long? minimum, bool exclusiveMinimum, long? maximum, bool exclusiveMaximum)
+        public static JToken GetRandomLong(RuntimeContext ctx, long? minimum, bool? exclusiveMinimum, long? maximum, bool? exclusiveMaximum)
         {
 
             long min = minimum.HasValue ? Math.Min(minimum.Value, long.MinValue) : 0;
             long max = maximum.HasValue ? Math.Max(maximum.Value, long.MaxValue) : 0;
 
-            if (exclusiveMinimum && min > long.MinValue)
+            if (exclusiveMinimum.HasValue && exclusiveMinimum.Value && min > int.MinValue)
                 min--;
 
-            if (exclusiveMaximum && max < long.MaxValue)
+            if (exclusiveMaximum.HasValue && exclusiveMaximum.Value && max < int.MaxValue)
                 max++;
 
             var options = new FieldOptionsLong()
@@ -186,16 +186,16 @@ namespace Bb.Json.Jslt.CustomServices
         [JsltExtensionMethodParameter("exclusiveMinimum", "specify if the minimum value is include")]
         [JsltExtensionMethodParameter("maximum", "specify the maximum value")]
         [JsltExtensionMethodParameter("exclusiveMaximum", "specify if the maximum value is include")]
-        public static JToken GetRandomShort(RuntimeContext ctx, short? minimum, bool exclusiveMinimum, short? maximum, bool exclusiveMaximum)
+        public static JToken GetRandomShort(RuntimeContext ctx, short? minimum, bool? exclusiveMinimum, short? maximum, bool? exclusiveMaximum)
         {
 
             short min = minimum.HasValue ? Math.Min(minimum.Value, short.MinValue) : (short)0;
-            short max = maximum.HasValue ? Math.Max(maximum.Value, short.MaxValue) : (short)0;
+            short max = maximum.HasValue ? Math.Max(maximum.Value, short.MaxValue) : (short)256;
 
-            if (exclusiveMinimum && min > long.MinValue)
+            if (exclusiveMinimum.HasValue && exclusiveMinimum.Value && min > int.MinValue)
                 min--;
 
-            if (exclusiveMaximum && max < long.MaxValue)
+            if (exclusiveMaximum.HasValue && exclusiveMaximum.Value && max < int.MaxValue)
                 max++;
 
             var options = new FieldOptionsLong()
@@ -236,8 +236,8 @@ namespace Bb.Json.Jslt.CustomServices
 
             var options2 = new FieldOptionsText()
             {
-                Min = minLength.HasValue ? Math.Min((int)minLength.Value, int.MinValue) : 0,
-                Max = maxLength.HasValue ? Math.Max((int)maxLength.Value, int.MaxValue) : 0,
+                Min = minLength.HasValue ? Math.Min((int)minLength.Value, int.MinValue) : 1,
+                Max = maxLength.HasValue ? Math.Max((int)maxLength.Value, int.MaxValue) : 200,
                 UseLetter = true,
                 UseLowercase = true,
                 UseUppercase = true,
@@ -437,12 +437,12 @@ namespace Bb.Json.Jslt.CustomServices
         [JsltExtensionMethodParameter("countryCodeIso2", "country code Iso 2")]
         [JsltExtensionMethodParameter("includeIban", "include Iban")]
         [JsltExtensionMethodParameter("includeBban", "include bban")]
-        public static JToken GetRandomIban(RuntimeContext ctx, string countryCodeIso2, bool includeIban, bool includeBban)
+        public static JToken GetRandomIban(RuntimeContext ctx, string countryCodeIso2, bool? includeIban, bool? includeBban)
         {
 
             string type = "";
-            if (includeBban)
-                type = includeIban ? "BOTH" : "BBAN";
+            if (includeBban.HasValue && includeBban.Value)
+                type = (includeIban.HasValue || true) ? "BOTH" : "BBAN";
 
             var options = new FieldOptionsIBAN()
             {
