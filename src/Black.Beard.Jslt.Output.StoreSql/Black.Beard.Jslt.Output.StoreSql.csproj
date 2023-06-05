@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Black.Beard.Configurations.ConfigurationProvider.SqlServer" Version="1.0.8" />
-    <PackageReference Include="Black.Beard.Roslyn" Version="1.0.39" />
+    <PackageReference Include="Black.Beard.Roslyn" Version="1.0.40" />
   </ItemGroup>
 
   <ItemGroup>

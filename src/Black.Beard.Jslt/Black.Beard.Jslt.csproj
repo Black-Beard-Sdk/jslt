@@ -33,7 +33,6 @@
 		<PackageReference Include="Antlr4.Runtime.Standard" Version="4.9.3" />
 		<PackageReference Include="Black.Beard.Helpers.ContentLoaders.Compress" Version="2.0.1" />
 		<PackageReference Include="Black.Beard.Helpers.ContentLoaders.Files" Version="2.0.1" />
-		<PackageReference Include="Black.Beard.Roslyn" Version="1.0.39" />
 		<PackageReference Include="System.CodeDom" Version="7.0.0" />
 	</ItemGroup>
 
@@ -46,6 +45,10 @@
 	<ItemGroup>
 	  <None Include="..\..\LICENSE" Link="LICENSE" />
 	  <None Include="Json\Jslt\CustomServices\Randomizers\CreditCardValidator\CreditCardValidator.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\..\Black.Beard.Roslyn\Src\Black.Beard.Roslyn\Black.Beard.Roslyn.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
