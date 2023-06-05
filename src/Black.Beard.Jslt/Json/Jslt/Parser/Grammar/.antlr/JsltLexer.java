@@ -1,4 +1,4 @@
-// Generated from c:\Src\jslt\src\Black.Beard.Jslt\Json\Jslt\Parser\Grammar\JsltLexer.g4 by ANTLR 4.8
+// Generated from c:\Src\Parrot\Clones\jslt\src\Black.Beard.Jslt\Json\Jslt\Parser\Grammar\JsltLexer.g4 by ANTLR 4.9.2
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
@@ -10,7 +10,7 @@ import org.antlr.v4.runtime.misc.*;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class JsltLexer extends Lexer {
-	static { RuntimeMetaData.checkVersion("4.8", RuntimeMetaData.VERSION); }
+	static { RuntimeMetaData.checkVersion("4.9.2", RuntimeMetaData.VERSION); }
 
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =
@@ -138,7 +138,7 @@ public class JsltLexer extends Lexer {
 	public ATN getATN() { return _ATN; }
 
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\2B\u01e1\b\1\4\2\t"+
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\2B\u01df\b\1\4\2\t"+
 		"\2\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13"+
 		"\t\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22\t\22"+
 		"\4\23\t\23\4\24\t\24\4\25\t\25\4\26\t\26\4\27\t\27\4\30\t\30\4\31\t\31"+
@@ -167,14 +167,14 @@ public class JsltLexer extends Lexer {
 		"?\5?\u019b\n?\3?\3?\3?\6?\u01a0\n?\r?\16?\u01a1\5?\u01a4\n?\3?\5?\u01a7"+
 		"\n?\3@\3@\3@\7@\u01ac\n@\f@\16@\u01af\13@\5@\u01b1\n@\3A\5A\u01b4\nA\3"+
 		"A\3A\3A\7A\u01b9\nA\fA\16A\u01bc\13A\5A\u01be\nA\3B\3B\5B\u01c2\nB\3B"+
-		"\3B\3C\3C\7C\u01c8\nC\fC\16C\u01cb\13C\3D\3D\3D\3D\3E\3E\3E\3E\3E\7E\u01d6"+
-		"\nE\fE\16E\u01d9\13E\3F\3F\7F\u01dd\nF\fF\16F\u01e0\13F\3\u0174\2G\3\3"+
-		"\5\4\7\5\t\6\13\7\r\b\17\t\21\n\23\13\25\f\27\r\31\16\33\17\35\20\37\21"+
+		"\3B\3C\3C\7C\u01c8\nC\fC\16C\u01cb\13C\3D\3D\3D\3D\3E\3E\3E\7E\u01d4\n"+
+		"E\fE\16E\u01d7\13E\3F\3F\7F\u01db\nF\fF\16F\u01de\13F\3\u0174\2G\3\3\5"+
+		"\4\7\5\t\6\13\7\r\b\17\t\21\n\23\13\25\f\27\r\31\16\33\17\35\20\37\21"+
 		"!\22#\23%\24\'\25)\26+\27-\30/\31\61\32\63\33\65\34\67\359\36;\37= ?!"+
 		"A\"C#E$G%I&K\'M(O)Q*S+U,W-Y.[/]\60_\61a\62c\63e\64g\65i\66k\67m8o9q:s"+
 		"\2u\2w\2y\2{;}<\177=\u0081>\u0083\2\u0085?\u0087@\u0089A\u008bB\3\2\r"+
 		"\n\2$$\61\61^^ddhhppttvv\5\2\62;CHch\5\2\2!$$^^\4\2--//\3\2\63;\3\2\62"+
-		";\4\2GGgg\5\2C\\aac|\6\2\62;C\\aac|\4\2aac|\5\2\62;aac|\2\u01f1\2\3\3"+
+		";\4\2GGgg\5\2C\\aac|\6\2\62;C\\aac|\4\2aac|\5\2\62;aac|\2\u01ef\2\3\3"+
 		"\2\2\2\2\5\3\2\2\2\2\7\3\2\2\2\2\t\3\2\2\2\2\13\3\2\2\2\2\r\3\2\2\2\2"+
 		"\17\3\2\2\2\2\21\3\2\2\2\2\23\3\2\2\2\2\25\3\2\2\2\2\27\3\2\2\2\2\31\3"+
 		"\2\2\2\2\33\3\2\2\2\2\35\3\2\2\2\2\37\3\2\2\2\2!\3\2\2\2\2#\3\2\2\2\2"+
@@ -201,7 +201,7 @@ public class JsltLexer extends Lexer {
 		"\u016e\3\2\2\2q\u017c\3\2\2\2s\u017e\3\2\2\2u\u0183\3\2\2\2w\u0189\3\2"+
 		"\2\2y\u018b\3\2\2\2{\u018d\3\2\2\2}\u019a\3\2\2\2\177\u01b0\3\2\2\2\u0081"+
 		"\u01b3\3\2\2\2\u0083\u01bf\3\2\2\2\u0085\u01c5\3\2\2\2\u0087\u01cc\3\2"+
-		"\2\2\u0089\u01d0\3\2\2\2\u008b\u01da\3\2\2\2\u008d\u008e\7\60\2\2\u008e"+
+		"\2\2\u0089\u01d0\3\2\2\2\u008b\u01d8\3\2\2\2\u008d\u008e\7\60\2\2\u008e"+
 		"\4\3\2\2\2\u008f\u0090\7,\2\2\u0090\6\3\2\2\2\u0091\u0092\7B\2\2\u0092"+
 		"\b\3\2\2\2\u0093\u0094\7<\2\2\u0094\n\3\2\2\2\u0095\u0096\7%\2\2\u0096"+
 		"\f\3\2\2\2\u0097\u0098\7\60\2\2\u0098\u0099\7\60\2\2\u0099\16\3\2\2\2"+
@@ -292,14 +292,14 @@ public class JsltLexer extends Lexer {
 		"\2\2\2\u01c5\u01c9\t\t\2\2\u01c6\u01c8\t\n\2\2\u01c7\u01c6\3\2\2\2\u01c8"+
 		"\u01cb\3\2\2\2\u01c9\u01c7\3\2\2\2\u01c9\u01ca\3\2\2\2\u01ca\u0086\3\2"+
 		"\2\2\u01cb\u01c9\3\2\2\2\u01cc\u01cd\7)\2\2\u01cd\u01ce\5\u0085C\2\u01ce"+
-		"\u01cf\7)\2\2\u01cf\u0088\3\2\2\2\u01d0\u01d1\7B\2\2\u01d1\u01d2\7B\2"+
-		"\2\u01d2\u01d3\3\2\2\2\u01d3\u01d7\t\t\2\2\u01d4\u01d6\t\n\2\2\u01d5\u01d4"+
-		"\3\2\2\2\u01d6\u01d9\3\2\2\2\u01d7\u01d5\3\2\2\2\u01d7\u01d8\3\2\2\2\u01d8"+
-		"\u008a\3\2\2\2\u01d9\u01d7\3\2\2\2\u01da\u01de\t\13\2\2\u01db\u01dd\t"+
-		"\f\2\2\u01dc\u01db\3\2\2\2\u01dd\u01e0\3\2\2\2\u01de\u01dc\3\2\2\2\u01de"+
-		"\u01df\3\2\2\2\u01df\u008c\3\2\2\2\u01e0\u01de\3\2\2\2\31\2\u015b\u015d"+
-		"\u0167\u0169\u0174\u0181\u0192\u0194\u0197\u019a\u01a1\u01a3\u01a6\u01ad"+
-		"\u01b0\u01b3\u01ba\u01bd\u01c1\u01c9\u01d7\u01de\3\b\2\2";
+		"\u01cf\7)\2\2\u01cf\u0088\3\2\2\2\u01d0\u01d1\5\7\4\2\u01d1\u01d5\t\t"+
+		"\2\2\u01d2\u01d4\t\n\2\2\u01d3\u01d2\3\2\2\2\u01d4\u01d7\3\2\2\2\u01d5"+
+		"\u01d3\3\2\2\2\u01d5\u01d6\3\2\2\2\u01d6\u008a\3\2\2\2\u01d7\u01d5\3\2"+
+		"\2\2\u01d8\u01dc\t\13\2\2\u01d9\u01db\t\f\2\2\u01da\u01d9\3\2\2\2\u01db"+
+		"\u01de\3\2\2\2\u01dc\u01da\3\2\2\2\u01dc\u01dd\3\2\2\2\u01dd\u008c\3\2"+
+		"\2\2\u01de\u01dc\3\2\2\2\31\2\u015b\u015d\u0167\u0169\u0174\u0181\u0192"+
+		"\u0194\u0197\u019a\u01a1\u01a3\u01a6\u01ad\u01b0\u01b3\u01ba\u01bd\u01c1"+
+		"\u01c9\u01d5\u01dc\3\b\2\2";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

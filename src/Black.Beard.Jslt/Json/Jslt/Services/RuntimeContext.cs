@@ -191,7 +191,7 @@ namespace Bb.Json.Jslt.Services
             JToken result = null;
 
             object l = null;
-            object r = null;
+            object r = null;            
 
             if (leftToken == null)
                 l = null;
@@ -917,6 +917,7 @@ namespace Bb.Json.Jslt.Services
 
         }
 
+
         #endregion Operators
 
         #region Variables
@@ -945,7 +946,7 @@ namespace Bb.Json.Jslt.Services
 
                 var t1 = string.IsNullOrEmpty(text.Trim().Replace(item, string.Empty).Trim());
 
-                if (ctx.SubSources.Variables.Get(item.Substring(2), out object r))
+                if (ctx.SubSources.Variables.Get(item.Substring(1), out object r))
                 {
 
                     if (keys.Length == 1 && t1)
@@ -960,13 +961,17 @@ namespace Bb.Json.Jslt.Services
 
                 else
                 {
-                    ctx.Diagnostics.AddError(string.Empty, trace, d, $"the key '{item}' can't be resolved.");
+                    ctx.Diagnostics.AddInformation(string.Empty, trace, d, $"the key '{item}' can't be found.");
                     d = d.Replace(item, string.Empty);
                 }
             }
 
             try
             {
+
+                if (d.StartsWith("@"))
+                    d = null;
+
                 return new JValue(d);
             }
             catch (Exception)
@@ -998,7 +1003,7 @@ namespace Bb.Json.Jslt.Services
                 return service.Execute(ctx, token);
             }
             catch (Exception ex)
-            {                
+            {
                 ctx.Diagnostics.AddError(string.Empty, trace, $"failed to run function {serviceName}", ex.Message);
                 ctx.Break();
             }

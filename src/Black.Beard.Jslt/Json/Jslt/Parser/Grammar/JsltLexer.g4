@@ -144,7 +144,7 @@ IDQUOTED
    : '\'' ID '\''
    ;
 
-VARIABLE_NAME : '@@' [_A-Za-z][_A-Za-z0-9]*;
+VARIABLE_NAME : CURRENT_VALUE [_A-Za-z][_A-Za-z0-9]*;
 
 IDLOWCASE
    : [_a-z] [_a-z0-9]*

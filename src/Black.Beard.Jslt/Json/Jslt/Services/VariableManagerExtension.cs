@@ -8,7 +8,7 @@ namespace Bb.Json.Jslt.Services
         static VariableManagerExtension()
         {
 
-            _reg = new Regex(@"@@[a-zA-Z0-9_]+");
+            _reg = new Regex(@"@[a-zA-Z0-9_]+");
 
         }
 

@@ -27,68 +27,84 @@ namespace Bb.Json.Jslt.Asts
         public override bool ToString(Writer writer, StrategySerializationItem strategy)
         {
 
+            WriteOperator(writer);
+
             if (Left != null)
                 Left.ToString(writer, strategy);
 
-            switch (Kind)
+            return true;
+
+        }
+
+        protected void WriteOperator(Writer writer)
+        {
+
+            switch (Operator)
             {
-                case JsltKind.Object:
+                case OperationEnum.Undefined:
                     break;
-                case JsltKind.Property:
+                case OperationEnum.GreaterThan:
+                    writer.Append(">");
                     break;
-                case JsltKind.Array:
+                case OperationEnum.GreaterThanOrEqual:
+                    writer.Append(">=");
                     break;
-                case JsltKind.TimeSpan:
+                case OperationEnum.Equal:
+                    writer.Append("==");
                     break;
-                case JsltKind.Uri:
+                case OperationEnum.LessThanOrEqual:
+                    writer.Append("<=");
                     break;
-                case JsltKind.Guid:
+                case OperationEnum.LessThan:
+                    writer.Append("<");
                     break;
-                case JsltKind.Bytes:
+                case OperationEnum.NotEqual:
+                    writer.Append("!=");
                     break;
-                case JsltKind.Date:
+                case OperationEnum.Add:
+                    writer.Append("+");
                     break;
-                case JsltKind.Null:
+                case OperationEnum.Subtract:
+                    writer.Append("-");
                     break;
-                case JsltKind.Boolean:
+                case OperationEnum.Divide:
+                    writer.Append("/");
                     break;
-                case JsltKind.String:
+                case OperationEnum.Modulo:
+                    writer.Append("%");
                     break;
-                case JsltKind.Float:
+                case OperationEnum.Multiply:
+                    writer.Append("*");
                     break;
-                case JsltKind.Integer:
+                case OperationEnum.Power:
+                    writer.Append(" ");
                     break;
-                case JsltKind.Path:
+                case OperationEnum.Chain:
+                    writer.Append("->");
                     break;
-                case JsltKind.Function:
+                case OperationEnum.And:
+                    writer.Append("&");
                     break;
-                case JsltKind.PathParent:
+                case OperationEnum.AndExclusive:
+                    writer.Append("&&");
                     break;
-                case JsltKind.PathKey:
+                case OperationEnum.Or:
+                    writer.Append("|");
                     break;
-                case JsltKind.PathCoalesce:
+                case OperationEnum.OrExclusive:
+                    writer.Append("||");
                     break;
-                case JsltKind.Jpath:
+                case OperationEnum.Coalesce:
+                    writer.Append("??");
                     break;
-                case JsltKind.PathIndice:
-                    break;
-                case JsltKind.Type:
-                    break;
-                case JsltKind.Operator:
-                    break;
-                case JsltKind.JVariable:
-                    break;
-                case JsltKind.JTranslateVariable:
+                case OperationEnum.Not:
+                    writer.Append("!");
                     break;
                 default:
                     break;
             }
-            writer.Append("");
 
-            //if (Right != null)
-            //    Right.ToString(writer, strategy);
-
-            return true;
+            writer.Append(" ");
 
         }
 

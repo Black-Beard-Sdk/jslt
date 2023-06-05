@@ -238,7 +238,7 @@ namespace Bb.Json.Jslt.Services
         {
             foreach (var item in node.Variables)
             {
-                item.ToDesctruct = true;
+                item.ToDestruct = true;
                 var i = (Expression)item.Accept(this);
                 if (i != null)
                     src.Add(i);
@@ -249,7 +249,7 @@ namespace Bb.Json.Jslt.Services
         {
             foreach (var item in node.Variables)
             {
-                item.ToDesctruct = false;
+                item.ToDestruct = false;
                 var i = (Expression)item.Accept(this);
                 if (i != null)
                     src.Add(i);
@@ -295,7 +295,7 @@ namespace Bb.Json.Jslt.Services
             {
                 var name = Expression.Constant(node.Name);
 
-                if (node.ToDesctruct)
+                if (node.ToDestruct)
                     return RuntimeContext._DelVariable.Call(ctx.Current.Context, name);
 
                 else

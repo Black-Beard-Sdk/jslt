@@ -1,4 +1,5 @@
-﻿using Bb.Json.Jslt.Parser;
+﻿using Bb.Asts;
+using Bb.Json.Jslt.Parser;
 
 namespace Bb.Json.Jslt.Asts
 {
@@ -23,9 +24,26 @@ namespace Bb.Json.Jslt.Asts
             return visitor.VisitBinaryOperator(this);
         }
 
+        public override bool ToString(Writer writer, StrategySerializationItem strategy)
+        {
+
+            if (Left != null)
+                Left.ToString(writer, strategy);
+
+            writer.Append(" ");
+            WriteOperator(writer);
+
+            if (Right != null)
+                Right.ToString(writer, strategy);
+
+            return true;
+
+        }
 
     }
 
-
 }
+
+
+
 

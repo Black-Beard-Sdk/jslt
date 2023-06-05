@@ -1,7 +1,15 @@
-﻿namespace Bb.Json.Jslt.Asts
+﻿using Bb.Asts;
+
+namespace Bb.Json.Jslt.Asts
 {
     public class JsltVariable : JsltProperty
     {
+
+        public JsltVariable(string name)
+        {
+            Kind = JsltKind.JVariable;
+            this.Name = name;
+        }
 
         public JsltVariable()
         {
@@ -13,7 +21,13 @@
             return visitor.VisitJVariable(this);
         }
 
-        public bool ToDesctruct { get; set; }
+        public override bool ToString(Writer writer, StrategySerializationItem strategy)
+        {
+            writer.Append($"@{Name}");
+            return true;
+        }
+
+        public bool ToDestruct { get; set; }
 
     }
 
