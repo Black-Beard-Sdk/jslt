@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
 		<RootNamespace>Bb.Jslt.Services</RootNamespace>
-
+		<Nullable>disable</Nullable>
 		<RepositoryUrl>https://github.com/Black-Beard-Sdk/jslt</RepositoryUrl>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Description>support extended method(loading excel, html, multicsv, sql).</Description>

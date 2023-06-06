@@ -1,37 +1,38 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
-    <AssemblyName>Json</AssemblyName>
-    <RootNamespace>Bb.Json</RootNamespace>
-    <StartupObject>Bb.Json.Program</StartupObject>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<Nullable>disable</Nullable>
+		<TargetFramework>net6.0</TargetFramework>
+		<AssemblyName>Json</AssemblyName>
+		<RootNamespace>Bb.Json</RootNamespace>
+		<StartupObject>Bb.Json.Program</StartupObject>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Commands\Command.Import.cs" />
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Remove="Commands\Command.Import.cs" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Black.Beard.CommandLine" Version="1.0.9" />
-    <PackageReference Include="Black.Beard.Roslyn" Version="1.0.41" />
-    <PackageReference Include="ExcelDataReader" Version="3.6.0" />
-    <PackageReference Include="ExcelDataReader.DataSet" Version="3.6.0" />
-    <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.1" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.4" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="7.0.0" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
-    <PackageReference Include="System.Text.Encoding" Version="4.3.0" />
-    <PackageReference Include="System.Text.Encoding.CodePages" Version="7.0.0" />
-    <PackageReference Include="Ude.NetStandard" Version="1.2.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Black.Beard.CommandLine" Version="1.0.9" />
+		<PackageReference Include="Black.Beard.Roslyn" Version="1.0.41" />
+		<PackageReference Include="ExcelDataReader" Version="3.6.0" />
+		<PackageReference Include="ExcelDataReader.DataSet" Version="3.6.0" />
+		<PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.1" />
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.4" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="7.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="7.0.0" />
+		<PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
+		<PackageReference Include="System.Text.Encoding" Version="4.3.0" />
+		<PackageReference Include="System.Text.Encoding.CodePages" Version="7.0.0" />
+		<PackageReference Include="Ude.NetStandard" Version="1.2.0" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Black.Beard.Elasticsearch\Black.Beard.Elasticsearch.csproj" />
-    <ProjectReference Include="..\Black.Beard.Jslt.Services\Black.Beard.Jslt.Services.csproj" />
-    <ProjectReference Include="..\Black.Beard.Jslt\Black.Beard.Jslt.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Black.Beard.Elasticsearch\Black.Beard.Elasticsearch.csproj" />
+		<ProjectReference Include="..\Black.Beard.Jslt.Services\Black.Beard.Jslt.Services.csproj" />
+		<ProjectReference Include="..\Black.Beard.Jslt\Black.Beard.Jslt.csproj" />
+	</ItemGroup>
 
 </Project>
