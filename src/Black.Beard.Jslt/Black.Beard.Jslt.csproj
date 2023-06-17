@@ -32,9 +32,9 @@
 
 	<ItemGroup>
 		<PackageReference Include="Antlr4.Runtime.Standard" Version="4.9.3" />
-		<PackageReference Include="Black.Beard.Helpers.ContentLoaders.Compress" Version="2.0.1" />
-		<PackageReference Include="Black.Beard.Helpers.ContentLoaders.Files" Version="2.0.1" />
-		<PackageReference Include="Black.Beard.Roslyn" Version="1.0.42" />
+		<PackageReference Include="Black.Beard.Helpers.ContentLoaders.Compress" Version="2.0.4" />
+		<PackageReference Include="Black.Beard.Helpers.ContentLoaders.Files" Version="2.0.4" />
+		<PackageReference Include="Black.Beard.Roslyn" Version="1.0.44" />
 		<PackageReference Include="System.CodeDom" Version="7.0.0" />
 	</ItemGroup>
 
