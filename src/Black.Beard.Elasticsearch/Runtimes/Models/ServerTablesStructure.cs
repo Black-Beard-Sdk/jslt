@@ -61,7 +61,7 @@ namespace Bb.Elastic.Runtimes.Models
             if (string.IsNullOrEmpty(this.Filename))
                 throw new InvalidOperationException("missing name for loading");
 
-            var sb = ContentHelperFiles.LoadFromFile(this.Filename);
+            var sb = this.Filename.LoadFromFile();
             JArray a = JArray.Parse(sb.ToString());
 
             this.Deserialize(a);
