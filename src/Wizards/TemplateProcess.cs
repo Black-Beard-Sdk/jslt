@@ -12,7 +12,7 @@ namespace Wizards
         public class TemplateProcess
         {
 
-            public TemplateProcess(string rulePayloadFilename, JObject variables, bool debug, string[] paths = null)
+            public TemplateProcess(string rulePayloadFilename, JObject variables, bool debug, string[] paths)
             {
 
                 var file = ResolveFile(rulePayloadFilename, paths);

@@ -18,6 +18,9 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 
+#pragma warning disable CS3001
+#pragma warning disable CS3003
+
 namespace Bb.Json.Jslt.Parser
 {
 
@@ -592,7 +595,7 @@ namespace Bb.Json.Jslt.Parser
                             {
                                 prop = JToken.Parse(payloadValue);
                             }
-                            catch (Exception ex)
+                            catch (Exception)
                             {
                                 var location = new TokenLocation(startIndex, startIndex + payload.Length, start.Line, start.Column);
                                 AddError(location, "Failed to parse json", $"The conversion of {payloadValue} in Json value failed");
