@@ -18,12 +18,14 @@ namespace Black.Beard.Jslt.UnitTests
 
 
         [TestMethod]
-        public void TestMObjectWithPropertyString()
+        public void TestEscapeCharset()
         {
             var c = new JsltConstant(@"^([A-Za-z0-9]?\s?-?)+$", JsltKind.String);
             var value = c.ToString();
             Assert.AreEqual(value, @"""^([A-Za-z0-9]?\\s?-?)+$""");
         }
+
+        
 
     }
 
