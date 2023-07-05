@@ -9,6 +9,7 @@ using Bb.Json.Jslt.Asts;
 using Bb.Json.Jslt.Builds;
 using Bb.Json.Jslt.Services;
 using Oldtonsoft.Json.Linq;
+using SharpCompress.Common;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -176,19 +177,19 @@ namespace Bb.Json.Jslt.Parser
                     result.Items.Add(t);
 
                 else if (itemResult is string s)
-                    result.Items.Add(new JsltConstant() { Value = s, Start = item.Start.ToLocation(), Stop = item.Start.ToLocation() });
+                    result.Items.Add(new JsltConstant(s, JsltKind.String) { Start = item.Start.ToLocation(), Stop = item.Start.ToLocation() });
 
                 else if (itemResult is float f)
-                    result.Items.Add(new JsltConstant() { Value = f, Start = item.Start.ToLocation(), Stop = item.Start.ToLocation() });
+                    result.Items.Add(new JsltConstant(f, JsltKind.Float) { Start = item.Start.ToLocation(), Stop = item.Start.ToLocation() });
 
                 else if (itemResult is double d)
-                    result.Items.Add(new JsltConstant() { Value = d, Start = item.Start.ToLocation(), Stop = item.Start.ToLocation() });
+                    result.Items.Add(new JsltConstant(d, JsltKind.Float) { Start = item.Start.ToLocation(), Stop = item.Start.ToLocation() });
 
                 else if (itemResult is int i)
-                    result.Items.Add(new JsltConstant() { Value = i, Start = item.Start.ToLocation(), Stop = item.Start.ToLocation() });
+                    result.Items.Add(new JsltConstant(i, JsltKind.Integer) { Start = item.Start.ToLocation(), Stop = item.Start.ToLocation() });
 
                 else if (itemResult is long l)
-                    result.Items.Add(new JsltConstant() { Value = l, Start = item.Start.ToLocation(), Stop = item.Start.ToLocation() });
+                    result.Items.Add(new JsltConstant(l, JsltKind.Integer) { Start = item.Start.ToLocation(), Stop = item.Start.ToLocation() });
 
                 else
                 {
@@ -210,12 +211,12 @@ namespace Bb.Json.Jslt.Parser
             {
                 var o = Int64.Parse(value);
                 if (o <= Int32.MaxValue)
-                    return new JsltConstant() { Value = (Int32)0, Kind = JsltKind.Integer, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+                    return new JsltConstant((Int32)0, JsltKind.Integer) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
 
-                return new JsltConstant() { Value = o, Kind = JsltKind.Integer, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+                return new JsltConstant(o, JsltKind.Integer) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
             }
 
-            JsltBase result = new JsltConstant() { Value = 0, Kind = JsltKind.Integer, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+            JsltBase result = new JsltConstant(0, JsltKind.Integer) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
 
             result = GetConverter(context.jsonType(), result, out Type type);
 
@@ -226,7 +227,7 @@ namespace Bb.Json.Jslt.Parser
         public override object VisitJsonValueBoolean([NotNull] JsltParser.JsonValueBooleanContext context)
         {
 
-            JsltBase result = new JsltConstant() { Value = context.GetText().ToUpper() == "TRUE", Kind = JsltKind.Boolean, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+            JsltBase result = new JsltConstant(context.GetText().ToUpper() == "TRUE", JsltKind.Boolean) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
 
             result = GetConverter(context.jsonType(), result, out Type type);
 
@@ -245,15 +246,15 @@ namespace Bb.Json.Jslt.Parser
                 if (value.Contains(this._currentCulture.NumberFormat.NumberDecimalSeparator))
                 {
                     var p = double.Parse(value, this._currentCulture);
-                    return new JsltConstant() { Value = p, Kind = JsltKind.Float, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+                    return new JsltConstant(p, JsltKind.Float) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
                 }
 
                 var o = Int64.Parse(value);
-                return new JsltConstant() { Value = o, Kind = JsltKind.Integer, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+                return new JsltConstant(o, JsltKind.Integer) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
 
             }
 
-            JsltBase result = new JsltConstant() { Value = 0, Kind = JsltKind.Integer, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+            JsltBase result = new JsltConstant(0, JsltKind.Integer) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
 
             result = GetConverter(context.jsonType(), result, out Type type);
 
@@ -381,7 +382,7 @@ namespace Bb.Json.Jslt.Parser
                 {
 
                     List<JsltBase> args = null;
-                    var c = new JsltConstant() { Value = type, Kind = JsltKind.Type, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+                    var c = new JsltConstant(type, JsltKind.Type) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
 
                     if (containsVariable)
                         args = new List<JsltBase>() { result, new JsltTranslateVariable(c) };
@@ -419,25 +420,25 @@ namespace Bb.Json.Jslt.Parser
             JsltConstant result;
 
             if (type == typeof(string))
-                result = new JsltConstant() { Value = txt, Kind = JsltKind.String, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+                result = new JsltConstant(txt, JsltKind.String) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
 
             else if (type == typeof(Uri))
-                result = new JsltConstant() { Value = new Uri(txt), Kind = JsltKind.Uri, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+                result = new JsltConstant(new Uri(txt), JsltKind.Uri) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
 
             else if (type == typeof(TimeSpan))
-                result = new JsltConstant() { Value = TimeSpan.Parse(txt, this._currentCulture), Kind = JsltKind.TimeSpan, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+                result = new JsltConstant(TimeSpan.Parse(txt, this._currentCulture), JsltKind.TimeSpan) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
 
             else if (type == typeof(DateTime))
-                result = new JsltConstant() { Value = DateTime.Parse(txt, this._currentCulture), Kind = JsltKind.Date, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+                result = new JsltConstant(DateTime.Parse(txt, this._currentCulture), JsltKind.Date) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
 
             else if (type == typeof(DateTime))
-                result = new JsltConstant() { Value = Guid.Parse(txt), Kind = JsltKind.Guid, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+                result = new JsltConstant(Guid.Parse(txt), JsltKind.Array) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
 
             else if (type == typeof(bool))
-                result = new JsltConstant() { Value = InternalConverters.ToBoolean(txt), Kind = JsltKind.Guid, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+                result = new JsltConstant(InternalConverters.ToBoolean(txt), JsltKind.Guid) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
 
             else
-                result = new JsltConstant() { Value = txt, Kind = JsltKind.String, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+                result = new JsltConstant(txt, JsltKind.String) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
 
             return result;
 
@@ -457,28 +458,28 @@ namespace Bb.Json.Jslt.Parser
             var txt = context.GetText().Substring(1);
 
             if (context.URI_TYPE() != null)
-                return new JsltConstant() { Value = typeof(Uri), Kind = JsltKind.Type, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+                return new JsltConstant(typeof(Uri), JsltKind.Type) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
 
             else if (context.TIME_TYPE() != null)
-                return new JsltConstant() { Value = typeof(TimeSpan), Kind = JsltKind.Type, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+                return new JsltConstant(typeof(TimeSpan), JsltKind.Type) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
 
             else if (context.DATETIME_TYPE() != null)
-                return new JsltConstant() { Value = typeof(DateTime), Kind = JsltKind.Type, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+                return new JsltConstant(typeof(DateTime), JsltKind.Type) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
 
             else if (context.STRING_TYPE() != null)
-                return new JsltConstant() { Value = typeof(string), Kind = JsltKind.Type, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+                return new JsltConstant(typeof(string), JsltKind.Type) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
 
             else if (context.GUID_TYPE() != null)
-                return new JsltConstant() { Value = typeof(Guid), Kind = JsltKind.Type, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+                return new JsltConstant(typeof(Guid), JsltKind.Type) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
 
             else if (context.INTEGER_TYPE() != null)
-                return new JsltConstant() { Value = typeof(Int64), Kind = JsltKind.Type, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+                return new JsltConstant(typeof(Int64), JsltKind.Type) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
 
             else if (context.DECIMAL_TYPE() != null)
-                return new JsltConstant() { Value = typeof(decimal), Kind = JsltKind.Type, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+                return new JsltConstant(typeof(decimal), JsltKind.Type) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
 
             else if (context.BOOLEAN_TYPE() != null)
-                return new JsltConstant() { Value = typeof(bool), Kind = JsltKind.Type, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+                return new JsltConstant(typeof(bool), JsltKind.Type) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
 
             throw new NotImplementedException(context.GetText());
 
@@ -486,7 +487,7 @@ namespace Bb.Json.Jslt.Parser
 
         public override object VisitJsonValueNull([NotNull] JsltParser.JsonValueNullContext context)
         {
-            return new JsltConstant() { Value = null, Kind = JsltKind.Null, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+            return new JsltConstant(null, JsltKind.Null) { Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
         }
 
         public override object VisitPair([NotNull] JsltParser.PairContext context)
@@ -602,7 +603,7 @@ namespace Bb.Json.Jslt.Parser
                             }
                             startIndex += payloadValue.Length;
                             if (prop != null)
-                                metadatas.Add(metaKey, new JsltMetadata() { Start = new TokenLocation(lastIndex, startIndex, start.Line, start.Column), Value = prop });
+                                metadatas.Add(metaKey, new JsltMetadata(prop) { Start = new TokenLocation(lastIndex, startIndex, start.Line, start.Column) });
 
                         }
 
@@ -630,7 +631,7 @@ namespace Bb.Json.Jslt.Parser
             var ltItem = context.jsonLtItem();
             if (ltItem != null)
                 left = (JsltBase)ltItem.Accept(this);
-       
+
             else if (subOperation != null)
                 left = (JsltBase)subOperation.Accept(this);
 
@@ -722,7 +723,7 @@ namespace Bb.Json.Jslt.Parser
 
                 }
 
-         
+
             }
 
             left = _pile.Pop();
@@ -750,7 +751,7 @@ namespace Bb.Json.Jslt.Parser
                 if (type == null)
                     LocalDebug.Stop();
 
-                var c = new JsltConstant() { Value = type, Kind = JsltKind.Type, Start = jsonType.Start.ToLocation(), Stop = jsonType.Stop.ToLocation() };
+                var c = new JsltConstant(type, JsltKind.Type) { Start = jsonType.Start.ToLocation(), Stop = jsonType.Stop.ToLocation() };
                 var call = new JsltFunctionCall("convert", new List<JsltBase>() { left, c });
                 this._functions.Add(call);
                 left = call;
@@ -912,7 +913,7 @@ namespace Bb.Json.Jslt.Parser
                         var type = context.jsonType();
                         if (type != null)
                         {
-                            var c = new JsltConstant() { Value = type, Kind = JsltKind.Type, Start = type.Start.ToLocation(), Stop = type.Stop.ToLocation() };
+                            var c = new JsltConstant(type, JsltKind.Type) { Start = type.Start.ToLocation(), Stop = type.Stop.ToLocation() };
                             call = new JsltFunctionCall("convert", new List<JsltBase>() { call, c });
                             this._functions.Add(call);
                         }
@@ -946,7 +947,7 @@ namespace Bb.Json.Jslt.Parser
 
                 else
                 {
-                    var expression = new JsltConstant() { Value = @case.Name, Kind = JsltKind.String, Start = @case.Start, Stop = @case.Stop };
+                    var expression = new JsltConstant(@case.Name, JsltKind.String) { Start = @case.Start, Stop = @case.Stop };
                     var c = new JsltCase() { RightExpression = expression, Block = @case.Value, Start = @case.Start, Stop = @case.Stop };
                     result.Cases.Add(c);
                 }
@@ -1448,7 +1449,7 @@ namespace Bb.Json.Jslt.Parser
                             foreach (JsltBase fu in ar4.Items)
                             {
                                 if (fu is JsltConstant packageName)
-                                    CollectPackages(new JsltConstant() { Value = @"https://www.nuget.org/api/v2/package/" }, dll2, packageName);
+                                    CollectPackages(new JsltConstant(@"https://www.nuget.org/api/v2/package/", JsltKind.String) { }, dll2, packageName);
 
                                 else if (fu is JsltArray ar5)
                                 {

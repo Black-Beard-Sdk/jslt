@@ -73,7 +73,7 @@ namespace Bb.Json.Jslt.Services
         {
 
             var s = _stack.Peek();
-            var s1 = Expression.Assign(Expression.Property(s.Context, RuntimeContext._ScriptProperty), Expression.Constant(this.ScriptPath));
+            var s1 = Expression.Assign(Expression.Property(s.Context, RuntimeContext._ScriptProperty), Expression.Constant(this.ScriptPath ?? string.Empty));
 
             _compiler.Add(s1);
 

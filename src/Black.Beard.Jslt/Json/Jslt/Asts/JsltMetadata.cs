@@ -3,7 +3,7 @@
     public class JsltMetadata : JsltConstant
     {
 
-        public JsltMetadata()
+        public JsltMetadata(object value) : base(value, JsltKind.Object)
         {
 
         }

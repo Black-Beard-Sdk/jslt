@@ -10,18 +10,13 @@ namespace Bb.Json.Jslt.Asts
     {
 
 
-        public JsltConstant(object value)
+        public JsltConstant(object value, JsltKind kind)
         {
+            this.Kind = kind;
             this.Value = value;
         }
 
-        public JsltConstant()
-        {
-
-        }
-
-        public object Value { get; set; }
-
+        public object Value { get; }
 
         public Type Type { get => Value?.GetType() ?? typeof(object); }
 
@@ -84,9 +79,27 @@ namespace Bb.Json.Jslt.Asts
                     return true;
 
                 case nameof(String):
-                    writer.Append("\"");
-                    writer.Append(value);
-                    writer.Append("\"");
+
+                    if (value != null)
+                    {
+                        writer.Append("\"");
+
+                        if (value is string s)
+                        {
+                            if (s.Contains('\\'))
+                            {
+                                s = s.Replace("\\", "\\\\");
+                                writer.Append(s);
+                            }
+                        }
+                        else
+                            writer.Append(value);
+
+                        writer.Append("\"");
+                    }
+                    else
+                        writer.Append("null");
+
                     return true;
 
                 case nameof(Boolean):
