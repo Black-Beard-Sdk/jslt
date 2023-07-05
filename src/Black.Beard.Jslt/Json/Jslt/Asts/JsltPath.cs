@@ -16,7 +16,7 @@ namespace Bb.Json.Jslt.Asts
             Kind = JsltKind.Jpath;
         }
 
-        public string Value { get; internal set; }
+        public string Value { get; set; }
 
         public override object Accept(IJsltJsonVisitor visitor)
         {

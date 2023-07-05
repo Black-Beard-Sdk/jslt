@@ -14,7 +14,7 @@ namespace Bb.Json.Jslt.Asts
         }
 
 
-        internal JsltBase Append(JsltBase item)
+        public JsltBase Append(JsltBase item)
         {
             _items.Add(item);
             return item;

@@ -19,12 +19,21 @@ namespace Bb.Json.Jslt.Asts
             this._varItems = new Dictionary<string, JsltVariable>();
         }
 
+        public void Append(string name, JsltBase value)
+        {
+            Append(new JsltProperty() 
+            {
+                Name = name, 
+                Value = value 
+            });
+        }
+
         public void Append(JsltProperty property)
         {
 
             if (property is JsltVariable v)
                 _varItems.Add(v.Name, v);
-            
+
             else if (property.Name == TransformJsonConstants.Source)
                 this.Source = property.Value;
 
