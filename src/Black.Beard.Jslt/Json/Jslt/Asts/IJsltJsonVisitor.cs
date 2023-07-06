@@ -15,7 +15,7 @@ namespace Bb.Json.Jslt.Asts
         object VisitComment(JsltComment comment);
         object VisitObject(JsltObject node);
 
-        object VisitDirective(JsltDirective node);
+        object VisitDirective(JsltDirectives node);
 
         object VisitProperty(JsltProperty node);
 

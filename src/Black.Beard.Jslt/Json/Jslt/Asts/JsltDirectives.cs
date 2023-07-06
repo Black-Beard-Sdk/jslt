@@ -4,10 +4,10 @@ using Bb.Json.Jslt.Parser;
 namespace Bb.Json.Jslt.Asts
 {
 
-    public class JsltDirective : JsltProperty
+    public class JsltDirectives : JsltProperty
     {
 
-        public JsltDirective()
+        public JsltDirectives()
         {
             this.Kind = JsltKind.Property;
             this.Name = "$directives";

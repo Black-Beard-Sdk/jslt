@@ -246,7 +246,7 @@ namespace Bb.Json.Jslt.Services
             }
         }
 
-        public object VisitDirective(JsltDirective node)
+        public object VisitDirective(JsltDirectives node)
         {
             return null;
         }

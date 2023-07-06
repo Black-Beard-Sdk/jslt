@@ -123,7 +123,7 @@ namespace Bb.JsltEvaluator.AvalonEdit
 
         }
 
-        public object VisitDirective(JsltDirective node)
+        public object VisitDirective(JsltDirectives node)
         {
 
             if (node.Source != null)

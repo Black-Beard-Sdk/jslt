@@ -246,7 +246,7 @@ namespace Bb.Json.Jslt.Services
 
         }
 
-        public override object VisitDirective(JsltDirective node)
+        public override object VisitDirective(JsltDirectives node)
         {
 
             if (Evaluate(node))

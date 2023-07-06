@@ -182,7 +182,7 @@ namespace Bb.Json.Jslt.Services
 
         }
 
-        public virtual object VisitDirective(JsltDirective node)
+        public virtual object VisitDirective(JsltDirectives node)
         {
 
             if (node.Where != null)
