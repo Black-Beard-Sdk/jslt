@@ -11,7 +11,7 @@ namespace Bb.Json.Jslt.Asts
     public class JsltConstant : JsltBase
     {
 
-        public static JsltKind? Resolve(object value)
+        public static JsltKind Resolve(object value)
         {
 
             if (value == null)
@@ -31,9 +31,6 @@ namespace Bb.Json.Jslt.Asts
 
             if (value is byte[])
                 return JsltKind.Bytes;
-
-            if (value is DateTime)
-                return JsltKind.Date;
 
             if (value is bool)
                 return JsltKind.Boolean;
@@ -65,7 +62,13 @@ namespace Bb.Json.Jslt.Asts
             if (value is ushort)
                 return JsltKind.Integer;
 
-            return null;
+            if (value is DateTime)
+                return JsltKind.Date;
+
+            if (value is TimeSpan)
+                return JsltKind.TimeSpan;
+
+            throw new NotImplementedException($"{value.GetType().Name} is not managed. Please resolve JsltKind manually.");
 
         }
 

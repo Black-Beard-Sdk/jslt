@@ -92,7 +92,7 @@ namespace Bb.Expressions.CsharpGenerators
 
             var indentObj = new Indentation(_output, Indent + 1);
 
-            b.Append('\"');
+            b.Append(Quote);
 
             int i = 0;
             while (i < value.Length)
@@ -105,8 +105,9 @@ namespace Bb.Expressions.CsharpGenerators
                     case '\t':
                         b.Append("\\t");
                         break;
-                    case '\"':
-                        b.Append("\\\"");
+                    case Quote:
+                        b.Append("\\");
+                        b.Append(Quote);
                         break;
                     case '\'':
                         b.Append("\\\'");
@@ -145,12 +146,12 @@ namespace Bb.Expressions.CsharpGenerators
                     b.Append("\" +");
                     b.Append(Environment.NewLine);
                     b.Append(indentObj.IndentationString);
-                    b.Append('\"');
+                    b.Append(Quote);
                 }
                 ++i;
             }
 
-            b.Append('\"');
+            b.Append(Quote);
 
             return b.ToString();
         }
@@ -163,13 +164,13 @@ namespace Bb.Expressions.CsharpGenerators
 
             for (int i = 0; i < value.Length; i++)
             {
-                if (value[i] == '\"')
-                    b.Append("\"\"");
+                if (value[i] == Quote)
+                    b.Append("\Quote);
                 else
                     b.Append(value[i]);
             }
 
-            b.Append('\"');
+            b.Append(Quote);
 
             return b.ToString();
         }
@@ -750,7 +751,7 @@ namespace Bb.Expressions.CsharpGenerators
                 case '\t':
                     Output.Write("\\t");
                     break;
-                case '\"':
+                case Quote:
                     Output.Write("\\\"");
                     break;
                 case '\'':
@@ -1079,7 +1080,7 @@ namespace Bb.Expressions.CsharpGenerators
             Output.Write(e.LineNumber);
             Output.Write(" \"");
             Output.Write(e.FileName);
-            Output.Write('\"');
+            Output.Write(Quote);
             Output.WriteLine();
         }
 
@@ -2514,7 +2515,7 @@ namespace Bb.Expressions.CsharpGenerators
                     Output.Write(b.ToString("X2", CultureInfo.InvariantCulture));
                 }
             }
-            Output.WriteLine("\"");
+            Output.WriteLine(Quote);
         }
 
         private void GenerateCodeRegionDirective(CodeRegionDirective regionDirective)
@@ -3120,20 +3121,20 @@ namespace Bb.Expressions.CsharpGenerators
 
             if (sa.Length == 1)
             {
-                return "\"" + sa[0] + "\"";
+                return Quote + sa[0] + Quote;
             }
 
             var sb = new StringBuilder();
             for (int i = 0; i < sa.Length - 1; i++)
             {
-                sb.Append('\"');
+                sb.Append(Quote);
                 sb.Append(sa[i]);
-                sb.Append('\"');
+                sb.Append(Quote);
                 sb.Append(separator);
             }
-            sb.Append('\"');
+            sb.Append(Quote);
             sb.Append(sa[sa.Length - 1]);
-            sb.Append('\"');
+            sb.Append(Quote);
 
             return sb.ToString();
         }
@@ -3284,6 +3285,9 @@ namespace Bb.Expressions.CsharpGenerators
                 }
             }
         }
+
+        public const char Quote = '"';
+
     }
 
     internal sealed partial class LocalCSharpCodeGenerator

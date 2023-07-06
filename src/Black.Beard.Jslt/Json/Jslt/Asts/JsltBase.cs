@@ -56,6 +56,7 @@ namespace Bb.Json.Jslt.Asts
 
         private List<JsltComment> _comments;
 
+        public const string Quote = "\"";
 
     }
 

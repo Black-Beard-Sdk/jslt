@@ -203,15 +203,17 @@ namespace Bb.Asts
             return result;
         }
 
-        public IDisposable Indent(bool crlf = false)
+        public IDisposable Indent(StrategySerializationItem strategy, bool crlf = false)
         {
-
-            var strategy = StrategySerializationItem.Default;
-
             var result = new _disposable(strategy, this);
             if (crlf)
                 result.After.Add(c => c.AppendEndLine());
             return result;
+        }
+
+        public IDisposable Indent(bool crlf = false)
+        {
+            return Indent(StrategySerializationItem.Default, crlf);
         }
 
         public IDisposable IndentWithParentheses(StrategySerializationItem strategy, bool crlf = false)
@@ -260,7 +262,7 @@ namespace Bb.Asts
                 if (this._strategy.Indent)
                     this._writer.AddIndent();
 
-                if (strategy.ReturnLineBefore)
+                if (strategy.ReturnLineBeforeStarting)
                     writer.AppendEndLine();
 
             }
@@ -284,7 +286,7 @@ namespace Bb.Asts
                         foreach (var item in After)
                             item(this._writer);
 
-                        if (_strategy.ReturnLineAfter)
+                        if (_strategy.ReturnLineAfterEnding)
                             _writer.AppendEndLine();
 
                     }

@@ -3,10 +3,12 @@ using Bb.Json.Jslt.Parser;
 
 namespace Bb.Json.Jslt.Asts
 {
+
+
+
     [System.Diagnostics.DebuggerDisplay("{Operator} {Operator}")]
     public class JsltOperator : JsltBase
     {
-
 
         public JsltOperator(JsltBase left, OperationEnum @operator)
         {

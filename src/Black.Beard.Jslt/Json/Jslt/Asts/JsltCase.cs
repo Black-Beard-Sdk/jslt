@@ -21,7 +21,7 @@ namespace Bb.Json.Jslt.Asts
         {
             return visitor.VisitCase(this);
         }
-        
+
         public override bool ToString(Writer writer, StrategySerializationItem strategy)
         {
 

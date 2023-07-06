@@ -1,5 +1,8 @@
-﻿namespace Bb.Json.Jslt.Asts
+﻿using Bb.Json.Jslt.Parser;
+
+namespace Bb.Json.Jslt.Asts
 {
+
     public class JsltMetadata : JsltConstant
     {
 

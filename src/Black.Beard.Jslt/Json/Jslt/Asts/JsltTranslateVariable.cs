@@ -25,11 +25,6 @@ namespace Bb.Json.Jslt.Asts
             else if (token is JsltPath p)
                 _value = p.Value?.ToString();
 
-            else
-            {
-
-            }
-
             var matchs = VariableManagerExtension.Match(_value);
             while (matchs.Success)
             {

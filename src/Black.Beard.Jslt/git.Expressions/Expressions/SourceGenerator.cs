@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -45,7 +46,7 @@ namespace Bb.Expressions
             foreach (var item in node.Parameters)
             {
                 if (t)
-                    Append(", ");
+                    Append(Comma);
                 Append(item.Type);
                 Append(" ");
                 Visit(item);
@@ -260,7 +261,7 @@ namespace Bb.Expressions
             foreach (var item in node.Arguments)
             {
                 if (t)
-                    Append(", ");
+                    Append(Comma);
                 Visit(item);
                 t = true;
             }
@@ -336,7 +337,7 @@ namespace Bb.Expressions
             foreach (var item in node.Arguments)
             {
                 if (t)
-                    Append(", ");
+                    Append(Comma);
                 Visit(item);
                 t = true;
             }
@@ -350,7 +351,7 @@ namespace Bb.Expressions
         {
 
             if (node.Value is string)
-                Append($"\"{node.Value}\"");
+                Append($"{Quote}{node.Value}{Quote}");
 
             else if (node.Value is char)
                 Append($"'{node.Value}'");
@@ -418,7 +419,7 @@ namespace Bb.Expressions
             foreach (var item in node.Arguments)
             {
                 if (t)
-                    Append(", ");
+                    Append(Comma);
                 Visit(item);
                 t = true;
             }
@@ -586,7 +587,7 @@ namespace Bb.Expressions
             {
                 Append(comma);
                 Visit(item);
-                comma = ", ";
+                comma = Comma;
             }
             Append(" }");
 
@@ -691,6 +692,11 @@ namespace Bb.Expressions
         private int _indentation;
         private StringBuilder sb = new StringBuilder(10 * 1024);
         private readonly HashSet<string> _usings;
+
+
+        public const char Quote = '"';
+        public const string Comma = ", ";
+
     }
 
 }

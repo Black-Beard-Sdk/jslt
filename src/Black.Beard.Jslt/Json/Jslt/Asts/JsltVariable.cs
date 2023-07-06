@@ -2,6 +2,7 @@
 
 namespace Bb.Json.Jslt.Asts
 {
+
     public class JsltVariable : JsltProperty
     {
 

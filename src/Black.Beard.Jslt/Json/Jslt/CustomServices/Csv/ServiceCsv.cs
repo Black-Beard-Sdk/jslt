@@ -19,7 +19,7 @@ namespace Bb.Json.Jslt.CustomServices.Csv
         [JsltExtensionMethodParameter("hasHeader", "has header")]
         [JsltExtensionMethodParameter("separator", "separator charset. If null the value is ';'")]
         [JsltExtensionMethodParameter("quote", "quote charset. If null the value is '\"'")]
-        [JsltExtensionMethodParameter("escape", "quote charset. If null the value is '\"'")]
+        [JsltExtensionMethodParameter("escape", $"quote charset. If null the value is '\"'")]
         [JsltExtensionMethodParameter("excludedColumns", "List of column to exclude form reading")]
         [JsltExtensionMethodParameter("excludeNullAndEmpty", "bypass null and empty values")]
         public static JToken ExecuteLoadCsvSource(RuntimeContext ctx, string sourcePath, bool hasHeader, string separator, string quote, string escape, string excludedColumns, bool excludeNullAndEmpty)

@@ -685,7 +685,7 @@ namespace Oldtonsoft.Json.Linq.JsonPath
                             resolvedChar = currentChar;
                             break;
                         default:
-                            throw new JsonException(@"Unknown escape character: \" + currentChar);
+                            throw new JsonException(@"Unknown escape character: " + currentChar);
                     }
 
                     sb.Append(resolvedChar);

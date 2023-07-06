@@ -46,7 +46,7 @@ namespace Bb.Json.Jslt.Asts
         public override bool ToString(Writer writer, StrategySerializationItem strategy)
         {
 
-            writer.Append($"\"{Name}\" : ");
+            writer.Append($"{Quote}{Name}{Quote} : ");
 
             if (Value != null)
             {

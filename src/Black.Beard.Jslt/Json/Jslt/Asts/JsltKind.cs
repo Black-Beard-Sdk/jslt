@@ -4,6 +4,7 @@
     {
         Object,
         Property,
+        Directives,
         Array,
         TimeSpan,
         Uri,

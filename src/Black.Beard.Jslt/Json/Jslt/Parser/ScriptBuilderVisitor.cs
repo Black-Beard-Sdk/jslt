@@ -524,7 +524,7 @@ namespace Bb.Json.Jslt.Parser
                         else if (name.ToLower() == "$directives" && value is JsltObject directives)
                         {
                             ParseDirectives(directives);
-                            return new JsltDirective() { Name = name, Value = value, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
+                            return new JsltDirective() { Value = value, Start = context.Start.ToLocation(), Stop = context.Stop.ToLocation() };
                         }
                         else if (name.StartsWith("$") && name != "$" && name != "$where")
                         {
