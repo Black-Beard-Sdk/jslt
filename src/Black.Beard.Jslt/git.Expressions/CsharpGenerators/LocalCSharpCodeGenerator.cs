@@ -165,7 +165,7 @@ namespace Bb.Expressions.CsharpGenerators
             for (int i = 0; i < value.Length; i++)
             {
                 if (value[i] == Quote)
-                    b.Append("\Quote);
+                    b.Append(Quote);
                 else
                     b.Append(value[i]);
             }
