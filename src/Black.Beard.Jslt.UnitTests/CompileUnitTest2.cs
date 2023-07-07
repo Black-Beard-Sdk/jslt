@@ -42,7 +42,17 @@ namespace Black.Beard.Jslt.UnitTests
 
             result.Append(new JsltProperty() { Name = "value", Value = new JsltConstant(true, JsltKind.Boolean) });
 
-            var resultTxt = result.ToString();
+            var resultTxt = result.ToString()
+                .Replace("\t", "")
+                .Replace("\r", "")
+                .Replace("\n", "")
+                .Replace("\"", "'")
+
+                ;
+
+            var expected = "{'$directives' : {'culture' : 'fr-FR','output' : {'filter' : $.value}},'value' : true}";
+
+            Assert.AreEqual(resultTxt, expected);
 
         }
     }
