@@ -17,7 +17,7 @@ namespace Bb.Json.Jslt.Asts
 
         public string Name { get; set; }
 
-        public JsltBase Value { get; set; }
+        public virtual JsltBase Value { get; set; }
 
         public override object Accept(IJsltJsonVisitor visitor)
         {
@@ -46,11 +46,15 @@ namespace Bb.Json.Jslt.Asts
         public override bool ToString(Writer writer, StrategySerializationItem strategy)
         {
 
+
+            strategy.ApplyReturnLineBeforeStarting(writer);
             writer.Append($"{Quote}{Name}{Quote} : ");
+            strategy.ApplyReturnLineAfterStarting(writer);
+
 
             if (Value != null)
             {
-                
+
                 if (Value is JsltObject)
                     writer.AppendEndLine();
 

@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Xml.Linq;
 
 namespace Black.Beard.Jslt.UnitTests
 {
@@ -25,8 +26,25 @@ namespace Black.Beard.Jslt.UnitTests
             Assert.AreEqual(value, @"""^([A-Za-z0-9]?\\s?-?)+$""");
         }
 
-        
 
+
+        [TestMethod]
+        public void TestGenerationOfDirectives()
+        {
+
+            var result = new JsltObject();
+
+            var d = new JsltDirectives()
+                .SetCulture(CultureInfo.CurrentCulture)
+                .Output(c => c.SetFilter("$.value"))
+                ;
+            result.Append(d);
+
+            result.Append(new JsltProperty() { Name = "value", Value = new JsltConstant(true, JsltKind.Boolean) });
+
+            var resultTxt = result.ToString();
+
+        }
     }
 
 }

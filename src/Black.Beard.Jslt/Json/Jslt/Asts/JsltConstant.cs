@@ -246,6 +246,9 @@ namespace Bb.Json.Jslt.Asts
                                 s = s.Replace("\\", "\\\\");
                                 writer.Append(s);
                             }
+                            else
+                                writer.Append(value);
+
                         }
                         else
                             writer.Append(value);
