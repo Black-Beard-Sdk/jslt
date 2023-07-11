@@ -55,6 +55,32 @@ namespace Black.Beard.Jslt.UnitTests
             Assert.AreEqual(resultTxt, expected);
 
         }
+
+
+        [TestMethod]
+        public void TestGenerationArray()
+        {
+
+            List<JsltBase> list = new List<JsltBase>()
+            {
+                new JsltConstant("Business", JsltKind.String),
+                new JsltConstant("Private", JsltKind.String),
+            };
+            var result = new JsltFunctionCall("getrandom_in_list", new JsltArray(list));
+
+            string expected = @"getrandom_in_list(['Business', 'Private'])";
+            var resultTxt = result.ToString()
+                .Replace("\t", "")
+                .Replace("\r", "")
+                .Replace("\n", "")
+                .Replace("\"", "'")
+                .Trim()
+
+                ;
+            Assert.AreEqual(resultTxt, expected);
+
+        }
+
     }
 
 }

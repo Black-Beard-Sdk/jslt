@@ -1,4 +1,5 @@
 ﻿using Bb.Asts;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
 
 namespace Bb.Json.Jslt.Asts
@@ -77,7 +78,11 @@ namespace Bb.Json.Jslt.Asts
 
         }
 
+        public JsltBase this[int index] => _items[index];
+
         public List<JsltBase> Items { get => _items; }
+
+        public int Count { get => _items.Count; }
 
         private readonly List<JsltBase> _items;
 

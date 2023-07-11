@@ -1,4 +1,5 @@
 ﻿using Bb.Json.Attributes;
+using Bb.Json.Jslt.Asts;
 using Bb.Json.Jslt.Services;
 using Fare;
 using Oldtonsoft.Json.Linq;
@@ -511,6 +512,15 @@ namespace Bb.Json.Jslt.CustomServices
 
 
         }
+
+        [JsltExtensionMethod("getrandom_in_list")]
+        public static JToken GetRandomInList(RuntimeContext ctx, JsltArray items)
+        {
+            var m = items.Count;
+            var index = DateTime.Now.Millisecond % m;
+            return new JValue(items[index]);
+        }
+
 
         //[JsltExtensionMethod("getrandomhostname")]
         //public static JToken GetRandomHostname(RuntimeContext ctx, JToken token)
