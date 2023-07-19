@@ -288,6 +288,11 @@ namespace Bb.Json.Jslt.Asts
 
         }
 
+        public JToken ToJson()
+        {
+            return new JValue(Value);
+        }
+
     }
 
 }

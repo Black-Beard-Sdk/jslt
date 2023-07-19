@@ -514,11 +514,13 @@ namespace Bb.Json.Jslt.CustomServices
         }
 
         [JsltExtensionMethod("getrandom_in_list")]
-        public static JToken GetRandomInList(RuntimeContext ctx, JsltArray items)
+        public static JToken GetRandomInList(RuntimeContext ctx, JArray items)
         {
             var m = items.Count;
             var index = DateTime.Now.Millisecond % m;
-            return new JValue(items[index]);
+            JToken item = items[index];
+            return item;
+
         }
 
 

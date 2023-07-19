@@ -1,4 +1,5 @@
 using Bb.Json.Jslt.Asts;
+using Bb.Json.Jslt.CustomServices;
 using Bb.Json.Jslt.Parser;
 using Bb.Json.Jslt.Services;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -78,6 +79,44 @@ namespace Black.Beard.Jslt.UnitTests
 
                 ;
             Assert.AreEqual(resultTxt, expected);
+
+        }
+
+        [TestMethod]
+        public void TestUseGetRandomInList()
+        {
+
+            HashSet<string> _h = new HashSet<string>() { "Business", "Private" };
+            var list = new List<Oldtonsoft.Json.Linq.JToken>();
+
+            foreach (string s in _h)
+                list.Add(new Oldtonsoft.Json.Linq.JValue(s));
+
+            var ctx = new RuntimeContext();
+
+            var o = Services.GetRandomInList(ctx, new Oldtonsoft.Json.Linq.JArray(list));
+            Assert.IsTrue(_h.Contains(o.ToString()));
+
+        }
+
+        [TestMethod]
+        public void TestGenerationArray2()
+        {
+
+            HashSet<string> _h = new HashSet<string>() { "Business", "Private" };
+            List<JsltBase> list = new List<JsltBase>();
+
+            foreach (string s in _h)
+                list.Add(new JsltConstant(s, JsltKind.String));
+
+            var r = new JsltObject();
+            r.Append("value", new JsltFunctionCall("getrandom_in_list", new JsltArray(list)));
+
+            var oo = JsltTemplate.GetTemplate(r);
+            var r2 = oo.Transform(Sources.GetEmpty());
+            var pp = r2.TokenResult["value"].ToString();
+            
+            Assert.IsTrue(_h.Contains(pp));
 
         }
 

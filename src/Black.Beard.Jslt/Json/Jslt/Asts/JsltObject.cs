@@ -12,7 +12,6 @@ namespace Bb.Json.Jslt.Asts
     public class JsltObject : JsltBase
     {
 
-
         public JsltObject()
         {
             this.Kind = JsltKind.Object;

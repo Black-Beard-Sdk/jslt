@@ -12,6 +12,7 @@ using System.Text;
 
 namespace Bb.Json.Jslt.Services
 {
+
     public class TemplateTransformProvider
     {
 
@@ -25,6 +26,15 @@ namespace Bb.Json.Jslt.Services
 
         }
 
+        /// <summary>
+        /// Gets the template from text.
+        /// </summary>
+        /// <param name="sb">The sb.</param>
+        /// <param name="withDebug">if set to <c>true</c> [with debug].</param>
+        /// <param name="filename">The filename.</param>
+        /// <param name="diagnostics">The diagnostics.</param>
+        /// <returns></returns>
+        /// <exception cref="Bb.JSon.ParsingJsonException">Failed to parse Json. " + e.Message</exception>
         public JsltTemplate GetTemplate(StringBuilder sb, bool withDebug, string filename, Diagnostics diagnostics = null)
         {
 
@@ -136,6 +146,20 @@ namespace Bb.Json.Jslt.Services
             return result;
 
         }
+
+        /// <summary>
+        /// Gets the template from tree syntax.
+        /// </summary>
+        /// <param name="tree">The tree.</param>
+        /// <param name="withDebug">if set to <c>true</c> [with debug].</param>
+        /// <param name="filename">The filename.</param>
+        /// <param name="diagnostics">The diagnostics.</param>
+        /// <returns></returns>
+        public JsltTemplate GetTemplate(JsltBase tree, bool withDebug, string filename, Diagnostics diagnostics = null)
+        {
+            return GetTemplate(new StringBuilder(tree.ToString()), withDebug, filename, diagnostics);
+        }
+
 
         private Func<RuntimeContext, JToken, JToken> Get(JsltBase tree, FunctionFoundry foundry, Diagnostics _errors, string filepathCode, string scriptPath, bool withDebug)
         {

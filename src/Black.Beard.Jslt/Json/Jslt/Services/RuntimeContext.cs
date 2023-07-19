@@ -14,6 +14,9 @@ namespace Bb.Json.Jslt.Services
     public class RuntimeContext
     {
 
+        /// <summary>
+        /// Initializes the <see cref="RuntimeContext"/> class.
+        /// </summary>
         static RuntimeContext()
         {
             //_mapPropertyService = RuntimeContext.MapPropertyService;
@@ -38,15 +41,26 @@ namespace Bb.Json.Jslt.Services
 
         }
 
-        internal RuntimeContext(Sources sources, Diagnostics diagnostic)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RuntimeContext"/> class.
+        /// </summary>
+        public RuntimeContext() : this(Sources.GetEmpty(), null) { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RuntimeContext"/> class.
+        /// </summary>
+        /// <param name="sources">The sources.</param>
+        /// <param name="diagnostic">The diagnostic.</param>
+        public RuntimeContext(Sources sources, Diagnostics diagnostic = null)
         {
 
-            var d = diagnostic ?? new Diagnostics();
+            SubSources = sources ?? Sources.GetEmpty();
+            _diagnostics = diagnostic ?? new Diagnostics();
+            
             this._watch = new Stopwatch();
 
-            TokenSource = sources.Source.Datas;
-            SubSources = sources;
-            _diagnostics = d;
+            if (sources != null)
+                TokenSource = sources.Source?.Datas;
 
             this._stack = new Stack<MethodContext>();
 
@@ -191,7 +205,7 @@ namespace Bb.Json.Jslt.Services
             JToken result = null;
 
             object l = null;
-            object r = null;            
+            object r = null;
 
             if (leftToken == null)
                 l = null;

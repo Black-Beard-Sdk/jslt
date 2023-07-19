@@ -13,9 +13,93 @@ namespace Bb.Json.Jslt.Services
     public class JsltTemplate
     {
 
-        public JsltTemplate()
+        internal JsltTemplate()
         {
 
+        }
+
+        /// <summary>
+        /// Gets the template from tree.
+        /// </summary>
+        /// <param name="tree">The tree.</param>
+        /// <param name="withDebug">if set to <c>true</c> [with debug].</param>
+        /// <param name="filename">The filename.</param>
+        /// <param name="diagnostics">The diagnostics.</param>
+        /// <param name="configuration">The configuration.</param>
+        /// <returns></returns>
+        public static JsltTemplate GetTemplate(JsltBase tree, bool withDebug, string filename, Diagnostics diagnostics = null, TranformJsonAstConfiguration configuration = null)
+        {
+            var provider = new TemplateTransformProvider(configuration);
+            return provider.GetTemplate(tree, withDebug, filename, diagnostics);
+        }
+
+        /// <summary>
+        /// Gets the template from tree.
+        /// </summary>
+        /// <param name="tree">The tree.</param>
+        /// <param name="filename">The filename.</param>
+        /// <param name="diagnostics">The diagnostics.</param>
+        /// <param name="configuration">The configuration.</param>
+        /// <returns></returns>
+        public static JsltTemplate GetTemplate(JsltBase tree, string filename, Diagnostics diagnostics = null, TranformJsonAstConfiguration configuration = null)
+        {
+            var provider = new TemplateTransformProvider(configuration);
+            return provider.GetTemplate(tree, false, filename, diagnostics);
+        }
+
+        /// <summary>
+        /// Gets the template from tree.
+        /// </summary>
+        /// <param name="tree">The tree.</param>
+        /// <param name="diagnostics">The diagnostics.</param>
+        /// <param name="configuration">The configuration.</param>
+        /// <returns></returns>
+        public static JsltTemplate GetTemplate(JsltBase tree, Diagnostics diagnostics = null, TranformJsonAstConfiguration configuration = null)
+        {
+            var provider = new TemplateTransformProvider(configuration);
+            return provider.GetTemplate(tree, false, string.Empty, diagnostics);
+        }
+
+        /// <summary>
+        /// Gets the template from text.
+        /// </summary>
+        /// <param name="sb">The sb.</param>
+        /// <param name="withDebug">if set to <c>true</c> [with debug].</param>
+        /// <param name="filename">The filename.</param>
+        /// <param name="diagnostics">The diagnostics.</param>
+        /// <param name="configuration">The configuration.</param>
+        /// <returns></returns>
+        public static JsltTemplate GetTemplate(StringBuilder sb, bool withDebug, string filename, Diagnostics diagnostics = null, TranformJsonAstConfiguration configuration = null)
+        {
+            var provider = new TemplateTransformProvider(configuration);
+            return provider.GetTemplate(sb, withDebug, filename, diagnostics);
+        }
+
+        /// <summary>
+        /// Gets the template from text.
+        /// </summary>
+        /// <param name="sb">The sb.</param>
+        /// <param name="filename">The filename.</param>
+        /// <param name="diagnostics">The diagnostics.</param>
+        /// <param name="configuration">The configuration.</param>
+        /// <returns></returns>
+        public static JsltTemplate GetTemplate(StringBuilder sb, string filename, Diagnostics diagnostics = null, TranformJsonAstConfiguration configuration = null)
+        {
+            var provider = new TemplateTransformProvider(configuration);
+            return provider.GetTemplate(sb, false, filename, diagnostics);
+        }
+
+        /// <summary>
+        /// Gets the template from text.
+        /// </summary>
+        /// <param name="sb">The sb.</param>
+        /// <param name="diagnostics">The diagnostics.</param>
+        /// <param name="configuration">The configuration.</param>
+        /// <returns></returns>
+        public static JsltTemplate GetTemplate(StringBuilder sb, Diagnostics diagnostics = null, TranformJsonAstConfiguration configuration = null)
+        {
+            var provider = new TemplateTransformProvider(configuration);
+            return provider.GetTemplate(sb, false, string.Empty, diagnostics);
         }
 
         public Func<RuntimeContext, JToken, JToken> Rules { get; internal set; }
@@ -36,12 +120,22 @@ namespace Bb.Json.Jslt.Services
 
         public OutputSerializationRule RuleOutput { get; internal set; }
 
+        /// <summary>
+        /// Execute the template
+        /// </summary>
+        /// <param name="sources">The sources.</param>
+        /// <returns></returns>
         public StringBuilder TransformForOutput(Sources sources)
         {
             RuntimeContext result = this.Transform(sources);
             return ApplyOutput(result);
         }
 
+        /// <summary>
+        /// Execute the template
+        /// </summary>
+        /// <param name="ctx">The CTX.</param>
+        /// <returns></returns>
         public StringBuilder TransformForOutput(RuntimeContext ctx)
         {
             RuntimeContext result = this.Transform(ctx);
@@ -93,6 +187,24 @@ namespace Bb.Json.Jslt.Services
 
         }
 
+        /// <summary>
+        /// Execute the template.
+        /// </summary>
+        /// <returns></returns>
+        public RuntimeContext Transform()
+        {
+            RuntimeContext ctx = GetContext(null);
+            ctx.Configuration = this.Configuration;
+            ctx.TokenResult = Rules(ctx, ctx.TokenSource);
+            return ctx;
+
+        }
+
+        /// <summary>
+        /// Execute the template
+        /// </summary>
+        /// <param name="sources">The sources.</param>
+        /// <returns></returns>
         public RuntimeContext Transform(Sources sources)
         {
             RuntimeContext ctx = GetContext(sources);
@@ -103,6 +215,12 @@ namespace Bb.Json.Jslt.Services
 
         }
 
+        /// <summary>
+        /// Execute the template
+        /// </summary>
+        /// <param name="ctx">The CTX.</param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentNullException">ctx</exception>
         public RuntimeContext Transform(RuntimeContext ctx)
         {
             if (ctx == null)
