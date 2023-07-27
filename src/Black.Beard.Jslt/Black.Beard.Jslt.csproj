@@ -25,6 +25,7 @@
 
 	<ItemGroup>
 		<Compile Remove="Helpers\Crc32.cs" />
+		<Compile Remove="Json\Jslt\Parser\DiagnosticReport.cs" />
 		<Compile Remove="Json\Jslt\Services\Factory.cs" />
 		<Compile Remove="Json\Jslt\Services\ObjectCreator.cs" />
 		<Compile Remove="Json\Jslt\Services\TranformJsonTemplateReader.cs" />
@@ -32,9 +33,10 @@
 
 	<ItemGroup>
 		<PackageReference Include="Antlr4.Runtime.Standard" Version="4.9.3" />
+		<PackageReference Include="Black.Beard.Analysis" Version="1.0.55" />
 		<PackageReference Include="Black.Beard.Helpers.ContentLoaders.Compress" Version="2.0.7" />
 		<PackageReference Include="Black.Beard.Helpers.ContentLoaders.Files" Version="2.0.7" />
-		<PackageReference Include="Black.Beard.Roslyn" Version="1.0.51" />
+		<PackageReference Include="Black.Beard.Roslyn" Version="1.0.55" />
 		<PackageReference Include="System.CodeDom" Version="7.0.0" />
 	</ItemGroup>
 

@@ -2,6 +2,7 @@
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
+using Bb.Analysis;
 using Bb.Compilers;
 using Bb.ComponentModel;
 using Bb.ComponentModel.Factories;
@@ -1125,7 +1126,7 @@ namespace Bb.Json.Jslt.Parser
 
         }
 
-        public IEnumerable<ErrorModel> Errors { get => this._diagnostics; }
+        public IEnumerable<DiagnosticReport> Errors { get => this._diagnostics; }
 
         public string Filename { get; set; }
 
@@ -1139,15 +1140,18 @@ namespace Bb.Json.Jslt.Parser
         private void LoadAssemblyFromCs(List<FileInfo> sources)
         {
 
-            var assemblyDescription = CSharp.GetAssembly(sources.Select(c => c.FullName).ToArray());
+            AssemblyResult assemblyDescription = CSharp.GetAssembly(sources.Select(c => c.FullName).ToArray());
 
             if (!assemblyDescription.Success)
             {
 
-                foreach (DiagnosticResult diagnostic in assemblyDescription.Disgnostics)
+                foreach (DiagnosticReport diagnostic in assemblyDescription.Disgnostics)
                 {
-                    var location = new TokenLocation(diagnostic.Locations.FirstOrDefault()) { };
-                    if (diagnostic.IsWarningAsError)
+
+                    var i = diagnostic.Locations.FirstOrDefault();
+
+                    var location = new TokenLocation(i) { };
+                    if (diagnostic.IsSeverityAsError)
                         AddError(location, diagnostic.Message, diagnostic.Message);
 
                     else

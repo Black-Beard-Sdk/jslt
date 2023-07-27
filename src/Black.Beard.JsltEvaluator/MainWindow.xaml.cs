@@ -30,6 +30,7 @@ using Bb.JsltEvaluator.AvalonEdit;
 using System.Diagnostics;
 using Bb;
 using Bb.Expressions;
+using Bb.Analysis;
 
 namespace AppJsonEvaluator
 {
@@ -300,7 +301,7 @@ namespace AppJsonEvaluator
             {
                 foreach (var item in e2.AssemblyResult.Disgnostics)
                     if (item.Severity == "Error")
-                        Errors.Items.Add(new ErrorModel() { Severity = SeverityEnum.Error, Message = item.Message });
+                        Errors.Items.Add(new DiagnosticReport() { Severity = SeverityEnum.Error, Message = item.Message });
             
                     else
                     {
@@ -309,7 +310,7 @@ namespace AppJsonEvaluator
             }
             catch (Exception e1)
             {
-                Errors.Items.Add(new ErrorModel() { Severity = SeverityEnum.Error, Message = e1.Message });
+                Errors.Items.Add(new DiagnosticReport() { Severity = SeverityEnum.Error, Message = e1.Message });
             }
             finally
             {
@@ -358,7 +359,7 @@ namespace AppJsonEvaluator
                         }
                         catch (Exception e1)
                         {
-                            Errors.Items.Add(new ErrorModel() { Severity = SeverityEnum.Error, Message = e1.Message });
+                            Errors.Items.Add(new DiagnosticReport() { Severity = SeverityEnum.Error, Message = e1.Message });
                         }
                     }
 
@@ -416,7 +417,7 @@ namespace AppJsonEvaluator
                 }
                 catch (Exception e2)
                 {
-                    Errors.Items.Add(new ErrorModel() { Severity = SeverityEnum.Error, Message = e2.Message });
+                    Errors.Items.Add(new DiagnosticReport() { Severity = SeverityEnum.Error, Message = e2.Message });
                 }
                 finally
                 {
@@ -572,7 +573,7 @@ namespace AppJsonEvaluator
 
                 if (completions.Exceptions.Count > 0)
                     foreach (var item in completions.Exceptions)
-                        Errors.Items.Add(new ErrorModel() { Severity = SeverityEnum.Error, Message = item.Message, Text = item.ToString() });
+                        Errors.Items.Add(new DiagnosticReport() { Severity = SeverityEnum.Error, Message = item.Message, Text = item.ToString() });
 
                 // Open code completion && map from proposition
                 completionWindow = new CompletionWindow(TemplateEditor.TextArea);
@@ -592,7 +593,7 @@ namespace AppJsonEvaluator
             }
             catch (Exception ex)
             {
-                Errors.Items.Add(new ErrorModel() { Severity = SeverityEnum.Error, Message = ex.Message, Text = ex.ToString() });
+                Errors.Items.Add(new DiagnosticReport() { Severity = SeverityEnum.Error, Message = ex.Message, Text = ex.ToString() });
             }
 
         }
@@ -689,7 +690,7 @@ namespace AppJsonEvaluator
         {
             if (Errors.SelectedValue != null)
             {
-                if (Errors.SelectedValue is ErrorModel m)
+                if (Errors.SelectedValue is DiagnosticReport m)
                 {
                     if (m.StartIndex != 0)
                     {

@@ -1,4 +1,5 @@
-﻿using Bb.Expressions;
+﻿using Bb.Analysis;
+using Bb.Expressions;
 using Bb.Expressions.Statements;
 using Bb.Json.Jslt.Asts;
 using Bb.Json.Jslt.Parser;
@@ -15,7 +16,6 @@ namespace Bb.Json.Jslt.Services
 
     internal class TemplateWithExpressionBuilder : IJsltJsonVisitor
     {
-
 
         static TemplateWithExpressionBuilder()
         {
@@ -38,8 +38,6 @@ namespace Bb.Json.Jslt.Services
             _ctorJValueUri = typeof(JValue).GetConstructor(new Type[] { typeof(Uri) });
             _ctorJValueTimeSpan = typeof(JValue).GetConstructor(new Type[] { typeof(TimeSpan) });
             _jValueGetNull = typeof(JValue).GetMethod("CreateNull");
-
-
 
         }
 

@@ -1,4 +1,5 @@
-﻿using Bb.Expressions;
+﻿using Bb.Analysis;
+using Bb.Expressions;
 using Bb.Json.Attributes;
 using Bb.Json.Jslt.Services;
 using Oldtonsoft.Json.Linq;
@@ -30,7 +31,7 @@ namespace Bb.Json.Jslt.CustomServices
                     .ConvertToJson();
             else
             {
-                ctx.Diagnostics.AddDiagnostic(Parser.SeverityEnum.Warning, string.Empty, ctx.GetCurrentLocation(), "file.FullName", $"file '{file.FullName}' not found");
+                ctx.Diagnostics.AddDiagnostic(SeverityEnum.Warning, string.Empty, ctx.GetCurrentLocation(), "file.FullName", $"file '{file.FullName}' not found");
             }
 
             return JValue.CreateNull();

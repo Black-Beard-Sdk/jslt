@@ -1,4 +1,5 @@
-﻿using Bb.Json.Jslt.Asts;
+﻿using Bb.Analysis;
+using Bb.Json.Jslt.Asts;
 using Bb.Json.Jslt.Parser;
 using Oldtonsoft.Json.Linq;
 using System;
