@@ -24,16 +24,18 @@ namespace Bb.Json.Jslt.Asts
 
         public JsltBase Where { get; internal set; }
 
-        public TokenLocation Start { get; set; }
+        public TokenLocation Location { get; set; }
 
-        public TokenLocation Stop { get; set; }
+        //public TokenLocation Start { get; set; }
+
+        //public TokenLocation End { get; set; }
 
         public TokenLocation GetLocation()
         {
-            int line = this.Start.Line;
-            int column = this.Start.Column;
-            int startIndex = this.Start.StartIndex;
-            int endIndex = this.Stop.StopIndex;
+            int line = this.Location.Start.Line;
+            int column = this.Location.Start.Column;
+            int startIndex = this.Location.Start.Index;
+            int endIndex = this.Location.End.Index;
             return new TokenLocation(startIndex, endIndex, line, column);
         }
 

@@ -68,7 +68,7 @@ namespace Bb.Json.Jslt.Services
                         {
                             if (c == '*' && sb[i + 1] == '/')
                             {
-                                comment.Stop = new TokenLocation(i + 1, 0, 0, 0);
+                                comment.Location = new TokenLocation(i + 1, 0, 0, 0);
                                 inComment = false;
                             }
                         }
@@ -78,7 +78,7 @@ namespace Bb.Json.Jslt.Services
                             {
                                 comment = new JsltComment()
                                 {
-                                    Start = new TokenLocation(i, 0, 0, 0),
+                                    Location = new TokenLocation(i, 0, 0, 0),
                                 };
                                 _comments.Add(comment);
                                 inComment = true;

@@ -10,6 +10,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
+using Bb.Json.Jslt.Parser;
 
 namespace Bb.Json.Jslt.CustomServices
 {

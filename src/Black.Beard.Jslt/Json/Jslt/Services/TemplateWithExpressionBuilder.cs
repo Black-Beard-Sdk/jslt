@@ -208,7 +208,7 @@ namespace Bb.Json.Jslt.Services
                             ctx.Current.Source.Add(call);
                         else
                         {
-                            _diagnostics.AddError("template builder", item.Start, string.Empty, $"value missing on property {item.Name}");
+                            _diagnostics.AddError("template builder", item.Location, string.Empty, $"value missing on property {item.Name}");
                         }
 
                     }
@@ -266,7 +266,7 @@ namespace Bb.Json.Jslt.Services
 
             }
 
-            this._diagnostics.AddError("template building", node.Start, string.Empty, $"missing value on property {name}");
+            this._diagnostics.AddError("template building", node.Location, string.Empty, $"missing value on property {name}");
 
             return null;
 
@@ -356,15 +356,15 @@ namespace Bb.Json.Jslt.Services
 
                 if (!node.ServiceProvider.IsCtor)
                 {
-                    var s = node.Start;
+                    var s = node.Location;
                     var c = Expression
                         .Call(null, RuntimeContext._TraceLocation
                         , ctx.Current.Context
                         , Expression.Constant(node.Name)
-                        , Expression.Constant(s.Line)
-                        , Expression.Constant(s.Column)
-                        , Expression.Constant(s.StartIndex)
-                        , Expression.Constant(s.StopIndex)
+                        , Expression.Constant(s.Start.Line)
+                        , Expression.Constant(s.Start.Column)
+                        , Expression.Constant(s.Start.Index)
+                        , Expression.Constant(s.End.Index)
                         );
                     args.Add(c);
                 }
@@ -605,9 +605,6 @@ namespace Bb.Json.Jslt.Services
             }
 
         }
-
-
-
 
         public TranformJsonAstConfiguration Configuration { get; set; }
 

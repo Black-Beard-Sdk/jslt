@@ -27,10 +27,10 @@ namespace Bb.Json.Jslt.Services
         private bool Evaluate(JsltBase item)
         {
 
-            if (this.Location.StartIndex > item.Start.StartIndex)
+            if (this.Location.Start.Index > item.Location.Start.Index)
             {
 
-                if (this.Location.StopIndex <= item.Stop.StopIndex)
+                if (this.Location.End.Index <= item.Location.End.Index)
                 {
                     this.Current = item;
                     return true;

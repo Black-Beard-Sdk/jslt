@@ -43,8 +43,7 @@ namespace Bb.Json.Jslt.Asts
                 {
                     Name = argName,
                     Value = item,
-                    Start = item?.Start?.Clone(),
-                    Stop = item?.Stop?.Clone(),
+                    Location = item?.Location.Clone(),                    
                 });
             }
 
@@ -57,8 +56,7 @@ namespace Bb.Json.Jslt.Asts
             {
                 Name = string.Empty,
                 Value = argument,
-                Start = argument.Start.Clone(),
-                Stop = argument.Stop.Clone()
+                Location = argument?.Location.Clone(),
             });
 
             int index = 0;

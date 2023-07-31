@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using Bb.Json.Jslt.Parser;
 
 namespace Bb.Json.Jslt.CustomServices
 {

@@ -68,7 +68,7 @@ namespace Wizards.Commands
                         // compilation error
                         app.Result = Errors.CompilationError;
 
-                        assembly.Disgnostics
+                        assembly.Diagnostics
                         .ConvertList("", c => c.Id, c => c.Message)
                         .PrintList("Id", "Message");
                         ;

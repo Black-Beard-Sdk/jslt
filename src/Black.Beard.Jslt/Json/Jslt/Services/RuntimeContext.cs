@@ -119,10 +119,9 @@ namespace Bb.Json.Jslt.Services
         {
             var e = new MethodContext()
             {
-                Trace = new TokenLocation(position, positionEnd, line, column)
+                Trace = new TokenLocation( new DiagnosticLocation(ctx.ScriptFile, new CodeLocation(line, column, position ), new CodeLocation(-1,-1, positionEnd)))
                 {
                     Function = functionName,
-                    ScriptFile = ctx.ScriptFile,
                 }
             };
             ctx._stack.Push(e);
@@ -941,7 +940,7 @@ namespace Bb.Json.Jslt.Services
         {
             ctx.SubSources.Variables.Add(name, value);
             if (value == null)
-                ctx.Diagnostics.AddWarning(string.Empty, trace, name, $"the key '{name}' is setted with null value.");
+                ctx.Diagnostics.AddWarning(trace, name, $"the key '{name}' is setted with null value.");
         }
 
         public static void DelVariable(RuntimeContext ctx, string name)
@@ -976,7 +975,7 @@ namespace Bb.Json.Jslt.Services
 
                 else
                 {
-                    ctx.Diagnostics.AddInformation(string.Empty, trace, d, $"the key '{item}' can't be found.");
+                    ctx.Diagnostics.AddInformation(trace, d, $"the key '{item}' can't be found.");
                     d = d.Replace(item, string.Empty);
                 }
             }
@@ -991,7 +990,7 @@ namespace Bb.Json.Jslt.Services
             }
             catch (Exception)
             {
-                ctx.Diagnostics.AddError(string.Empty, trace, d, $"'d' can't be converted in jvalue");
+                ctx.Diagnostics.AddError(trace, d, $"'d' can't be converted in jvalue");
                 throw;
             }
 
@@ -1019,7 +1018,7 @@ namespace Bb.Json.Jslt.Services
             }
             catch (Exception ex)
             {
-                ctx.Diagnostics.AddError(string.Empty, trace, $"failed to run function {serviceName}", ex.Message);
+                ctx.Diagnostics.AddError(trace, $"failed to run function {serviceName}", ex.Message);
                 ctx.Break();
             }
             finally
@@ -1048,7 +1047,7 @@ namespace Bb.Json.Jslt.Services
             {
 
                 if (token == null)
-                    ctx.Diagnostics.AddError(string.Empty, trace, String.Empty, $"the token is null. the filter '{path}' can't be apply");
+                    ctx.Diagnostics.AddError(trace, String.Empty, $"the token is null. the filter '{path}' can't be apply");
 
                 else
                 {
@@ -1090,7 +1089,7 @@ namespace Bb.Json.Jslt.Services
             }
             catch (Oldtonsoft.Json.JsonException e)
             {
-                ctx.Diagnostics.AddError(string.Empty, trace, $"invalid json path '{path}'." + e.Message, e.Message);
+                ctx.Diagnostics.AddError(trace, $"invalid json path '{path}'." + e.Message, e.Message);
             }
 
             return result;

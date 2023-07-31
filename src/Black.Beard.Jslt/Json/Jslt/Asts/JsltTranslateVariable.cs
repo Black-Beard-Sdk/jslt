@@ -13,8 +13,7 @@ namespace Bb.Json.Jslt.Asts
         {
             Kind = JsltKind.JTranslateVariable;
             this.Value = token;
-            this.Start = token.Start;
-            this.Stop = token.Stop;
+            this.Location = token.Location.Clone();
             this.VariableNames = new List<string>();
 
             string _value = null;

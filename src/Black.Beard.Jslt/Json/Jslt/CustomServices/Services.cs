@@ -5,12 +5,8 @@ using Bb.Json.Jslt.Services;
 using Oldtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Globalization;
-using System.IO;
-using System.Linq.Expressions;
-using System.Security.Cryptography;
-using System.Text;
+using Bb.Json.Jslt.Parser;
 
 namespace Bb.Json.Jslt.CustomServices
 {
@@ -31,7 +27,7 @@ namespace Bb.Json.Jslt.CustomServices
                     .ConvertToJson();
             else
             {
-                ctx.Diagnostics.AddDiagnostic(SeverityEnum.Warning, string.Empty, ctx.GetCurrentLocation(), "file.FullName", $"file '{file.FullName}' not found");
+                ctx.Diagnostics.AddWarning(string.Empty, ctx.GetCurrentLocation(), "file.FullName", $"file '{file.FullName}' not found");
             }
 
             return JValue.CreateNull();
@@ -116,7 +112,7 @@ namespace Bb.Json.Jslt.CustomServices
                 }
                 catch (Exception ex)
                 {
-                    ctx.Diagnostics.AddError(string.Empty, null, $"convert method {token} to {targetType}", ex.Message);
+                    ctx.Diagnostics.AddError(null, $"convert method {token} to {targetType}", ex.Message);
                 }
 
 

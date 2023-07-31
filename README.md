@@ -39,6 +39,10 @@ Like that
 **'mymethod'** is the name of the service you want to call. The sdk provide another keys like sum or distinct. the list is available [here](Documentation/Custom_services.md).
 If you write your own method, you must register the methods before in the configuration. the arguments must be any json part (see the directives for register your extension).
 
+```JSON
+{ "prices": method($..n) } 
+```  
+
 A sample for call the method
 ```JSON
 // Source
@@ -51,12 +55,7 @@ A sample for call the method
 { "prices":  6 }
 ```  
 
-### Note
-if the string start with '\$' the value is automatically convert in json path. if the method expect a string you must cast the value.
 
-```JSON
-{ "prices": method($..n) } 
-```  
 
 ### cast
 for cast a value you must use this syntax '@type' after expression
@@ -120,7 +119,24 @@ the method when is very usefull. it is a switch case.
         "case1": { /* structure to inject if the value of '$.prop1' is equal to 'case1' */ }
     }
 } 
-```  
+```
+
+### Use array
+Declare an array like a classical array. For setting an iterator you must just set the source "$" : iterator value.
+
+```JSON
+{	
+	"$" : [{ "a" : "v1"}, { "a" : "v2"},{ "a" : "v3"}],	
+	"items" : [
+	{
+		"$" : $,
+		"name": $.a
+	}
+	]
+}
+```
+
+
 
 ## How to use
 ### Command line

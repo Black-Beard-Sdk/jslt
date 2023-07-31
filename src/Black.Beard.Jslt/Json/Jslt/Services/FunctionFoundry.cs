@@ -41,16 +41,16 @@ namespace Bb.Json.Jslt.Services
 
             var result2 = this.Services.GetWriterService(name);
             if (result2 != null)
-                diagnostics.AddError(null, location, name, $"Service {name} exists but bad arguments calling");
+                diagnostics.AddError(location, name, $"Service {name} exists but bad arguments calling");
 
             else
             {
                 result2 = this.configuration.Services.GetWriterService(name);
                 if (result2 != null)
-                    diagnostics.AddError(null, location, name, $"Service {name} exists but bad arguments calling");
+                    diagnostics.AddError(location, name, $"Service {name} exists but bad arguments calling");
 
                 else
-                    diagnostics.AddError(null, location, name, $"Service {name} not found");
+                    diagnostics.AddError(location, name, $"Service {name} not found");
 
             }
 
@@ -71,16 +71,16 @@ namespace Bb.Json.Jslt.Services
 
             var result2 = this.Services.GetOutputService(name);
             if (result2 != null)
-                diagnostics.AddError(null, location, name, $"Service {name} exists but bad arguments calling");
+                diagnostics.AddError(location, name, $"Service {name} exists but bad arguments calling");
 
             else
             {
                 result2 = this.configuration.Services.GetOutputService(name);
                 if (result2 != null)
-                    diagnostics.AddError(null, location, name, $"Service {name} exists but bad arguments calling");
+                    diagnostics.AddError(location, name, $"Service {name} exists but bad arguments calling");
 
                 else
-                    diagnostics.AddError(null, location, name, $"Service {name} not found");
+                    diagnostics.AddError(location, name, $"Service {name} not found");
 
             }
 
@@ -101,16 +101,16 @@ namespace Bb.Json.Jslt.Services
 
             var result2 = this.Services.GetService(name);
             if (result2 != null)
-                diagnostics.AddError(null, location, name, $"Service {name} exists but bad arguments calling");
+                diagnostics.AddError(location, name, $"Service {name} exists but bad arguments calling");
 
             else
             {
                 result2 = this.configuration.Services.GetService(name);
                 if (result2 != null)
-                    diagnostics.AddError(null, location, name, $"Service {name} exists but bad arguments calling");
+                    diagnostics.AddError(location, name, $"Service {name} exists but bad arguments calling");
 
                 else
-                    diagnostics.AddError(null, location, name, $"Service {name} not found");
+                    diagnostics.AddError(location, name, $"Service {name} not found");
 
             }
 

@@ -218,7 +218,7 @@ namespace Bb.Json.Jslt.Services
                             ctx.Current.Source.Add(call);
                         else
                         {
-                            _diagnostics.AddError("template builder", item.Start, string.Empty, $"value missing on property {item.Name}");
+                            _diagnostics.AddError("template builder", item.Location, string.Empty, $"value missing on property {item.Name}");
                         }
 
                     }
@@ -281,7 +281,7 @@ namespace Bb.Json.Jslt.Services
 
             }
 
-            this._diagnostics.AddError("template building", node.Start, string.Empty, $"missing value on property {name}");
+            this._diagnostics.AddError("template building", node.Location, string.Empty, $"missing value on property {name}");
 
             return null;
 
@@ -616,6 +616,7 @@ namespace Bb.Json.Jslt.Services
 
 
         public TranformJsonAstConfiguration Configuration { get; set; }
+
 
         #region Context
 

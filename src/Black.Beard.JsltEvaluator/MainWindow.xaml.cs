@@ -299,9 +299,9 @@ namespace AppJsonEvaluator
             }
             catch (CompilationException e2)
             {
-                foreach (var item in e2.AssemblyResult.Disgnostics)
+                foreach (var item in e2.AssemblyResult.Diagnostics)
                     if (item.Severity == "Error")
-                        Errors.Items.Add(new DiagnosticReport() { Severity = SeverityEnum.Error, Message = item.Message });
+                        Errors.Items.Add(new DiagnosticReport() { Message = item.Message }.SetSeverity(SeverityEnum.Error));
             
                     else
                     {
@@ -310,7 +310,7 @@ namespace AppJsonEvaluator
             }
             catch (Exception e1)
             {
-                Errors.Items.Add(new DiagnosticReport() { Severity = SeverityEnum.Error, Message = e1.Message });
+                Errors.Items.Add(new DiagnosticReport() { Message = e1.Message }.SetSeverity(SeverityEnum.Error));
             }
             finally
             {
@@ -335,7 +335,7 @@ namespace AppJsonEvaluator
                 foreach (var item in _template.Diagnostics.Take(200))
                 {
 
-                    if (item.Severity == SeverityEnum.Error)
+                    if (item.Severity == SeverityEnum.Error.ToString())
                         errors++;
 
                     Errors.Items.Add(item);
@@ -347,19 +347,19 @@ namespace AppJsonEvaluator
                     int lenght = 5;
                     var x = TemplateEditor.Document.TextLength - index;
                     if (x < lenght)
-                        lenght = x;
+                        lenght = x.Value;
 
-                    if (item.Severity == SeverityEnum.Error)
+                    if (item.Severity == SeverityEnum.Error.ToString())
                     {
                         try
                         {
-                            ITextMarker marker = textMarkerService.Create(index, lenght);
+                            ITextMarker marker = textMarkerService.Create(index.Value, lenght);
                             marker.MarkerTypes = TextMarkerTypes.SquigglyUnderline;
                             marker.MarkerColor = Colors.Red;
                         }
                         catch (Exception e1)
                         {
-                            Errors.Items.Add(new DiagnosticReport() { Severity = SeverityEnum.Error, Message = e1.Message });
+                            Errors.Items.Add(new DiagnosticReport() { Message = e1.Message }.SetSeverity(SeverityEnum.Error));
                         }
                     }
 
@@ -397,7 +397,7 @@ namespace AppJsonEvaluator
 
                     st.Stop();
 
-                    _template.Diagnostics.AddInformation(this._template.Filename, new TokenLocation(), st.Elapsed.TotalSeconds.ToString(), $"running in {st.Elapsed.TotalSeconds} seconds");
+                    _template.Diagnostics.AddInformation(this._template.Filename, TokenLocation.Empty, st.Elapsed.TotalSeconds.ToString(), $"runs in {st.Elapsed.TotalSeconds} seconds");
 
 
                     var p2 = Path.Combine(this._template.Configuration.OutputPath, Path.GetFileNameWithoutExtension(this._template.Filename) + "_result.json");
@@ -417,7 +417,7 @@ namespace AppJsonEvaluator
                 }
                 catch (Exception e2)
                 {
-                    Errors.Items.Add(new DiagnosticReport() { Severity = SeverityEnum.Error, Message = e2.Message });
+                    Errors.Items.Add(new DiagnosticReport() { Message = e2.Message }.SetSeverity(SeverityEnum.Error));
                 }
                 finally
                 {
@@ -573,7 +573,7 @@ namespace AppJsonEvaluator
 
                 if (completions.Exceptions.Count > 0)
                     foreach (var item in completions.Exceptions)
-                        Errors.Items.Add(new DiagnosticReport() { Severity = SeverityEnum.Error, Message = item.Message, Text = item.ToString() });
+                        Errors.Items.Add(new DiagnosticReport() { Message = item.Message, Text = item.ToString() }.SetSeverity(SeverityEnum.Error));
 
                 // Open code completion && map from proposition
                 completionWindow = new CompletionWindow(TemplateEditor.TextArea);
@@ -593,7 +593,7 @@ namespace AppJsonEvaluator
             }
             catch (Exception ex)
             {
-                Errors.Items.Add(new DiagnosticReport() { Severity = SeverityEnum.Error, Message = ex.Message, Text = ex.ToString() });
+                Errors.Items.Add(new DiagnosticReport() { Message = ex.Message, Text = ex.ToString() }.SetSeverity(SeverityEnum.Error));
             }
 
         }
@@ -694,7 +694,7 @@ namespace AppJsonEvaluator
                 {
                     if (m.StartIndex != 0)
                     {
-                        TemplateEditor.SelectionStart = m.StartIndex;
+                        TemplateEditor.SelectionStart = m.StartIndex.Value;
                         TemplateEditor.SelectionLength = 1;
                         TemplateEditor.Focus();
                     }

@@ -122,7 +122,7 @@ namespace Bb.Expressions
     {
 
         public CompilationException(Compilers.AssemblyResult assemblyResult)
-            : base(assemblyResult.Disgnostics.First(c => c.Severity == "Error").Message)
+            : base(assemblyResult.Diagnostics.First(c => c.Severity == "Error").Message)
         {
             this.AssemblyResult = assemblyResult;
         }
