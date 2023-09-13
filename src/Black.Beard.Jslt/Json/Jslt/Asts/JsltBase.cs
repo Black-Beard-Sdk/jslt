@@ -32,10 +32,10 @@ namespace Bb.Json.Jslt.Asts
 
         public TokenLocation GetLocation()
         {
-            int line = this.Location.Start.Line;
-            int column = this.Location.Start.Column;
-            int startIndex = this.Location.Start.Index;
-            int endIndex = this.Location.End.Index;
+            int line = (this.Location.Start as CodePositionLocation).Line;
+            int column = (this.Location.Start as CodePositionLocation).Column;
+            int startIndex = (this.Location.Start as CodePositionLocation).Index;
+            int endIndex = (this.Location.End as CodePositionLocation).Index;
             return new TokenLocation(startIndex, endIndex, line, column);
         }
 

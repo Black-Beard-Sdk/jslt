@@ -119,7 +119,7 @@ namespace Bb.Json.Jslt.Services
         {
             var e = new MethodContext()
             {
-                Trace = new TokenLocation( new DiagnosticLocation(ctx.ScriptFile, new CodeLocation(line, column, position ), new CodeLocation(-1,-1, positionEnd)))
+                Trace = new TokenLocation( new DiagnosticLocation(ctx.ScriptFile, new CodePositionLocation(line, column, position ), new CodePositionLocation(-1,-1, positionEnd)))
                 {
                     Function = functionName,
                 }

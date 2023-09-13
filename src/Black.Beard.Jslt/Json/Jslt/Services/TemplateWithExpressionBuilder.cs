@@ -361,10 +361,10 @@ namespace Bb.Json.Jslt.Services
                         .Call(null, RuntimeContext._TraceLocation
                         , ctx.Current.Context
                         , Expression.Constant(node.Name)
-                        , Expression.Constant(s.Start.Line)
-                        , Expression.Constant(s.Start.Column)
-                        , Expression.Constant(s.Start.Index)
-                        , Expression.Constant(s.End.Index)
+                        , Expression.Constant((s.Start as CodePositionLocation).Line)
+                        , Expression.Constant((s.Start as CodePositionLocation).Column)
+                        , Expression.Constant((s.Start as CodePositionLocation).Index)
+                        , Expression.Constant((s.End as CodePositionLocation).Index)
                         );
                     args.Add(c);
                 }

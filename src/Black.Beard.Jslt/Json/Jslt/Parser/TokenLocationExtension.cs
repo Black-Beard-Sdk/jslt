@@ -13,7 +13,7 @@ namespace Bb.Json.Jslt.Parser
 
         public static TokenLocation ToLocation(this IToken self, IToken stop)
         {
-            return new TokenLocation(new CodeLocation(self.Line, self.Column, self.StartIndex), new CodeLocation(stop.Line, stop.Column, stop.StopIndex));
+            return new TokenLocation(new CodePositionLocation(self.Line, self.Column, self.StartIndex), new CodePositionLocation(stop.Line, stop.Column, stop.StopIndex));
         }
 
         public static TokenLocation ToLocation(this IToken self)
@@ -47,13 +47,13 @@ namespace Bb.Json.Jslt.Parser
 
         public string Function { get; set; }
 
-        public TokenLocation(CodeLocation start, CodeLocation @end) : base(string.Empty, start, end)
+        public TokenLocation(CodePositionLocation start, CodePositionLocation @end) : base(string.Empty, start, end)
         {
 
         }
 
 
-        public TokenLocation(int start, int end, int line, int column) : base(string.Empty, new CodeLocation(line, column, start), new CodeLocation(-1, -1, end))
+        public TokenLocation(int start, int end, int line, int column) : base(string.Empty, new CodePositionLocation(line, column, start), new CodePositionLocation(-1, -1, end))
         {
             
         }
@@ -65,7 +65,7 @@ namespace Bb.Json.Jslt.Parser
 
         public TokenLocation Clone()
         {
-            return new TokenLocation(Start.Index, End.Index, Start.Line, Start.Column)
+            return new TokenLocation((Start as CodePositionLocation).Index, (End as CodePositionLocation).Index, (Start as CodePositionLocation).Line, (Start as CodePositionLocation).Column)
             {
                 Function = Function
             };

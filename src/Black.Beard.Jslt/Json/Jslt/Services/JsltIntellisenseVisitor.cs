@@ -16,7 +16,7 @@ namespace Bb.Json.Jslt.Services
                 Configuration = configuration,
                 Location = location,
             };
-         
+
             self.Accept(visitor);
 
             return visitor.Current;
@@ -27,10 +27,10 @@ namespace Bb.Json.Jslt.Services
         private bool Evaluate(JsltBase item)
         {
 
-            if (this.Location.Start.Index > item.Location.Start.Index)
+            if ((this.Location.Start as CodePositionLocation).Index > (item.Location.Start as CodePositionLocation).Index)
             {
 
-                if (this.Location.End.Index <= item.Location.End.Index)
+                if ((this.Location.End as CodePositionLocation).Index <= ((item.Location.End as CodePositionLocation).Index))
                 {
                     this.Current = item;
                     return true;

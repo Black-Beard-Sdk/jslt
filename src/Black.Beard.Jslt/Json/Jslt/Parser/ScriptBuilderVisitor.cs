@@ -1148,9 +1148,9 @@ namespace Bb.Json.Jslt.Parser
                 foreach (DiagnosticReport diagnostic in assemblyDescription.Diagnostics)
                 {
 
-                    var i = diagnostic.Locations.FirstOrDefault();
+                    SpanLocation i = diagnostic.Locations.FirstOrDefault();
 
-                    var location = new TokenLocation(i) { };
+                    var location = new TokenLocation(i as DiagnosticLocation) { };
                     if (diagnostic.IsSeverityAsError)
                         AddError(location, diagnostic.Message, diagnostic.Message);
 
@@ -1212,7 +1212,7 @@ namespace Bb.Json.Jslt.Parser
 
             }
             else
-                AddError(item.Location, u, $"Failed to local file at position {item.Location.Start.Index}, line {item.Location.Start.Line}, col {item.Location.Start.Column} '{u}'");
+                AddError(item.Location, u, $"Failed to local file at position {(item.Location.Start as CodePositionLocation).Index}, line {(item.Location.Start as CodePositionLocation).Line}, col {(item.Location.Start as CodePositionLocation).Column} '{u}'");
 
         }
 
@@ -1242,7 +1242,7 @@ namespace Bb.Json.Jslt.Parser
                     cs.Add(file);
             }
             else
-                AddError(item.Location, u, $"Failed to local file at position {item.Location.Start.Index}, line {item.Location.Start.Line}, col {item.Location.Start.Column} '{u}'");
+                AddError(item.Location, u, $"Failed to local file at position {(item.Location.Start as CodePositionLocation).Index}, line {(item.Location.Start as CodePositionLocation).Line}, col {(item.Location.Start as CodePositionLocation).Column} '{u}'");
 
         }
 
@@ -1265,9 +1265,9 @@ namespace Bb.Json.Jslt.Parser
             this._diagnostics
                 .AddError(
                     path ?? Filename,
-                    start.Start.Line,
-                    start.Start.Index,
-                    start.Start.Column,
+                    (start.Start as CodePositionLocation).Line,
+                    (start.Start as CodePositionLocation).Index,
+                    (start.Start as CodePositionLocation).Column,
                     txt,
                     message
             );
@@ -1278,9 +1278,9 @@ namespace Bb.Json.Jslt.Parser
             this._diagnostics
                 .AddWarning(
                     path ?? Filename,
-                    start.Start.Line,
-                    start.Start.Index,
-                    start.Start.Column,
+                    (start.Start as CodePositionLocation).Line,
+                    (start.Start as CodePositionLocation).Index,
+                    (start.Start as CodePositionLocation).Column,
                     txt,
                     message
             );
