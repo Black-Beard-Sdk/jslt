@@ -15,18 +15,31 @@ namespace Bb.Json.Jslt.Asts
     public class JsltFunctionCall : JsltBase
     {
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JsltFunctionCall"/> class.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <param name="arguments">The arguments.</param>
         public JsltFunctionCall(string name, params JsltBase[] arguments) : this(name, arguments.ToList())
         {
 
-
         }
 
-        public JsltFunctionCall(string name, IEnumerable<JsltBase> arguments) : this(name, arguments.ToList())
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JsltFunctionCall"/> class.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <param name="arguments">The arguments.</param>
+        public JsltFunctionCall(string name, IEnumerable<JsltBase> arguments) : this(name, arguments?.ToList())
         {
 
-
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JsltFunctionCall"/> class.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <param name="arguments">The arguments.</param>
         public JsltFunctionCall(string name, List<JsltBase> arguments)
         {
 
@@ -36,19 +49,27 @@ namespace Bb.Json.Jslt.Asts
             this._items = new List<JsltArgument>();
             this._items2 = new List<JsltArgument>();
 
-            foreach (var item in arguments)
+            if (arguments != null && arguments.Count > 0)
             {
-                var argName = "arg" + this._items.Count.ToString();
-                this._items.Add(new JsltArgument()
+                foreach (var item in arguments)
                 {
-                    Name = argName,
-                    Value = item,
-                    Location = item?.Location.Clone(),                    
-                });
+                    var argName = "arg" + this._items.Count.ToString();
+                    this._items.Add(new JsltArgument()
+                    {
+                        Name = argName,
+                        Value = item,
+                        Location = item?.Location?.Clone() ?? TokenLocation.Empty,
+                    });
+                }
             }
 
         }
 
+        /// <summary>
+        /// Injects the specified argument.
+        /// </summary>
+        /// <param name="argument">The argument.</param>
+        /// <param name="position">The position.</param>
         public void Inject(JsltBase argument, int position)
         {
 
@@ -56,7 +77,7 @@ namespace Bb.Json.Jslt.Asts
             {
                 Name = string.Empty,
                 Value = argument,
-                Location = argument?.Location.Clone(),
+                Location = argument?.Location?.Clone() ?? TokenLocation.Empty,
             });
 
             int index = 0;
@@ -74,17 +95,34 @@ namespace Bb.Json.Jslt.Asts
 
         public Type[] ParameterTypes { get; internal set; }
 
-        public string Type { get; internal set; }
+        //public string Type { get; internal set; }
 
         public Factory ServiceProvider { get; internal set; }
 
+        /// <summary>
+        /// Gets the name of the function.
+        /// </summary>
+        /// <value>
+        /// The name.
+        /// </value>
         public string Name { get; }
 
+        /// <summary>
+        /// Accepts the specified visitor for parsing the tree.
+        /// </summary>
+        /// <param name="visitor">The visitor.</param>
+        /// <returns></returns>
         public override object Accept(IJsltJsonVisitor visitor)
         {
             return visitor.VisitFunction(this);
         }
 
+        /// <summary>
+        /// Converts to string.
+        /// </summary>
+        /// <param name="writer">The writer.</param>
+        /// <param name="strategy">The strategy.</param>
+        /// <returns></returns>
         public override bool ToString(Writer writer, StrategySerializationItem strategy)
         {
             

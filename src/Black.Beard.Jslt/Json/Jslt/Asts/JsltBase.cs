@@ -11,19 +11,51 @@ namespace Bb.Json.Jslt.Asts
     public abstract class JsltBase : IWriter
     {
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JsltBase"/> class.
+        /// </summary>
         public JsltBase()
         {
             this._comments = new List<JsltComment>();
         }
 
+        /// <summary>
+        /// Gets the kind of the node ast.
+        /// </summary>
+        /// <value>
+        /// The kind.
+        /// </value>
         public JsltKind Kind { get; internal set; }
 
+        /// <summary>
+        /// Accepts the specified visitor for parsing the tree.
+        /// </summary>
+        /// <param name="visitor">The visitor.</param>
+        /// <returns></returns>
         public abstract object Accept(IJsltJsonVisitor visitor);
 
+        /// <summary>
+        /// Gets the source of data.
+        /// </summary>
+        /// <value>
+        /// The source.
+        /// </value>
         public JsltBase Source { get; internal set; }
 
+        /// <summary>
+        /// Gets the where condition to apply on source.
+        /// </summary>
+        /// <value>
+        /// The where.
+        /// </value>
         public JsltBase Where { get; internal set; }
 
+        /// <summary>
+        /// Gets or sets the location of the code source.
+        /// </summary>
+        /// <value>
+        /// The location.
+        /// </value>
         public TokenLocation Location { get; set; }
 
         //public TokenLocation Start { get; set; }
@@ -32,18 +64,29 @@ namespace Bb.Json.Jslt.Asts
 
         public TokenLocation GetLocation()
         {
-            int line = (this.Location.Start as CodePositionLocation).Line;
-            int column = (this.Location.Start as CodePositionLocation).Column;
-            int startIndex = (this.Location.Start as CodePositionLocation).Index;
-            int endIndex = (this.Location.End as CodePositionLocation).Index;
+            int line = (Location?.Start as CodePositionLocation).Line;
+            int column = (Location?.Start as CodePositionLocation).Column;
+            int startIndex = (Location?.Start as CodePositionLocation).Index;
+            int endIndex = (Location?.End as CodePositionLocation).Index;
             return new TokenLocation(startIndex, endIndex, line, column);
         }
 
-
+        /// <summary>
+        /// Gets the comment's list.
+        /// </summary>
+        /// <value>
+        /// The comments.
+        /// </value>
         public IEnumerable<JsltComment> Comments { get => this._comments; }
 
         public virtual string RuleName => GetType().Name;
 
+        /// <summary>
+        /// Converts to string.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="System.String" /> that represents this instance.
+        /// </returns>
         public override string ToString()
         {
             Writer writer = new Writer();
@@ -51,8 +94,18 @@ namespace Bb.Json.Jslt.Asts
             return writer.ToString();
         }
 
+        /// <summary>
+        /// Converts the tree to json string source code.
+        /// </summary>
+        /// <param name="writer">The writer.</param>
+        /// <param name="strategy">The strategy.</param>
+        /// <returns></returns>
         public abstract bool ToString(Writer writer, StrategySerializationItem strategy);
 
+        /// <summary>
+        /// Adds the specified comments.
+        /// </summary>
+        /// <param name="comments">The comments.</param>
         internal void AddComments(IEnumerable<JsltComment> comments)
         {
             _comments.AddRange(comments);

@@ -1212,7 +1212,7 @@ namespace Bb.Json.Jslt.Parser
 
             }
             else
-                AddError(item.Location, u, $"Failed to local file at position {(item.Location.Start as CodePositionLocation).Index}, line {(item.Location.Start as CodePositionLocation).Line}, col {(item.Location.Start as CodePositionLocation).Column} '{u}'");
+                AddError(item.Location, u, $"Failed to local file at position {(item?.Location?.Start as CodePositionLocation)?.Index}, line {(item?.Location?.Start as CodePositionLocation)?.Line}, col {(item?.Location?.Start as CodePositionLocation)?.Column} '{u}'");
 
         }
 
@@ -1242,7 +1242,7 @@ namespace Bb.Json.Jslt.Parser
                     cs.Add(file);
             }
             else
-                AddError(item.Location, u, $"Failed to local file at position {(item.Location.Start as CodePositionLocation).Index}, line {(item.Location.Start as CodePositionLocation).Line}, col {(item.Location.Start as CodePositionLocation).Column} '{u}'");
+                AddError(item.Location, u, $"Failed to local file at position {(item?.Location?.Start as CodePositionLocation).Index}, line {(item?.Location?.Start as CodePositionLocation)?.Line}, col {(item?.Location?.Start as CodePositionLocation)?.Column} '{u}'");
 
         }
 
