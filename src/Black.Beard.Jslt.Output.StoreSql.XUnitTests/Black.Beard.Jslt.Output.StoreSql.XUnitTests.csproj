@@ -9,7 +9,7 @@
 
 	<ItemGroup>
 		
-		<PackageReference Include="Black.Beard.Roslyn" Version="1.0.63" />
+		<PackageReference Include="Black.Beard.Roslyn" Version="1.0.64" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
 		<PackageReference Include="xunit" Version="2.5.0" />
 
