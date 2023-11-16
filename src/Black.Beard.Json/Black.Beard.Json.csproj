@@ -14,6 +14,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Include="..\..\Dockerfile.Ubuntu" Link="Dockerfile.Ubuntu" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Black.Beard.CommandLine" Version="1.0.9" />
 		<PackageReference Include="Black.Beard.Roslyn" Version="1.0.70" />
 		<PackageReference Include="ExcelDataReader" Version="3.6.0" />

@@ -17,18 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Elasticsearch",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F4F3EC60-D90A-4902-8103-7CBC47A99ED5}"
 	ProjectSection(SolutionItems) = preProject
-		..\Documentation\Custom_services.md = ..\Documentation\Custom_services.md
-		..\Documentation\Format_DateTime.md = ..\Documentation\Format_DateTime.md
-		..\Documentation\Format_double.md = ..\Documentation\Format_double.md
-		..\Documentation\Format_Guid.md = ..\Documentation\Format_Guid.md
-		..\Documentation\Format_integer.md = ..\Documentation\Format_integer.md
-		..\Documentation\Format_Timespan.md = ..\Documentation\Format_Timespan.md
-		..\Documentation\JsltLexer.rrd.html = ..\Documentation\JsltLexer.rrd.html
-		..\Documentation\JsltParser.rrd.html = ..\Documentation\JsltParser.rrd.html
-		..\Documentation\jsonexcutable.md = ..\Documentation\jsonexcutable.md
-		..\Documentation\jsonpath.md = ..\Documentation\jsonpath.md
-		..\LICENSE = ..\LICENSE
-		..\README.md = ..\README.md
+		Dockerfile.Ubuntu = Dockerfile.Ubuntu
 		..\RefreshCode.bat = ..\RefreshCode.bat
 	EndProjectSection
 EndProject
@@ -43,6 +32,32 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wizards", "Wizards\Wizards.csproj", "{F6AC5B2A-2EB5-4CB7-891E-780303C6AD89}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Jslt.Output.StoreSql.XUnitTests", "Black.Beard.Jslt.Output.StoreSql.XUnitTests\Black.Beard.Jslt.Output.StoreSql.XUnitTests.csproj", "{8D51B8A3-764C-42F5-8743-CFBDE652709C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentations", "Documentations", "{6DF656E4-3485-4E5B-9091-7B774E3E9561}"
+	ProjectSection(SolutionItems) = preProject
+		..\Documentation\Custom_services.md = ..\Documentation\Custom_services.md
+		..\Documentation\Format_DateTime.md = ..\Documentation\Format_DateTime.md
+		..\Documentation\Format_double.md = ..\Documentation\Format_double.md
+		..\Documentation\Format_Guid.md = ..\Documentation\Format_Guid.md
+		..\Documentation\Format_integer.md = ..\Documentation\Format_integer.md
+		..\Documentation\Format_Timespan.md = ..\Documentation\Format_Timespan.md
+		..\Documentation\JsltLexer.rrd.html = ..\Documentation\JsltLexer.rrd.html
+		..\Documentation\JsltParser.rrd.html = ..\Documentation\JsltParser.rrd.html
+		..\Documentation\jsonexcutable.md = ..\Documentation\jsonexcutable.md
+		..\Documentation\jsonpath.md = ..\Documentation\jsonpath.md
+		..\LICENSE = ..\LICENSE
+		..\README.md = ..\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "appveyor", "appveyor", "{CEFC0348-0738-40A5-B949-5EF66C8DF33B}"
+	ProjectSection(SolutionItems) = preProject
+		..\.appveyor\build.ps1 = ..\.appveyor\build.ps1
+		..\.appveyor\deploy.ps1 = ..\.appveyor\deploy.ps1
+		..\.appveyor\help.txt = ..\.appveyor\help.txt
+		..\.appveyor\test.ps1 = ..\.appveyor\test.ps1
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Éléments de solution", "Éléments de solution", "{C52B62B7-3DA3-4F7C-A800-B8C134A58516}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -126,6 +141,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6DF656E4-3485-4E5B-9091-7B774E3E9561} = {F4F3EC60-D90A-4902-8103-7CBC47A99ED5}
+		{CEFC0348-0738-40A5-B949-5EF66C8DF33B} = {F4F3EC60-D90A-4902-8103-7CBC47A99ED5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8EAE07F2-1EA4-4F97-A026-0B180053A8F7}

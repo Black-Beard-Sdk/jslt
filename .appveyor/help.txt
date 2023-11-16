@@ -1,0 +1,1 @@
+https://stefanscherer.github.io/use-appveyor-to-build-multi-arch-docker-image/

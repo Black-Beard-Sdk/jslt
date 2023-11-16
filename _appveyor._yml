@@ -1,0 +1,61 @@
+version: 1.0.{build}
+
+image: 
+  - Visual Studio 2022
+#  - Ubuntu
+
+configuration: Debug
+platform: Any CPU
+
+environment:
+  KEY_NUGET_ORG: oy2jdsubv2g2bizgvheq24ph5xke6dpe5enyvzcobw2op4
+  KEY_GITHUB_DEPLOY: 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
+  matrix:
+    # - ARCH: arm
+    # - ARCH: arm64
+    - ARCH: amd64
+
+#test: off
+
+build_script:
+    - ps: ./.appveyor/build.ps1
+
+artifacts:
+- path: .\Src\Black.Beard.Json\bin\Release\net6.0\win10-x64
+  name: cli
+  type: OctopusPackage
+- path: .\src\Black.Beard.JsltEvaluator\bin\Release\net6.0-windows\win10-x64
+  name: evaluator
+  type: OctopusPackage
+- path: .\Src\Black.Beard.Jslt\bin\Release\Black.Beard.Jslt.*.*nupkg
+  name: package_jslt
+- path: .\Src\Black.Beard.Jslt.Services\bin\Release\Black.Beard.Jslt.Services.*.*nupkg
+  name: package_jslt_service
+
+deploy:
+- provider: GitHub
+  auth_token:
+    secure: YbUC9oqkIB2Ox6QzlGZzvoGowxxmyGkM+vJMNbD5It0=
+  artifact: cli
+- provider: GitHub
+  auth_token:
+    secure: YbUC9oqkIB2Ox6QzlGZzvoGowxxmyGkM+vJMNbD5It0=
+  artifact: evaluator
+- provider: NuGet
+  api_key:
+    secure: y39LgAirVlF9Kb3mtv8Y9g==
+  artifact: package_jslt
+- provider: NuGet
+  api_key:
+    secure: y39LgAirVlF9Kb3mtv8Y9g==
+  artifact: spackage_jslt_service
+
+
+
+test_script:
+    - ps: ./.appveyor/test.ps1
+
+#deploy_script:
+#    - ps: ./.appveyor/deploy.ps1
+
+
