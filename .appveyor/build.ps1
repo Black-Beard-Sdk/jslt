@@ -13,11 +13,10 @@ $ErrorActionPreference = 'Stop';
 
 Write-Host Starting build $taggedimage;
 
-Set-Location .\Src
+Set-Location .\src
 Write-Host setting working directory to $pwd;
 
 $os = If ($isWindows) {'Windows'} Else {'Ubuntu'}
-
 docker info
 
 Write-Host docker build --tag $imageName --file "dockerfile.${os}" $pwd
