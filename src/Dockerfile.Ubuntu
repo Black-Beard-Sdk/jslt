@@ -21,7 +21,7 @@ LABEL maintainer="gaelgael5@gmail.com" github="https://github.com/Black-Beard-Sd
 # RUN dotnet restore --use-current-runtime
 
 
-WORKDIR /src/Black.Beard.Json
+WORKDIR /src
 COPY */* .
 RUN dotnet restore --use-current-runtime
 RUN dotnet publish --use-current-runtime -r linux-x64 --no-restore -c Release -o /app
