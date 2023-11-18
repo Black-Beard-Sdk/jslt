@@ -4,21 +4,9 @@ LABEL maintainer="gaelgael5@gmail.com" github="https://github.com/Black-Beard-Sd
 WORKDIR /src
 
 
-# WORKDIR /src/Black.Beard.Elasticsearch
-# COPY Black.Beard.Elasticsearch/* .
-# RUN dotnet restore --use-current-runtime
-
-# WORKDIR /src/Black.Beard.Jslt
-# COPY Black.Beard.Jslt/* .
-# RUN dotnet restore --use-current-runtime
-
-# WORKDIR /src/Black.Beard.Jslt.Services
-# COPY Black.Beard.Jslt.Services/* .
-# RUN dotnet restore --use-current-runtime
-
 
 COPY */* .
-RUN ls
+
 # RUN dotnet restore --use-current-runtime
 # RUN dotnet publish --use-current-runtime -r linux-x64 --no-restore -c Release -o /jslt
 
@@ -26,12 +14,12 @@ RUN ls
 
 
 # final stage/image
-FROM mcr.microsoft.com/dotnet/aspnet:6.0-jammy
-WORKDIR /jslt
-COPY --from=build /jslt .
+# FROM mcr.microsoft.com/dotnet/aspnet:6.0-jammy
+# WORKDIR /jslt
+# COPY --from=build /jslt .
 
-#ENV use_swagger=true
-#ENV trace_all=true
+# ENV use_swagger=true
+# ENV trace_all=true
 
 # EXPOSE 80	# with "mcr.microsoft.com/dotnet/aspnet:6.0"
 EXPOSE 5000
