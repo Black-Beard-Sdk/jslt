@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/dotnet/sdk:6.0-jammy AS build
 LABEL maintainer="gaelgael5@gmail.com" github="https://github.com/Black-Beard-Sdk/jslt"
 
 WORKDIR /src/Black.Beard.Jslt
-COPY Black.Beard.Jslt/* /src/Black.Beard.Jslt
+COPY Black.Beard.Jslt/ /src/Black.Beard.Jslt/
 # RUN dotnet restore --use-current-runtime
 
 # WORKDIR /src/Black.Beard.Elasticsearch
