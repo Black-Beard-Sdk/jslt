@@ -13,23 +13,21 @@ $ErrorActionPreference = 'Stop';
 
 Write-Host Starting build $taggedimage;
 
-# Set-Location .\src
+Set-Location .\src
 Write-Host setting working directory to $pwd;
 
 $os = If ($isWindows) {'Windows'} Else {'Ubuntu'}
-# docker info
+docker info
 
-ls
+Write-Host docker build --tag $taggedimagelatest --file "dockerfile.${os}" $pwd
+docker build --tag $taggedimagelatest --file "Dockerfile.${os}" .
+Write-Host image $taggedimagelatest is generated
 
-# Write-Host docker build --tag $taggedimagelatest --file "/src/dockerfile.${os}" $pwd
-# docker build --tag $taggedimagelatest --file "/src/Dockerfile.${os}" $pwd
-# Write-Host image $taggedimagelatest is generated
+Write-Host retag $taggedimagelatest to $taggedimage
+docker tag $taggedimagelatest $taggedimage
 
-# Write-Host retag $taggedimagelatest to $taggedimage
-# docker tag $taggedimagelatest $taggedimage
+Write-Host build ended
 
-# Write-Host build ended
-
-# docker images
+docker images
 
 Set-Location ..

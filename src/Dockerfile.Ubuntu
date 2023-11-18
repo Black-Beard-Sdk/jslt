@@ -4,13 +4,22 @@ LABEL maintainer="gaelgael5@gmail.com" github="https://github.com/Black-Beard-Sd
 WORKDIR /src
 
 
+WORKDIR /src/Black.Beard.Elasticsearch
+COPY Black.Beard.Elasticsearch/* .
+RUN dotnet restore --use-current-runtime
 
-COPY src/* .
+WORKDIR /src/Black.Beard.Jslt
+COPY Black.Beard.Jslt/* .
+RUN dotnet restore --use-current-runtime
 
-# RUN dotnet restore --use-current-runtime
-# RUN dotnet publish --use-current-runtime -r linux-x64 --no-restore -c Release -o /jslt
+WORKDIR /src/Black.Beard.Jslt.Services
+COPY Black.Beard.Jslt.Services/* .
+RUN dotnet restore --use-current-runtime
 
-
+WORKDIR /src/Black.Beard.Json
+COPY Black.Beard.Json/* .
+RUN dotnet restore --use-current-runtime
+RUN dotnet publish --use-current-runtime -r linux-x64 --no-restore -c Release -o /jslt
 
 
 # final stage/image
