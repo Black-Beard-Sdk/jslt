@@ -13,13 +13,14 @@ $ErrorActionPreference = 'Stop';
 
 Write-Host Starting build $taggedimage;
 
+Set-Location .\src
 Write-Host setting working directory to $pwd;
 
 $os = If ($isWindows) {'Windows'} Else {'Ubuntu'}
 docker info
 
-Write-Host docker build --tag $taggedimagelatest --file "dockerfile.${os}" $pwd
-docker build --tag $taggedimagelatest --file "Dockerfile.${os}" .
+Write-Host docker build --tag $taggedimagelatest --file ".\src\dockerfile.${os}" $pwd
+docker build --tag $taggedimagelatest --file ".\src\Dockerfile.${os}" .
 Write-Host image $taggedimagelatest is generated
 
 Write-Host retag $taggedimagelatest to $taggedimage
