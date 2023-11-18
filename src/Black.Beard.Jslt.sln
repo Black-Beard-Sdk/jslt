@@ -36,6 +36,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentations", "Documentations", "{6DF656E4-3485-4E5B-9091-7B774E3E9561}"
 	ProjectSection(SolutionItems) = preProject
 		..\Documentation\Custom_services.md = ..\Documentation\Custom_services.md
+		..\Documentation\docker.md = ..\Documentation\docker.md
 		..\Documentation\Format_DateTime.md = ..\Documentation\Format_DateTime.md
 		..\Documentation\Format_double.md = ..\Documentation\Format_double.md
 		..\Documentation\Format_Guid.md = ..\Documentation\Format_Guid.md
