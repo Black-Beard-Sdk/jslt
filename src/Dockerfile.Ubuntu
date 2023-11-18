@@ -21,7 +21,6 @@ COPY Black.Beard.Json/* .
 RUN dotnet restore --use-current-runtime
 RUN dotnet publish --use-current-runtime -r linux-x64 --no-restore -c Release -o /jslt
 
-
 # final stage/image
 # FROM mcr.microsoft.com/dotnet/aspnet:6.0-jammy
 # WORKDIR /jslt
