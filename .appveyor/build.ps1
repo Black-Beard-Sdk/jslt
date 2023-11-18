@@ -13,7 +13,7 @@ $ErrorActionPreference = 'Stop';
 
 Write-Host Starting build $taggedimage;
 
-Set-Location .\src
+# Set-Location .\src
 Write-Host setting working directory to $pwd;
 
 $os = If ($isWindows) {'Windows'} Else {'Ubuntu'}
