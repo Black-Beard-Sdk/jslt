@@ -28,7 +28,6 @@ namespace Bb.Json.Commands
         public CommandLineApplication CommandFormat(CommandLine app)
         {
 
-
             /*
                 json format --indented
             */

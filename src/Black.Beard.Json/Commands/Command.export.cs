@@ -28,10 +28,8 @@ namespace Bb.Json.Commands
 
             var cmd = app.Command("export", config =>
             {
-
                 config.Description = "export process";
                 config.HelpOption(HelpFlag);
-
             });
 
             /*
@@ -55,7 +53,7 @@ namespace Bb.Json.Commands
                      );
 
                 var argSource = validator.Option("--source", "json source file path that contains data source. if option is missing source is readed from stdin stream");
-                var argTargetName = validator.Option("--name", "name of the output csv files. if the value is missing a randomized name is generated");
+                var argTargetName = validator.Option("--name", "name of the output csv files. if the value is missing a randomized name is used");
                 var optWriteHeader = validator.OptionNoValue("--h", "Write header");
                 var optSeparator = validator.Option("--s", "specify the charset separator. by default the value is ';'");
                 var optQuote = validator.Option("--q", "specify the charset quote. by default the value is '\"'");
@@ -104,16 +102,7 @@ namespace Bb.Json.Commands
                         parser.Load(source, ctx);
 
 
-                    }
-
-                    //parser.Schema.DataSet.WriteToCsv(
-                    //       targetDir
-                    //     , targetName
-                    //     , Encoding.UTF8
-                    //     , optWriteHeader.HasValue()
-                    //     , separator
-                    //     , quote
-                    //     );
+                    }                                      
 
                     return 0;
 

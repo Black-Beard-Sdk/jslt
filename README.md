@@ -139,9 +139,14 @@ Declare an array like a classical array. For setting an iterator you must just s
 
 
 ## How to use
+
 ### Command line
 You can use the command line json.exe.
-[Documentation of json cli](Documentation/jsonexcutable.md).  
+[Documentation of json cli](Documentation/jsonexcutable.md).
+
+### Docker
+You can use the command line json.exe.
+[Documentation for launch docker](Documentation/docker.md).  
 
 ### By code 
 ```CSHARP

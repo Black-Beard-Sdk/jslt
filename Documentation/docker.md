@@ -10,11 +10,51 @@ For launch the docker container
 
 Or in interactive mode
 ```batch
--- enter in the container
+
+# enter in the container
     sudo docker run -p 80:80 -it --entrypoint /bin/bash blackbeardteam/bash_jslt
+
+# make right for execute
+    chmod 777 ./Json
+
+# execute get help
+    ./Json -?       
 
 ```
 
+# Methods
+
+
+## Export
+```batch
+
+# execute a template and export output in csv
+  ./Json export csv <template> <target folder> --source 'source file' --name 'nameRoot' --h --s ';' --q '"'
+
+```
+
+## schemas
+```batch
+
+# list the types of the assemblies, that can extract schema
+  ./Json list --assembly 'assembly path'
+
+# generate schema in the specified folder
+  ./Json generate <output> 'output directory path location' --assembly 'assembly path'
+
+```
+
+## Templates
+```batch
+
+# ??
+  ./Json template execute <template path> --source <source data> --out <target path>
+
+```
+
+
+
+.\Json schema --excelconfig C:\_perso\Src\Sdk\TransformJsonToJson\Src\DocTests\template1.json C:\_perso\Src\Sdk\TransformJsonToJson\Src\DocTests\source1.json | .\Json.exe format
 
 
 # How to test on windows

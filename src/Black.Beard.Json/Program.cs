@@ -5,8 +5,8 @@ using Microsoft.Extensions.Configuration;
 using System;
 
 
-[assembly: System.Reflection.AssemblyMetadata("githubName", "Black-Beard-Sdk/jslt")]
-[assembly: System.Reflection.AssemblyMetadata("githubartefact", "cli.zip")]
+//[assembly: System.Reflection.AssemblyMetadata("githubName", "Black-Beard-Sdk/jslt")]
+//[assembly: System.Reflection.AssemblyMetadata("githubartefact", "cli.zip")]
 namespace Bb.Json
 {
 

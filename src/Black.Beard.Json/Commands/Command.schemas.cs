@@ -29,7 +29,6 @@ namespace Bb.Json.Commands
         public CommandLineApplication CommandSchema(CommandLine app)
         {
 
-
             var schema = app.Command("schema", config =>
             {
                 config.Description = "manage schema";
@@ -40,16 +39,16 @@ namespace Bb.Json.Commands
             schema.Command("list", config =>
             {
 
-                config.Description = "generate schema";
+                config.Description = "list the types of the assemblies, that can extract schema";
                 config.HelpOption(HelpFlag);
 
                 var validator = new GroupArgument(config);
-                var assemblyFilename = validator.OptionMultiValue("--assembly", "output directory path location");
+                var assemblyFilename = validator.OptionMultiValue("--assembly", "list of assemblies");
 
                 config.OnExecute(() =>
                 {
 
-                    List<Type> types = LoadFiles(assemblyFilename);
+                    List<Type> types = LoadFiles(app, assemblyFilename);
 
                     (app as CommandLine).Result = types;
 
@@ -75,13 +74,13 @@ namespace Bb.Json.Commands
                 config.HelpOption(HelpFlag);
 
                 var validator = new GroupArgument(config);
-                var outputdirectory = validator.Argument("<output path>", "output directory path location");
+                var outputdirectory = validator.Argument("<output>", "output directory path location");
                 var assemblyFilename = validator.OptionMultiValue("--assembly", "output directory path location");
 
                 config.OnExecute(() =>
                 {
 
-                    List<Type> types = LoadFiles(assemblyFilename);
+                    List<Type> types = LoadFiles(app, assemblyFilename);
                     string outputPath = outputdirectory.Value.TrimPath();
 
                     foreach (var type in types)
@@ -96,7 +95,7 @@ namespace Bb.Json.Commands
 
         }
 
-        private List<Type> LoadFiles(CommandOption assemblyFilename)
+        private List<Type> LoadFiles(CommandLine app, CommandOption assemblyFilename)
         {
 
             List<Type> types = new List<Type>();
@@ -104,15 +103,11 @@ namespace Bb.Json.Commands
 
             foreach (var assemblyFile in assemblyFilename.Values)
             {
-                if (!LoadLibrary(assemblyFile))
+                if (!LoadLibrary(app, assemblyFile))
                 {
-                    if (!LoadLibrary(assemblyFile + ".dll"))
+                    if (!LoadLibrary(app, assemblyFile + ".dll"))
                     {
-                        if (!LoadLibrary(assemblyFile + ".exe"))
-                        {
-
-                        }
-                        else
+                        if (LoadLibrary(app, assemblyFile + ".exe"))
                             _list.Add(assemblyFile + ".exe");
                     }
                     else
@@ -127,6 +122,8 @@ namespace Bb.Json.Commands
                 .Where(c => FilterConfiguration(c))
                 .ToList();
 
+            if (types.Count == 0)
+                app.Error.WriteLine("assembly have not type with CategoryAttribute");
 
             types = types
                .Where(c => _list.Count == 0 || _list.Contains(Path.GetFileName(c.Assembly.ManifestModule.ScopeName)))
@@ -136,15 +133,18 @@ namespace Bb.Json.Commands
             return types;
         }
 
-        private static bool LoadLibrary(string filename)
+        private static bool LoadLibrary(CommandLine app, string filename)
         {
             var ass = new FileInfo(filename);
+            ass.Refresh();
             if (ass.Exists)
             {
                 TypeDiscovery.Instance.LoadAssembly(ass, null);
+                app.Out.WriteLine($"file {ass.FullName} loaded");
                 return true;
             }
 
+            app.Error.WriteLine($"file {ass.FullName} not found");
             return false;
 
         }
@@ -154,12 +154,8 @@ namespace Bb.Json.Commands
 
             var attributes = c.GetCustomAttributes(true);
             foreach (var item in attributes)
-            {
-
                 if (item is CategoryAttribute category)
                     return category.Category == "Configuration";
-
-            }
 
             return false;
 
