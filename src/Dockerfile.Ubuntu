@@ -2,6 +2,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:6.0-jammy AS build
 LABEL maintainer="gaelgael5@gmail.com" github="https://github.com/Black-Beard-Sdk/jslt"
 
+# Copy ---------------------------------------------------------
 WORKDIR /src/Black.Beard.Jslt
 COPY Black.Beard.Jslt/ /src/Black.Beard.Jslt/
 
@@ -13,19 +14,22 @@ COPY Black.Beard.Jslt.Services/ /src/Black.Beard.Jslt.Services
 
 WORKDIR /src/Black.Beard.Json
 COPY Black.Beard.Json/ /src/Black.Beard.Json
+
+
+# Restore & build Jslt -----------------------------------------
 RUN dotnet restore --use-current-runtime
 RUN dotnet publish --use-current-runtime -r linux-x64 --no-restore -c Release -o /jslt
 
-# final stage/image
-# FROM mcr.microsoft.com/dotnet/aspnet:6.0-jammy
-# WORKDIR /jslt
-# COPY --from=build /jslt .
+
+# final stage/image --------------------------------------------
+FROM mcr.microsoft.com/dotnet/aspnet:6.0-jammy
+WORKDIR /jslt
+COPY --from=build /jslt .
 
 # ENV use_swagger=truecd
 # ENV trace_all=true
 
 # EXPOSE 80	# with "mcr.microsoft.com/dotnet/aspnet:6.0"
-EXPOSE 5000
 
 # ENTRYPOINT ["dotnet", ]
 
