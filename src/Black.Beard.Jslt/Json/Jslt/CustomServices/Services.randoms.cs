@@ -71,7 +71,7 @@ namespace Bb.Json.Jslt.CustomServices
             if (exclusiveMaximum.HasValue && exclusiveMaximum.Value && max < int.MaxValue)
                 max++;
 
-            var options = new FieldOptionsInteger()
+            var options = new FieldOptionsByte()
             {
                 Min = min,
                 Max = max,
@@ -79,7 +79,7 @@ namespace Bb.Json.Jslt.CustomServices
                 ValueAsString = true,
             };
 
-            var randomizer = new RandomizerNumber<int>(options);
+            var randomizer = new RandomizerNumber<byte>(options);
             var result = randomizer.Generate();
 
             return new JValue(result);
@@ -199,7 +199,7 @@ namespace Bb.Json.Jslt.CustomServices
             if (exclusiveMaximum.HasValue && exclusiveMaximum.Value && max < int.MaxValue)
                 max++;
 
-            var options = new FieldOptionsLong()
+            var options = new FieldOptionsShort()
             {
                 Min = min,
                 Max = max,
@@ -207,7 +207,7 @@ namespace Bb.Json.Jslt.CustomServices
                 ValueAsString = true,
             };
 
-            var randomizer = new RandomizerNumber<long>(options);
+            var randomizer = new RandomizerNumber<short>(options);
             var result = randomizer.Generate();
 
             return new JValue(result);

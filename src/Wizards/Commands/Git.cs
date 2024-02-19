@@ -47,12 +47,14 @@ namespace Wizards.Commands
         public string Clone(string sourceUrl)
         {
 
-            var co = new CloneOptions()
-            {
-                CredentialsProvider = GetCredential()
-            };
+            //var co = new CloneOptions()
+            //{
+            //    CredentialsProvider = GetCredential()
+            //};
 
-            return Repository.Clone(sourceUrl, _workdirPath, co);
+            //return Repository.Clone(sourceUrl, _workdirPath, co);
+
+            return null;
 
         }
 

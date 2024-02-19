@@ -161,7 +161,7 @@ namespace Bb.Json.Commands
 
                     var items = reader.Read(new FileInfo(file), out string resultText, out int resultCode);
 
-                    outputPath.Save(reader.Serialize());
+                    outputPath.Save(reader.Serialize(true));
 
                     return 0;
 
