@@ -13,99 +13,45 @@ using System.Reflection;
 namespace Bb.Json.Jslt.Services
 {
 
-
-    public class FunctionFoundry
+    /// <summary>
+    /// Discovers services in assemblies
+    /// </summary>
+    public class ServiceFunctionFoundry
     {
 
-        public FunctionFoundry(TranformJsonAstConfiguration configuration)
+        /// <summary>
+        /// Create a new instance of FunctionFoundry
+        /// </summary>
+        /// <param name="configuration"></param>
+        public ServiceFunctionFoundry(TranformJsonAstConfiguration configuration)
         {
             this.configuration = configuration;
             this.Services = this.configuration.Services; 
 
             foreach (Assembly assembly in configuration.Assemblies)
-                ServiceContainer.Common.ServiceDiscovery.AddAssembly(assembly);
+                this.Services.ServiceDiscovery.AddAssembly(assembly);
+
         }
 
 
-
-        internal Factory GetServiceWriter(string name, Type[] types, Diagnostics diagnostics, TokenLocation location)
+        internal Factory GetService(FunctionKindEnum kind, string name, Type[] types, Diagnostics diagnostics, TokenLocation location)
         {
 
-            var result = this.Services.GetWriterService(name, types);
+            var result = this.Services.GetService(kind, name, types);
             if (result != null)
                 return result;
 
-            result = this.configuration.Services.GetWriterService(name, types);
+            result = this.configuration.Services.GetService(kind, name, types);
             if (result != null)
                 return result;
 
-            var result2 = this.Services.GetWriterService(name);
+            var result2 = this.Services.GetService(kind, name);
             if (result2 != null)
                 diagnostics.AddError(location, name, $"Service {name} exists but bad arguments calling");
 
             else
             {
-                result2 = this.configuration.Services.GetWriterService(name);
-                if (result2 != null)
-                    diagnostics.AddError(location, name, $"Service {name} exists but bad arguments calling");
-
-                else
-                    diagnostics.AddError(location, name, $"Service {name} not found");
-
-            }
-
-            return null;
-
-        }
-
-        internal Factory GetServiceOutput(string name, Type[] types, Diagnostics diagnostics, TokenLocation location)
-        {
-
-            var result = this.Services.GetOutputService(name, types);
-            if (result != null)
-                return result;
-
-            result = this.configuration.Services.GetOutputService(name, types);
-            if (result != null)
-                return result;
-
-            var result2 = this.Services.GetOutputService(name);
-            if (result2 != null)
-                diagnostics.AddError(location, name, $"Service {name} exists but bad arguments calling");
-
-            else
-            {
-                result2 = this.configuration.Services.GetOutputService(name);
-                if (result2 != null)
-                    diagnostics.AddError(location, name, $"Service {name} exists but bad arguments calling");
-
-                else
-                    diagnostics.AddError(location, name, $"Service {name} not found");
-
-            }
-
-            return null;
-
-        }
-
-        internal Factory GetService(string name, Type[] types, Diagnostics diagnostics, TokenLocation location)
-        {
-
-            var result = this.Services.GetService(name, types);
-            if (result != null)
-                return result;
-
-            result = this.configuration.Services.GetService(name, types);
-            if (result != null)
-                return result;
-
-            var result2 = this.Services.GetService(name);
-            if (result2 != null)
-                diagnostics.AddError(location, name, $"Service {name} exists but bad arguments calling");
-
-            else
-            {
-                result2 = this.configuration.Services.GetService(name);
+                result2 = this.configuration.Services.GetService(kind, name);
                 if (result2 != null)
                     diagnostics.AddError(location, name, $"Service {name} exists but bad arguments calling");
 
@@ -119,7 +65,11 @@ namespace Bb.Json.Jslt.Services
         }
 
 
-
+        /// <summary>
+        /// Discovers services in assembly specified by name
+        /// </summary>
+        /// <param name="assemblyFilename"></param>
+        /// <returns></returns>
         internal Assembly AddAssembly(string assemblyFilename)
         {
             Assembly assembly = TypeDiscovery.Instance.AddAssemblyFile(assemblyFilename, System.Diagnostics.Debugger.IsAttached);
@@ -127,6 +77,11 @@ namespace Bb.Json.Jslt.Services
             return assembly;
         }
 
+        /// <summary>
+        /// Discovers services in assembly specified by name
+        /// </summary>
+        /// <param name="assemblyname"></param>
+        /// <returns></returns>
         internal Assembly AddAssemblyName(string assemblyname)
         {
             Assembly assembly = TypeDiscovery.Instance.AddAssemblyname(assemblyname, true);
@@ -134,7 +89,12 @@ namespace Bb.Json.Jslt.Services
             return assembly;
 
         }
-        
+
+        /// <summary>
+        /// Discovers services in specified assembly
+        /// </summary>
+        /// <param name="assembly"></param>
+        /// <returns></returns>
         public Assembly AddAssembly(Assembly assembly)
         {
             
@@ -147,7 +107,14 @@ namespace Bb.Json.Jslt.Services
             return assembly;
         }
 
-        public FunctionFoundry AddService(Type service, string name = null)
+        /// <summary>
+        /// Add service
+        /// </summary>
+        /// <param name="service"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public ServiceFunctionFoundry AddService(Type service, string name = null)
         {
 
             string _description = string.Empty;

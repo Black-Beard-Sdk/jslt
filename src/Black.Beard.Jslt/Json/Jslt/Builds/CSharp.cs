@@ -57,17 +57,17 @@ namespace Bb.Json.Jslt.Builds
             {
 
                 var a = new AssemblyReferences();
-                foreach (var item in References)
-                    a.AddRange(item);
+                //foreach (var item in References)
+                a.AddByAssemblies(References.ToArray());
 
-                var compiler = new RoslynCompiler(a)
+                var compiler = new RoslynCompiler(a, new Analysis.Diagnostics())
                 {
                     Debug = true,
                     ResolveObjects = false,
                 };
 
                 foreach (var item in list)
-                    compiler.AddCodeSource(item.Datas, item.Name);
+                    compiler.AddCodeSource(item.Source, item.Name);
 
                 var result1 = compiler.SetOutput(OutputPath)
                        .Generate()

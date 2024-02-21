@@ -6,6 +6,7 @@ using Bb.Analysis;
 using Bb.Compilers;
 using Bb.ComponentModel;
 using Bb.ComponentModel.Factories;
+using Bb.Json.Attributes;
 using Bb.Json.Jslt.Asts;
 using Bb.Json.Jslt.Builds;
 using Bb.Json.Jslt.Services;
@@ -48,17 +49,20 @@ namespace Bb.Json.Jslt.Parser
             this._configuration = configuration;
             this._currentCulture = _configuration.Culture;
             this._functions = new List<JsltFunctionCall>();
-            this._foundry = new FunctionFoundry(this._configuration);
+            this._foundry = new ServiceFunctionFoundry(this._configuration);
         }
 
-        public FunctionFoundry Foundry { get => this._foundry; }
+        public ServiceFunctionFoundry Foundry { get => this._foundry; }
 
         public override object VisitScript([NotNull] JsltParser.ScriptContext context)
         {
 
             this._initialSource = new StringBuilder(context.Start.InputStream.ToString());
+         
+            // parse document
             var result = context.json().Accept(this);
 
+            // resolve functions
             foreach (var item in this._functions)
             {
 
@@ -66,13 +70,13 @@ namespace Bb.Json.Jslt.Parser
                 Factory service;
 
                 if (this.OutputConfiguration != null && item == this.OutputConfiguration.Function)
-                    service = this._foundry.GetServiceOutput(item.Name, types, this._diagnostics, context.Start.ToLocation());
+                    service = this._foundry.GetService(FunctionKindEnum.Output, item.Name, types, this._diagnostics, context.Start.ToLocation());
 
                 else if (this.OutputConfiguration != null && item == this.OutputConfiguration.Writer)
-                    service = this._foundry.GetServiceWriter(item.Name, types, this._diagnostics, context.Start.ToLocation());
+                    service = this._foundry.GetService(FunctionKindEnum.Writer, item.Name, types, this._diagnostics, context.Start.ToLocation());
 
                 else
-                    service = this._foundry.GetService(item.Name, types, this._diagnostics, context.Start.ToLocation());
+                    service = this._foundry.GetService(FunctionKindEnum.FunctionStandard, item.Name, types, this._diagnostics, context.Start.ToLocation());
 
                 if (service == null)
                     AddError(item.Location, string.Empty, $"the service {item.Name} can't be resolved.");
@@ -969,7 +973,7 @@ namespace Bb.Json.Jslt.Parser
                 if (item.Value is JsltFunctionCall ctor)
                 {
                     var types = ResolveArgumentsTypes(ctor);
-                    var service = this._foundry.GetService(ctor.Name, types, this._diagnostics, n.Location);
+                    var service = this._foundry.GetService( FunctionKindEnum.FunctionStandard, ctor.Name, types, this._diagnostics, n.Location);
                     if (service == null)
                     {
                         _diagnostics.AddError(n.Location, item.Name, $" service {item.Name} not found");
@@ -1172,6 +1176,7 @@ namespace Bb.Json.Jslt.Parser
 
             }
 
+            // Add assembly to the service discovery for explore service to adding
             Assembly assembly = TypeDiscovery.Instance.AddAssemblyFile(assemblyDescription.AssemblyFile, System.Diagnostics.Debugger.IsAttached);
             var discovery = this._configuration.Services.ServiceDiscovery;
             discovery.AddAssembly(assembly);
@@ -1489,7 +1494,7 @@ namespace Bb.Json.Jslt.Parser
         private StringBuilder _initialSource;
         private readonly JsltParser _parser;
         private Diagnostics _diagnostics;
-        private readonly FunctionFoundry _foundry;
+        private readonly ServiceFunctionFoundry _foundry;
         private readonly string _scriptPath;
         private readonly string _scriptPathDirectory;
         private TranformJsonAstConfiguration _configuration;

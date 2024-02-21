@@ -14,7 +14,7 @@ namespace Bb.Json.Jslt.Services
         public TranformJsonAstConfiguration(CultureInfo culture = null)
         {
             this.Culture = culture ?? CultureInfo.InvariantCulture;
-            this.Services = ServiceContainer.Common;
+            this.Services = ServiceContainer.Instance;
             this.Paths = new List<string>();
             this.Paths.Add(Environment.CurrentDirectory);
             this.OutputPath = string.Empty;

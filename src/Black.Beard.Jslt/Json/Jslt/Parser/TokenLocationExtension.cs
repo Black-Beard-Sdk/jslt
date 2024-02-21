@@ -39,7 +39,7 @@ namespace Bb.Json.Jslt.Parser
 
     }
 
-    [DebuggerDisplay("{StartIndex}, {StopIndex} : ({Line},{Column})")]
+    [DebuggerDisplay("{Start.Index}, {Stop.Index} : ({Line},{Column})")]
     public class TokenLocation : DiagnosticLocation
     {
 
@@ -65,11 +65,14 @@ namespace Bb.Json.Jslt.Parser
 
         public TokenLocation Clone()
         {
-            return new TokenLocation((Start as CodePositionLocation).Index, (End as CodePositionLocation).Index, (Start as CodePositionLocation).Line, (Start as CodePositionLocation).Column)
+            var s = (Start as CodePositionLocation);
+            var e = (End as CodePositionLocation);
+            return new TokenLocation(s.Index, e?.Index ?? 0, s.Line, s.Column)
             {
                 Function = Function
             };
         }
+    
     }
 
 

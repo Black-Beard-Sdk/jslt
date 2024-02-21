@@ -28,11 +28,11 @@ namespace Bb.Json.Jslt.Services
         }
 
         /// <summary>
-        /// Gets the template from text.
+        /// Gets the template builded from text.
         /// </summary>
-        /// <param name="sb">The sb.</param>
-        /// <param name="withDebug">if set to <c>true</c> [with debug].</param>
-        /// <param name="filename">The filename.</param>
+        /// <param name="sb">The template to run for transform the datas</param>
+        /// <param name="withDebug">if set to <c>true</c> [with debug]. generate source code and manage a debugger for running step by step.</param>
+        /// <param name="filename">The filename that  contains the code.</param>
         /// <param name="diagnostics">The diagnostics.</param>
         /// <returns></returns>
         /// <exception cref="Bb.JSon.ParsingJsonException">Failed to parse Json. " + e.Message</exception>
@@ -42,55 +42,28 @@ namespace Bb.Json.Jslt.Services
             if (string.IsNullOrEmpty(this._configuration.OutputPath) && !string.IsNullOrEmpty(filename))
                 this._configuration.OutputPath = new FileInfo(filename).Directory.FullName;
 
-            string filepathCode = string.Empty;
             var _errors = diagnostics ?? new Diagnostics();
+            
             CultureInfo culture = this._configuration.Culture;
             OutputModelConfiguration outputConfiguration = null;
-            FunctionFoundry _foundry = null;
+            ServiceFunctionFoundry _foundry = null;
             JsltBase tree = null;
 
             try
             {
                 if (sb.Length > 0)
                 {
+
+                    // Parse the template or get the syntax tree
                     var parser = ScriptParser.ParseString(sb);
                     var visitor = new ScriptBuilderVisitor(this._configuration, parser.Parser, _errors, filename);
                     tree = (JsltBase)parser.Visit(visitor);
 
-                    JsltComment comment = null;
-                    List<JsltComment> _comments = new List<JsltComment>();
-                    bool inComment = false;
-
-                    for (int i = 0; i < sb.Length; i++)
-                    {
-                        var c = sb[i];
-                        if (inComment)
-                        {
-                            if (c == '*' && sb[i + 1] == '/')
-                            {
-                                comment.Location = new TokenLocation(i + 1, 0, 0, 0);
-                                inComment = false;
-                            }
-                        }
-                        else
-                        {
-                            if (c == '/' && sb[i + 1] == '*')
-                            {
-                                comment = new JsltComment()
-                                {
-                                    Location = new TokenLocation(i, 0, 0, 0),
-                                };
-                                _comments.Add(comment);
-                                inComment = true;
-                            }
-
-                        }
-                    }
-
-                    tree.AddComments(_comments);
+                    if (tree != null && _errors.Success)
+                        NormalizeComments(sb, tree);
 
                     _foundry = visitor.Foundry;
-                    culture = visitor.Culture;
+                    culture = visitor.Culture; // the script define a specific culture for execution context
                     outputConfiguration = visitor.OutputConfiguration;
 
                 }
@@ -101,31 +74,52 @@ namespace Bb.Json.Jslt.Services
                 throw new ParsingJsonException("Failed to parse Json. " + e.Message, e);
             }
 
+            if (_errors.Success && tree != null) // if the parsing haven't  thrown any error
+            {
+                var result = build(sb, tree, _foundry, _errors, filename, withDebug, outputConfiguration, culture);
+                return result;
+            }
+
+            return new JsltTemplate()
+            {
+                Diagnostics = _errors,
+                Filename = filename,
+                Culture = culture,
+                Rule = sb,
+                Configuration = this._configuration,
+                Rules = null,
+                RuleOutput = null,
+                Tree = tree,
+            };
+
+        }
+
+        private JsltTemplate build(StringBuilder sb, JsltBase tree, ServiceFunctionFoundry _foundry, Diagnostics _errors,
+            string filename, bool withDebug, OutputModelConfiguration outputConfiguration, CultureInfo culture)
+        {
+
             Func<RuntimeContext, JToken, JToken> rules = null;
             Func<RuntimeContext, StringBuilder> ruleOutput = null;
             Func<RuntimeContext, object> ruleWriter = null;
+            string filepathCode = string.Empty;
 
-            if (_errors.Success)
+            var crc = Crc32.CalculateCrc32(sb).ToString();
+            filepathCode = crc + ".cs";
+
+            // build the template
+            rules = Get(tree, _foundry, _errors, filepathCode, filename, withDebug); // compilation
+
+            if (outputConfiguration != null && outputConfiguration.Function != null)
             {
-                var crc = Crc32.CalculateCrc32(sb).ToString();
-                filepathCode = crc + ".cs";
-                // Transform the template
-                rules = Get(tree, _foundry, _errors, filepathCode, filename, withDebug);
 
-                if (outputConfiguration != null && outputConfiguration.Function != null)
-                {
-                    var codeName = Path.GetFileNameWithoutExtension(filepathCode) + "_output" + Path.GetExtension(filepathCode);
-                    ruleOutput = GetOutput(outputConfiguration.Function, _foundry, _errors, codeName, withDebug);
+                var codeName = Path.GetFileNameWithoutExtension(filepathCode) + "_output" + Path.GetExtension(filepathCode);
+                ruleOutput = GetOutput(outputConfiguration.Function, _foundry, _errors, codeName, withDebug);
 
-                    if (outputConfiguration.Writer != null)
-                    {
-                        ruleWriter = GetWriter(outputConfiguration.Writer, _foundry, _errors, codeName, withDebug);
-
-                    }
-
-                }
+                if (outputConfiguration.Writer != null)
+                    ruleWriter = GetWriter(outputConfiguration.Writer, _foundry, _errors, codeName, withDebug);
 
             }
+
 
             JsltTemplate result = new JsltTemplate()
             {
@@ -148,6 +142,41 @@ namespace Bb.Json.Jslt.Services
 
         }
 
+        private static void NormalizeComments(StringBuilder sb, JsltBase tree)
+        {
+            JsltComment comment = null;
+            List<JsltComment> _comments = new List<JsltComment>();
+            bool inComment = false;
+
+            for (int i = 0; i < sb.Length; i++)
+            {
+                var c = sb[i];
+                if (inComment)
+                {
+                    if (c == '*' && sb[i + 1] == '/')
+                    {
+                        comment.Location = new TokenLocation(i + 1, 0, 0, 0);
+                        inComment = false;
+                    }
+                }
+                else
+                {
+                    if (c == '/' && sb[i + 1] == '*')
+                    {
+                        comment = new JsltComment()
+                        {
+                            Location = new TokenLocation(i, 0, 0, 0),
+                        };
+                        _comments.Add(comment);
+                        inComment = true;
+                    }
+
+                }
+            }
+
+            tree.AddComments(_comments);
+        }
+
         /// <summary>
         /// Gets the template from tree syntax.
         /// </summary>
@@ -162,7 +191,7 @@ namespace Bb.Json.Jslt.Services
         }
 
 
-        private Func<RuntimeContext, JToken, JToken> Get(JsltBase tree, FunctionFoundry foundry, Diagnostics _errors, string filepathCode, string scriptPath, bool withDebug)
+        private Func<RuntimeContext, JToken, JToken> Get(JsltBase tree, ServiceFunctionFoundry foundry, Diagnostics _errors, string filepathCode, string scriptPath, bool withDebug)
         {
 
             Func<RuntimeContext, JToken, JToken> fnc;
@@ -200,7 +229,7 @@ namespace Bb.Json.Jslt.Services
 
         }
 
-        private Func<RuntimeContext, StringBuilder> GetOutput(JsltBase tree, FunctionFoundry foundry, Diagnostics _errors, string filepathCode, bool withDebug)
+        private Func<RuntimeContext, StringBuilder> GetOutput(JsltBase tree, ServiceFunctionFoundry foundry, Diagnostics _errors, string filepathCode, bool withDebug)
         {
 
             Func<RuntimeContext, StringBuilder> fnc;
@@ -233,7 +262,7 @@ namespace Bb.Json.Jslt.Services
 
         }
 
-        private Func<RuntimeContext, object> GetWriter(JsltBase tree, FunctionFoundry foundry, Diagnostics _errors, string filepathCode, bool withDebug)
+        private Func<RuntimeContext, object> GetWriter(JsltBase tree, ServiceFunctionFoundry foundry, Diagnostics _errors, string filepathCode, bool withDebug)
         {
 
             Func<RuntimeContext, object> fnc;

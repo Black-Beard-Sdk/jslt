@@ -3,6 +3,7 @@ using Bb.Expressions;
 using Bb.Expressions.Statements;
 using Bb.Json.Jslt.Asts;
 using Bb.Json.Jslt.Parser;
+using Bb.Util;
 using Oldtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -357,14 +358,25 @@ namespace Bb.Json.Jslt.Services
                 if (!node.ServiceProvider.IsCtor)
                 {
                     var s = node.Location;
+                    if (s == null)
+                        s = TokenLocation.Empty;
+                    var s2 = s.Start as CodePositionLocation;
+
+                    if (s2 == null)
+                        s2 = new CodePositionLocation((0, 0), -1);
+
+                    var e = s.End as CodePositionLocation;
+                    if ((e == null))
+                        e = new CodePositionLocation((s2.Line, s2.Column), s2.Index + node.Name.Length);
+
                     var c = Expression
                         .Call(null, RuntimeContext._TraceLocation
                         , ctx.Current.Context
                         , Expression.Constant(node.Name)
-                        , Expression.Constant((s.Start as CodePositionLocation).Line)
-                        , Expression.Constant((s.Start as CodePositionLocation).Column)
-                        , Expression.Constant((s.Start as CodePositionLocation).Index)
-                        , Expression.Constant((s.End as CodePositionLocation).Index)
+                        , Expression.Constant(s2.Line)
+                        , Expression.Constant(s2.Column)
+                        , Expression.Constant(s2.Index)
+                        , Expression.Constant(e.Index)
                         );
                     args.Add(c);
                 }
@@ -615,7 +627,7 @@ namespace Bb.Json.Jslt.Services
             get => _stack.Peek();
         }
 
-        public FunctionFoundry EmbbededFunctions { get; internal set; }
+        public ServiceFunctionFoundry EmbbededFunctions { get; internal set; }
         public string ScriptPath { get; internal set; }
 
         private CurrentContext NewContext()

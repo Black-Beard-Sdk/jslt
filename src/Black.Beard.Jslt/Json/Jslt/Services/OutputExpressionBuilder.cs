@@ -625,7 +625,7 @@ namespace Bb.Json.Jslt.Services
             get => _stack.Peek();
         }
 
-        public FunctionFoundry EmbbededFunctions { get; internal set; }
+        public ServiceFunctionFoundry EmbbededFunctions { get; internal set; }
 
         private CurrentContext NewContext()
         {

@@ -26,7 +26,7 @@ namespace Bb.Json.Jslt.CustomServices
                 Formatting = indented ? Formatting.Indented : Formatting.None,
                 Culture = ctx.Configuration.Culture,
                 DefaultValueHandling = ignoreNullAndEmptyValue ? DefaultValueHandling.Ignore : DefaultValueHandling.Include,
-                NullValueHandling = ignoreNullAndEmptyValue ? NullValueHandling.Ignore : NullValueHandling.Include,
+                NullValueHandling = ignoreNullAndEmptyValue ? Oldtonsoft.Json.NullValueHandling.Ignore : Oldtonsoft.Json.NullValueHandling.Include,
                 TypeNameHandling = TypeNameHandling.All,
             };
 

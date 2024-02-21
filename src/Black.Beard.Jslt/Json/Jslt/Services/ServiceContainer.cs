@@ -8,203 +8,142 @@ using static Bb.Json.Jslt.Services.TranformJsonAstConfiguration;
 namespace Bb.Json.Jslt.Services
 {
 
+    /// <summary>
+    /// Manage the storage of the services registered
+    /// </summary>
     public class ServiceContainer
     {
 
+
+        /// <summary>
+        /// static constructor
+        /// </summary>
         static ServiceContainer()
         {
             var service = new ServiceContainer();
-            ServiceContainer.Common = service;
+            ServiceContainer.Instance = service;
             service.ServiceDiscovery.AddAssembly(typeof(TranformJsonAstConfiguration).Assembly);
         }
 
-        private ServiceContainer()
+
+        /// <summary>
+        /// private creation
+        /// </summary>
+        public ServiceContainer()
         {
 
-            this._dictionary = new Dictionary<string, TransformJsonServiceProvider>();
-            this._dictionaryOutput = new Dictionary<string, TransformJsonServiceProvider>();
-            this._dictionaryWriter = new Dictionary<string, TransformJsonServiceProvider>();
-            
+            this._dic = new Dictionary<FunctionKindEnum, Dictionary<string, TransformJsonServiceProvider>>
+            {
+                { FunctionKindEnum.FunctionStandard, new Dictionary<string, TransformJsonServiceProvider>() },
+                { FunctionKindEnum.Output, new Dictionary<string, TransformJsonServiceProvider>() },
+                { FunctionKindEnum.Writer, new Dictionary<string, TransformJsonServiceProvider>() }
+            };
+
             this.ServiceDiscovery = new ServiceDiscovery(this);
 
         }
 
+        /// <summary>
+        /// add a new service, the name is the key for finding the service
+        /// </summary>
+        /// <param name="name">name for matching service</param>
+        /// <param name="provider"></param>
+        /// <param name="kind"></param>
+        /// <returns></returns>
         public ServiceContainer AddService(string name, Factory provider, FunctionKindEnum kind)
         {
 
             TransformJsonServiceProvider serviceProvider = null;
-            switch (kind)
+
+            Dictionary<string, TransformJsonServiceProvider> dic = null;
+
+            dic = this._dic[kind];
+
+            if (dic != null)
             {
 
-                case FunctionKindEnum.Output:
-                    if (!_dictionaryOutput.TryGetValue(name.ToLower(), out serviceProvider))
-                        this._dictionaryOutput.Add(name.ToLower(), (serviceProvider = new TransformJsonServiceProvider()));
-                    break;
+                if (!dic.TryGetValue(name.ToLower(), out serviceProvider))
+                    dic.Add(name.ToLower(), (serviceProvider = new TransformJsonServiceProvider()));
 
-                case FunctionKindEnum.FunctionStandard:
-                    if (!_dictionary.TryGetValue(name.ToLower(), out serviceProvider))
-                        this._dictionary.Add(name.ToLower(), (serviceProvider = new TransformJsonServiceProvider()));
-                    break;
-
-                case FunctionKindEnum.Writer:
-                    if (!_dictionaryWriter.TryGetValue(name.ToLower(), out serviceProvider))
-                        this._dictionaryWriter.Add(name.ToLower(), (serviceProvider = new TransformJsonServiceProvider()));
-                    break;
-
-                default:
-                    if (System.Diagnostics.Debugger.IsAttached)
-                        System.Diagnostics.Debugger.Break();
-                    break;
-
-            }
-
-            if (serviceProvider != null)
-            {
                 provider.Name = name;
                 serviceProvider.Add(provider);
                 System.Diagnostics.Debug.WriteLine($"service {name} is added");
+
             }
 
             return this;
 
         }
 
-
-        public Factory GetWriterService(string name, Type[] parameters)
+        /// <summary>
+        /// resolve factory for the service matched by the name
+        /// </summary>
+        /// <param name="kind"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public TransformJsonServiceProvider GetService(FunctionKindEnum kind, string name)
         {
 
-            List<Type> sign = new List<Type> { typeof(RuntimeContext) };
-            sign.AddRange(parameters);
+            //if (ServiceContainer.Instance != this)
+            //    return ServiceContainer.Instance.GetService(FunctionKindEnum.FunctionStandard, name);
 
-            if (ServiceContainer.Common != this)
-                return ServiceContainer.Common.GetWriterService(name, parameters);
+            var d = _dic[kind];
 
-            if (_dictionaryWriter.TryGetValue(name.ToLower(), out TransformJsonServiceProvider serviceProvider))
-                return serviceProvider.Get_Impl(sign.ToArray());
-
-            return null;
-
-        }
-      
-
-        public Factory GetOutputService(string name, Type[] parameters)
-        {
-
-            List<Type> sign = new List<Type> { typeof(RuntimeContext) };
-            sign.AddRange(parameters);
-
-            if (ServiceContainer.Common != this)
-                return ServiceContainer.Common.GetOutputService(name, parameters);
-
-            if (_dictionaryOutput.TryGetValue(name.ToLower(), out TransformJsonServiceProvider serviceProvider))
-                return serviceProvider.Get_Impl(sign.ToArray());
-
-            return null;
-
-        }
-
-        public Factory GetService(string name, Type[] parameters)
-        {
-
-            List<Type> sign = new List<Type> { typeof(RuntimeContext) };
-            sign.AddRange(parameters);
-
-            if (ServiceContainer.Common != this)
-                return ServiceContainer.Common.GetService(name, parameters);
-
-            if (_dictionary.TryGetValue(name.ToLower(), out TransformJsonServiceProvider serviceProvider))
-                return serviceProvider.Get_Impl(sign.ToArray());
-
-            return null;
-
-        }
-
-
-
-        public TransformJsonServiceProvider GetService(string name)
-        {
-
-            if (ServiceContainer.Common != this)
-                return ServiceContainer.Common.GetService(name);
-
-            if (_dictionary.TryGetValue(name.ToLower(), out TransformJsonServiceProvider serviceProvider))
+            if (d.TryGetValue(name.ToLower(), out TransformJsonServiceProvider serviceProvider))
                 return serviceProvider;
 
             return null;
 
         }
 
-        public TransformJsonServiceProvider GetOutputService(string name)
+        /// <summary>
+        /// resolve factory for the service matched by the name and the arguments
+        /// </summary>
+        /// <param name="kind"></param>
+        /// <param name="name"></param>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
+        public Factory GetService(FunctionKindEnum kind, string name, Type[] parameters)
         {
 
-            if (ServiceContainer.Common != this)
-                return ServiceContainer.Common.GetOutputService(name);
+            var d = _dic[kind];
 
-            if (_dictionaryOutput.TryGetValue(name.ToLower(), out TransformJsonServiceProvider serviceProvider))
-                return serviceProvider;
+            List<Type> sign = new List<Type> { typeof(RuntimeContext) }; // add the runtime context as first parameter becauses it's alway the first parameter of all services
+            sign.AddRange(parameters);
+
+            //if (ServiceContainer.Instance != this)
+            //    return ServiceContainer.Instance.GetService(kind, name, parameters);
+
+            if (d.TryGetValue(name.ToLower(), out TransformJsonServiceProvider serviceProvider))
+                return serviceProvider.Get_Impl(sign.ToArray());
 
             return null;
 
         }
 
-        public TransformJsonServiceProvider GetWriterService(string name)
+        public IEnumerable<TransformJsonServiceProvider> GetServices(FunctionKindEnum kind)
         {
 
-            if (ServiceContainer.Common != this)
-                return ServiceContainer.Common.GetWriterService(name);
+            var d = _dic[kind];
 
-            if (_dictionaryWriter.TryGetValue(name.ToLower(), out TransformJsonServiceProvider serviceProvider))
-                return serviceProvider;
+            //if (ServiceContainer.Instance != this)
+            //    foreach (var item in ServiceContainer.Instance.GetServices(kind))
+            //        yield return item;
 
-            return null;
-
-        }
-
-
-
-        public IEnumerable<TransformJsonServiceProvider> GetOutputServices()
-        {
-
-            if (ServiceContainer.Common != this)
-                foreach (var item in ServiceContainer.Common.GetOutputServices())
-                    yield return item;
-
-            foreach (var item in _dictionaryOutput.Values)
+            foreach (var item in d.Values)
                 yield return item;
 
         }
 
-        public IEnumerable<TransformJsonServiceProvider> GetWriterServices()
-        {
 
-            if (ServiceContainer.Common != this)
-                foreach (var item in ServiceContainer.Common.GetWriterServices())
-                    yield return item;
-
-            foreach (var item in _dictionaryWriter.Values)
-                yield return item;
-
-        }
-
-        public IEnumerable<TransformJsonServiceProvider> GetServices()
-        {
-
-            if (ServiceContainer.Common != this)
-                foreach (var item in ServiceContainer.Common.GetServices())
-                    yield return item;
-
-            foreach (var item in _dictionary.Values)
-                yield return item;
-
-        }
 
         public ServiceDiscovery ServiceDiscovery { get; }
 
-        public static ServiceContainer Common { get; }
+        public static ServiceContainer Instance { get; }
 
-        private readonly Dictionary<string, TransformJsonServiceProvider> _dictionary;
-        private readonly Dictionary<string, TransformJsonServiceProvider> _dictionaryOutput;
-        private readonly Dictionary<string, TransformJsonServiceProvider> _dictionaryWriter;
+
+
+        private readonly Dictionary<FunctionKindEnum, Dictionary<string, TransformJsonServiceProvider>> _dic;
 
 
     }

@@ -31,6 +31,7 @@ using System.Diagnostics;
 using Bb;
 using Bb.Expressions;
 using Bb.Analysis;
+using Bb.Json.Attributes;
 
 namespace AppJsonEvaluator
 {
@@ -128,11 +129,11 @@ namespace AppJsonEvaluator
                     (key, result) =>
                     {
 
-                        foreach (var provider in Bb.Json.Jslt.Services.ServiceContainer.Common.GetServices())
+                        foreach (var provider in Bb.Json.Jslt.Services.ServiceContainer.Instance.GetServices(FunctionKindEnum.FunctionStandard))
                             foreach (Factory factory in provider.GetItems())
                                 result.Add(new CompletionData(factory.MethodInfos.Content, factory.MethodInfos.Name, string.IsNullOrEmpty(factory.MethodInfos.Description) ? factory.MethodInfos.Content : factory.MethodInfos.Description));
 
-                        foreach (var provider in Bb.Json.Jslt.Services.ServiceContainer.Common.GetOutputServices())
+                        foreach (var provider in Bb.Json.Jslt.Services.ServiceContainer.Instance.GetServices(FunctionKindEnum.Output))
                             foreach (Factory factory in provider.GetItems())
                                 result.Add(new CompletionData(factory.MethodInfos.Content, factory.MethodInfos.Name, string.IsNullOrEmpty(factory.MethodInfos.Description) ? factory.MethodInfos.Content : factory.MethodInfos.Description));
 
@@ -287,10 +288,11 @@ namespace AppJsonEvaluator
 
                 _template = text.GetTransformProvider(debug, filename, _path);
 
-
-                var colorize = new ColorizeFromTreeVisitor(textMarkerService, TemplateEditor) { Configuration = _template.Configuration };
-                colorize.Apply(_template.Tree);
-
+                if (_template != null)
+                {
+                    var colorize = new ColorizeFromTreeVisitor(textMarkerService, TemplateEditor) { Configuration = _template.Configuration };
+                    colorize.Apply(_template.Tree);
+                }
 
             }
             catch (ArgumentOutOfRangeException)

@@ -21,6 +21,10 @@ namespace Bb.Json.Jslt.Services
             this._assemblies = new HashSet<string>();
         }
 
+        /// <summary>
+        /// explore the assembly and add services in the configuration container. the type must to have an attribute <see cref="Bb.Json.Attributes.JsltExtensionMethodAttribute" /> for identify the key to match.
+        /// </summary>
+        /// <param name="assembly"></param>
         public void AddAssembly(Assembly assembly)
         {
 

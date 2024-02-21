@@ -85,7 +85,7 @@ namespace Bb.Json.Jslt.Parser
             if (visitor is IFile f)
                 f.Filename = this.File;
 
-            if (System.Diagnostics.Debugger.IsAttached)
+            if (System.Diagnostics.Debugger.IsAttached && !string.IsNullOrEmpty(this.File))
                 System.Diagnostics.Trace.WriteLine(this.File);
 
             var context = this._context;

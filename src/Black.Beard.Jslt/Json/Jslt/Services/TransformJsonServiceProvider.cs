@@ -71,6 +71,12 @@ namespace Bb.Json.Jslt.Services
 
         }
 
+        /// <summary>
+        /// this method evaluate the ranl scoring of the méthod 
+        /// </summary>
+        /// <param name="parameters"></param>
+        /// <param name="result"></param>
+        /// <param name="factory"></param>
         private static void TestMethod(Type[] parameters, List<(int[], Factory)> result, Factory factory)
         {
             bool test = true;

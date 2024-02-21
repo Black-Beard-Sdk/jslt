@@ -114,7 +114,7 @@ namespace Wizards.Commands
 
             // Resolve the name of objects
             List<CodeObject> _items = new List<CodeObject>();
-            foreach (Microsoft.CodeAnalysis.SyntaxTree item in assembly.Codes)
+            foreach (Microsoft.CodeAnalysis.SyntaxTree item in assembly.SyntaxTree)
                 _items.AddRange(ObjectResolverVisitor.GetObjects(item)
                    .Where(c => c.EvaluateInherit("Model")));
 
@@ -142,23 +142,23 @@ namespace Wizards.Commands
 
             // Build assembly
 
-            Action<CSharpCompilationOptions> action = (r) =>
-            {
+            //Action<CSharpCompilationOptions> action = (r) =>
+            //{
 
-            };
+            //};
 
             BuildCSharp builder = new BuildCSharp()
             {
-                ResolveAssembliesInCode = true,
+                //ResolveAssembliesInCode = true,
                 Debug = true,
-                LanguageVersion = Microsoft.CodeAnalysis.CSharp.LanguageVersion.CSharp7,
+                //LanguageVersion = LanguageVersion.CSharp7,
             }
             .AddSource(fileInfo)
             .Suppress("CS1702", "CS1998")
             ;
 
-            // System.Collections
-            builder.References.AddRange(
+            builder.References.AddByTypes
+            (
                 typeof(Model),
                 typeof(WizardModel),
                 typeof(JObject),
@@ -167,10 +167,9 @@ namespace Wizards.Commands
                 typeof(DataSet),
                 typeof(ProcessStartInfo),
                 typeof(Bb.Expressions.LocalMethodCompiler)
-            );
-
-            builder.References.AddAssemblyFile(typeof(DataSet).Assembly.Location);
-            builder.References.Add(Assembly.LoadWithPartialName("System.Collections"));
+            )
+            .AddByAssemblies(Assembly.LoadWithPartialName("System.Collections"))
+            ;
 
             var assembly = builder.Build();
             return assembly;
