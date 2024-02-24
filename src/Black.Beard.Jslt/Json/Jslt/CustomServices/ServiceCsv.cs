@@ -1,13 +1,13 @@
-﻿using Bb.Json.Attributes;
+﻿using Bb.Csv;
+using Bb.Json.Attributes;
 using Bb.Json.Jslt.Services;
-using Oldtonsoft.Json;
 using Oldtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Bb.Json.Jslt.CustomServices.Csv
+namespace Bb.Json.Jslt.CustomServices
 {
 
 
@@ -54,7 +54,7 @@ namespace Bb.Json.Jslt.CustomServices.Csv
 
         }
 
-        private static JArray ReadCsv(string filename, bool hasHeader, string? charsetSeparator, string? quoteCharset, string escapeCharset, string excludedColumns, bool excludeNullAndEmpty)
+        private static JArray ReadCsv(string filename, bool hasHeader, string charsetSeparator, string quoteCharset, string escapeCharset, string excludedColumns, bool excludeNullAndEmpty)
         {
 
             var separator = charsetSeparator;
@@ -165,7 +165,7 @@ namespace Bb.Json.Jslt.CustomServices.Csv
         private static JValue GetValue(object value, bool excludeNullAndEmpty)
         {
 
-            if (value == null || value == System.DBNull.Value)
+            if (value == null || value == DBNull.Value)
             {
                 if (excludeNullAndEmpty)
                     return null;
@@ -221,7 +221,7 @@ namespace Bb.Json.Jslt.CustomServices.Csv
                     if (isdecimal && decimal.TryParse(v, out decimal d))
                         return new JValue(d);
 
-                    if (isint && Int64.TryParse(v, out long l))
+                    if (isint && long.TryParse(v, out long l))
                     {
                         if (l.ToString() == v)
                         {
@@ -267,9 +267,9 @@ namespace Bb.Json.Jslt.CustomServices.Csv
 
             var dic = new Dictionary<char, char>();
 
-            Add(dic, (int)'a', (int)'z');
-            Add(dic, (int)'A', (int)'Z');
-            Add(dic, (int)'0', (int)'9');
+            Add(dic, 'a', 'z');
+            Add(dic, 'A', 'Z');
+            Add(dic, '0', '9');
 
             dic.Add(' ', '_');
             dic.Add('\'', '_');

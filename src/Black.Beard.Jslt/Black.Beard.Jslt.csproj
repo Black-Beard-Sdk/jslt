@@ -58,21 +58,12 @@
 			<AutoGen>True</AutoGen>
 			<DependentUpon>ResourceString.resx</DependentUpon>
 		</Compile>
-		<Compile Update="Json\Jslt\CustomServices\Csv\ExceptionMessage.Designer.cs">
-		  <DesignTime>True</DesignTime>
-		  <AutoGen>True</AutoGen>
-		  <DependentUpon>ExceptionMessage.resx</DependentUpon>
-		</Compile>
 	</ItemGroup>
 
 	<ItemGroup>
 		<EmbeddedResource Update="git.Expressions\CsharpGenerators\ResourceString.resx">
 			<Generator>ResXFileCodeGenerator</Generator>
 			<LastGenOutput>ResourceString.Designer.cs</LastGenOutput>
-		</EmbeddedResource>
-		<EmbeddedResource Update="Json\Jslt\CustomServices\Csv\ExceptionMessage.resx">
-		  <Generator>ResXFileCodeGenerator</Generator>
-		  <LastGenOutput>ExceptionMessage.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
 	</ItemGroup>
 

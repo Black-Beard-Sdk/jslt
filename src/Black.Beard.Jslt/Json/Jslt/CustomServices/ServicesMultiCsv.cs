@@ -1,10 +1,11 @@
 ﻿using Bb.Json.Attributes;
 using Bb.Json.Jslt.Services;
+using Bb.MultiCsv;
 using Oldtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Bb.Json.Jslt.CustomServices.MultiCsv
+namespace Bb.Json.Jslt.CustomServices
 {
 
     public static partial class ServicesMultiCsv
@@ -31,20 +32,21 @@ namespace Bb.Json.Jslt.CustomServices.MultiCsv
 
                 foreach (var item in reader.Items)
                 {
-                    var resultVisitor = visitor.Visit(item);
+
+                    System.Text.Json.Nodes.JsonNode json = visitor.Visit(item);
+                    var txt = json.ToJsonString();
+                    var resultVisitor = txt.ConvertToJson();
 
                     var info = reader.FileInformations;
-
+                    
                     var metadatas = new JObject(
-                        new JProperty("Filename", info.FileInfo.FullName),
-                        new JProperty("EncodingFile", info.EncodingByUde.HeaderName),
-                        new JProperty("EncodingFileBody", info.EncodingByUde.BodyName)
-                        );
+                        new JProperty("_filename", info.FileInfo.FullName),
+                        new JProperty("_encodingFile", info.EncodingByUde.HeaderName),
+                        new JProperty("_encodingFileBody", info.EncodingByUde.BodyName)
+                      );
 
                     foreach (var meta in info.Metadatas)
-                    {
                         metadatas.Add(new JProperty(meta.Key, meta.Value));
-                    }
 
                     if (resultVisitor is JObject obj)
                         obj.Add(new JProperty("_metadatas", metadatas));
