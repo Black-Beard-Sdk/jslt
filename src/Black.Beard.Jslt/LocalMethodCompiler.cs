@@ -1,4 +1,5 @@
-﻿using Bb.Builds;
+﻿using Bb.Analysis.Traces;
+using Bb.Builds;
 using Bb.Expressions.CsharpGenerators;
 using Bb.Json.Jslt.Builds;
 using System;
@@ -46,8 +47,14 @@ namespace Bb.Expressions
                 BuildCSharp build = new BuildCSharp()
                 {
                     OutputPath = path,
-                };
-                build.Sources.Add(file);
+                }
+                .AddSource(file)
+                .AddReferences(
+                      typeof(LocationDefault)
+                    , typeof(LocalMethodCompiler)
+                    )
+                ;
+
                 var assembly = build.Build(name);
 
                 if (!assembly.Success && System.Diagnostics.Debugger.IsAttached)

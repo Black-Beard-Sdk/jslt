@@ -1,4 +1,5 @@
 ﻿using Bb.Analysis;
+using Bb.Analysis.Traces;
 using Bb.Json.Jslt.Asts;
 using Bb.Json.Jslt.Parser;
 
@@ -8,7 +9,7 @@ namespace Bb.Json.Jslt.Services
     {
 
 
-        public static JsltBase Parse(JsltBase self, TranformJsonAstConfiguration configuration, TokenLocation location)
+        public static JsltBase Parse(JsltBase self, TranformJsonAstConfiguration configuration, TextLocation location)
         {
 
             var visitor = new JsltIntellisenseVisitor()
@@ -27,18 +28,15 @@ namespace Bb.Json.Jslt.Services
         private bool Evaluate(JsltBase item)
         {
 
-            if ((this.Location?.Start as CodePositionLocation)?.Index > (item?.Location?.Start as CodePositionLocation)?.Index)
-            {
-
-                if ((this.Location?.End as CodePositionLocation)?.Index <= ((item?.Location?.End as CodePositionLocation)?.Index))
+            if (this.Location.StopEndBefore(item?.Location))
+                if (this.Location.StopEndBefore(item?.Location))
                 {
                     this.Current = item;
                     return true;
                 }
 
-            }
-
             return false;
+
         }
 
 
@@ -355,7 +353,7 @@ namespace Bb.Json.Jslt.Services
 
 
 
-        public TokenLocation Location { get; private set; }
+        public TextLocation Location { get; private set; }
         public JsltBase Current { get; private set; }
     }
 

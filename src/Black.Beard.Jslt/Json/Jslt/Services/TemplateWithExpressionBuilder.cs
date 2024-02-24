@@ -1,4 +1,5 @@
 ﻿using Bb.Analysis;
+using Bb.Analysis.Traces;
 using Bb.Expressions;
 using Bb.Expressions.Statements;
 using Bb.Json.Jslt.Asts;
@@ -43,7 +44,7 @@ namespace Bb.Json.Jslt.Services
         }
 
 
-        public TemplateWithExpressionBuilder(Diagnostics diagnostics, MethodCompiler compiler, bool debug)
+        public TemplateWithExpressionBuilder(ScriptDiagnostics diagnostics, MethodCompiler compiler, bool debug)
         {
 
             PrivatedIndex.Reset();
@@ -357,17 +358,24 @@ namespace Bb.Json.Jslt.Services
 
                 if (!node.ServiceProvider.IsCtor)
                 {
+
+                    int line = 0;
+                    int col = 0;
+                    int index = 0;
+                    int index2 = 0;
+
                     var s = node.Location;
                     if (s == null)
-                        s = TokenLocation.Empty;
-                    var s2 = s.Start as CodePositionLocation;
+                        s = TextLocation.Empty;
 
+                    var s2 = s.Start as LocationLineAndIndex;
                     if (s2 == null)
-                        s2 = new CodePositionLocation((0, 0), -1);
+                        s2 = new LocationLineAndIndex((0, 0), -1);
 
-                    var e = s.End as CodePositionLocation;
+
+                    var e = s.Stop as LocationLineAndIndex;
                     if ((e == null))
-                        e = new CodePositionLocation((s2.Line, s2.Column), s2.Index + node.Name.Length);
+                        e = new LocationLineAndIndex((s2.Line, s2.Column), s2.Index + node.Name.Length);
 
                     var c = Expression
                         .Call(null, RuntimeContext._TraceLocation
@@ -714,7 +722,7 @@ namespace Bb.Json.Jslt.Services
         #endregion Context
 
         private readonly MethodCompiler _compiler;
-        private readonly Diagnostics _diagnostics;
+        private readonly ScriptDiagnostics _diagnostics;
         private int _indexMethod;
         private List<MethodCallExpression> _resultReset;
         private static readonly ConstructorInfo _ctorJArray;

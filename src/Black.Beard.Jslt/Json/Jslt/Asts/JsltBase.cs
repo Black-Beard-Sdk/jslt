@@ -1,4 +1,5 @@
 ﻿using Bb.Analysis;
+using Bb.Analysis.Traces;
 using Bb.Asts;
 using Bb.Json.Jslt.Parser;
 using Oldtonsoft.Json.Linq;
@@ -56,19 +57,16 @@ namespace Bb.Json.Jslt.Asts
         /// <value>
         /// The location.
         /// </value>
-        public TokenLocation Location { get; set; }
+        public TextLocation Location { get; set; }
 
-        //public TokenLocation Start { get; set; }
 
-        //public TokenLocation End { get; set; }
-
-        public TokenLocation GetLocation()
+        /// <summary>
+        /// Gets the comment's list.
+        /// </summary>
+        /// <returns></returns>
+        public TextLocation GetLocation()
         {
-            int line = (Location?.Start as CodePositionLocation).Line;
-            int column = (Location?.Start as CodePositionLocation).Column;
-            int startIndex = (Location?.Start as CodePositionLocation).Index;
-            int endIndex = (Location?.End as CodePositionLocation).Index;
-            return new TokenLocation(startIndex, endIndex, line, column);
+            return Location.Copy();
         }
 
         /// <summary>

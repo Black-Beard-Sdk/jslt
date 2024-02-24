@@ -1,11 +1,11 @@
-﻿using Bb.Analysis;
+﻿using Bb.Analysis.Traces;
 using Bb.Json.Jslt.Parser;
+using ICSharpCode.Decompiler.CSharp.Syntax;
 using Oldtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
@@ -32,7 +32,7 @@ namespace Bb.Json.Jslt.Services
             _convertToken = RuntimeContext.ConvertTo;
             _translateVariable = RuntimeContext.Translate;
 
-            _setVariable = typeof(RuntimeContext).GetMethod(nameof(RuntimeContext.SetVariable), new Type[] { typeof(RuntimeContext), typeof(string), typeof(object), typeof(TokenLocation) });
+            _setVariable = typeof(RuntimeContext).GetMethod(nameof(RuntimeContext.SetVariable), new Type[] { typeof(RuntimeContext), typeof(string), typeof(object), typeof(Analysis.Traces.TextLocation) });
             _DelVariable = typeof(RuntimeContext).GetMethod(nameof(RuntimeContext.DelVariable), new Type[] { typeof(RuntimeContext), typeof(string) });
 
             _TraceLocation = typeof(RuntimeContext).GetMethod(nameof(RuntimeContext.TraceLocation), new Type[] { typeof(RuntimeContext), typeof(string), typeof(int), typeof(int), typeof(int), typeof(int) });
@@ -52,11 +52,11 @@ namespace Bb.Json.Jslt.Services
         /// </summary>
         /// <param name="sources">The sources.</param>
         /// <param name="diagnostic">The diagnostic.</param>
-        public RuntimeContext(Sources sources, Diagnostics diagnostic = null)
+        public RuntimeContext(Sources sources, ScriptDiagnostics diagnostic = null)
         {
 
             SubSources = sources ?? Sources.GetEmpty();
-            _diagnostics = diagnostic ?? new Diagnostics();
+            _diagnostics = diagnostic ?? new ScriptDiagnostics();
             
             this._watch = new Stopwatch();
 
@@ -68,7 +68,7 @@ namespace Bb.Json.Jslt.Services
         }
 
 
-        public static bool IsTrace(RuntimeContext ctx, TokenLocation trace)
+        public static bool IsTrace(RuntimeContext ctx, Bb.Analysis.Traces.TextLocation trace)
         {
 
             if (ctx._stack.Count > 0)
@@ -86,7 +86,7 @@ namespace Bb.Json.Jslt.Services
                 var e = ctx._stack.Pop();
                 e.Watch.Stop();
 
-                ctx.Diagnostics.AddInformation(ctx.ScriptFile, e.Trace, "Diagnostic", $"Elapsed time in {e.Trace.Function} seconde(s) {Math.Round(e.Watch.Elapsed.TotalSeconds, 4)}");
+                ctx.Diagnostics.AddInformation(ctx.ScriptFile, e.Trace, "Diagnostic", $"Elapsed time in {e.Trace.Get("Function")} seconds(s) {Math.Round(e.Watch.Elapsed.TotalSeconds, 4)}");
 
             }
 
@@ -102,7 +102,7 @@ namespace Bb.Json.Jslt.Services
         }
 
 
-        public static RuntimeContext TraceLocation(RuntimeContext ctx, string functionName, TokenLocation token)
+        public static RuntimeContext TraceLocation(RuntimeContext ctx, string functionName, Bb.Analysis.Traces.TextLocation token)
         {
             var e = new MethodContext()
             {
@@ -117,12 +117,13 @@ namespace Bb.Json.Jslt.Services
 
         public static RuntimeContext TraceLocation(RuntimeContext ctx, string functionName, int line, int column, int position, int positionEnd)
         {
+
+            var location = Analysis.Traces.TextLocation.Create((line, column, position), (-1, -1, positionEnd));
+            location.Filename = ctx.ScriptFile;
+
             var e = new MethodContext()
             {
-                Trace = new TokenLocation( new DiagnosticLocation(ctx.ScriptFile, new CodePositionLocation(line, column, position ), new CodePositionLocation(-1,-1, positionEnd)))
-                {
-                    Function = functionName,
-                }
+                Trace = location.Add("Function", functionName),
             };
             ctx._stack.Push(e);
 
@@ -133,12 +134,12 @@ namespace Bb.Json.Jslt.Services
 
         public string ScriptFile { get; set; }
 
-        public TokenLocation GetCurrentLocation()
+        public Analysis.Traces.TextLocation GetCurrentLocation()
         {
             if (this._stack.Count > 0)
                 return this._stack.Peek().Trace;
 
-            return new TokenLocation(0, 0, 0, 0);
+            return Analysis.Traces.TextLocation.Empty;
 
         }
 
@@ -936,7 +937,7 @@ namespace Bb.Json.Jslt.Services
 
         #region Variables
 
-        public static void SetVariable(RuntimeContext ctx, string name, object value, TokenLocation trace)
+        public static void SetVariable(RuntimeContext ctx, string name, object value, Analysis.Traces.TextLocation trace)
         {
             ctx.SubSources.Variables.Add(name, value);
             if (value == null)
@@ -948,7 +949,7 @@ namespace Bb.Json.Jslt.Services
             ctx.SubSources.Variables.Del(name);
         }
 
-        public static JToken Translate(RuntimeContext ctx, string text, string[] keys, TokenLocation trace)
+        public static JToken Translate(RuntimeContext ctx, string text, string[] keys, Analysis.Traces.TextLocation trace)
         {
 
             if (text == null)
@@ -1007,7 +1008,7 @@ namespace Bb.Json.Jslt.Services
 
         }
 
-        public static JToken GetContentFromService(RuntimeContext ctx, JToken token, ITransformJsonService service, TokenLocation trace, string serviceName)
+        public static JToken GetContentFromService(RuntimeContext ctx, JToken token, ITransformJsonService service, Analysis.Traces.TextLocation trace, string serviceName)
         {
 
             TraceLocation(ctx, serviceName, trace);
@@ -1034,11 +1035,12 @@ namespace Bb.Json.Jslt.Services
         }
 
 
-        public bool MustoBreak { get; private set; }
+        public bool MusToBreak { get; private set; }
 
-        public void Break() { MustoBreak = true; }
 
-        public static JToken GetContentByJPath(RuntimeContext ctx, JToken token, string path, TokenLocation trace)
+        public void Break() { MusToBreak = true; }
+
+        public static JToken GetContentByJPath(RuntimeContext ctx, JToken token, string path, Analysis.Traces.TextLocation trace)
         {
 
             JToken result = null;
@@ -1133,11 +1135,11 @@ namespace Bb.Json.Jslt.Services
 
         internal static readonly Func<JToken, Type, object> _convertToken;
         internal static readonly Func<RuntimeContext, JToken, Func<RuntimeContext, JToken, JToken>, JToken> _getProjectionFromSource;
-        internal static readonly Func<RuntimeContext, JToken, string, TokenLocation, JToken> _getContentByJPath;
-        internal static readonly Func<RuntimeContext, JToken, ITransformJsonService, TokenLocation, string, JToken> _getContentFromService;
+        internal static readonly Func<RuntimeContext, JToken, string, Analysis.Traces.TextLocation, JToken> _getContentByJPath;
+        internal static readonly Func<RuntimeContext, JToken, ITransformJsonService, Analysis.Traces.TextLocation, string, JToken> _getContentFromService;
         internal static readonly Func<RuntimeContext, JToken, OperationEnum, JToken> _evaluateUnaryOperator;
         internal static readonly Func<RuntimeContext, object, OperationEnum, object, JToken> _evaluateBinaryOperator;
-        internal static readonly Func<RuntimeContext, string, string[], TokenLocation, object> _translateVariable;
+        internal static readonly Func<RuntimeContext, string, string[], Analysis.Traces.TextLocation, object> _translateVariable;
 
         internal static readonly MethodInfo _addProperty;
         internal static readonly MethodInfo _setVariable;
@@ -1153,7 +1155,7 @@ namespace Bb.Json.Jslt.Services
 
         public Sources SubSources { get; }
 
-        public Diagnostics Diagnostics { get => _diagnostics; }
+        public ScriptDiagnostics Diagnostics { get => _diagnostics; }
 
 
         public JToken TokenResult { get; set; }
@@ -1166,7 +1168,7 @@ namespace Bb.Json.Jslt.Services
 
         private static readonly Dictionary<Type, Dictionary<string, (PropertyInfo, Action<object, object>)>> _properties;
         private static object _lock = new object();
-        private readonly Diagnostics _diagnostics;
+        private readonly ScriptDiagnostics _diagnostics;
         private readonly Stack<MethodContext> _stack;
 
 
@@ -1178,7 +1180,7 @@ namespace Bb.Json.Jslt.Services
                 this.Watch = new Stopwatch();
             }
 
-            public TokenLocation Trace { get; internal set; }
+            public Analysis.Traces.TextLocation Trace { get; internal set; }
 
             public Stopwatch Watch { get; }
 

@@ -1,4 +1,5 @@
 ﻿using Bb.Analysis;
+using Bb.Analysis.Traces;
 using Bb.ComponentModel;
 using Bb.ComponentModel.Factories;
 using Bb.Json.Attributes;
@@ -34,7 +35,7 @@ namespace Bb.Json.Jslt.Services
         }
 
 
-        internal Factory GetService(FunctionKindEnum kind, string name, Type[] types, Diagnostics diagnostics, TokenLocation location)
+        internal Factory GetService(FunctionKindEnum kind, string name, Type[] types, ScriptDiagnostics diagnostics, TextLocation location)
         {
 
             var result = this.Services.GetService(kind, name, types);

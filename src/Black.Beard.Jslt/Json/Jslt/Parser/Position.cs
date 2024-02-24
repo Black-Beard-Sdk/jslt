@@ -6,7 +6,7 @@ namespace Bb.Json.Jslt.Parser
     internal class Position
     {
 
-        public Position(TokenLocation start, TokenLocation stop, JValue comment)
+        public Position(TextLocation start, TextLocation stop, JValue comment)
         {
             this.Start = start;
             this.Stop = stop;
@@ -15,9 +15,9 @@ namespace Bb.Json.Jslt.Parser
 
         public JValue Value { get; }
 
-        public TokenLocation Start { get; }
+        public TextLocation Start { get; }
 
-        public TokenLocation Stop { get; }
+        public TextLocation Stop { get; }
     }
 
 }

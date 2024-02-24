@@ -1,5 +1,6 @@
 ﻿using AppJsonEvaluator;
 using Bb.Analysis;
+using Bb.Analysis.Traces;
 using Bb.Json.Jslt.Asts;
 using Bb.Json.Jslt.Parser;
 using Bb.Json.Jslt.Services;
@@ -36,7 +37,7 @@ namespace Bb.JsltEvaluator.AvalonEdit
 
                 foreach (var item in tree.Comments)
                     item.Accept(this);
-            
+
             }
         }
 
@@ -240,7 +241,7 @@ namespace Bb.JsltEvaluator.AvalonEdit
             if (node.Where != null)
                 node.Where.Accept(this);
 
-            ApplyMarker((node.Location.Start as CodePositionLocation).Index, node.Name.Length + 2, TextMarkerTypes.None, Colors.White, Colors.MediumPurple, Colors.White);
+            ApplyMarker((node.Location.Start as ILocationIndex)?.Index ?? 0, node.Name.Length + 2, TextMarkerTypes.None, Colors.White, Colors.MediumPurple, Colors.White);
 
             foreach (var item in node.Metadatas)
                 item.Accept(this);
@@ -253,8 +254,8 @@ namespace Bb.JsltEvaluator.AvalonEdit
 
         public object VisitComment(JsltComment node)
         {
-            var start = (node.Location.Start as CodePositionLocation).Index;
-            var lenght = node.Location.End.IsEmpty ? this._document.TextLength - start:  (node.Location.Start as CodePositionLocation).Index - start; 
+            var start = (node.Location.Start as ILocationIndex)?.Index ?? 0;
+            var lenght = node.Location.Stop.IsEmpty ? this._document.TextLength - start : (node.Location.Start as ILocationIndex)?.Index ?? 0 - start;
             ApplyMarker(start, lenght, TextMarkerTypes.None, Colors.White, Colors.LightGray, Colors.White);
             return node;
         }
@@ -326,12 +327,14 @@ namespace Bb.JsltEvaluator.AvalonEdit
             marker.BackgroundColor = backgroundColor;
         }
 
-        private void ApplyMarker(TokenLocation location, TextMarkerTypes style, Color markerColor, Color foregroundColor, Color backgroundColor)
+        private void ApplyMarker(Analysis.Traces.TextLocation location, TextMarkerTypes style, Color markerColor, Color foregroundColor, Color backgroundColor)
         {
-            var index = (location.Start as CodePositionLocation).Index;
-            int lenght = (location.End as CodePositionLocation).Index - index + 1;
+            var index = (location.Start as ILocationIndex)?.Index ?? 0;
+            int lenght = (location.Stop as ILocationIndex)?.Index ?? 0 - index + 1;
+            if (lenght < 0)
+                lenght = 0;
             ApplyMarker(index, lenght, style, markerColor, foregroundColor, backgroundColor);
-        }              
+        }
 
         public TranformJsonAstConfiguration Configuration { get; set; }
 

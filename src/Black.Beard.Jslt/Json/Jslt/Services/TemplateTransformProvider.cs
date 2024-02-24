@@ -1,4 +1,5 @@
 ﻿using Bb.Analysis;
+using Bb.Analysis.Traces;
 using Bb.Expressions;
 using Bb.Json.Jslt.Asts;
 using Bb.Json.Jslt.Parser;
@@ -36,13 +37,13 @@ namespace Bb.Json.Jslt.Services
         /// <param name="diagnostics">The diagnostics.</param>
         /// <returns></returns>
         /// <exception cref="Bb.JSon.ParsingJsonException">Failed to parse Json. " + e.Message</exception>
-        public JsltTemplate GetTemplate(StringBuilder sb, bool withDebug, string filename, Diagnostics diagnostics = null)
+        public JsltTemplate GetTemplate(StringBuilder sb, bool withDebug, string filename, ScriptDiagnostics diagnostics = null)
         {
 
             if (string.IsNullOrEmpty(this._configuration.OutputPath) && !string.IsNullOrEmpty(filename))
                 this._configuration.OutputPath = new FileInfo(filename).Directory.FullName;
 
-            var _errors = diagnostics ?? new Diagnostics();
+            var _errors = diagnostics ?? new ScriptDiagnostics();
             
             CultureInfo culture = this._configuration.Culture;
             OutputModelConfiguration outputConfiguration = null;
@@ -94,7 +95,7 @@ namespace Bb.Json.Jslt.Services
 
         }
 
-        private JsltTemplate build(StringBuilder sb, JsltBase tree, ServiceFunctionFoundry _foundry, Diagnostics _errors,
+        private JsltTemplate build(StringBuilder sb, JsltBase tree, ServiceFunctionFoundry _foundry, ScriptDiagnostics _errors,
             string filename, bool withDebug, OutputModelConfiguration outputConfiguration, CultureInfo culture)
         {
 
@@ -155,7 +156,7 @@ namespace Bb.Json.Jslt.Services
                 {
                     if (c == '*' && sb[i + 1] == '/')
                     {
-                        comment.Location = new TokenLocation(i + 1, 0, 0, 0);
+                        comment.Location =  TextLocation.Create(i + 1);
                         inComment = false;
                     }
                 }
@@ -165,7 +166,7 @@ namespace Bb.Json.Jslt.Services
                     {
                         comment = new JsltComment()
                         {
-                            Location = new TokenLocation(i, 0, 0, 0),
+                            Location = TextLocation.Create(i),
                         };
                         _comments.Add(comment);
                         inComment = true;
@@ -185,13 +186,13 @@ namespace Bb.Json.Jslt.Services
         /// <param name="filename">The filename.</param>
         /// <param name="diagnostics">The diagnostics.</param>
         /// <returns></returns>
-        public JsltTemplate GetTemplate(JsltBase tree, bool withDebug, string filename, Diagnostics diagnostics = null)
+        public JsltTemplate GetTemplate(JsltBase tree, bool withDebug, string filename, ScriptDiagnostics diagnostics = null)
         {
             return GetTemplate(new StringBuilder(tree.ToString()), withDebug, filename, diagnostics);
         }
 
 
-        private Func<RuntimeContext, JToken, JToken> Get(JsltBase tree, ServiceFunctionFoundry foundry, Diagnostics _errors, string filepathCode, string scriptPath, bool withDebug)
+        private Func<RuntimeContext, JToken, JToken> Get(JsltBase tree, ServiceFunctionFoundry foundry, ScriptDiagnostics _errors, string filepathCode, string scriptPath, bool withDebug)
         {
 
             Func<RuntimeContext, JToken, JToken> fnc;
@@ -229,7 +230,7 @@ namespace Bb.Json.Jslt.Services
 
         }
 
-        private Func<RuntimeContext, StringBuilder> GetOutput(JsltBase tree, ServiceFunctionFoundry foundry, Diagnostics _errors, string filepathCode, bool withDebug)
+        private Func<RuntimeContext, StringBuilder> GetOutput(JsltBase tree, ServiceFunctionFoundry foundry, ScriptDiagnostics _errors, string filepathCode, bool withDebug)
         {
 
             Func<RuntimeContext, StringBuilder> fnc;
@@ -262,7 +263,7 @@ namespace Bb.Json.Jslt.Services
 
         }
 
-        private Func<RuntimeContext, object> GetWriter(JsltBase tree, ServiceFunctionFoundry foundry, Diagnostics _errors, string filepathCode, bool withDebug)
+        private Func<RuntimeContext, object> GetWriter(JsltBase tree, ServiceFunctionFoundry foundry, ScriptDiagnostics _errors, string filepathCode, bool withDebug)
         {
 
             Func<RuntimeContext, object> fnc;

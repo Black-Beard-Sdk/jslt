@@ -1,4 +1,5 @@
-﻿using Bb.Asts;
+﻿using Bb.Analysis.Traces;
+using Bb.Asts;
 using Bb.ComponentModel.Factories;
 using Bb.Json.Jslt.Parser;
 using Bb.Json.Jslt.Services;
@@ -58,7 +59,7 @@ namespace Bb.Json.Jslt.Asts
                     {
                         Name = argName,
                         Value = item,
-                        Location = item?.Location?.Clone() ?? TokenLocation.Empty,
+                        Location = (TextLocation)item?.Location?.Clone() ?? TextLocation.Empty,
                     });
                 }
             }
@@ -77,7 +78,7 @@ namespace Bb.Json.Jslt.Asts
             {
                 Name = string.Empty,
                 Value = argument,
-                Location = argument?.Location?.Clone() ?? TokenLocation.Empty,
+                Location = (TextLocation)argument?.Location?.Clone() ?? TextLocation.Empty,
             });
 
             int index = 0;

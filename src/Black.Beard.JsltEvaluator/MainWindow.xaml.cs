@@ -32,6 +32,7 @@ using Bb;
 using Bb.Expressions;
 using Bb.Analysis;
 using Bb.Json.Attributes;
+using Bb.Analysis.Traces;
 
 namespace AppJsonEvaluator
 {
@@ -304,7 +305,7 @@ namespace AppJsonEvaluator
                 foreach (var item in e2.AssemblyResult.Diagnostics)
                     if (item.Severity == "Error")
                         Errors.Items.Add(new DiagnosticReport() { Message = item.Message }.SetSeverity(SeverityEnum.Error));
-            
+
                     else
                     {
 
@@ -342,20 +343,20 @@ namespace AppJsonEvaluator
 
                     Errors.Items.Add(item);
 
-                    var index = item.StartIndex;
+                    var index = (item.Location.Start as ILocationIndex)?.Index ?? 0;
                     if (index > 0)
                         index--;
 
                     int lenght = 5;
                     var x = TemplateEditor.Document.TextLength - index;
                     if (x < lenght)
-                        lenght = x.Value;
+                        lenght = x;
 
                     if (item.Severity == SeverityEnum.Error.ToString())
                     {
                         try
                         {
-                            ITextMarker marker = textMarkerService.Create(index.Value, lenght);
+                            ITextMarker marker = textMarkerService.Create(index, lenght);
                             marker.MarkerTypes = TextMarkerTypes.SquigglyUnderline;
                             marker.MarkerColor = Colors.Red;
                         }
@@ -399,7 +400,7 @@ namespace AppJsonEvaluator
 
                     st.Stop();
 
-                    _template.Diagnostics.AddInformation(this._template.Filename, TokenLocation.Empty, st.Elapsed.TotalSeconds.ToString(), $"runs in {st.Elapsed.TotalSeconds} seconds");
+                    _template.Diagnostics.AddInformation(this._template.Filename, Bb.Analysis.Traces.TextLocation.Empty, st.Elapsed.TotalSeconds.ToString(), $"runs in {st.Elapsed.TotalSeconds} seconds");
 
 
                     var p2 = Path.Combine(this._template.Configuration.OutputPath, Path.GetFileNameWithoutExtension(this._template.Filename) + "_result.json");
@@ -692,11 +693,13 @@ namespace AppJsonEvaluator
         {
             if (Errors.SelectedValue != null)
             {
-                if (Errors.SelectedValue is DiagnosticReport m)
+                if (Errors.SelectedValue is ScriptDiagnostic m)
                 {
-                    if (m.StartIndex != 0)
+                    var o = m.Location.Start as LocationLineAndIndex;
+
+                    if (o.Index != 0)
                     {
-                        TemplateEditor.SelectionStart = m.StartIndex.Value;
+                        TemplateEditor.SelectionStart = o.Index;
                         TemplateEditor.SelectionLength = 1;
                         TemplateEditor.Focus();
                     }
@@ -1153,7 +1156,130 @@ namespace AppJsonEvaluator
         private void WindowSizeChanged(object sender, SizeChangedEventArgs e)
         {
             //TemplateEditor.HorizontalScrollBarVisibility =  System.Windows.Controls.ScrollBarVisibility.Visible;
-            
+
+        }
+
+    }
+
+
+    [System.Diagnostics.DebuggerDisplay("[{Severity}] {Message}")]
+    public class DiagnosticReport
+    {
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DiagnosticReport"/> class.
+        /// </summary>
+        /// <param name="locations">The locations.</param>
+        public DiagnosticReport(params DiagnosticLocation[] locations) : this()
+        {
+            Locations.AddRange(locations);
+        }
+
+        public DiagnosticReport()
+        {
+            Locations = new List<DiagnosticLocation>();
+        }
+
+        public string Filename => Location?.Filename;
+
+        public int StartIndex => Location?.StartIndex ?? 0;
+
+        public int StartColumn => Location?.StartColumn ?? 0;
+
+        public int StartLine => Location?.StartLine ?? 0;
+
+
+        public DiagnosticLocation Location => Locations.FirstOrDefault();
+
+        public List<DiagnosticLocation> Locations { get; set; }
+
+
+        public string Text { get; set; }
+
+        public string Message { get; set; }
+
+        public string Severity { get; set; }
+
+        public int SeverityLevel { get; set; }
+
+        public bool IsSeverityAsError { get; internal set; }
+
+
+        // public string Location => $"({StartLine}, {StartColumn})";
+
+        public override string ToString()
+        {
+            return Message.ToString();
+        }
+
+        public DiagnosticReport SetSeverity(SeverityEnum severity)
+        {
+            this.Severity = severity.ToString();
+            this.SeverityLevel = (int)severity;
+            this.IsSeverityAsError = severity == SeverityEnum.Error;
+            return this;
+        }
+
+    }
+
+
+    public class DiagnosticLocation
+    {
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DiagnosticLocation"/> class.
+        /// </summary>
+        public DiagnosticLocation()
+        {
+
+        }
+
+        public DiagnosticLocation(string filename)
+        {
+            this.Filename = filename;
+        }
+
+        public DiagnosticLocation(string filename, int startIndex, int startline = -1, int startColumn = -1) : this(filename)
+        {
+            this.StartIndex = startIndex;
+            this.StartLine = startline;
+            this.StartColumn = startColumn;
+        }
+
+        public DiagnosticLocation(Bb.Analysis.Traces.TextLocation location) : this(location.Filename)
+        {
+
+            var start = location.Start as LocationLineAndIndex;
+            var stop = location.Start as LocationLineAndIndex;
+
+            StartLine = start.Line;
+            StartIndex = start.Index;
+            StartColumn = start.Column;
+
+            EndLine = start.Line;
+            EndIndex = start.Index;
+            EndColumn = start.Column;
+
+        }
+
+
+        public string Filename { get; internal set; }
+
+
+        public int StartIndex { get; internal set; }
+        public int StartColumn { get; internal set; }
+        public int StartLine { get; internal set; }
+
+
+        public int EndIndex { get; internal set; }
+        public int EndColumn { get; internal set; }
+        public int EndLine { get; internal set; }
+
+
+        public override string ToString()
+        {
+            var file = this.Filename ?? string.Empty;
+            return $"{file} from (line {this.StartLine}, column {this.StartColumn}) to (line {this.EndLine}, column {this.EndColumn})";
         }
 
     }

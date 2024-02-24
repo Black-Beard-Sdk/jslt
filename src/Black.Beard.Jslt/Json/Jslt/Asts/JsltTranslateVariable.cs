@@ -1,4 +1,5 @@
-﻿using Bb.Asts;
+﻿using Bb.Analysis.Traces;
+using Bb.Asts;
 using Bb.Json.Jslt.Services;
 using System.Collections.Generic;
 
@@ -13,7 +14,7 @@ namespace Bb.Json.Jslt.Asts
         {
             Kind = JsltKind.JTranslateVariable;
             this.Value = token;
-            this.Location = token.Location?.Clone();
+            this.Location = token.Location.Copy();
             this.VariableNames = new List<string>();
 
             string _value = null;

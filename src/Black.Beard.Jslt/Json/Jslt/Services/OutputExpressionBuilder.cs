@@ -1,4 +1,5 @@
 ﻿using Bb.Analysis;
+using Bb.Analysis.Traces;
 using Bb.Expressions;
 using Bb.Expressions.Statements;
 using Bb.Json.Jslt.Asts;
@@ -42,7 +43,7 @@ namespace Bb.Json.Jslt.Services
         }
 
 
-        public OutputExpressionBuilder(Diagnostics diagnostics, MethodCompiler compiler)
+        public OutputExpressionBuilder(ScriptDiagnostics diagnostics, MethodCompiler compiler)
         {
 
             PrivatedIndex.Reset();
@@ -708,7 +709,7 @@ namespace Bb.Json.Jslt.Services
         #endregion Context
 
         private readonly MethodCompiler _compiler;
-        private readonly Diagnostics _diagnostics;
+        private readonly ScriptDiagnostics _diagnostics;
         private int _indexMethod;
         private List<MethodCallExpression> _resultReset;
         private static readonly ConstructorInfo _ctorJArray;
