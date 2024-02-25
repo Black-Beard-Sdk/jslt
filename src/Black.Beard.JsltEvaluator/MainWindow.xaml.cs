@@ -566,7 +566,7 @@ namespace AppJsonEvaluator
 
                 // récupération des propositions de completions contextuelles à la position.
                 var position = TemplateEditor.SelectionStart;
-                var keys = this._parsers.GetIntellisense(position, new StringBuilder(TemplateEditor.Text), this._parameters.TemplateFile);
+                var keys = this._parsers.GetIntellisense(position, new StringBuilder(TemplateEditor.Text), this._parameters.TemplateFile ?? string.Empty);
                 if (keys.Count == 0)
                 {
 

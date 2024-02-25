@@ -56,11 +56,11 @@ namespace Bb.Json.Jslt.Builds
             if (result.Count == 0 || changed)
             {
 
-                var a = new AssemblyReferences();
+                var references = new AssemblyReferences();
                 //foreach (var item in References)
-                a.AddByAssemblies(References.ToArray());
+                references.AddByAssemblies(References.ToArray());
 
-                var compiler = new RoslynCompiler(a, new Analysis.Traces.ScriptDiagnostics())
+                var compiler = new RoslynCompiler(Microsoft.CodeAnalysis.OutputKind.DynamicallyLinkedLibrary, references, new Analysis.Traces.ScriptDiagnostics())
                 {
                     Debug = true,
                     ResolveObjects = false,
