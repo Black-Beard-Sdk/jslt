@@ -1,4 +1,4 @@
-﻿using Bb.Analysis.Traces;
+﻿using Bb.Analysis.DiagTraces;
 using Bb.Asts;
 using Bb.Json.Jslt.Services;
 using System.Collections.Generic;

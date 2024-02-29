@@ -1,5 +1,4 @@
-﻿using Bb.Analysis;
-using Bb.Analysis.Traces;
+﻿using Bb.Analysis.DiagTraces;
 using Bb.Expressions;
 using Bb.Expressions.Statements;
 using Bb.Json.Jslt.Asts;

@@ -1,9 +1,5 @@
 ﻿using Antlr4.Runtime;
-using Bb.Analysis;
-using Bb.Analysis.Traces;
-using Bb.Compilers;
-using Microsoft.CodeAnalysis;
-using System.Diagnostics;
+using Bb.Analysis.DiagTraces;
 
 namespace Bb.Json.Jslt.Parser
 {

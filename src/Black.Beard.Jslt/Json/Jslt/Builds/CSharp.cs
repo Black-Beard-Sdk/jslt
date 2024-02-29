@@ -60,7 +60,7 @@ namespace Bb.Json.Jslt.Builds
                 //foreach (var item in References)
                 references.AddByAssemblies(References.ToArray());
 
-                var compiler = new RoslynCompiler(Microsoft.CodeAnalysis.OutputKind.DynamicallyLinkedLibrary, references, new Analysis.Traces.ScriptDiagnostics())
+                var compiler = new RoslynCompiler(Microsoft.CodeAnalysis.OutputKind.DynamicallyLinkedLibrary, references, new Analysis.DiagTraces.ScriptDiagnostics())
                 {
                     Debug = true,
                     ResolveObjects = false,

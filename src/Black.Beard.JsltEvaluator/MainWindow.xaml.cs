@@ -10,7 +10,6 @@ using ICSharpCode.AvalonEdit.CodeCompletion;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Folding;
 using Microsoft.Win32;
-using Oldtonsoft.Json;
 using Oldtonsoft.Json.Linq;
 using ScintillaNET;
 using System;
@@ -30,9 +29,8 @@ using Bb.JsltEvaluator.AvalonEdit;
 using System.Diagnostics;
 using Bb;
 using Bb.Expressions;
-using Bb.Analysis;
 using Bb.Json.Attributes;
-using Bb.Analysis.Traces;
+using Bb.Analysis.DiagTraces;
 
 namespace AppJsonEvaluator
 {
@@ -400,7 +398,7 @@ namespace AppJsonEvaluator
 
                     st.Stop();
 
-                    _template.Diagnostics.AddInformation(this._template.Filename, Bb.Analysis.Traces.TextLocation.Empty, st.Elapsed.TotalSeconds.ToString(), $"runs in {st.Elapsed.TotalSeconds} seconds");
+                    _template.Diagnostics.AddInformation(this._template.Filename, Bb.Analysis.DiagTraces.TextLocation.Empty, st.Elapsed.TotalSeconds.ToString(), $"runs in {st.Elapsed.TotalSeconds} seconds");
 
 
                     var p2 = Path.Combine(this._template.Configuration.OutputPath, Path.GetFileNameWithoutExtension(this._template.Filename) + "_result.json");
@@ -1246,7 +1244,7 @@ namespace AppJsonEvaluator
             this.StartColumn = startColumn;
         }
 
-        public DiagnosticLocation(Bb.Analysis.Traces.TextLocation location) : this(location.Filename)
+        public DiagnosticLocation(Bb.Analysis.DiagTraces.TextLocation location) : this(location.Filename)
         {
 
             var start = location.Start as LocationLineAndIndex;

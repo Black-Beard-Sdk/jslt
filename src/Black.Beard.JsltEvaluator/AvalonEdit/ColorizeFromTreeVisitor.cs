@@ -1,17 +1,9 @@
 ﻿using AppJsonEvaluator;
-using Bb.Analysis;
-using Bb.Analysis.Traces;
+using Bb.Analysis.DiagTraces;
 using Bb.Json.Jslt.Asts;
-using Bb.Json.Jslt.Parser;
 using Bb.Json.Jslt.Services;
 using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Document;
-using ICSharpCode.AvalonEdit.Rendering;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media;
 
 namespace Bb.JsltEvaluator.AvalonEdit
@@ -327,7 +319,7 @@ namespace Bb.JsltEvaluator.AvalonEdit
             marker.BackgroundColor = backgroundColor;
         }
 
-        private void ApplyMarker(Analysis.Traces.TextLocation location, TextMarkerTypes style, Color markerColor, Color foregroundColor, Color backgroundColor)
+        private void ApplyMarker(Analysis.DiagTraces.TextLocation location, TextMarkerTypes style, Color markerColor, Color foregroundColor, Color backgroundColor)
         {
             var index = (location.Start as ILocationIndex)?.Index ?? 0;
             int lenght = (location.Stop as ILocationIndex)?.Index ?? 0 - index + 1;

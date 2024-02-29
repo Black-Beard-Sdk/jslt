@@ -2,8 +2,7 @@
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
-using Bb.Analysis;
-using Bb.Analysis.Traces;
+using Bb.Analysis.DiagTraces;
 using Bb.Compilers;
 using Bb.ComponentModel;
 using Bb.ComponentModel.Factories;
@@ -13,14 +12,12 @@ using Bb.Json.Jslt.Builds;
 using Bb.Json.Jslt.Services;
 using Microsoft.CodeAnalysis;
 using Oldtonsoft.Json.Linq;
-using SharpCompress.Common;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
 
 #pragma warning disable CS3001

@@ -1,9 +1,6 @@
-﻿using Bb.Analysis.Traces;
+﻿using Bb.Analysis.DiagTraces;
 using Bb.Asts;
 using Bb.ComponentModel.Factories;
-using Bb.Json.Jslt.Parser;
-using Bb.Json.Jslt.Services;
-using Oldtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
