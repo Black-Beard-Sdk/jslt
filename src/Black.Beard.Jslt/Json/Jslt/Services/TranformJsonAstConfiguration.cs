@@ -15,8 +15,10 @@ namespace Bb.Json.Jslt.Services
         {
             this.Culture = culture ?? CultureInfo.InvariantCulture;
             this.Services = ServiceContainer.Instance;
-            this.Paths = new List<string>();
-            this.Paths.Add(Environment.CurrentDirectory);
+            this.Paths = new List<string>
+            {
+                Environment.CurrentDirectory
+            };
             this.OutputPath = string.Empty;
             this.Assemblies = new List<Assembly>();
         }

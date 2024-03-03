@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Bb.JSon
-{
 
+namespace Bb.Exceptions
+{ 
 
     [Serializable]
     public class ParsingJsonException : Exception

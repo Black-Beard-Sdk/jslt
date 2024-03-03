@@ -1,6 +1,7 @@
 ﻿using Bb.Analysis.DiagTraces;
 using Bb.Builds;
 using Bb.Expressions.CsharpGenerators;
+using Bb.Nugets;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,6 +10,10 @@ using System.Linq.Expressions;
 
 namespace Bb.Expressions
 {
+
+
+
+
     public class LocalMethodCompiler : MethodCompiler
     {
 
@@ -42,16 +47,22 @@ namespace Bb.Expressions
                 compileUnit.Namespaces.Add(code);
                 LocalCodeGenerator.GenerateCsharpCode(compileUnit, file);
 
+
+                var dir = Path.Combine(Environment.CurrentDirectory, Path.GetRandomFileName());
+                var controller = new NugetController().AddFolder(dir, NugetController.HostNugetOrg);
+
                 // Build assembly
                 BuildCSharp build = new BuildCSharp()
                 {
-                    OutputPath = path,
+                    OutputPath = path,                    
                 }
+                .SetNugetController(controller)
                 .AddSource(file)
                 .AddReferences(
                       typeof(LocationDefault)
                     , typeof(LocalMethodCompiler)
                     )
+                .AddPackage("Microsoft.CodeAnalysis.CSharp.Workspaces")
                 ;
 
                 var assembly = build.Build(name);

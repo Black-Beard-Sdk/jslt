@@ -1,8 +1,9 @@
 ﻿using Bb.Analysis.DiagTraces;
 using Bb.Expressions;
 using Bb.Json.Jslt.Asts;
+using Bb.Metrology;
 using Bb.Json.Jslt.Parser;
-using Bb.JSon;
+using Bb.Exceptions;
 using Oldtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -28,69 +29,92 @@ namespace Bb.Json.Jslt.Services
         }
 
         /// <summary>
-        /// Gets the template builded from text.
+        /// Gets the template built from text.
         /// </summary>
-        /// <param name="sb">The template to run for transform the datas</param>
+        /// <param name="sb">The template to run for transform the data</param>
         /// <param name="withDebug">if set to <c>true</c> [with debug]. generate source code and manage a debugger for running step by step.</param>
         /// <param name="filename">The filename that  contains the code.</param>
         /// <param name="diagnostics">The diagnostics.</param>
         /// <returns></returns>
-        /// <exception cref="Bb.JSon.ParsingJsonException">Failed to parse Json. " + e.Message</exception>
+        /// <exception cref="Bb.Json.ParsingJsonException">Failed to parse Json. " + e.Message</exception>
         public JsltTemplate GetTemplate(StringBuilder sb, bool withDebug, string filename, ScriptDiagnostics diagnostics = null)
         {
 
-            if (string.IsNullOrEmpty(this._configuration.OutputPath) && !string.IsNullOrEmpty(filename))
-                this._configuration.OutputPath = new FileInfo(filename).Directory.FullName;
-
-            var _errors = diagnostics ?? new ScriptDiagnostics();
-            
-            CultureInfo culture = this._configuration.Culture;
-            OutputModelConfiguration outputConfiguration = null;
-            ServiceFunctionFoundry _foundry = null;
-            JsltBase tree = null;
-
-            try
+            using (var activity = JsltActivityProvider.StartActivity("Build jslt template", System.Diagnostics.ActivityKind.Internal))
             {
-                if (sb.Length > 0)
+
+
+                if (string.IsNullOrEmpty(this._configuration.OutputPath) && !string.IsNullOrEmpty(filename))
+                    this._configuration.OutputPath = new FileInfo(filename).Directory.FullName;
+
+                var _errors = diagnostics ?? new ScriptDiagnostics();
+
+                CultureInfo culture = this._configuration.Culture;
+                OutputModelConfiguration outputConfiguration = null;
+                ServiceFunctionFoundry _foundry = null;
+                JsltBase tree = null;
+
+                try
+                {
+                    if (sb.Length > 0)
+                    {
+
+                        // Parse the template or get the syntax tree
+                        var parser = ScriptParser.ParseString(sb);
+                        var visitor = new ScriptBuilderVisitor(this._configuration, parser.Parser, _errors, filename);
+                        tree = (JsltBase)parser.Visit(visitor);
+
+                        if (tree != null && _errors.Success)
+                            NormalizeComments(sb, tree);
+
+                        _foundry = visitor.Foundry;
+                        culture = visitor.Culture; // the script define a specific culture for execution context
+                        outputConfiguration = visitor.OutputConfiguration;
+
+                    }
+                }
+                catch (Exception e)
+                {
+                    //LocalDebug.Stop();
+                    throw new ParsingJsonException("Failed to parse Json. " + e.Message, e);
+                }
+
+
+                if (_errors.Success && tree != null) // if the parsing haven't  thrown any error
                 {
 
-                    // Parse the template or get the syntax tree
-                    var parser = ScriptParser.ParseString(sb);
-                    var visitor = new ScriptBuilderVisitor(this._configuration, parser.Parser, _errors, filename);
-                    tree = (JsltBase)parser.Visit(visitor);
+                    var result = build(sb, tree, _foundry, _errors, filename, withDebug, outputConfiguration, culture);
 
-                    if (tree != null && _errors.Success)
-                        NormalizeComments(sb, tree);
+                    JsltActivityProvider.Set(c =>
+                    {
+                        foreach (var item in _errors)
+                            c.SetCustomProperty(item.Id.ToString(), item);
+                    });
 
-                    _foundry = visitor.Foundry;
-                    culture = visitor.Culture; // the script define a specific culture for execution context
-                    outputConfiguration = visitor.OutputConfiguration;
-
+                    return result;
                 }
-            }
-            catch (Exception e)
-            {
-                //LocalDebug.Stop();
-                throw new ParsingJsonException("Failed to parse Json. " + e.Message, e);
-            }
 
-            if (_errors.Success && tree != null) // if the parsing haven't  thrown any error
-            {
-                var result = build(sb, tree, _foundry, _errors, filename, withDebug, outputConfiguration, culture);
-                return result;
-            }
 
-            return new JsltTemplate()
-            {
-                Diagnostics = _errors,
-                Filename = filename,
-                Culture = culture,
-                Rule = sb,
-                Configuration = this._configuration,
-                Rules = null,
-                RuleOutput = null,
-                Tree = tree,
-            };
+                JsltActivityProvider.Set(c =>
+                {
+                    foreach (var item in _errors)
+                        c.SetCustomProperty(item.Id.ToString(), item);
+                });
+
+                return new JsltTemplate()
+                {
+                    Diagnostics = _errors,
+                    Filename = filename,
+                    Culture = culture,
+                    Rule = sb,
+                    Configuration = this._configuration,
+                    Rules = null,
+                    RuleOutput = null,
+                    Tree = tree,
+                };
+
+
+            }
 
         }
 

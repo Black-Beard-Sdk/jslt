@@ -1,4 +1,4 @@
-﻿namespace Bb.Json.Services
+﻿namespace Bb.Exceptions
 {
 
     [System.Serializable]

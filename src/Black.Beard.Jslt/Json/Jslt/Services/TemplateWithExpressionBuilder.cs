@@ -3,6 +3,7 @@ using Bb.Expressions;
 using Bb.Expressions.Statements;
 using Bb.Json.Jslt.Asts;
 using Bb.Json.Jslt.Parser;
+using Bb.Metrology;
 using Oldtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -69,21 +70,28 @@ namespace Bb.Json.Jslt.Services
         internal Func<RuntimeContext, JToken, JToken> GenerateLambda(JsltBase tree, string filepathCode)
         {
 
-            var s = _stack.Peek();
-            var s1 = Expression.Assign(Expression.Property(s.Context, RuntimeContext._ScriptProperty), Expression.Constant(this.ScriptPath ?? string.Empty));
+            using (var activity = JsltActivityProvider.StartActivity("generate lambda jslt", System.Diagnostics.ActivityKind.Internal))
+            {
 
-            _compiler.Add(s1);
 
-            // Start parsing
-            Expression e = tree.Accept(this) as Expression;
+                var s = _stack.Peek();
+                var s1 = Expression.Assign(Expression.Property(s.Context, RuntimeContext._ScriptProperty), Expression.Constant(this.ScriptPath ?? string.Empty));
 
-            foreach (var item in _resultReset)
-                _compiler.Add(item);
+                _compiler.Add(s1);
 
-            _compiler.Add(e);
+                // Start parsing
+                Expression e = tree.Accept(this) as Expression;
 
-            var result = _compiler.Compile<Func<RuntimeContext, JToken, JToken>>(filepathCode);
-            return result;
+                foreach (var item in _resultReset)
+                    _compiler.Add(item);
+
+                _compiler.Add(e);
+
+                var result = _compiler.Compile<Func<RuntimeContext, JToken, JToken>>(filepathCode);
+             
+                return result;
+
+            }
 
         }
 
