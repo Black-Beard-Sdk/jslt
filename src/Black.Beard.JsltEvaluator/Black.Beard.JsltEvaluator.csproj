@@ -36,9 +36,9 @@
 
   <ItemGroup>
     <PackageReference Include="AvalonEdit" Version="6.3.0.90" />
-    <PackageReference Include="Black.Beard.Analysis" Version="1.0.99" />
+    <PackageReference Include="Black.Beard.Analysis" Version="1.0.100" />
     <PackageReference Include="Black.Beard.Helpers.ContentLoaders.Files" Version="2.0.26" />
-    <PackageReference Include="Black.Beard.Roslyn" Version="1.0.99" />
+    <PackageReference Include="Black.Beard.Roslyn" Version="1.0.100" />
     <PackageReference Include="ExcelDataReader.DataSet" Version="3.6.0" />
     <PackageReference Include="System.Text.Encoding" Version="4.3.0" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
