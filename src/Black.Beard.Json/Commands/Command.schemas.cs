@@ -139,7 +139,7 @@ namespace Bb.Json.Commands
             ass.Refresh();
             if (ass.Exists)
             {
-                TypeDiscovery.Instance.LoadAssembly(ass, null);
+                AssemblyLoader.Instance.LoadAssembly(ass, null);
                 app.Out.WriteLine($"file {ass.FullName} loaded");
                 return true;
             }

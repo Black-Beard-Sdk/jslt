@@ -5,6 +5,7 @@ using Bb.Json.Attributes;
 using System;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Loader;
 
 namespace Bb.Json.Jslt.Services
 {
@@ -68,7 +69,7 @@ namespace Bb.Json.Jslt.Services
         /// <returns></returns>
         internal Assembly AddAssembly(string assemblyFilename)
         {
-            Assembly assembly = TypeDiscovery.Instance.AddAssemblyFile(assemblyFilename, System.Diagnostics.Debugger.IsAttached);
+            var assembly = AssemblyLoader.Instance.LoadAssembly(assemblyFilename, System.Diagnostics.Debugger.IsAttached);
             AddAssembly(assembly);
             return assembly;
         }

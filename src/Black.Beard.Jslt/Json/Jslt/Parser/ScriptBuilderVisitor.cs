@@ -1176,7 +1176,7 @@ namespace Bb.Json.Jslt.Parser
             }
 
             // Add assembly to the service discovery for explore service to adding
-            Assembly assembly = TypeDiscovery.Instance.AddAssemblyFile(assemblyDescription.AssemblyFile, System.Diagnostics.Debugger.IsAttached);
+            Assembly assembly = AssemblyLoader.Instance.LoadAssembly(assemblyDescription.AssemblyFile, System.Diagnostics.Debugger.IsAttached);
             var discovery = this._configuration.Services.ServiceDiscovery;
             discovery.AddAssembly(assembly);
 
@@ -1189,7 +1189,7 @@ namespace Bb.Json.Jslt.Parser
 
             foreach (var file in sources)
             {
-                Assembly assembly = TypeDiscovery.Instance.AddAssemblyFile(file.FullName, System.Diagnostics.Debugger.IsAttached);
+                Assembly assembly = AssemblyLoader.Instance.LoadAssembly(file.FullName, System.Diagnostics.Debugger.IsAttached);
                 discovery.AddAssembly(assembly);
             }
 
