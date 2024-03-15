@@ -30,7 +30,7 @@ namespace Bb.Json.Jslt.Parser
     {
 
         /// <summary>
-        /// 
+        /// Create a new instance of <see cref="ScriptBuilderVisitor"/>
         /// </summary>
         /// <param name="culture"></param>
         public ScriptBuilderVisitor(TranformJsonAstConfiguration configuration, JsltParser parser, ScriptDiagnostics diagnostics, string path)
@@ -52,6 +52,11 @@ namespace Bb.Json.Jslt.Parser
 
         public ServiceFunctionFoundry Foundry { get => this._foundry; }
 
+        /// <summary>
+        /// Parse tree produced by <see cref="JsltParser.script"/>.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public override object VisitScript([NotNull] JsltParser.ScriptContext context)
         {
 

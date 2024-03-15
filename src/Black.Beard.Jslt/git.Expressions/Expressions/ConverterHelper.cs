@@ -8,12 +8,14 @@ namespace Bb.Expressions
 {
 
     /// <summary>
-    /// build lanbda and compile for ActionResult 
+    /// build lambda and compile for ActionResult 
     /// </summary>
     public static partial class ConverterHelper
     {
 
-
+        /// <summary>
+        /// Cosntructor
+        /// </summary>
         static ConverterHelper()
         {
 
@@ -56,20 +58,12 @@ namespace Bb.Expressions
                 }
         }
 
-        private static void Register(Type sourceType, Type targetType, MethodBase methodConverter)
-        {
-
-            if (!_dicConverters.TryGetValue(sourceType, out Dictionary<Type, MethodBase> dicSource))
-                _dicConverters.Add(sourceType, dicSource = new Dictionary<Type, MethodBase>());
-
-            if (dicSource.ContainsKey(targetType))
-                dicSource[targetType] = methodConverter;
-
-            else
-                dicSource.Add(targetType, methodConverter);
-
-        }
-
+        /// <summary>
+        /// Convert a value to another type
+        /// </summary>
+        /// <param name="self"></param>
+        /// <param name="targetType"></param>
+        /// <returns></returns>
         public static object ToObject(object self, Type targetType)
         {
 
@@ -102,6 +96,11 @@ namespace Bb.Expressions
 
         }
 
+        /// <summary>
+        /// Resolve the mothod to convert sourceType to targetType
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="toOverride"></param>
         public static void ResolveConverter(Type type, Func<MethodInfo, bool> toOverride)
         {
 
@@ -117,6 +116,12 @@ namespace Bb.Expressions
 
         }
 
+        /// <summary>
+        /// Append method to the convert sourceType to targetType
+        /// </summary>
+        /// <param name="sourceType"></param>
+        /// <param name="targetType"></param>
+        /// <param name="methodConverter"></param>
         public static void AddMethod(Type sourceType, Type targetType, MethodBase methodConverter)
         {
 
@@ -126,6 +131,12 @@ namespace Bb.Expressions
 
         }
 
+        /// <summary>
+        /// Get the method to convert sourceType to targetType
+        /// </summary>
+        /// <param name="sourceType"></param>
+        /// <param name="targetType"></param>
+        /// <returns></returns>
         public static MethodBase GetConvertMethod(Type sourceType, Type targetType)
         {
 
@@ -167,7 +178,6 @@ namespace Bb.Expressions
             var result = self.ToObject<T>();
             return result;
         }
-
 
         private static void registerCtors(Type sourceType, Type targetType)
         {
@@ -273,6 +283,20 @@ namespace Bb.Expressions
             }
 
             return null;
+
+        }
+
+        private static void Register(Type sourceType, Type targetType, MethodBase methodConverter)
+        {
+
+            if (!_dicConverters.TryGetValue(sourceType, out Dictionary<Type, MethodBase> dicSource))
+                _dicConverters.Add(sourceType, dicSource = new Dictionary<Type, MethodBase>());
+
+            if (dicSource.ContainsKey(targetType))
+                dicSource[targetType] = methodConverter;
+
+            else
+                dicSource.Add(targetType, methodConverter);
 
         }
 
