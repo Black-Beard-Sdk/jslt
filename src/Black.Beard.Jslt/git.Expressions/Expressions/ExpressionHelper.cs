@@ -247,16 +247,20 @@ namespace Bb.Expressions
             var parameters = method.GetParameters();
             Expression[] arguments = new Expression[parameters.Length];
 
-            if (parameters[0].ParameterType == sourceType)
+            var type0 = parameters[0].ParameterType;
+            var type1 = parameters[1].ParameterType;
+            var name1 = parameters[1].Name;
+
+            if (type0 == sourceType)
                 arguments[0] = self;
 
-            else if (typeof(IFormatProvider).IsAssignableFrom(parameters[0].ParameterType))
+            else if (typeof(IFormatProvider).IsAssignableFrom(type0))
                 arguments[0] = Expression.Constant(CultureInfo.CurrentCulture);
 
-            else if (parameters[0].ParameterType.IsAssignableFrom(sourceType))
-                arguments[0] = ConvertIfDifferent(self, parameters[0].ParameterType);
+            else if (type0.IsAssignableFrom(sourceType))
+                arguments[0] = ConvertIfDifferent(self, type0);
 
-            else if (parameters[0].ParameterType == typeof(Type))
+            else if (type0 == typeof(Type))
                 arguments[0] = Expression.Constant(targetType);
 
             else
@@ -266,21 +270,24 @@ namespace Bb.Expressions
 
             if (parameters.Length > 1)
             {
-                if (parameters[1].ParameterType == sourceType)
+                if (type1 == sourceType)
                     arguments[1] = self;
 
-                else if (typeof(IFormatProvider).IsAssignableFrom(parameters[1].ParameterType))
+                else if (typeof(IFormatProvider).IsAssignableFrom(type1))
                     arguments[1] = Expression.Constant(CultureInfo.CurrentCulture);
 
-                else if (parameters[1].ParameterType.IsAssignableFrom(sourceType))
-                    arguments[1] = ConvertIfDifferent(self, parameters[0].ParameterType);
+                else if (type1.IsAssignableFrom(sourceType))
+                    arguments[1] = ConvertIfDifferent(self, type0);
 
-                else if (parameters[1].ParameterType == typeof(Type))
+                else if (type1 == typeof(Type))
                     arguments[1] = Expression.Constant(targetType);
 
+                else if (type1 == typeof(Int32) && name1 == "toBase")
+                    arguments[1] = Expression.Constant(10);
+                
                 else
                 {
-
+                    //LocalDebug.Stop();
                 }
 
             }
@@ -296,6 +303,7 @@ namespace Bb.Expressions
             }
             else if (method is ConstructorInfo ctor)
                 result = Expression.New(ctor, arguments);
+
             return result;
         }
 

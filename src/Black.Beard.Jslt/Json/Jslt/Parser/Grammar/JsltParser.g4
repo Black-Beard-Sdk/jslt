@@ -122,7 +122,7 @@ jsonValueList :
    jsonValue (COMMA jsonValue)*
    ;
 
-jsltJsonpath : jsonpath jsonType?;
+jsltJsonpath : (VARIABLE_NAME COLON)? jsonpath jsonType?;
 jsonpath : DOLLAR jsonpath_subscript?;
 
 // -----------   Json path   -----------

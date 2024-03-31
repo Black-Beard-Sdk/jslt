@@ -37,7 +37,7 @@ namespace Bb.Jslt.Services.Sql
                 }
                 catch (Exception)
                 {
-                    ctx.Diagnostics.AddError(null, connexion, $"the connection '{connexion}' can't be resolved.");
+                    ctx.Diagnostics.AddError(ctx.GetCurrentLocation(), connexion, $"the connection '{connexion}' can't be resolved.");
                     return new JArray();
                 }
 

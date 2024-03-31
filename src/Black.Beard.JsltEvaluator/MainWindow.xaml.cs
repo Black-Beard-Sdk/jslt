@@ -77,6 +77,8 @@ namespace AppJsonEvaluator
                     _templateIsClean = false;
 
                 }
+                else
+                    this._parameters.TemplateFile = string.Empty;
 
             }
             else
@@ -341,7 +343,7 @@ namespace AppJsonEvaluator
 
                     Errors.Items.Add(item);
 
-                    var index = (item.Location.Start as ILocationIndex)?.Index ?? 0;
+                    var index = item.Location != null ? (item.Location.Start as ILocationIndex)?.Index ?? 0 : 0;
                     if (index > 0)
                         index--;
 
@@ -398,7 +400,32 @@ namespace AppJsonEvaluator
 
                     st.Stop();
 
-                    _template.Diagnostics.AddInformation(this._template.Filename, Bb.Analysis.DiagTraces.TextLocation.Empty, st.Elapsed.TotalSeconds.ToString(), $"runs in {st.Elapsed.TotalSeconds} seconds");
+                    string time = string.Empty;
+                    string unity = string.Empty;
+                    if (st.Elapsed.TotalSeconds > 60)
+                    {
+                        time = st.Elapsed.TotalMinutes.ToString();
+                        unity = "minute";
+                        if (st.Elapsed.TotalMinutes > 1)
+                            unity += "s";
+                    }
+                    if (st.Elapsed.TotalMilliseconds > 10 && st.Elapsed.TotalSeconds < 60)
+                    {
+                        time = st.Elapsed.TotalSeconds.ToString();
+                        unity = "second";
+                        if (st.Elapsed.TotalSeconds > 1)
+                            unity += "s";
+
+                    }
+                    else
+                    {
+                        time = st.Elapsed.TotalMilliseconds.ToString();
+                        unity = "millisecond";
+                        if (st.Elapsed.TotalMilliseconds > 1)
+                            unity += "s";
+                    }
+
+                    _template.Diagnostics.AddInformation(this._template.Filename, Bb.Analysis.DiagTraces.TextLocation.Empty, time, $"runs in {time} {unity}");
 
 
                     var p2 = Path.Combine(this._template.Configuration.OutputPath, Path.GetFileNameWithoutExtension(this._template.Filename) + "_result.json");
@@ -636,24 +663,6 @@ namespace AppJsonEvaluator
 
         }
 
-        private readonly BraceFoldingStrategy _foldingStrategy;
-        private readonly FoldingManager _templateFoldingManager;
-        private VariableHelper _variableHelper;
-
-        public int _max { get; }
-
-        private readonly Parsers _parsers;
-        private Timer _timerMajUpdateTemplate;
-        private readonly Timer _timerMajLocalisation;
-        private JsltTemplate _template;
-        private string _parameterFile;
-        private Parameters _parameters;
-        private bool _templateIsClean;
-        private bool _templateIsRunning;
-        private string[] _path;
-        private TextMarkerService textMarkerService;
-        CompletionWindow completionWindow;
-
         private void TemplateEditor_Drop(object sender, DragEventArgs e)
         {
 
@@ -712,7 +721,6 @@ namespace AppJsonEvaluator
             // Assign the MaskedTextBox control as the host control's child.
             ControlBag.Child = TextArea;
         }
-
 
         #region Search
 
@@ -780,7 +788,6 @@ namespace AppJsonEvaluator
         private volatile object _lock = new object();
 
         #endregion Search
-
 
         #region Scintilla
 
@@ -1029,7 +1036,6 @@ namespace AppJsonEvaluator
 
         #endregion Scintilla
 
-
         private async void ButtonGenerateCmdLine(object sender, RoutedEventArgs e)
         {
 
@@ -1156,6 +1162,27 @@ namespace AppJsonEvaluator
             //TemplateEditor.HorizontalScrollBarVisibility =  System.Windows.Controls.ScrollBarVisibility.Visible;
 
         }
+
+
+
+
+        private readonly BraceFoldingStrategy _foldingStrategy;
+        private readonly FoldingManager _templateFoldingManager;
+        private VariableHelper _variableHelper;
+
+        public int _max { get; }
+
+        private readonly Parsers _parsers;
+        private Timer _timerMajUpdateTemplate;
+        private readonly Timer _timerMajLocalisation;
+        private JsltTemplate _template;
+        private string _parameterFile;
+        private Parameters _parameters;
+        private bool _templateIsClean;
+        private bool _templateIsRunning;
+        private string[] _path;
+        private TextMarkerService textMarkerService;
+        CompletionWindow completionWindow;
 
     }
 

@@ -25,15 +25,16 @@ COLON : ':';
 SHARP : '#';
 RECURSIVE_DESCENT : '..' ;
 
-URI_TYPE : '@uri';
-TIME_TYPE : '@time';
-DATETIME_TYPE : '@datetime';
-STRING_TYPE : '@string';
-BOOLEAN_TYPE : '@boolean';
-GUID_TYPE : '@uuid';
+URI_TYPE : '#uri';
+TIME_TYPE : '#time';
+DATETIME_TYPE : '#datetime';
+STRING_TYPE : '#string';
+BOOLEAN_TYPE : '#boolean';
+GUID_TYPE : '#uuid';
+INTEGER_TYPE : '#integer';
+DECIMAL_TYPE : '#decimal';
+
 WHEN_TYPE : '@when';
-INTEGER_TYPE : '@integer';
-DECIMAL_TYPE : '@decimal';
 
 IN : 'in';
 NIN : 'nin';

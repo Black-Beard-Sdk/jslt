@@ -274,16 +274,22 @@ namespace Bb.Json.Jslt.Parser
         public override object VisitVariable([NotNull] JsltParser.VariableContext context)
         {
 
-            var txt = context.GetText();
-            var type = typeof(string);
+            var txt = context.VARIABLE_NAME().GetText();
+            
+            JsltBase result = new JsltVariable() { Name = txt.Substring(1), Location = context.ToLocation() };
 
             var jsonType = context.jsonType();
             if (jsonType != null)
-                type = ((JsltConstant)jsonType.Accept(this)).Value as Type;
+            {
+                var type = ((JsltConstant)jsonType.Accept(this)).Value as Type;
 
-            var result = new JsltTranslateVariable(GetConstant(txt, type, context));
+                result = GetConverter(context.jsonType(), result, out Type type2);
 
+            }
+
+            //var result = new JsltTranslateVariable(GetConstant(txt, type, context));
             return result;
+
         }
 
         public override object VisitString([NotNull] JsltParser.StringContext context)
@@ -765,7 +771,7 @@ namespace Bb.Json.Jslt.Parser
                     LocalDebug.Stop();
 
                 var c = new JsltConstant(type, JsltKind.Type) { Location = jsonType.ToLocation() };
-                var call = new JsltFunctionCall("convert", new List<JsltBase>() { left, c });
+                var call = new JsltFunctionCall("convert", new List<JsltBase>() { left, c }) { Location = jsonType.ToLocation() };
                 this._functions.Add(call);
                 left = call;
             }
@@ -994,29 +1000,29 @@ namespace Bb.Json.Jslt.Parser
                 else if (item.Value is JsltConstant v)
                     _types.Add(v.Type);
 
-                else if (item.Value is JsltPath p)
+                else if (item.Value is JsltPath)
                     _types.Add(typeof(JToken));
 
-                else if (item.Value is JsltTranslateVariable t)
+                else if (item.Value is JsltVariable)
                     _types.Add(typeof(JToken));
 
-                else if (item.Value is JsltBinaryOperator b)
-                {
+                else if (item.Value is JsltTranslateVariable)
                     _types.Add(typeof(JToken));
-                }
-                else if (item.Value is JsltObject o)
-                {
+
+                else if (item.Value is JsltBinaryOperator)
                     _types.Add(typeof(JToken));
-                }
-                else if (item.Value is JsltArray a)
-                {
+                
+                else if (item.Value is JsltObject)
+                    _types.Add(typeof(JToken));
+                
+                else if (item.Value is JsltArray)
                     _types.Add(typeof(JArray));
-                }
+                
                 else
                 {
                     LocalDebug.Stop();
-
                 }
+
             }
 
             return _types.ToArray();
@@ -1054,6 +1060,15 @@ namespace Bb.Json.Jslt.Parser
             if (jsonType != null)
                 result = GetConverter(jsonType, result, out Type type);
 
+            var variable = context.VARIABLE_NAME();
+            if (variable != null)
+            {
+                var variable_name = variable.GetText();
+                variable_name = variable_name.Substring(1);
+                result.Source = new JsltVariable(variable_name) { Location = context.ToLocation() };
+
+            }
+
             return result;
 
         }
@@ -1074,26 +1089,7 @@ namespace Bb.Json.Jslt.Parser
 
 
         }
-
-        ///// <summary>
-        /////    : ROOT_VALUE subscript? EOF
-        ///// </summary>
-        ///// <param name="context"></param>
-        ///// <returns></returns>
-        //public override object VisitJsonpath([NotNull] JsltParser.JsonpathContext context)
-        //{
-
-        //    var result = new JPathRootValue(context.ToLocation());
-
-        //    var subscript = context.jsonpath_subscript();
-
-        //    if (subscript != null)
-        //        result.AppendEnd((JPathSubscript)VisitJsonpath_subscript(subscript));
-
-        //    return result;
-
-        //}
-
+             
         #endregion Jsonpath
 
         public void EvaluateErrors(IParseTree item)

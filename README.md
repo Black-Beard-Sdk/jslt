@@ -4,7 +4,7 @@
 
 Implementation of jslt language in DOTNET. Use a template for transform Json To another json. Consider the following template. note this template is a json that describe the structure of the target json. If the template is empty, the process return the initial source json.
 
-## Case 1 ##  
+## Default case ##  
 
 For the template document
 
@@ -20,7 +20,7 @@ The result will be.
 In this case the result is exactly what you have in the template, because you have not used any operations of transformation.
 
 
-## Case 2 ##
+## using Json path ##
 In this case, the value is a json path. Json path is a query language for JSON, similar to XPath for XML. The implementation of JsonPath is did by newtonsoft. [SelectToken] by the method (https://www.newtonsoft.com/json/help/html/SelectToken.htm).
 ```JSON
     { "name" : $.n }
@@ -28,12 +28,28 @@ In this case, the value is a json path. Json path is a query language for JSON, 
 
 The result will be an object with a property named "name" and the value will be the properties "n" at the root of the source json. The value '$..n' is a valid json path implemented by newtonsoft. 
 
-## Case 3 ##
+## Using variables ##
+you can manage variables 
+
+Like that
+```JSON
+{
+
+    "@a": 6, 
+    "a" : @a,
+	
+    "@b" : { "Test1": { "Test2" : 8 } },  
+    "bb" : @b:$.Test1.Test2
+			
+}
+```
+
+## Using method ##
 you can use functions for extend the process. 
 
 Like that
 ```JSON
-    "property name": .mymethod( $.property, arg2, ...)
+    "property__name": .mymethod( $.property, arg2, ...)
 ```
 
 **'mymethod'** is the name of the service you want to call. The sdk provide another keys like sum or distinct. the list is available [here](Documentation/Custom_services.md).
@@ -57,16 +73,16 @@ A sample for call the method
 
 
 
-### cast
-for cast a value you must use this syntax '@type' after expression
-* @uri
-* @time
-* @datetime
-* @string
-* @guid
-* @integer 
-* @decimal
-* @boolean
+### Using cast
+for casting a value you must use this syntax '#type' after expression
+* #uri
+* #time
+* #datetime
+* #string
+* #guid
+* #integer 
+* #decimal
+* #boolean
 
 ### Custom services
 the customs services are used to extend the feature of the Sdk. You can create your own customs services.

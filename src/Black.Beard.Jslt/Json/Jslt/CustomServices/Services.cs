@@ -111,7 +111,8 @@ namespace Bb.Json.Jslt.CustomServices
                 }
                 catch (Exception ex)
                 {
-                    ctx.Diagnostics.AddError(null, $"convert method {token} to {targetType}", ex.Message);
+                    var location = ctx.GetCurrentLocation();
+                    ctx.Diagnostics.AddError(location, $"convert method {token} to {targetType}", ex.Message);
                 }
 
 

@@ -29,8 +29,8 @@ namespace Bb.Json.Jslt.CustomServices
 
 
             if (string.IsNullOrEmpty(jpathFilter))
-            {
-                ctx.Diagnostics.AddError(null, "jpathFilter", "jpathFilter is null or empty in the get method");
+            {                
+                ctx.Diagnostics.AddError(ctx.GetCurrentLocation(), "jpathFilter", "jpathFilter is null or empty in the get method");
                 return token;
             }
 
@@ -39,7 +39,7 @@ namespace Bb.Json.Jslt.CustomServices
 
                 SourceJson src = ctx.SubSources[s];
                 if (src == null)
-                    ctx.Diagnostics.AddError(null, "sourceName", "source name is null or empty in the get method");
+                    ctx.Diagnostics.AddError(ctx.GetCurrentLocation(), "sourceName", "source name is null or empty in the get method");
 
                 datas = src.Datas;
 

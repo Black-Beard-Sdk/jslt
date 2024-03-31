@@ -88,7 +88,7 @@ namespace Bb.Json.Jslt.Services
                 _compiler.Add(e);
 
                 var result = _compiler.Compile<Func<RuntimeContext, JToken, JToken>>(filepathCode);
-             
+
                 return result;
 
             }
@@ -291,8 +291,16 @@ namespace Bb.Json.Jslt.Services
 
                 else
                 {
-                    var getValue = (Expression)node.Value.Accept(this);
-                    return RuntimeContext._setVariable.Call(ctx.Current.Context, name, getValue, node.GetLocation().AsConstant());
+                    if (node.Value != null)
+                    {
+                        var getValue = (Expression)node.Value.Accept(this);
+                        return RuntimeContext._setVariable.Call(ctx.Current.Context, name, getValue, node.GetLocation().AsConstant());
+                    }
+                    else
+                    {
+                        return RuntimeContext._getVariable.Call(ctx.Current.Context, name, node.GetLocation().AsConstant());
+                        
+                    }
                 }
 
             }
@@ -566,11 +574,19 @@ namespace Bb.Json.Jslt.Services
 
             using (CurrentContext ctx = NewContext())
             {
+
+                var source = ctx.Current.RootSource;
+
+                if (node.Source != null)
+                {
+                    source = (Expression)node.Source.Accept(this);
+                }
+
                 ctx.Current.RootSource = Expression.Call
                 (
                     RuntimeContext._getContentByJPath.Method,
                     ctx.Current.Context,
-                    ctx.Current.RootSource,
+                    source,
                     Expression.Constant(node.Value),
                     node.GetLocation().AsConstant()
                 );
