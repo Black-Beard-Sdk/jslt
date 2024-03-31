@@ -120,7 +120,8 @@ namespace Bb.Json.Jslt.Services
                         var listArray = i.Then.AddVar(typeof(JArray), null, resultToken.ConvertIfDifferent(typeof(JArray)));
 
                         var _for = i.Then.For(Expression.Constant(0), listArray.Property("Count"));
-                        _for.Condition = Expression.AndAlso(_for.Condition, ctx.Current.Context.Property("MustoBreak").IsFalse());
+                        var m = ctx.Current.Context.Property(nameof(RuntimeContext.MusToBreak));
+                        _for.Condition = Expression.AndAlso(_for.Condition, m.IsFalse());
 
                         //_for.Condition = Expression.LessThan(_for.Index, listArray.Property("Count"));
                         ctx.Current.Source = _for.Body;

@@ -44,6 +44,23 @@ Like that
 }
 ```
 
+## Using loop and array ##
+If you want create an array with items of the source json, you can use the following syntax.
+
+```JSON
+[
+    {
+        "$source"       : $.items,
+        "Key"           : $.name
+    }    
+]
+```
+
+Like that
+```JSON
+    "property__name": .mymethod( $.property, arg2, ...)
+```
+
 ## Using method ##
 you can use functions for extend the process. 
 
@@ -126,7 +143,7 @@ If you use a easy treatement, the template is a valid json structure. If you wan
 
 
 ### when
-the method when is very usefull. it is a switch case.
+the method when is very usefull. it is like a switch case.
 
 ```JSON
 {
