@@ -40,7 +40,7 @@ namespace Bb.Json.Jslt.Asts
         /// <value>
         /// The source.
         /// </value>
-        public JsltBase Source { get; internal set; }
+        public JsltBase Source { get; set; }
 
         /// <summary>
         /// Gets the where condition to apply on source.
@@ -48,7 +48,7 @@ namespace Bb.Json.Jslt.Asts
         /// <value>
         /// The where.
         /// </value>
-        public JsltBase Where { get; internal set; }
+        public JsltBase Where { get; set; }
 
         /// <summary>
         /// Gets or sets the location of the code source.
@@ -56,16 +56,16 @@ namespace Bb.Json.Jslt.Asts
         /// <value>
         /// The location.
         /// </value>
-        public TextLocation Location { get; set; }
+        public TextLocation? Location { get; set; }
 
 
         /// <summary>
         /// Gets the comment's list.
         /// </summary>
         /// <returns></returns>
-        public TextLocation GetLocation()
+        public TextLocation? GetLocation()
         {
-            return Location.Copy();
+            return Location?.Copy();
         }
 
         /// <summary>
