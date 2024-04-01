@@ -52,12 +52,8 @@ namespace Bb.Json.Jslt.Asts
         public override bool ToString(Writer writer, StrategySerializationItem strategy)
         {
 
-
-            strategy.ApplyReturnLineBeforeStarting(writer);
             writer.Append($"{Quote}{Name}{Quote} : ");
-            strategy.ApplyReturnLineAfterStarting(writer);
-
-
+            
             if (Value != null)
             {
 
@@ -73,6 +69,12 @@ namespace Bb.Json.Jslt.Asts
             else
                 writer.Append("null");
 
+            strategy.ApplyIndentLineAfterStarting(writer);
+            strategy.ApplyReturnLineAfterStarting(writer);
+
+            strategy.ApplyIndentLineBeforeEnding(writer);
+            strategy.ApplyReturnLineBeforeEnding(writer);
+            
             return true;
 
         }

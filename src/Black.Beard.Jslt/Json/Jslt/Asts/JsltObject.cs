@@ -24,13 +24,16 @@ namespace Bb.Json.Jslt.Asts
         /// </summary>
         /// <param name="name"></param>
         /// <param name="value"></param>
-        public void Append(string name, JsltBase value)
+        public JsltObject Append(string name, JsltBase value)
         {
-            Append(new JsltProperty() 
+            Append(new JsltProperty()
             {
-                Name = name, 
-                Value = value 
+                Name = name,
+                Value = value
             });
+
+            return this;
+
         }
 
         /// <summary>
@@ -82,42 +85,73 @@ namespace Bb.Json.Jslt.Asts
         public override bool ToString(Writer writer, StrategySerializationItem strategy)
         {
 
+            bool AddComma = false;
+
             writer.Append("{");
+            writer.AddIndent();
+            writer.AppendEndLine();
 
-            using (writer.Indent())
+            var s = this.Source;                   
+        
+            if (this.Source != null)
             {
-                writer.AppendEndLine();
-
-                var variables = this.Variables.ToList();
-
-                if (variables.Count > 0)
-                {
-                    writer.ToString(variables[0]);
-                    if (_items.Count > 0)
-                        for (int i = 1; i < variables.Count; i++)
-                        {
-                            writer.AppendEndLine(",");
-                            writer.ToString(variables[i]);
-                        }
-                }
-
-
-                var properties = this.Properties.ToList();
-                if (properties.Count > 0)
-                {
-                    if (variables.Count > 0)
-                        writer.AppendEndLine(",");
-
-                    writer.ToString(properties[0]);
-                    if (_items.Count > 0)
-                        for (int i = 1; i < properties.Count; i++)
-                        {
-                            writer.AppendEndLine(",");
-                            writer.ToString(properties[i]);
-                        }
-                }
-
+                writer.Append($"{Quote}$source{Quote} : ");
+                this.Source.ToString(writer, strategy);
+                AddComma = true;
             }
+
+            if (this.Where != null)
+            {
+                if (AddComma)
+                {
+                    writer.AppendEndLine(",");
+                    AddComma = false;
+                }
+                writer.Append($"{Quote}$where{Quote} : ");
+                this.Where.ToString(writer, strategy);
+                AddComma = true;
+            }
+
+            var variables = this.Variables.ToList();
+
+            if (variables.Count > 0)
+            {
+
+                if (AddComma)
+                {
+                    writer.AppendEndLine(",");
+                    AddComma = false;
+                }
+                writer.ToString(variables[0]);
+                
+                if (_items.Count > 1)
+                    for (int i = 1; i < variables.Count; i++)
+                    {
+                        writer.AppendEndLine(",");
+                        writer.ToString(variables[i]);
+                    }
+            }
+
+            var properties = this.Properties.ToList();
+            if (properties.Count > 0)
+            {
+                if (AddComma)
+                {
+                    writer.AppendEndLine(",");
+                    AddComma = false;
+                }
+
+                writer.ToString(properties[0]);
+
+                if (_items.Count > 1)
+                    for (int i = 1; i < properties.Count; i++)
+                    {
+                        writer.AppendEndLine(",");
+                        writer.ToString(properties[i]);
+                    }
+            }
+
+            writer.DelIndent();
             writer.AppendEndLine();
             writer.Append("}");
 

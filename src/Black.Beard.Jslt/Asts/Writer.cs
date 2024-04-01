@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using static Refs.System.Resources;
 
 namespace Bb.Asts
 {
@@ -22,7 +23,6 @@ namespace Bb.Asts
             this.Strategy = new SerializationStrategies();
             _index = 0;
         }
-
 
         public void TrimBegin()
         {
@@ -87,8 +87,6 @@ namespace Bb.Asts
             return true;
 
         }
-
-
 
         public void CleanIndent()
         {
@@ -201,39 +199,6 @@ namespace Bb.Asts
             return result;
         }
 
-        public IDisposable Indent(StrategySerializationItem strategy, bool crlf = false)
-        {
-            var result = new _disposable(strategy, this);
-            if (crlf)
-                result.After.Add(c => c.AppendEndLine());
-            return result;
-        }
-
-        public IDisposable Indent(bool crlf = false)
-        {
-            return Indent(StrategySerializationItem.Default, crlf);
-        }
-
-        public IDisposable IndentWithParentheses(StrategySerializationItem strategy, bool crlf = false)
-        {
-
-            var result = new _disposable(strategy, this, "(", ")");
-            if (crlf)
-                result.After.Add(c => c.AppendEndLine());
-            return result;
-        }
-
-        public IDisposable IndentWithParentheses(bool crlf = false)
-        {
-
-            var strategy = StrategySerializationItem.Default;
-
-            var result = new _disposable(strategy, this, "(", ")");
-            if (crlf)
-                result.After.Add(c => c.AppendEndLine());
-            return result;
-        }
-
         public int Length => this._sb.Length;
 
         public StringBuilder Text { get => _sb; }
@@ -246,22 +211,14 @@ namespace Bb.Asts
         private class _disposable : IDisposable
         {
 
-            public _disposable(StrategySerializationItem strategy, Writer writer, string start = null, string end = null)
+            public _disposable(StrategySerializationItem strategy, Writer writer)
             {
 
                 this._strategy = strategy;
-                this.After = new List<Action<Writer>>();
-                this._end = end;
                 this._writer = writer;
 
-                if (!string.IsNullOrEmpty(start))
-                    _writer.Append(start);
-
-                if (this._strategy.Indent)
-                    this._writer.AddIndent();
-
-                if (strategy.ReturnLineBeforeStarting)
-                    writer.AppendEndLine();
+                //_strategy.ApplyIndentLineBeforeStarting(_writer);
+                //_strategy.ApplyReturnLineBeforeStarting(_writer);
 
             }
 
@@ -272,21 +229,8 @@ namespace Bb.Asts
                 {
                     if (disposing)
                     {
-
-                        if (this._strategy.Indent)
-                        {
-                            this._writer.DelIndent();
-                        }
-
-                        if (!string.IsNullOrEmpty(_end))
-                            _writer.Append(_end);
-
-                        foreach (var item in After)
-                            item(this._writer);
-
-                        if (_strategy.ReturnLineAfterEnding)
-                            _writer.AppendEndLine();
-
+                        //_strategy.ApplyIndentLineAfterEnding(_writer);
+                        //_strategy.ApplyReturnLineAfterEnding(_writer);
                     }
 
                     disposedValue = true;
@@ -295,7 +239,6 @@ namespace Bb.Asts
 
             private readonly StrategySerializationItem _strategy;
 
-            public List<Action<Writer>> After { get; set; }
 
             public void Dispose()
             {
@@ -305,7 +248,7 @@ namespace Bb.Asts
 
             private bool disposedValue;
             private Writer _writer;
-            private string _end;
+
         }
 
     }

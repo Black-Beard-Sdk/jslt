@@ -194,6 +194,16 @@ namespace Bb.Json.Jslt.Asts
         /// <summary>
         /// Creates a new instance of JsltBinaryOperator
         /// </summary>
+        /// <param name="self"> <see cref="DateTime"/> </param>
+        /// <returns></returns>
+        public static JsltConstant AsJsltConstant(this DateTimeOffset self)
+        {
+            return new JsltConstant(self, JsltKind.Date);
+        }
+
+        /// <summary>
+        /// Creates a new instance of JsltBinaryOperator
+        /// </summary>
         /// <param name="self">name of the function</param>
         /// <param name="arguments">arguments of the function</param>
         /// <returns></returns>

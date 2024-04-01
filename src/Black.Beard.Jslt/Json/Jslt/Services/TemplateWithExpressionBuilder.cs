@@ -112,6 +112,8 @@ namespace Bb.Json.Jslt.Services
 
                     if (node.Source != null)
                     {
+
+                        var mem = node.Source;
                         var resultToken = src.AddVar((typeof(JToken)), src.GetUniqueVariableName("source"), (Expression)node.Source.Accept(this));
                         node.Source = null;
 
@@ -148,6 +150,8 @@ namespace Bb.Json.Jslt.Services
                             b = (Expression)node.Accept(this);
                             _for.Body.Add(targetArray.Call(_AddJArray, b));
                         }
+
+                        node.Source = mem;
 
                     }
                     else

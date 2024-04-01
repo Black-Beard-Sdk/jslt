@@ -14,6 +14,15 @@ namespace Bb.Json.Jslt.Asts
         /// <summary>
         /// Initializes a new instance of the <see cref="JsltArray"/> class.
         /// </summary>
+        public JsltArray()
+        {
+            this.Kind = JsltKind.Array;
+            _items = new List<JsltBase>();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JsltArray"/> class.
+        /// </summary>
         /// <param name="count"></param>
         public JsltArray(int count)
         {
@@ -61,44 +70,22 @@ namespace Bb.Json.Jslt.Asts
         public override bool ToString(Writer writer, StrategySerializationItem strategy)
         {
 
-            var newLine = _items.Count > 1;
-            strategy.ApplyReturnLineBeforeStarting(writer);
             writer.Append("[");
-            strategy.ApplyReturnLineAfterStarting(writer);
-
-            using (writer.Indent(strategy))
-            {
-
-                writer.AppendEndLine();
-
-                strategy.ApplyReturnLineBeforeItems(writer);
-                writer.ToString(_items[0]);
-
-                if (_items.Count > 0)
-                    for (int i = 1; i < _items.Count; i++)
-                    {
-
-                        writer.Append(", ");
-
-                        if (newLine)
-                            writer.AppendEndLine();
-                        else
-                            strategy.ApplyReturnLineAfterItems(writer);
-
-
-                        writer.ToString(_items[i]);
-
-                        if (i < _items.Count)
-                            strategy.ApplyReturnLineAfterItems(writer);
-
-                    }
-
-            }
+            writer.AddIndent();
             writer.AppendEndLine();
+   
+            writer.ToString(_items[0]);
 
-            strategy.ApplyReturnLineBeforeEnding(writer);
+            if (_items.Count > 0)
+                for (int i = 1; i < _items.Count; i++)
+                {
+                    writer.AppendEndLine(", ");
+                    writer.ToString(_items[i]);
+                }
+
+            writer.DelIndent();
+            writer.AppendEndLine();
             writer.Append("]");
-            strategy.ApplyReturnLineAfterEnding(writer);
 
             return true;
 

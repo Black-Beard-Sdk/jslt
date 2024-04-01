@@ -3,6 +3,7 @@ using Oldtonsoft.Json.Linq;
 using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.Text;
 
 namespace Bb.Json.Jslt.Asts
 {
@@ -129,6 +130,8 @@ namespace Bb.Json.Jslt.Asts
                     case JsltKind.Date:
                         if (_value is DateTime s8)
                             this.Value = s8;
+                        else if (_value is DateTimeOffset s11)
+                            this.Value = s11;
                         else
                             this.Value = Convert.ChangeType(_value, typeof(DateTime), CultureInfo.InvariantCulture);
                         break;
@@ -235,13 +238,25 @@ namespace Bb.Json.Jslt.Asts
                     return true;
 
                 case nameof(DateTime):
+                    writer.Append("\"");
                     writer.Append(((DateTime)value).ToString(writer.Strategy.Culture));
+                    writer.Append("\"");
                     return true;
 
                 case nameof(DateTimeOffset):
+                    writer.Append("\"");
                     writer.Append(((DateTimeOffset)value).ToString(writer.Strategy.Culture));
+                    writer.Append("\"");
                     return true;
 
+                case "Byte[]":
+                    writer.Append("\"");
+                    writer.Append(System.Text.Encoding.UTF8.GetString((byte[])value));
+                    writer.Append("\"");
+                    return true;
+
+                case nameof(Guid):
+                case nameof(Uri):
                 case nameof(String):
 
                     if (value != null)

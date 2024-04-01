@@ -16,8 +16,27 @@ namespace Bb.Asts
         {
 
             if (!_strategies.TryGetValue(ast1, out var item))
-                _strategies.Add(ast1, item = new StrategySerializationItem(ast1));
+            {
 
+                if (ast1 == "JsltArray")
+                {
+                    _strategies.Add(ast1, item =  (StrategySerializationItem)StrategySerializationItem.DefaultJsltArray.Clone());
+                    item.AstName = ast1;
+                }
+                else if (ast1 == "JsltObject")
+                {
+                    _strategies.Add(ast1, item = (StrategySerializationItem)StrategySerializationItem.DefaultJsltObject.Clone());
+                    item.AstName = ast1;
+                }
+                else if (ast1 == "JsltProperty")
+                {
+                    _strategies.Add(ast1, item = (StrategySerializationItem)StrategySerializationItem.DefaultJsltProperty.Clone());
+                    item.AstName = ast1;
+                }
+                else
+                    _strategies.Add(ast1, item = new StrategySerializationItem(ast1));
+
+            }
             return item;
 
         }
@@ -38,10 +57,10 @@ namespace Bb.Asts
 
 
         private Dictionary<string, StrategySerializationItem> _strategies = new Dictionary<string, StrategySerializationItem>();
-        
+
         internal readonly StrategySerializationItem DefaultStrategy = new StrategySerializationItem();
         private readonly CultureInfo _culture;
 
     }
-        
+
 }

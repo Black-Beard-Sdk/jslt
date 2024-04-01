@@ -78,6 +78,7 @@ namespace Bb.Json.Jslt.Asts
 
         public virtual string RuleName => GetType().Name;
 
+
         /// <summary>
         /// Converts to string.
         /// </summary>
