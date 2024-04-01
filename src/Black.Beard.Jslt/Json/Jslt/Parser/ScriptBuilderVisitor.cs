@@ -966,7 +966,7 @@ namespace Bb.Json.Jslt.Parser
                 else
                 {
                     var expression = new JsltConstant(@case.Name, JsltKind.String) { Location = @case.Location };
-                    var c = new JsltCase() { RightExpression = expression, Block = @case.Value, Location = @case.Location };
+                    var c = new JsltSwitchCase() { RightExpression = expression, Block = @case.Value, Location = @case.Location };
                     result.Cases.Add(c);
                 }
 

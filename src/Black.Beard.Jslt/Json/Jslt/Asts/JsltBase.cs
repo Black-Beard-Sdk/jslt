@@ -5,6 +5,9 @@ using System.Collections.Generic;
 namespace Bb.Json.Jslt.Asts
 {
 
+    /// <summary>
+    /// Represents a node in a Jslt.
+    /// </summary>
     public abstract class JsltBase : IWriter
     {
 

@@ -6,6 +6,9 @@ using System.Collections.Generic;
 namespace Bb.Json.Jslt.Asts
 {
 
+    /// <summary>
+    /// Represents a variable to translate.
+    /// </summary>
     [System.Diagnostics.DebuggerDisplay("variables : {VariableNames}")]
     public class JsltTranslateVariable : JsltBase
     {

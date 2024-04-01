@@ -9,6 +9,9 @@ namespace Bb.Json.Jslt.Asts
 {
 
 
+    /// <summary>
+    /// Represents a function to call.
+    /// </summary>
     [System.Diagnostics.DebuggerDisplay("call {Name}")]
     public class JsltFunctionCall : JsltBase
     {

@@ -5,30 +5,48 @@ using System.Linq;
 
 namespace Bb.Json.Jslt.Asts
 {
+
     public static partial class JExpression
     {
 
-        public static JsltPath Path(string path)
+        /// <summary>
+        /// Create a new instance of JsltPath
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static JsltPath AsJsltPath(this string path)
         {
             return new JsltPath() { Value = path };
         }
 
-        public static JsltProperty Property(string name, JsltBase value)
+        /// <summary>
+        /// Create a new instance of JsltProperty
+        /// </summary>
+        /// <param name="name">name of the property</param>
+        /// <param name="value">value of the property</param>
+        /// <returns></returns>
+        public static JsltProperty AsJsltProperty(string name, JsltBase value)
         {
             return new JsltProperty() { Name = name, Value = value };
         }
 
-        public static JsltArgument Argument(string name, JsltBase value)
-        {
-            return new JsltArgument() { Name = name, Value = value };
-        }
-
-        public static JsltVariable Variable(string variableName)
+        /// <summary>
+        /// Create a new instance of JsltVariable
+        /// </summary>
+        /// <param name="variableName">Name of the variable</param>
+        /// <returns></returns>
+        public static JsltVariable AsJsltVariable(this string variableName)
         {
             return new JsltVariable(variableName);
         }
 
-        public static JsltTranslateVariable Translate(JsltBase value, params string[] variables)
+        /// <summary>
+        /// Create a new instance of JsltTranslateVariable
+        /// </summary>
+        /// <param name="value">object to translate</param>
+        /// <param name="variables">list of variable</param>
+        /// <returns></returns>
+        public static JsltTranslateVariable AsJsltTranslate(JsltBase value, params string[] variables)
         {
             var result = new JsltTranslateVariable(value);
             foreach (var item in variables)
@@ -36,20 +54,24 @@ namespace Bb.Json.Jslt.Asts
             return result;
         }
 
-        public static JsltArray Array(Func<IEnumerable<JsltBase>> items)
-        {
-            var i = items().ToArray();
-            var result = new JsltArray(i);
-            return result;
-        }
-
-        public static JsltArray Array(params JsltBase[] items)
+        /// <summary>
+        /// Create a new instance of JsltArray
+        /// </summary>
+        /// <param name="items">items of the JsltArray</param>
+        /// <returns></returns>
+        public static JsltArray AsJsltArray(this JsltBase[] items)
         {
             var result = new JsltArray(items);
             return result;
         }
 
-        public static JsltSwitch Switch(JsltBase expression, params JsltCase[] cases)
+        /// <summary>
+        /// Create a new instance of JsltSwitch
+        /// </summary>
+        /// <param name="expression">expression use like left operand</param>
+        /// <param name="cases">List of right operand</param>
+        /// <returns></returns>
+        public static JsltSwitch AsJsltSwitch(this JsltBase expression, params JsltSwitchCase[] cases)
         {
             var result = new JsltSwitch()
             {
@@ -61,7 +83,13 @@ namespace Bb.Json.Jslt.Asts
             return result;
         }
 
-        public static JsltSwitch Switch(JsltBase expression, Func<IEnumerable<JsltCase>> cases)
+        /// <summary>
+        /// create a new instance of JsltSwitch
+        /// </summary>
+        /// <param name="expression">expression use like left operand</param>
+        /// <param name="cases">List of right operand</param>
+        /// <returns></returns>
+        public static JsltSwitch AsJsltSwitch(this JsltBase expression, Func<IEnumerable<JsltSwitchCase>> cases)
         {
             var result = new JsltSwitch()
             {
@@ -75,9 +103,15 @@ namespace Bb.Json.Jslt.Asts
 
         }
 
-        public static JsltCase Case(JsltBase expression, JsltBase block)
+        /// <summary>
+        /// Create a new instance of JsltSwitchCase
+        /// </summary>
+        /// <param name="expression">expression to use in right operand</param>
+        /// <param name="block">block of instruction to execute if operands match</param>
+        /// <returns></returns>
+        public static JsltSwitchCase AsJsltCase(this JsltBase expression, JsltBase block)
         {
-            var result = new JsltCase()
+            var result = new JsltSwitchCase()
             {
                 RightExpression = expression,
                 Block = block
@@ -85,9 +119,15 @@ namespace Bb.Json.Jslt.Asts
             return result;
         }
 
-        public static JsltCase Case(JsltBase expression, Func<JsltBase> block)
+        /// <summary>
+        /// Create a new instance of JsltSwitchCase
+        /// </summary>
+        /// <param name="expression">expression to use in right operand</param>
+        /// <param name="block">block of instruction to execute if operands match</param>
+        /// <returns></returns>
+        public static JsltSwitchCase AsJsltCase(this JsltBase expression, Func<JsltBase> block)
         {
-            var result = new JsltCase()
+            var result = new JsltSwitchCase()
             {
                 RightExpression = expression,
                 Block = block()
@@ -95,7 +135,12 @@ namespace Bb.Json.Jslt.Asts
             return result;
         }
 
-        public static JsltObject Object(params JsltProperty[] properties)
+        /// <summary>
+        /// Create a new instance of JsltObject
+        /// </summary>
+        /// <param name="properties">List of properties of the object</param>
+        /// <returns></returns>
+        public static JsltObject AsJsltObject(params JsltProperty[] properties)
         {
             var result = new JsltObject();
             foreach (var item in properties)
@@ -103,7 +148,12 @@ namespace Bb.Json.Jslt.Asts
             return result;
         }
 
-        public static JsltObject Object(Func<IEnumerable<JsltProperty>> properties)
+        /// <summary>
+        /// Create a new instance of JsltObject
+        /// </summary>
+        /// <param name="properties">List of properties of the object</param>
+        /// <returns></returns>
+        public static JsltObject AsJsltObject(Func<IEnumerable<JsltProperty>> properties)
         {
             var result = new JsltObject();
             foreach (var item in properties().ToList())
@@ -111,41 +161,54 @@ namespace Bb.Json.Jslt.Asts
             return result;
         }
 
-        public static JsltOperator Operator(JsltBase left, OperationEnum @operator)
+        /// <summary>
+        /// Create a new instance of JsltFunctionCall
+        /// </summary>
+        /// <param name="left">left operand</param>
+        /// <param name="operator">unary operator</param>
+        /// <returns></returns>
+        public static JsltOperator AsJsltOperation(JsltBase left, OperationEnum @operator)
         {
             var result = new JsltOperator(left, @operator);
             return result;
         }
 
-        public static JsltOperator Operator(JsltBase left, OperationEnum @operator, JsltBase right)
-        {
-            var result = new JsltBinaryOperator(left, @operator, right);
-            return result;
-        }
-
-        public static JsltMetadata Metadata(object value)
+        /// <summary>
+        /// Create a new instance of JsltMetadata
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static JsltMetadata AsJsltMetadata(object value)
         {
             var result = new JsltMetadata(value);
             return result;
         }
 
-        public static JsltLinkedCode LinkedCode(object value, params JsltBase[] links)
+        /// <summary>
+        /// Create a new instance of JsltLinkedCode
+        /// </summary>
+        /// <param name="value">Initial expression</param>
+        /// <param name="links">expression to add on the first</param>
+        /// <returns></returns>
+        public static JsltLinkedCode AsJsltLinkedCode(this JsltBase value, params JsltBase[] links)
         {
             var result = new JsltLinkedCode();
-            foreach (var item in links)
-                result.Append(item);
+            result.Append(value);
+            if (links != null)
+                foreach (var item in links)
+                    result.Append(item);
             return result;
         }
 
-        public static JsltConstant Constant(object value, JsltKind? kind)
+        /// <summary>
+        /// Create a new instance of JsltConstant
+        /// </summary>
+        /// <param name="value">value of the constant</param>
+        /// <param name="kind">kind of the constant</param>
+        /// <returns></returns>
+        public static JsltConstant AsJsltConstant(this object value, JsltKind? kind)
         {
             var result = new JsltConstant(value, kind.HasValue ? kind.Value : JsltConstant.Resolve(value));
-            return result;
-        }
-
-        public static JsltFunctionCall Call(string functionName, JsltBase[] arguments)
-        {
-            var result = new JsltFunctionCall(functionName, arguments);
             return result;
         }
 

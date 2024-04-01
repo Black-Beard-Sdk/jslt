@@ -4,8 +4,10 @@ using Bb.Json.Jslt.Parser;
 namespace Bb.Json.Jslt.Asts
 {
 
-
-
+    /// <summary>
+    /// Represents an operator.
+    ///     Not:                 !
+    /// </summary>
     [System.Diagnostics.DebuggerDisplay("{Operator} {Operator}")]
     public class JsltOperator : JsltBase
     {
@@ -79,7 +81,7 @@ namespace Bb.Json.Jslt.Asts
                     writer.Append("*");
                     break;
                 case OperationEnum.Power:
-                    writer.Append(" ");
+                    writer.Append("^");
                     break;
                 case OperationEnum.Chain:
                     writer.Append("->");

@@ -19,6 +19,11 @@ namespace Bb.Json.Jslt.Asts
             this._varItems = new Dictionary<string, JsltVariable>();
         }
 
+        /// <summary>
+        /// add a new property to the object
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
         public void Append(string name, JsltBase value)
         {
             Append(new JsltProperty() 
@@ -28,7 +33,12 @@ namespace Bb.Json.Jslt.Asts
             });
         }
 
-        public void Append(JsltProperty property)
+        /// <summary>
+        /// ad a new property to the object
+        /// </summary>
+        /// <param name="property"></param>
+        /// <returns></returns>
+        public JsltObject Append(JsltProperty property)
         {
 
             if (property is JsltVariable v)
@@ -45,6 +55,9 @@ namespace Bb.Json.Jslt.Asts
 
             else
                 _items.Add(property.Name, property);
+
+            return this;
+
         }
 
         public IEnumerable<JsltProperty> Properties { get => _items.Values; }

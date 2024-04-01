@@ -83,7 +83,7 @@ namespace Bb.JsltEvaluator.AvalonEdit
             return node;
         }
 
-        public object VisitCase(JsltCase node)
+        public object VisitCase(JsltSwitchCase node)
         {
 
             if (node.Source != null)

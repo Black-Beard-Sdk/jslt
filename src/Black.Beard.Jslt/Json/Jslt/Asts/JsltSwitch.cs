@@ -11,12 +11,12 @@ namespace Bb.Json.Jslt.Asts
 
         public JsltSwitch()
         {
-            this.Cases = new List<JsltCase>();
+            this.Cases = new List<JsltSwitchCase>();
         }
 
         public JsltBase Expression { get; set; }
 
-        public List<JsltCase> Cases { get; }
+        public List<JsltSwitchCase> Cases { get; }
 
         public JsltBase Default { get; set; }
 

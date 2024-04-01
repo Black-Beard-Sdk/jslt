@@ -35,9 +35,6 @@ namespace Bb.Json.Jslt.Asts
             if (value is bool)
                 return JsltKind.Boolean;
 
-            if (value is string)
-                return JsltKind.String;
-
             if (value is double)
                 return JsltKind.Float;
 
@@ -72,6 +69,11 @@ namespace Bb.Json.Jslt.Asts
 
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JsltConstant"/> class.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="kind"></param>
         public JsltConstant(object value, JsltKind kind)
         {
 
@@ -171,8 +173,14 @@ namespace Bb.Json.Jslt.Asts
 
         }
 
+        /// <summary>
+        /// Get the Constant value
+        /// </summary>
         public object Value { get; }
 
+        /// <summary>
+        /// Get the type of the constant
+        /// </summary>
         public Type Type { get => Value?.GetType() ?? typeof(object); }
 
 
@@ -180,6 +188,7 @@ namespace Bb.Json.Jslt.Asts
         {
             return visitor.VisitConstant(this);
         }
+
 
         public override bool ToString(Writer writer, StrategySerializationItem strategy)
         {

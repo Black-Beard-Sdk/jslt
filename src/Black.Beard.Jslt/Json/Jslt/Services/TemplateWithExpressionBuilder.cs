@@ -638,7 +638,7 @@ namespace Bb.Json.Jslt.Services
 
         }
 
-        public object VisitCase(JsltCase node)
+        public object VisitCase(JsltSwitchCase node)
         {
 
             using (CurrentContext ctx = NewContext())

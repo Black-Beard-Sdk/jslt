@@ -125,7 +125,7 @@ namespace Bb.Json.Jslt.Services
 
         }
 
-        public override object VisitCase(JsltCase node)
+        public override object VisitCase(JsltSwitchCase node)
         {
 
             if (Evaluate(node))

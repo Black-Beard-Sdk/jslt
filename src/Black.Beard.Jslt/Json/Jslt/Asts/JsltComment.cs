@@ -4,9 +4,15 @@ using Bb.Json.Jslt.Parser;
 namespace Bb.Json.Jslt.Asts
 {
 
+    /// <summary>
+    /// Represents a comment in a Jslt.
+    /// </summary>
     public class JsltComment : JsltBase
     {
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JsltComment"/> class.
+        /// </summary>
         public JsltComment()
         {
 

@@ -15,8 +15,14 @@ namespace Bb.Json.Jslt.Asts
             _metadatas = new Dictionary<string, JsltMetadata>();
         }
 
+        /// <summary>
+        /// Name of the property
+        /// </summary>
         public string Name { get; set; }
 
+        /// <summary>
+        /// Value of the property
+        /// </summary>
         public virtual JsltBase Value { get; set; }
 
         public override object Accept(IJsltJsonVisitor visitor)

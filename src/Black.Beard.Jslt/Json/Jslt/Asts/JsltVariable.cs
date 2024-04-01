@@ -3,6 +3,9 @@
 namespace Bb.Json.Jslt.Asts
 {
 
+    /// <summary>
+    /// Represents a variable in a Jslt.
+    /// </summary>
     public class JsltVariable : JsltProperty
     {
 

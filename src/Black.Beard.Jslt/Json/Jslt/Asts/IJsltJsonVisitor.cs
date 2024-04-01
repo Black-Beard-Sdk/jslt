@@ -31,7 +31,7 @@ namespace Bb.Json.Jslt.Asts
 
         object VisitBinaryOperator(JsltBinaryOperator node);
         
-        object VisitCase(JsltCase node);
+        object VisitCase(JsltSwitchCase node);
 
         object VisitSwitch(JsltSwitch node);
         

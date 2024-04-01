@@ -3,6 +3,9 @@
 namespace Bb.Json.Jslt.Asts
 {
 
+    /// <summary>
+    /// Represents an argument in a Jslt function.
+    /// </summary>
     [System.Diagnostics.DebuggerDisplay("arg {Name}={Value}")]
     public class JsltArgument : JsltBase
     {
@@ -53,5 +56,6 @@ namespace Bb.Json.Jslt.Asts
         }
 
     }
+
 
 }

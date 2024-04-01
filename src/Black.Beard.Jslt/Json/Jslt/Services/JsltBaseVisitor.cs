@@ -80,7 +80,7 @@ namespace Bb.Json.Jslt.Services
             return node;
         }
 
-        public virtual object VisitCase(JsltCase node)
+        public virtual object VisitCase(JsltSwitchCase node)
         {
 
             if (node.Where != null)
