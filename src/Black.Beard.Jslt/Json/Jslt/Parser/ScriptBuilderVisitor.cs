@@ -541,7 +541,7 @@ namespace Bb.Json.Jslt.Parser
                             ParseDirectives(directives);
                             return new JsltDirectives() { Value = value, Location = context.ToLocation() };
                         }
-                        else if (name.StartsWith("$") && name != "$" && name != "$where")
+                        else if (name.StartsWith("$") && name != "$" && name != "$where" && name != "$source")
                         {
                             AddWarning(value.Location, "syntax", $"{name} is not recognized.");
                         }

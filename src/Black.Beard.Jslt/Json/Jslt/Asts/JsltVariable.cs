@@ -7,9 +7,14 @@ namespace Bb.Json.Jslt.Asts
     /// <summary>
     /// Represents a variable in a Jslt.
     /// </summary>
+    [System.Diagnostics.DebuggerDisplay("variable {Name} : {Value}")]
     public class JsltVariable : JsltProperty
     {
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JsltVariable"/> class.
+        /// </summary>
+        /// <param name="name">name of the variable</param>
         public JsltVariable(string name)
         {
             Kind = JsltKind.JVariable;
@@ -18,6 +23,9 @@ namespace Bb.Json.Jslt.Asts
                 this.Name = this.Name.Substring(1);
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JsltVariable"/> class.
+        /// </summary>
         public JsltVariable()
         {
             Kind = JsltKind.JVariable;

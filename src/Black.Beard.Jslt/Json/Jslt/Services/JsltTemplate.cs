@@ -13,12 +13,6 @@ namespace Bb.Json.Jslt.Services
     public class JsltTemplate
     {
 
-        static JsltTemplate()
-        {
-            //this.Configuration = new TemplateTransformProvider(TranformJsonAstConfiguration.Configuration);
-            //this.Culture = this.Configuration.Culture;
-        }
-
         internal JsltTemplate()
         {
 

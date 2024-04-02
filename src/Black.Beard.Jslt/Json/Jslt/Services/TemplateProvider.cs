@@ -62,7 +62,7 @@ namespace Bb.Json.Jslt.Services
         /// <summary>
         /// Gets the template built from text.
         /// </summary>
-        /// <param name="sb">The template to run for transform the data</param>
+        /// <param name="sb">The template payload for transform the data</param>
         /// <param name="withDebug">if set to <c>true</c> [with debug]. generate source code and manage a debugger for running step by step.</param>
         /// <param name="filename">The filename that  contains the code.</param>
         /// <param name="diagnostics">The diagnostics.</param>
