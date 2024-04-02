@@ -1,4 +1,5 @@
-﻿using Bb.Json.Attributes;
+﻿using Bb.Contracts;
+using Bb.Json.Attributes;
 using Bb.Json.Jslt.Services;
 using Oldtonsoft.Json.Linq;
 using System.Linq;

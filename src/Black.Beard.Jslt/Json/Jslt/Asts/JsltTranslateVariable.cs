@@ -1,5 +1,6 @@
 ﻿using Bb.Analysis.DiagTraces;
 using Bb.Asts;
+using Bb.Contracts;
 using Bb.Json.Jslt.Services;
 using System.Collections.Generic;
 

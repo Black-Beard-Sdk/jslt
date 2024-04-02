@@ -1,10 +1,11 @@
-﻿using Oldtonsoft.Json.Linq;
+﻿using Bb.Json.Jslt.Services;
+using Oldtonsoft.Json.Linq;
 
-namespace Bb.Json.Jslt.Services
+namespace Bb.Contracts
 {
 
     /// <summary>
-    /// Contract for implémentation of the custom service
+    /// Contract for implementation of the custom service
     /// </summary>
     public interface ITransformJsonService
     {

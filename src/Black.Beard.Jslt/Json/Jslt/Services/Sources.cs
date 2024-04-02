@@ -7,31 +7,73 @@ using System.Text;
 namespace Bb.Json.Jslt.Services
 {
 
+    /// <summary>
+    /// Source to append in the transformation process.
+    /// </summary>
     public class Sources
     {
 
-        public Sources(SourceJson source, EnvironmentVariableTarget target = EnvironmentVariableTarget.Machine)
+        /// <summary>
+        /// Initialize a new instance of Sources
+        /// </summary>
+        /// <param name="source">Source to append in global source</param>
+        /// <param name="target"></param>
+        public Sources(SourceJson? source, EnvironmentVariableTarget target = EnvironmentVariableTarget.Machine)
         {
+            
             this.Source = source;
-            this._datas = new Dictionary<string, SourceJson>();
-            this.Variables = new VariableManager(this, target);
+            
+            if (source != null &&!string.IsNullOrEmpty(source.Name))
+                this._datas = new Dictionary<string, SourceJson>() { { source.Name, source } };
+            else
+                this._datas = new Dictionary<string, SourceJson>();
+
+            this.Variables = new VariableManager(new VariableSourceResolver(this, new VariableEnvironmentResolver(target)));
         }
 
-
+        /// <summary>
+        /// return a new empty source
+        /// </summary>
+        /// <returns></returns>
         public static Sources GetEmpty()
         {
             return new Sources(SourceJson.GetFromText(String.Empty));
         }
 
-        public SourceJson Source { get; }
+        /// <summary>
+        /// Principal source
+        /// </summary>
+        public SourceJson Source { get; private set; }
 
-
+        /// <summary>
+        /// Append the source. Note if the source haven't name, the source is write in the principal source.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
         public Sources Add(SourceJson source)
         {
+            if (string.IsNullOrEmpty(source.Name))
+                Source = source;
             this._datas.Add(source.Name, source);
             return this;
         }
 
+        public bool TryGetValue(string key, out object source)
+        {
+            source = null;
+
+            if (this._datas.TryGetValue(key, out var s))
+                source = s.Datas;
+
+            return source != null;
+
+        }
+
+        /// <summary>
+        /// return source by specified name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public SourceJson this[string name]
         {
             get
@@ -43,7 +85,9 @@ namespace Bb.Json.Jslt.Services
             }
         }
 
-
+        /// <summary>
+        /// Variable manager <see cref="VariableManager "/>
+        /// </summary>
         public VariableManager Variables { get; }
 
         #region operators

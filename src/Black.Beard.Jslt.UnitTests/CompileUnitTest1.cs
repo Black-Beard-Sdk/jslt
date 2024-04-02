@@ -1,5 +1,7 @@
+using Bb.Json.Jslt.Asts;
 using Bb.Json.Jslt.Parser;
 using Bb.Json.Jslt.Services;
+using ICSharpCode.Decompiler.Metadata;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using Oldtonsoft.Json.Linq;
@@ -97,6 +99,29 @@ namespace Black.Beard.Jslt.UnitTests
             var src = new SourceJson[] { SourceJson.GetFromText(source) };
             RuntimeContext result = Test(expected, src, ("myMethod", typeof(DataClass)));
             Assert.AreEqual(result.TokenResult["propertyName"]["Uuid"], 6.6);
+        }
+
+        [TestMethod]
+        public void TestPropertyVariable()
+        {
+
+            string source = @"[{ 'Key': 2 }, { 'Key': 3 } ]".Replace("'", "\"");
+
+            var i = new JsltArray()
+                .Append(new JsltObject()
+                    .SetSource("body".AsJsltVariable())
+                    .Append("key", "$.Key".AsJsltPath())
+            );
+
+            var src = new SourceJson[] { SourceJson.GetFromText(source, "body") };
+            RuntimeContext result = Test(i, src);
+
+            var a = result.TokenResult as Oldtonsoft.Json.Linq.JArray;
+
+            Assert.AreEqual(a.Count, 2);
+            Assert.AreEqual(a[0]["key"], 2);
+            Assert.AreEqual(a[1]["key"], 3);
+
         }
 
         [TestMethod]
@@ -464,6 +489,26 @@ namespace Black.Beard.Jslt.UnitTests
             return result;
         }
 
+        private static RuntimeContext Test(JsltBase templateTree, SourceJson[] sources, params (string, Type)[] services)
+        {
+
+            var src = new Sources(sources[0]);
+            for (int i = 1; i < sources.Length; i++)
+                src.Add(sources[i]);
+
+            var template = GetProvider(templateTree, services);
+
+            if (!template.Diagnostics.Success)
+            {
+                var error = template.Diagnostics.Errors.First();
+                throw new Exception(error.Message);
+            }
+
+            var result = template.Transform(src);
+
+            return result;
+        }
+
 
         private static JsltTemplate GetProvider(string payloadTemplate, params (string, Type)[] services)
         {
@@ -477,13 +522,31 @@ namespace Black.Beard.Jslt.UnitTests
             foreach (var item in services)
                 configuration.Services.ServiceDiscovery.AddService(item.Item2, item.Item1);
 
-            TemplateTransformProvider Templateprovider = new TemplateTransformProvider(configuration);
+            TemplateProvider Templateprovider = TemplateProvider.Get(configuration);
             JsltTemplate template = Templateprovider.GetTemplate(sb, false, string.Empty);
 
             return template;
 
         }
 
+        private static JsltTemplate GetProvider(JsltBase payloadTemplate, params (string, Type)[] services)
+        {
+
+            StringBuilder sb = new StringBuilder(payloadTemplate.ToString());
+
+            var configuration = new TranformJsonAstConfiguration()
+            {
+
+            };
+            foreach (var item in services)
+                configuration.Services.ServiceDiscovery.AddService(item.Item2, item.Item1);
+
+            TemplateProvider Templateprovider = TemplateProvider.Get(configuration);
+            JsltTemplate template = Templateprovider.GetTemplate(sb, false, string.Empty);
+
+            return template;
+
+        }
 
     }
 

@@ -13,6 +13,12 @@ namespace Bb.Json.Jslt.Services
     public class JsltTemplate
     {
 
+        static JsltTemplate()
+        {
+            //this.Configuration = new TemplateTransformProvider(TranformJsonAstConfiguration.Configuration);
+            //this.Culture = this.Configuration.Culture;
+        }
+
         internal JsltTemplate()
         {
 
@@ -27,9 +33,9 @@ namespace Bb.Json.Jslt.Services
         /// <param name="diagnostics">The diagnostics.</param>
         /// <param name="configuration">The configuration.</param>
         /// <returns></returns>
-        public static JsltTemplate GetTemplate(JsltBase tree, bool withDebug, string filename, ScriptDiagnostics diagnostics = null, TranformJsonAstConfiguration configuration = null)
+        public static JsltTemplate GetTemplate(JsltBase tree, bool withDebug, string filename, ScriptDiagnostics? diagnostics = null, TranformJsonAstConfiguration configuration = null)
         {
-            var provider = new TemplateTransformProvider(configuration);
+            var provider = TemplateProvider.Get(configuration);
             return provider.GetTemplate(tree, withDebug, filename, diagnostics);
         }
 
@@ -41,9 +47,9 @@ namespace Bb.Json.Jslt.Services
         /// <param name="diagnostics">The diagnostics.</param>
         /// <param name="configuration">The configuration.</param>
         /// <returns></returns>
-        public static JsltTemplate GetTemplate(JsltBase tree, string filename, ScriptDiagnostics diagnostics = null, TranformJsonAstConfiguration configuration = null)
+        public static JsltTemplate GetTemplate(JsltBase tree, string filename, ScriptDiagnostics? diagnostics = null, TranformJsonAstConfiguration configuration = null)
         {
-            var provider = new TemplateTransformProvider(configuration);
+            var provider = TemplateProvider.Get(configuration);
             return provider.GetTemplate(tree, false, filename, diagnostics);
         }
 
@@ -54,9 +60,9 @@ namespace Bb.Json.Jslt.Services
         /// <param name="diagnostics">The diagnostics.</param>
         /// <param name="configuration">The configuration.</param>
         /// <returns></returns>
-        public static JsltTemplate GetTemplate(JsltBase tree, ScriptDiagnostics diagnostics = null, TranformJsonAstConfiguration configuration = null)
+        public static JsltTemplate GetTemplate(JsltBase tree, ScriptDiagnostics? diagnostics = null, TranformJsonAstConfiguration configuration = null)
         {
-            var provider = new TemplateTransformProvider(configuration);
+            var provider = TemplateProvider.Get(configuration);
             return provider.GetTemplate(tree, false, string.Empty, diagnostics);
         }
 
@@ -69,9 +75,9 @@ namespace Bb.Json.Jslt.Services
         /// <param name="diagnostics">The diagnostics.</param>
         /// <param name="configuration">The configuration.</param>
         /// <returns></returns>
-        public static JsltTemplate GetTemplate(StringBuilder sb, bool withDebug, string filename, ScriptDiagnostics diagnostics = null, TranformJsonAstConfiguration configuration = null)
+        public static JsltTemplate GetTemplate(StringBuilder sb, bool withDebug, string filename, ScriptDiagnostics? diagnostics = null, TranformJsonAstConfiguration configuration = null)
         {
-            var provider = new TemplateTransformProvider(configuration);
+            var provider = TemplateProvider.Get(configuration);
             return provider.GetTemplate(sb, withDebug, filename, diagnostics);
         }
 
@@ -83,9 +89,9 @@ namespace Bb.Json.Jslt.Services
         /// <param name="diagnostics">The diagnostics.</param>
         /// <param name="configuration">The configuration.</param>
         /// <returns></returns>
-        public static JsltTemplate GetTemplate(StringBuilder sb, string filename, ScriptDiagnostics diagnostics = null, TranformJsonAstConfiguration configuration = null)
+        public static JsltTemplate GetTemplate(StringBuilder sb, string filename, ScriptDiagnostics? diagnostics = null, TranformJsonAstConfiguration configuration = null)
         {
-            var provider = new TemplateTransformProvider(configuration);
+            var provider = TemplateProvider.Get(configuration);
             return provider.GetTemplate(sb, false, filename, diagnostics);
         }
 
@@ -96,9 +102,9 @@ namespace Bb.Json.Jslt.Services
         /// <param name="diagnostics">The diagnostics.</param>
         /// <param name="configuration">The configuration.</param>
         /// <returns></returns>
-        public static JsltTemplate GetTemplate(StringBuilder sb, ScriptDiagnostics diagnostics = null, TranformJsonAstConfiguration configuration = null)
+        public static JsltTemplate GetTemplate(StringBuilder sb, ScriptDiagnostics? diagnostics = null, TranformJsonAstConfiguration configuration = null)
         {
-            var provider = new TemplateTransformProvider(configuration);
+            var provider = TemplateProvider.Get(configuration);
             return provider.GetTemplate(sb, false, string.Empty, diagnostics);
         }
 

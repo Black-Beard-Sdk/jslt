@@ -15,17 +15,48 @@ using System.Text;
 namespace Bb.Json.Jslt.Services
 {
 
-    public class TemplateTransformProvider
+    public class TemplateProvider
     {
 
-        public TemplateTransformProvider(TranformJsonAstConfiguration configuration = null)
+        static TemplateProvider()
         {
+            Default = new TemplateProvider();
+        }
 
+
+        public static TemplateProvider Get(TranformJsonAstConfiguration configuration)
+        {
             if (configuration == null)
-                configuration = new TranformJsonAstConfiguration();
+                return Default;
 
-            this._configuration = configuration;
+            return new TemplateProvider(configuration);
 
+        }
+
+        public static TemplateProvider Default { get; set; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TemplateProvider"/> class.
+        /// </summary>
+        /// <param name="configuration"></param>
+        public TemplateProvider(TranformJsonAstConfiguration configuration = null)
+        {
+            this._configuration = configuration 
+                ?? TranformJsonAstConfiguration.Configuration;
+        }
+
+        /// <summary>
+        /// Gets the template built from text.
+        /// </summary>
+        /// <param name="tree">The template to run for transform the data</param>
+        /// <param name="withDebug">if set to <c>true</c> [with debug]. generate source code and manage a debugger for running step by step.</param>
+        /// <param name="filename">The filename that  contains the code.</param>
+        /// <param name="diagnostics">The diagnostics.</param>
+        /// <returns></returns>
+        /// <exception cref="Bb.Json.ParsingJsonException">Failed to parse Json. " + e.Message</exception>
+        public JsltTemplate GetTemplate(JsltBase tree, bool withDebug, string filename, ScriptDiagnostics? diagnostics = null)
+        {
+            return GetTemplate(new StringBuilder(tree.ToString()), withDebug, filename, diagnostics);
         }
 
         /// <summary>
@@ -37,7 +68,7 @@ namespace Bb.Json.Jslt.Services
         /// <param name="diagnostics">The diagnostics.</param>
         /// <returns></returns>
         /// <exception cref="Bb.Json.ParsingJsonException">Failed to parse Json. " + e.Message</exception>
-        public JsltTemplate GetTemplate(StringBuilder sb, bool withDebug, string filename, ScriptDiagnostics diagnostics = null)
+        public JsltTemplate GetTemplate(StringBuilder sb, bool withDebug, string filename, ScriptDiagnostics? diagnostics = null)
         {
 
             using (var activity = JsltActivityProvider.StartActivity("Build jslt template", System.Diagnostics.ActivityKind.Internal))
@@ -116,7 +147,7 @@ namespace Bb.Json.Jslt.Services
 
             }
 
-        }
+        }     
 
         private JsltTemplate build(StringBuilder sb, JsltBase tree, ServiceFunctionFoundry _foundry, ScriptDiagnostics _errors,
             string filename, bool withDebug, OutputModelConfiguration outputConfiguration, CultureInfo culture)
@@ -179,7 +210,7 @@ namespace Bb.Json.Jslt.Services
                 {
                     if (c == '*' && sb[i + 1] == '/')
                     {
-                        comment.Location =  TextLocation.Create(i + 1);
+                        comment.Location = TextLocation.Create(i + 1);
                         inComment = false;
                     }
                 }
@@ -200,20 +231,6 @@ namespace Bb.Json.Jslt.Services
 
             tree.AddComments(_comments);
         }
-
-        /// <summary>
-        /// Gets the template from tree syntax.
-        /// </summary>
-        /// <param name="tree">The tree.</param>
-        /// <param name="withDebug">if set to <c>true</c> [with debug].</param>
-        /// <param name="filename">The filename.</param>
-        /// <param name="diagnostics">The diagnostics.</param>
-        /// <returns></returns>
-        public JsltTemplate GetTemplate(JsltBase tree, bool withDebug, string filename, ScriptDiagnostics diagnostics = null)
-        {
-            return GetTemplate(new StringBuilder(tree.ToString()), withDebug, filename, diagnostics);
-        }
-
 
         private Func<RuntimeContext, JToken, JToken> Get(JsltBase tree, ServiceFunctionFoundry foundry, ScriptDiagnostics _errors, string filepathCode, string scriptPath, bool withDebug)
         {

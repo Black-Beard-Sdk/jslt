@@ -65,7 +65,7 @@ namespace AppJsonEvaluator
 
         }
 
-        public static TemplateTransformProvider GetProvider(string[] paths, params Type[] services)
+        public static TemplateProvider GetProvider(string[] paths, params Type[] services)
         {
 
             var configuration = new TranformJsonAstConfiguration();
@@ -79,7 +79,7 @@ namespace AppJsonEvaluator
             foreach (var item in services)
                 configuration.Services.ServiceDiscovery.AddService(item);
 
-            TemplateTransformProvider Templateprovider = new TemplateTransformProvider(configuration);
+            TemplateProvider Templateprovider = new TemplateProvider(configuration);
 
             return Templateprovider;
 

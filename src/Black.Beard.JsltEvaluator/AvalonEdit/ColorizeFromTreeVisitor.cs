@@ -1,5 +1,6 @@
 ﻿using AppJsonEvaluator;
 using Bb.Analysis.DiagTraces;
+using Bb.Contracts;
 using Bb.Json.Jslt.Asts;
 using Bb.Json.Jslt.Services;
 using ICSharpCode.AvalonEdit;

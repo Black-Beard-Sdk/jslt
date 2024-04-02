@@ -1,4 +1,5 @@
 ﻿using Bb.Asts;
+using Bb.Contracts;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
 

@@ -1,4 +1,4 @@
-﻿namespace Bb.Json.Jslt.Parser
+﻿namespace Bb.Contracts
 {
     public interface IFile
     {

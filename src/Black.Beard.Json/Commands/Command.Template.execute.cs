@@ -73,7 +73,7 @@ namespace Bb.Json.Commands
                     configuration.Assemblies.Add(typeof(Bb.Jslt.Services.Services).Assembly);
 
 
-                    TemplateTransformProvider Templateprovider = new TemplateTransformProvider(configuration);
+                    TemplateProvider Templateprovider = new TemplateProvider(configuration);
 
                     var path = new FileInfo(argTemplatePath.Value.TrimPath());
                     var sb = new StringBuilder(path.LoadFromFile());

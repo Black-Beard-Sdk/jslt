@@ -1,5 +1,6 @@
 ﻿using Bb.ComponentModel;
 using Bb.ComponentModel.Factories;
+using Bb.Contracts;
 using Bb.Json.Attributes;
 using Oldtonsoft.Json.Linq;
 using System;

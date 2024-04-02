@@ -11,6 +11,14 @@ namespace Bb.Json.Jslt.Services
     public partial class TranformJsonAstConfiguration
     {
 
+        static TranformJsonAstConfiguration()
+        {
+
+            TranformJsonAstConfiguration.Configuration = new TranformJsonAstConfiguration();
+
+        }
+
+
         public TranformJsonAstConfiguration(CultureInfo culture = null)
         {
             this.Culture = culture ?? CultureInfo.InvariantCulture;
@@ -22,6 +30,8 @@ namespace Bb.Json.Jslt.Services
             this.OutputPath = string.Empty;
             this.Assemblies = new List<Assembly>();
         }
+
+        public static TranformJsonAstConfiguration Configuration { get; set; }
 
         public ServiceContainer Services { get; }
 

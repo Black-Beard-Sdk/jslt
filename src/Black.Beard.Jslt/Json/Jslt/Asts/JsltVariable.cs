@@ -1,4 +1,5 @@
 ﻿using Bb.Asts;
+using Bb.Contracts;
 
 namespace Bb.Json.Jslt.Asts
 {
@@ -13,6 +14,8 @@ namespace Bb.Json.Jslt.Asts
         {
             Kind = JsltKind.JVariable;
             this.Name = name;
+            if (this.Name.StartsWith("@"))
+                this.Name = this.Name.Substring(1);
         }
 
         public JsltVariable()

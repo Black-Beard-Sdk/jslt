@@ -1,6 +1,7 @@
 ﻿using Bb.Analysis.DiagTraces;
 using Bb.Asts;
 using Bb.ComponentModel.Factories;
+using Bb.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;

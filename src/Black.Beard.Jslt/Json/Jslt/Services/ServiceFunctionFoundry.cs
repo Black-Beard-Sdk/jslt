@@ -1,6 +1,7 @@
 ﻿using Bb.Analysis.DiagTraces;
 using Bb.ComponentModel;
 using Bb.ComponentModel.Factories;
+using Bb.Contracts;
 using Bb.Json.Attributes;
 using System;
 using System.Linq;

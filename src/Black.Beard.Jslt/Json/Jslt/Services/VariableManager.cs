@@ -1,22 +1,24 @@
-﻿using Oldtonsoft.Json.Linq;
+﻿using Bb.Contracts;
+using Oldtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 
 namespace Bb.Json.Jslt.Services
 {
 
-    public class VariableManager
+    public class VariableManager : VariableResolver
     {
 
-
-        public VariableManager(Sources sources, EnvironmentVariableTarget target)
+        public VariableManager(IVariableResolver next) 
+            : base(next)
         {
-            this._target = target;
-            this.sources = sources;
             this._datas = new Dictionary<string, object>();
         }
 
-
+        /// <summary>
+        /// Add variable dictionary
+        /// </summary>
+        /// <param name="variables"></param>
         public void Add(IDictionary<string, JToken>? variables)
         {
             if (variables != null)
@@ -24,40 +26,41 @@ namespace Bb.Json.Jslt.Services
                     Add(item.Key, item.Value);
         }
 
+        /// <summary>
+        /// Add variable by the name
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
         public void Add(string key, object value)
         {
             this._datas.Add(key, value);
         }
 
+        /// <summary>
+        /// Remove the variable
+        /// </summary>
+        /// <param name="key"></param>
         public void Del(string key)
         {
             if (this._datas.ContainsKey(key))
                 this._datas.Remove(key);
         }
 
-        public bool Get(string key, out object resultValue)
+        /// <summary>
+        /// Variable implementation
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="resultValue"></param>
+        /// <returns></returns>
+        protected override bool GetImpl(string key, out object resultValue)
         {
-
-            resultValue = null;
-
-            if (!this._datas.TryGetValue(key, out resultValue))
-            {
-                var items = Environment.GetEnvironmentVariables();
-                if (items.Contains(key))
-                    resultValue = Environment.GetEnvironmentVariable(key, _target);
-                return false;
-            }
-
-            return true;
-
+            return this._datas.TryGetValue(key, out resultValue);
         }
 
-
-        private readonly EnvironmentVariableTarget _target;
-        private readonly Sources sources;
         private Dictionary<string, object> _datas;
 
     }
+
 
 
 }

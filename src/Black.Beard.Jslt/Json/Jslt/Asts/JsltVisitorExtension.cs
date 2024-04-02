@@ -8,6 +8,34 @@ namespace Bb.Json.Jslt.Asts
     {
 
         /// <summary>
+        /// Set the source of the object with fluent syntax
+        /// </summary>
+        /// <typeparam name="T">Type of the <see cref="JsltBase"/></typeparam>
+        /// <param name="self">instance to set</param>
+        /// <param name="source">value to write</param>
+        /// <returns></returns>
+        public static T SetSource<T>(this T self, JsltBase source)
+            where T : JsltBase
+        {
+            self.Source = source;
+            return self;
+        }
+
+        /// <summary>
+        /// Set the where of the object with fluent syntax
+        /// </summary>
+        /// <typeparam name="T">Type of the <see cref="JsltBase"/></typeparam>
+        /// <param name="self">instance to set</param>
+        /// <param name="where">value to write</param>
+        /// <returns></returns>
+        public static T SetWhere<T>(this T self, JsltBase where)
+            where T : JsltBase
+        {
+            self.Where = where;
+            return self;
+        }
+
+        /// <summary>
         /// Creates a new instance of JsltArgument
         /// </summary>
         /// <param name="self">name of the argument</param>

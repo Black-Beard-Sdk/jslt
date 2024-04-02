@@ -1,6 +1,7 @@
-﻿using Bb.Json.Jslt.Services;
+﻿using Bb.Json.Jslt.Asts;
+using Bb.Json.Jslt.Services;
 
-namespace Bb.Json.Jslt.Asts
+namespace Bb.Contracts
 {
     public interface IJsltJsonVisitor
     {
@@ -12,7 +13,9 @@ namespace Bb.Json.Jslt.Asts
         object VisitArray(JsltArray node);
 
         object VisitConstant(JsltConstant node);
+
         object VisitComment(JsltComment comment);
+        
         object VisitObject(JsltObject node);
 
         object VisitDirective(JsltDirectives node);
@@ -30,11 +33,11 @@ namespace Bb.Json.Jslt.Asts
         object VisitUnaryOperator(JsltOperator node);
 
         object VisitBinaryOperator(JsltBinaryOperator node);
-        
+
         object VisitCase(JsltSwitchCase node);
 
         object VisitSwitch(JsltSwitch node);
-        
+
         object VisitTranslateVariable(JsltTranslateVariable node);
 
         object VisitJVariable(JsltVariable node);

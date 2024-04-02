@@ -274,6 +274,29 @@ namespace Black.Beard.Jslt.UnitTests
 
         }
 
+        [TestMethod]
+        public void TestPropertyVariable()
+        {
+            
+            var expected = @"[	
+	{	
+		""$source"" : @body,
+		""key"" : $.Key
+	}
+]";
+            
+            var i = new JsltArray()
+                .Append( new JsltObject()
+                    .SetSource("body".AsJsltVariable())
+                    .Append("key", "$.Key".AsJsltPath())
+                    )
+                ;
+
+            var payload = i.ToString();
+
+            Assert.AreEqual(expected, payload);
+
+        }
 
 
     }

@@ -1,4 +1,5 @@
 ﻿using Bb.Analysis.DiagTraces;
+using Bb.Contracts;
 using Bb.Json.Jslt.Parser;
 using Oldtonsoft.Json.Linq;
 using System;
@@ -66,7 +67,6 @@ namespace Bb.Json.Jslt.Services
             this._stack = new Stack<MethodContext>();
 
         }
-
 
         public static bool IsTrace(RuntimeContext ctx, Bb.Analysis.DiagTraces.TextLocation trace)
         {
