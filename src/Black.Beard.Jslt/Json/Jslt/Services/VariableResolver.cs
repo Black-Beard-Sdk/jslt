@@ -1,4 +1,5 @@
 ﻿using Bb.Contracts;
+using System;
 
 namespace Bb.Json.Jslt.Services
 {
@@ -25,11 +26,20 @@ namespace Bb.Json.Jslt.Services
         /// <param name="key">variable name</param>
         /// <param name="result">data result</param>
         /// <returns></returns>
-        public bool Get(string key, out object result)
+        public virtual bool Get(string key, out object result)
         {
 
             if (GetImpl(key, out result))
+            {
+
+                if (Intercept != null)
+                    Intercept(this, key, true, result);
+
                 return true;
+            }
+
+            if (Intercept != null)
+                Intercept(this, key, false, result);
 
             if (_next != null)
                 return _next.Get(key, out result);
@@ -57,6 +67,10 @@ namespace Bb.Json.Jslt.Services
             else
                 this._next.SetNext(resolver);
         }
+
+
+        public static Action<IVariableResolver, string, bool, object> Intercept { get; set;}
+
 
         private IVariableResolver _next;
 

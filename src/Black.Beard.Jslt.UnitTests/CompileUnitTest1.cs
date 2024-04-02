@@ -496,6 +496,12 @@ namespace Black.Beard.Jslt.UnitTests
             for (int i = 1; i < sources.Length; i++)
                 src.Add(sources[i]);
 
+            VariableResolver.Intercept = (a, b, c, d) => 
+            {
+            
+            };
+
+
             var template = GetProvider(templateTree, services);
 
             if (!template.Diagnostics.Success)
