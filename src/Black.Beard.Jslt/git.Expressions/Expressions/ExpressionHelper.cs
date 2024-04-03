@@ -248,9 +248,7 @@ namespace Bb.Expressions
             Expression[] arguments = new Expression[parameters.Length];
 
             var type0 = parameters[0].ParameterType;
-            var type1 = parameters[1].ParameterType;
-            var name1 = parameters[1].Name;
-
+            
             if (type0 == sourceType)
                 arguments[0] = self;
 
@@ -270,6 +268,10 @@ namespace Bb.Expressions
 
             if (parameters.Length > 1)
             {
+
+                var type1 = parameters[1].ParameterType;
+                var name1 = parameters[1].Name;
+
                 if (type1 == sourceType)
                     arguments[1] = self;
 
