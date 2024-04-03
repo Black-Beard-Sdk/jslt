@@ -48,7 +48,8 @@ namespace Wizards
             {
 
                 var src = new Sources(SourceJson.GetFromText(String.Empty));
-                src.Variables.Add(_variables);
+                foreach (var item in _variables)
+                    src.Variables.Add(item.Key, item.Value);
 
                 var ctx = _template.Transform(src);
                 StringBuilder result = _template.ApplyOutput(ctx);

@@ -303,6 +303,7 @@ namespace Bb.Expressions
         private static Dictionary<Type, Dictionary<Type, Func<object, object>>> _dic = new Dictionary<Type, Dictionary<Type, Func<object, object>>>();
         private static Dictionary<Type, Dictionary<Type, MethodBase>> _dicConverters = new Dictionary<Type, Dictionary<Type, MethodBase>>();
         private static readonly HashSet<string> _names;
+    
     }
 
 }

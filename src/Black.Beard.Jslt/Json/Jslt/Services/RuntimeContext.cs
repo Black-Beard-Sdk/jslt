@@ -33,7 +33,7 @@ namespace Bb.Json.Jslt.Services
             _translateVariable = RuntimeContext.Translate;
 
             _setVariable = typeof(RuntimeContext).GetMethod(nameof(RuntimeContext.SetVariable), new Type[] { typeof(RuntimeContext), typeof(string), typeof(object), typeof(Analysis.DiagTraces.TextLocation) });
-            _getVariable = typeof(RuntimeContext).GetMethod(nameof(RuntimeContext.GetVariable), new Type[] { typeof(RuntimeContext), typeof(string), typeof(Analysis.DiagTraces.TextLocation) });
+            _getVariable = typeof(RuntimeContext).GetMethod(nameof(RuntimeContext.GetVariable), new Type[] { typeof(RuntimeContext), typeof(string), typeof(Type), typeof(Analysis.DiagTraces.TextLocation) });
             _DelVariable = typeof(RuntimeContext).GetMethod(nameof(RuntimeContext.DelVariable), new Type[] { typeof(RuntimeContext), typeof(string) });
 
             _TraceLocation = typeof(RuntimeContext).GetMethod(nameof(RuntimeContext.TraceLocation), new Type[] { typeof(RuntimeContext), typeof(string), typeof(int), typeof(int), typeof(int), typeof(int) });
@@ -145,8 +145,8 @@ namespace Bb.Json.Jslt.Services
 
         #region methods called in the expressions
 
-        [DebuggerStepThrough]
-        [DebuggerNonUserCode]
+        //[DebuggerStepThrough]
+        //[DebuggerNonUserCode]
         public void Stop()
         {
 
@@ -941,17 +941,27 @@ namespace Bb.Json.Jslt.Services
         {
             ctx.SubSources.Variables.Add(name, value);
             if (value == null)
-                ctx.Diagnostics.AddWarning(trace, name, $"the key '{name}' is setted with null value.");
+                ctx.Diagnostics.AddWarning(trace, name, $"the key '{name}' is set with null value.");
         }
 
-        public static JToken GetVariable(RuntimeContext ctx, string name, Analysis.DiagTraces.TextLocation trace)
+        public static JToken GetVariable(RuntimeContext ctx, string name, Type type, Analysis.DiagTraces.TextLocation trace)
         {
 
             if (!ctx.SubSources.Variables.Get(name, out var value))
                 ctx.Diagnostics.AddWarning(trace, name, $"the key '{name}' is missing.");
 
             if (value is JToken token)
-                return token;
+            {
+                
+                if (token.GetType() == type) 
+                    return token;
+
+                var payload = value.ToString();
+                var Jvalue = JToken.Parse(payload);
+                
+                return Jvalue;
+
+            }
 
             return new JValue(value);
 

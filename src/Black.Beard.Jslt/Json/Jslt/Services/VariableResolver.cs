@@ -36,6 +36,7 @@ namespace Bb.Json.Jslt.Services
                     Intercept(this, key, true, result);
 
                 return true;
+
             }
 
             if (Intercept != null)

@@ -54,7 +54,7 @@ namespace Bb.Expressions
                 // Build assembly
                 BuildCSharp build = new BuildCSharp()
                 {
-                    OutputPath = path,                    
+                    OutputPath = path,
                 }
                 .SetNugetController(controller)
                 .AddSource(file)
@@ -67,6 +67,9 @@ namespace Bb.Expressions
 
                 var assembly = build.Build(name);
 
+                if (assembly == null)
+                    return default;
+
                 if (!assembly.Success && System.Diagnostics.Debugger.IsAttached)
                 {
                     System.Diagnostics.Debugger.Break();
@@ -77,7 +80,12 @@ namespace Bb.Expressions
 
                     var ass = assembly.LoadAssembly();
 
-                    var type = ass.GetType($"N_{name}." + "Myclass");
+                    var typename = $"N_{name}." + "Myclass";
+                    var type = ass.GetType(typename);
+
+                    if (type == null)
+                        throw new TypeLoadException($"type {typename} not found.");
+
                     var method = type.GetMethod("MyMethod");
 
                     var ctor = type.GetConstructor(new Type[] { typeof(object[]) });
@@ -145,9 +153,9 @@ namespace Bb.Expressions
         }
 
         public CompilationException(string message) : base(message) { }
-        
+
         public CompilationException(string message, Exception inner) : base(message, inner) { }
-        
+
         protected CompilationException(
           System.Runtime.Serialization.SerializationInfo info,
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }

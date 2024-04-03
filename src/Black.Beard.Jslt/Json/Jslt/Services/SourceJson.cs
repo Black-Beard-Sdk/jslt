@@ -99,13 +99,13 @@ namespace Bb.Json.Jslt.Services
         /// <summary>
         /// create a new <see cref="SourceJson"/> with payload.
         /// </summary>
-        /// <param name="payload">payload to store</param>
+        /// <param name="datas">payload to store</param>
         /// <param name="name">name of the source</param>
         /// <returns></returns>
         /// <exception cref="NullReferenceException"></exception>
-        public static SourceJson GetFromJson(JToken payload, string name = null)
+        public static SourceJson GetFromJson(JToken datas, string name = null)
         {
-            return new SourceJson(payload, name);
+            return new SourceJson(datas, name);
         }
 
         /// <summary>
@@ -178,6 +178,7 @@ namespace Bb.Json.Jslt.Services
             this.Name = name;
             this.Datas = datas;
         }
+
 
         private static string Normalize(string payload)
         {

@@ -9,21 +9,23 @@ namespace Bb.Json.Jslt.Services
     public class VariableManager : VariableResolver
     {
 
-        public VariableManager(IVariableResolver next) 
+        public VariableManager(IVariableResolver next)
             : base(next)
         {
             this._datas = new Dictionary<string, object>();
         }
 
+
         /// <summary>
         /// Add variable dictionary
         /// </summary>
         /// <param name="variables"></param>
-        public void Add(IDictionary<string, JToken>? variables)
+        public void Add(IDictionary<string, object>? variables)
         {
             if (variables != null)
                 foreach (var item in variables)
                     Add(item.Key, item.Value);
+
         }
 
         /// <summary>
@@ -60,7 +62,5 @@ namespace Bb.Json.Jslt.Services
         private Dictionary<string, object> _datas;
 
     }
-
-
 
 }

@@ -1,4 +1,6 @@
 ﻿using Bb.Analysis.DiagTraces;
+using Bb.Analysis.Tools;
+using Bb.Codings;
 using Bb.Contracts;
 using Bb.Expressions;
 using Bb.Expressions.Statements;
@@ -15,7 +17,7 @@ namespace Bb.Json.Jslt.Services
 {
 
 
-    internal class TemplateWithExpressionBuilder : IJsltJsonVisitor
+    internal class TemplateWithExpressionBuilder : IJsltJsonVisitor, IStoreSource
     {
 
         static TemplateWithExpressionBuilder()
@@ -45,7 +47,7 @@ namespace Bb.Json.Jslt.Services
 
         public TemplateWithExpressionBuilder(ScriptDiagnostics diagnostics, MethodCompiler compiler, bool debug)
         {
-
+            _pathStorages = new Stack<DisposingStorage>();
             PrivatedIndex.Reset();
             _resultReset = new List<MethodCallExpression>();
             this._diagnostics = diagnostics;
@@ -99,8 +101,11 @@ namespace Bb.Json.Jslt.Services
         public object VisitArray(JsltArray node1)
         {
 
+            using (var store = NewStore())
             using (CurrentContext ctx = NewContext())
             {
+
+                Store("type", typeof(JArray)); // store the type for VisitVariable
 
                 var src = ctx.Current.Source;
 
@@ -113,7 +118,7 @@ namespace Bb.Json.Jslt.Services
 
                     if (node.Source != null)
                     {
-
+                        
                         var mem = node.Source;
                         var resultToken = src.AddVar((typeof(JToken)), src.GetUniqueVariableName("source"), (Expression)node.Source.Accept(this));
                         node.Source = null;
@@ -194,6 +199,7 @@ namespace Bb.Json.Jslt.Services
         public object VisitObject(JsltObject node)
         {
 
+            using (var store = NewStore())
             using (CurrentContext ctx = this.NewContext())
             {
                 var srcRoot = ctx.Current.Source;
@@ -288,6 +294,13 @@ namespace Bb.Json.Jslt.Services
         public object VisitJVariable(JsltVariable node)
         {
 
+            Type type = typeof(JToken);
+
+            if (this.TryGetInStorage<Type>("type", out var typeConversion))
+            {
+                type = typeConversion;
+            }
+
             using (CurrentContext ctx = NewContext())
             {
                 var name = Expression.Constant(node.Name);
@@ -304,7 +317,8 @@ namespace Bb.Json.Jslt.Services
                     }
                     else
                     {
-                        return RuntimeContext._getVariable.Call(ctx.Current.Context, name, node.GetLocation().AsConstant());
+                        var t = type.AsConstant();
+                        return RuntimeContext._getVariable.Call(ctx.Current.Context, name, t, node.GetLocation().AsConstant());
                         
                     }
                 }
@@ -748,6 +762,112 @@ namespace Bb.Json.Jslt.Services
 
         #endregion Context
 
+
+        #region Stores
+
+        /// <summary>
+        /// Get the value from the store
+        /// </summary>
+        /// <param name="key">key for resolve the value</param>
+        /// <param name="value">value stored</param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        public bool TryGetInStorage(string key, out object? value)
+        {
+            var s = _pathStorages.Peek();
+            if (s == null)
+                throw new InvalidOperationException("No storage found");
+            return s.TryGetInStorage(key, out value);
+        }
+
+        /// <summary>
+        /// Get the value from the store
+        /// </summary>
+        /// <typeparam name="T">type of value to return</typeparam>
+        /// <param name="key">key for resolve the value</param>
+        /// <param name="value">value stored</param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        public bool TryGetInStorage<T>(string key, out T? value)
+        {
+
+            var s = _pathStorages.Peek();
+            if (s == null)
+                throw new InvalidOperationException("No storage found");
+
+            if (s.TryGetInStorage(key, out var v))
+            {
+                value = (T)v;
+                return true;
+            }
+
+            value = default;
+            return false;
+
+        }
+
+        /// <summary>
+        /// return true if a store contains an entry for the specified key
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        public bool ContainsInStorage(string key)
+        {
+            var s = _pathStorages.Peek();
+            if (s == null)
+                throw new InvalidOperationException("No storage found");
+            return s.ContainsInStorage(key);
+        }
+
+        /// <summary>
+        /// return true if a store is available
+        /// </summary>
+        /// <returns></returns>
+        protected bool HasCurrentStore()
+        {
+            return _pathStorages.Count > 0;
+        }
+
+        /// <summary>
+        /// Get the current store
+        /// </summary>
+        /// <returns></returns>
+        protected IStore CurrentStore()
+        {
+            return _pathStorages.Peek();
+        }
+
+        /// <summary>
+        /// Append a new layer for storing data
+        /// </summary>
+        void IStoreSource.StorePop()
+        {
+            _pathStorages.Pop();
+        }
+
+        /// <summary>
+        /// remove the last layer for storing datas
+        /// </summary>
+        /// <param name="toDispose"></param>
+        void IStoreSource.StorePush(object toDispose)
+        {
+            _pathStorages.Push((DisposingStorage)toDispose);
+        }
+
+        protected void Store(string key, object value)
+        {
+            _pathStorages.Peek().AddInStorage(key, value);
+        }
+
+        protected IStore NewStore()
+        {
+            return new DisposingStorage(this);
+        }
+
+        #endregion Stores
+
+        private Stack<DisposingStorage> _pathStorages;
         private readonly MethodCompiler _compiler;
         private readonly ScriptDiagnostics _diagnostics;
         private int _indexMethod;

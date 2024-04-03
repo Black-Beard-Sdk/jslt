@@ -392,7 +392,8 @@ namespace AppJsonEvaluator
                     st.Start();
 
                     var src = Sources.GetEmpty();
-                    src.Variables.Add(_variableHelper.GetVariables());
+                    foreach (var item in _variableHelper.GetVariables())
+                        src.Variables.Add(item.Key, item.Value);
                     src.Variables.Add("My value", new JValue(1));
 
                     var ctx = _template.GetContext(src);
