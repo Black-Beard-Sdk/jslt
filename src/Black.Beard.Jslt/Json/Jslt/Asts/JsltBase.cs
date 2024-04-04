@@ -1,6 +1,9 @@
 ﻿using Bb.Analysis.DiagTraces;
 using Bb.Asts;
 using Bb.Contracts;
+using Bb.Json.Jslt.Parser;
+using Bb.Json.Jslt.Services;
+using Oldtonsoft.Json;
 using System.Collections.Generic;
 
 namespace Bb.Json.Jslt.Asts
@@ -79,6 +82,19 @@ namespace Bb.Json.Jslt.Asts
 
         public virtual string RuleName => GetType().Name;
 
+        /// <summary>
+        /// Evaluate text value
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static JsltBase Evaluate(string text)
+        {
+            var _errors = new ScriptDiagnostics();
+            var parser = ScriptParser.ParseString(text);
+            var visitor = new ScriptBuilderVisitor(TranformJsonAstConfiguration.Configuration, parser.Parser, _errors, string.Empty);
+            var tree = (JsltBase)parser.Visit(visitor);
+            return tree;
+        }
 
         /// <summary>
         /// Converts to string.

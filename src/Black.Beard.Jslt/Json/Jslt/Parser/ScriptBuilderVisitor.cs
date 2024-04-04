@@ -26,6 +26,9 @@ using System.Text;
 namespace Bb.Json.Jslt.Parser
 {
 
+    /// <summary>
+    /// Generate tree of script from a jslt script text
+    /// </summary>
     public class ScriptBuilderVisitor : JsltParserBaseVisitor<object>
     {
 

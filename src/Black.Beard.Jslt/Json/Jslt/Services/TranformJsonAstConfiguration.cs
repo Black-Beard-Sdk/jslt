@@ -13,9 +13,7 @@ namespace Bb.Json.Jslt.Services
 
         static TranformJsonAstConfiguration()
         {
-
             TranformJsonAstConfiguration.Configuration = new TranformJsonAstConfiguration();
-
         }
 
 

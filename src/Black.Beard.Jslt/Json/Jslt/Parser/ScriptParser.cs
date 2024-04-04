@@ -21,6 +21,21 @@ namespace Bb.Json.Jslt.Parser
             this._includes = new HashSet<string>();
         }
 
+        public static ScriptParser ParseString(string source)
+        {
+            ICharStream stream = CharStreams.fromString(source);
+
+            var parser = new ScriptParser(null, null)
+            {
+                File = string.Empty,
+                Content = new StringBuilder(source),
+                Crc = source.CalculateCrc32(),
+            };
+            parser.ParseCharStream(stream);
+            return parser;
+
+        }
+
         public static ScriptParser ParseString(StringBuilder source, string sourceFile = "", TextWriter output = null, TextWriter outputError = null)
         {
             ICharStream stream = CharStreams.fromString(source.ToString());

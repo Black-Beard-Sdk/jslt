@@ -214,6 +214,11 @@ namespace Bb.Json.Jslt.CustomServices
         public static JToken GetRandomString(RuntimeContext ctx, int? minLength, int? maxLength, string pattern)
         {
 
+            if (!minLength.HasValue)
+                minLength = 1;
+
+            if (!maxLength.HasValue)
+                maxLength = minLength + 5;
 
             if (!string.IsNullOrEmpty(pattern))
             {
@@ -229,8 +234,8 @@ namespace Bb.Json.Jslt.CustomServices
 
             var options2 = new FieldOptionsText()
             {
-                Min = minLength.HasValue ? Math.Min((int)minLength.Value, 1) : 1,
-                Max = maxLength.HasValue ? Math.Max((int)maxLength.Value,1) :1,
+                Min = minLength.Value,
+                Max = maxLength.Value,
                 UseLetter = true,
                 UseLowercase = true,
                 UseUppercase = true,
@@ -328,12 +333,19 @@ namespace Bb.Json.Jslt.CustomServices
         public static JToken GetRandomBinary(RuntimeContext ctx, int? minLength, int? maxLength)
         {
 
+            if (!minLength.HasValue)
+                minLength = 1;
+
+            if (!maxLength.HasValue)
+                maxLength = minLength + 5;
+
             var options = new FieldOptionsBytes()
             {
-                Min = minLength.HasValue ? Math.Min((int)minLength.Value, int.MaxValue) : 0,
-                Max = maxLength.HasValue ? Math.Max((int)maxLength.Value, 1) : 0,
+                Min = minLength.Value,
+                Max = maxLength.Value,
                 ValueAsString = true,
             };
+
             var randomizer = new RandomizerBytes(options);
             var result = randomizer.Generate();
 
