@@ -191,7 +191,7 @@ var configuration = new TranformJsonAstConfiguration()
 
 // add a custom service : Note the services in the sdk are already registered
 configuration.Services.ServiceDiscovery.AddService("serviceName", typeof(service));
-// if you want to implement your service : use and implemente the interface Bb.Json.Jslt.Services.ITransformJsonService                
+// if you want to implement your service : use and implemente the interface Bb.Jslt.Services.ITransformJsonService                
 
 TemplateTransformProvider Templateprovider = new TemplateTransformProvider(configuration);
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Oldtonsoft.Json.Linq;
+using System;
 
 namespace Bb.Expressions
 {
@@ -6,6 +7,16 @@ namespace Bb.Expressions
     {
 
         #region ToBoolean
+
+        public static bool ToBoolean(JToken value)
+        {
+            return Convert.ToBoolean(value.Value<object>());
+        }
+
+        public static bool ToBoolean(JValue value)
+        {
+            return Convert.ToBoolean(value.Value);
+        }
 
         public static bool ToBoolean(bool? value)
         {
@@ -88,6 +99,18 @@ namespace Bb.Expressions
         #endregion ToBoolean
 
         #region ToByte               
+
+        [CLSCompliant(false)]
+        public static sbyte ToSByte(JValue value)
+        {
+            return Convert.ToSByte(value.Value);
+        }
+
+        [CLSCompliant(false)]
+        public static sbyte ToSByte(JToken value)
+        {
+            return Convert.ToSByte(value.Value<object>());
+        }
 
         [CLSCompliant(false)]
         public static sbyte ToSByte(bool? value)
@@ -176,6 +199,17 @@ namespace Bb.Expressions
         #endregion ToByte
 
         #region ToChar
+
+        [CLSCompliant(false)]
+        public static char ToChar(JValue value)
+        {
+            return Convert.ToChar(value.Value);
+        }
+
+        public static char ToChar(JToken value)
+        {
+            return value.Value<char>();
+        }
 
         public static char ToChar(bool? value)
         {
@@ -272,6 +306,17 @@ namespace Bb.Expressions
 
         #region ToInt16
 
+        [CLSCompliant(false)]
+        public static short ToInt16(JValue value)
+        {
+            return Convert.ToInt16(value.Value);
+        }
+
+        public static short ToInt16(JToken value)
+        {
+            return value.Value<short>();
+        }
+
         public static short ToInt16(bool? value)
         {
             return value.HasValue ? Convert.ToInt16(value.Value) : (short)0;
@@ -349,6 +394,17 @@ namespace Bb.Expressions
         #endregion ToInt16        
 
         #region ToDateTime
+
+        [CLSCompliant(false)]
+        public static DateTime ToDateTime(JValue value)
+        {
+            return Convert.ToDateTime(value.Value);
+        }
+
+        public static DateTime ToDateTime(JToken value)
+        {
+            return value.Value<DateTime>();
+        }
 
         public static DateTime ToDateTime(DateTime? value)
         {
@@ -429,6 +485,17 @@ namespace Bb.Expressions
         #region ToDecimal
 
         [CLSCompliant(false)]
+        public static decimal ToDecimal(JValue value)
+        {
+            return Convert.ToDecimal(value.Value);
+        }
+
+        public static Decimal ToDecimal(JToken value)
+        {
+            return value.Value<Decimal>();
+        }
+
+        [CLSCompliant(false)]
         public static decimal ToDecimal(sbyte? value)
         {
             return value.HasValue ? Convert.ToDecimal(value.Value) : 0;
@@ -505,6 +572,17 @@ namespace Bb.Expressions
         #endregion ToDecimal
 
         #region ToDouble
+
+        [CLSCompliant(false)]
+        public static double ToDouble(JValue value)
+        {
+            return Convert.ToDouble(value.Value);
+        }
+
+        public static Double ToDouble(JToken value)
+        {
+            return value.Value<Double>();
+        }
 
         [CLSCompliant(false)]
         public static double ToDouble(sbyte? value)
@@ -584,6 +662,17 @@ namespace Bb.Expressions
 
         #region ToInt32
 
+        [CLSCompliant(false)]
+        public static Int32 ToInt32(JValue value)
+        {
+            return Convert.ToInt32(value.Value);
+        }
+
+        public static Int32 ToInt32(JToken value)
+        {
+            return value.Value<Int32>();
+        }
+
         public static int ToInt32(bool? value)
         {
             return value.HasValue ? Convert.ToInt32(value.Value) : 0;
@@ -661,6 +750,17 @@ namespace Bb.Expressions
         #endregion ToInt32
 
         #region ToInt64
+
+        [CLSCompliant(false)]
+        public static long ToInt64(JValue value)
+        {
+            return Convert.ToInt64(value.Value);
+        }
+
+        public static Int64 ToInt64(JToken value)
+        {
+            return value.Value<Int64>();
+        }
 
         public static long ToInt64(bool? value)
         {
@@ -752,6 +852,17 @@ namespace Bb.Expressions
 
         #region ToByte
 
+        [CLSCompliant(false)]
+        public static byte ToByte(JValue value)
+        {
+            return Convert.ToByte(value.Value);
+        }
+
+        public static byte ToByte(JToken value)
+        {
+            return value.Value<byte>();
+        }
+
         public static byte ToByte(bool? value)
         {
             return value.HasValue ? Convert.ToByte(value.Value) : (byte)0;
@@ -817,6 +928,17 @@ namespace Bb.Expressions
         #endregion ToSByte
 
         #region ToSingle
+
+        [CLSCompliant(false)]
+        public static float ToSingle(JValue value)
+        {
+            return Convert.ToSingle(value.Value);
+        }
+
+        public static float ToSingle(JToken value)
+        {
+            return value.Value<float>();
+        }
 
         [CLSCompliant(false)]
         public static float ToSingle(sbyte? value)
@@ -895,6 +1017,17 @@ namespace Bb.Expressions
         #endregion ToSingle
 
         #region ToString          
+
+        [CLSCompliant(false)]
+        public static string ToString(JValue value)
+        {
+            return Convert.ToString(value.Value);
+        }
+
+        public static string ToString(JToken value)
+        {
+            return value.Value<string>();
+        }
 
         public static string ToString(bool? value)
         {
@@ -1050,6 +1183,18 @@ namespace Bb.Expressions
         #region ToUInt16
 
         [CLSCompliant(false)]
+        public static ushort ToUInt16(JValue value)
+        {
+            return Convert.ToUInt16(value.Value);
+        }
+
+        [CLSCompliant(false)]
+        public static ushort ToUInt16(JToken value)
+        {
+            return value.Value<ushort>();
+        }
+
+        [CLSCompliant(false)]
         public static ushort ToUInt16(bool? value)
         {
             return value.HasValue ? Convert.ToUInt16(value.Value) : (ushort)0;
@@ -1133,6 +1278,17 @@ namespace Bb.Expressions
         #endregion ToUInt16
 
         #region ToUInt32
+
+        [CLSCompliant(false)]
+        public static uint ToUInt32(JValue value)
+        {
+            return Convert.ToUInt32(value.Value);
+        }
+
+        public static uint ToUInt32(JToken value)
+        {
+            return value.Value<uint>();
+        }
 
         [CLSCompliant(false)]
         public static uint ToUInt32(bool? value)
@@ -1221,6 +1377,18 @@ namespace Bb.Expressions
         #endregion ToUInt32
 
         #region ToUInt64
+
+        [CLSCompliant(false)]
+        public static ulong ToUInt64(JValue value)
+        {
+            return Convert.ToUInt64(value.Value);
+        }
+
+        [CLSCompliant(false)]
+        public static ulong ToUInt64(JToken value)
+        {
+            return value.Value<ulong>();
+        }
 
         [CLSCompliant(false)]
         public static ulong ToUInt64(sbyte? value)

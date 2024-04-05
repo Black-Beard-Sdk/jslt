@@ -5,7 +5,7 @@ The following sample for help you to easy start.
 ```CSHARP
 
     using Bb;
-    using Bb.Json.Jslt.Services;
+    using Bb.Jslt.Services;
     using System.Text;
 
     public static class TemplateHelper

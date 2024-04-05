@@ -16,10 +16,16 @@
 
 	<ItemGroup>
 		<Compile Remove="ConvertToDatables\**" />
+		<Compile Remove="Jslt\Parser\Grammar\.antlr\cache\**" />
+		<Compile Remove="Jslt\Parser\Grammar\.vscode\**" />
 		<Compile Remove="src\**" />
 		<EmbeddedResource Remove="ConvertToDatables\**" />
+		<EmbeddedResource Remove="Jslt\Parser\Grammar\.antlr\cache\**" />
+		<EmbeddedResource Remove="Jslt\Parser\Grammar\.vscode\**" />
 		<EmbeddedResource Remove="src\**" />
 		<None Remove="ConvertToDatables\**" />
+		<None Remove="Jslt\Parser\Grammar\.antlr\cache\**" />
+		<None Remove="Jslt\Parser\Grammar\.vscode\**" />
 		<None Remove="src\**" />
 	</ItemGroup>
 
@@ -33,7 +39,7 @@
 
 	<ItemGroup>
 		<Folder Include="git.Expressions\Expressions\Statements\" />
-		<Folder Include="Json\Jslt\Parser\Grammar\.antlr\" />
+		<Folder Include="Jslt\Parser\Grammar\.antlr\" />
 		<Folder Include="Oldtonsoft.Json\" />
 	</ItemGroup>
 

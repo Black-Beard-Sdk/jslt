@@ -1,5 +1,5 @@
-﻿using Bb.Json.Jslt.Asts;
-using Bb.Json.Jslt.Services;
+﻿using Bb.Jslt.Asts;
+using Bb.Jslt.Services;
 
 namespace Bb.Contracts
 {

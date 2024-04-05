@@ -81,7 +81,7 @@ namespace Bb.Expressions
             if (System.Diagnostics.Debugger.IsAttached)
             {
 
-                var _u = new string[] { "Newtonsoft.Json.Linq", "Bb.ComponentModel.Factories", "Bb.Json.Jslt.Services" };
+                var _u = new string[] { "Newtonsoft.Json.Linq", "Bb.ComponentModel.Factories", "Bb.Jslt.Services" };
                 //var sb = SourceGenerator.GetCode(result, _u);
                 //System.Diagnostics.Debug.WriteLine(sb.ToString());
 

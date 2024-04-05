@@ -2,8 +2,8 @@
 //using Bb.Elastic.Runtimes.Models;
 //using Bb.Elasticsearch.Configurations;
 //using Bb.Exceptions;
-//using Bb.Json.Attributes;
-//using Bb.Json.Jslt.Services;
+//using Bb.Attributes;
+//using Bb.Jslt.Services;
 //using Oldtonsoft.Json.Linq;
 //using System.ComponentModel;
 

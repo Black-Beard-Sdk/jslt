@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Antlr4.Runtime.Standard" Version="4.9.3" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
     <PackageReference Include="MSTest.TestAdapter" Version="3.2.2" />
     <PackageReference Include="MSTest.TestFramework" Version="3.2.2" />
@@ -15,10 +16,12 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="System.Data.SQLite" Version="1.0.118" />
     <PackageReference Include="Ude.NetStandard" Version="1.2.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Black.Beard.Jslt.Services\Black.Beard.Jslt.Services.csproj" />
     <ProjectReference Include="..\Black.Beard.Jslt\Black.Beard.Jslt.csproj" />
   </ItemGroup>
 

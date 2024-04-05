@@ -36,7 +36,7 @@ namespace Bb.Expressions
                 var constants = visitor._list;
 
                 // generate csharp code
-                var _u = new string[] { "Oldtonsoft.Json.Linq", "Bb.ComponentModel.Factories", "Bb.Json.Jslt.Services" };
+                var _u = new string[] { "Oldtonsoft.Json.Linq", "Bb.ComponentModel.Factories", "Bb.Jslt.Services" };
                 string name = Path.GetFileNameWithoutExtension(filepathCode);
                 string path = Path.Combine(this.OutputPath, "_temps");
                 if (!Directory.Exists(path))

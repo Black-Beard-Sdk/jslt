@@ -1,7 +1,7 @@
-using Bb.Json.Jslt.Asts;
-using Bb.Json.Jslt.CustomServices;
-using Bb.Json.Jslt.Parser;
-using Bb.Json.Jslt.Services;
+using Bb.Jslt.Asts;
+using Bb.Jslt.CustomServices;
+using Bb.Jslt.Parser;
+using Bb.Jslt.Services;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using Oldtonsoft.Json.Linq;
@@ -26,7 +26,6 @@ namespace Black.Beard.Jslt.UnitTests
             var value = c.ToString();
             Assert.AreEqual(value, @"""^([A-Za-z0-9]?\\s?-?)+$""");
         }
-
 
 
         [TestMethod]
@@ -94,7 +93,7 @@ namespace Black.Beard.Jslt.UnitTests
 
             var ctx = new RuntimeContext();
 
-            var o = Services.GetRandomInList(ctx, new Oldtonsoft.Json.Linq.JArray(list));
+            var o = CServices.GetRandomInList(ctx, new Oldtonsoft.Json.Linq.JArray(list));
             Assert.IsTrue(_h.Contains(o.ToString()));
 
         }

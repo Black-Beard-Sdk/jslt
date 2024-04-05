@@ -1,5 +1,5 @@
-﻿using Bb.Json.Attributes;
-using Bb.Json.Jslt.Services;
+﻿using Bb.Attributes;
+using Bb.Jslt.Services;
 using Oldtonsoft.Json.Linq;
 using PhoneNumbers;
 using System;

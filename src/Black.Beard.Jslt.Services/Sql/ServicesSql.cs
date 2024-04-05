@@ -1,33 +1,74 @@
-﻿using Bb.Json.Attributes;
-using Bb.Json.Jslt.CustomServices;
-using Bb.Json.Jslt.Services;
+﻿using Bb.ComponentModel;
+using Bb.ComponentModel.Accessors;
+using Bb.Attributes;
+using Bb.Jslt.CustomServices;
+using Bb.Jslt.Services;
+using Bb.Util;
 using Oldtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Linq;
+using System.Reflection;
+using static Refs.System.Net.WebSockets;
 
 namespace Bb.Jslt.Services.Sql
 {
 
     public static partial class ServicesSql
     {
-
-
-        //private static Dictionary<string, string> names = new Dictionary<string, string>()
-        //{
-        //    { "System.Data.SqlClient",  "System.Data.SqlClient" } //var factory = System.Data.SqlClient.SqlClientFactory.Instance;
-        //};
-
-        [JsltExtensionMethod("readsql")]
-        [JsltExtensionMethodParameter("client", "client clef")]
+        
+        [JsltExtensionMethod("connectsql")]
+        [JsltExtensionMethodParameter("client", "client key")]
         [JsltExtensionMethodParameter("connection", "connection")]
         [JsltExtensionMethodParameter("sql", "sql query")]
-        public static JToken ExecuteSqlServer(RuntimeContext ctx, string client, string connection, string sql)
+        public static JToken CreateSqlConnexion(RuntimeContext ctx, string client, string connexion)
         {
-            var clientFactory = DbProviderFactories.GetFactory(client);
-            var result = ReadSql(ctx, clientFactory, connection, sql);
-            return result;
+
+            DbProviderFactory clientFactory = Get(client);
+
+            using (var cnx = clientFactory.CreateConnection())
+            {
+                cnx.ConnectionString = connexion;
+                try
+                {
+                    cnx.Open();
+                    return new JObject()
+                    {
+                        { "client", client },
+                        { "connection", connexion }
+                    };
+                }
+                catch (Exception ex)
+                {
+                    ctx.Diagnostics.AddError(ctx.GetCurrentLocation(), connexion, $"the connection '{connexion}' can't be resolved.");
+                    throw ex;
+                }
+
+            }
+
         }
+
+
+        [JsltExtensionMethod("readsql")]
+        [JsltExtensionMethodParameter("client", "client key")]
+        [JsltExtensionMethodParameter("connection", "connection")]
+        [JsltExtensionMethodParameter("sql", "sql query")]
+        public static JToken ExecuteSql(RuntimeContext ctx, JObject connection, string sql)
+        {
+
+            //var datas = RuntimeContext.GetVariable(ctx, connectionName, typeof(JObject), ctx.GetCurrentLocation());
+
+            var client = connection["client"].Value<string>();
+            var cnx = connection["connection"].Value<string>();
+
+            var clientFactory = DbProviderFactories.GetFactory(client);
+            var result = ReadSql(ctx, clientFactory, cnx, sql);
+
+            return result;
+
+        }
+
 
         private static JArray ReadSql(RuntimeContext ctx, DbProviderFactory factory, string connexion, string sql)
         {
@@ -51,19 +92,20 @@ namespace Bb.Jslt.Services.Sql
 
                 using (var cmd = factory.CreateCommand())
                 {
-
+                    cmd.Connection = cnx;
                     cmd.CommandText = sql;
                     int line = 0;
 
                     using (var reader = cmd.ExecuteReader())
-                    {
-
                         while (reader.Read())
                         {
 
                             line++;
 
-                            var o = new JObject();
+                            var o = new JObject
+                            {
+                                new JProperty("$_line", line)
+                            };
 
                             for (int i = 0; i < reader.FieldCount; i++)
                             {
@@ -81,8 +123,6 @@ namespace Bb.Jslt.Services.Sql
 
                         }
 
-                    }
-
                 }
 
             }
@@ -93,78 +133,68 @@ namespace Bb.Jslt.Services.Sql
 
         }
 
-        //public static string GetLabel(string n)
-        //{
 
-        //    var sb = new StringBuilder(n.Length);
 
-        //    foreach (var c in n)
-        //    {
-        //        var p = (int)c;
+        private static DbProviderFactory Get(string @namespace)
+        {
 
-        //        //if (p == 65279) // Bom // { } 
-        //        if (_accepted.TryGetValue(c, out char v))
-        //            sb.Append(v);
+            try
+            {
+                DbProviderFactory clientFactory = DbProviderFactories.GetFactory(@namespace);
+                return clientFactory;
+            }
+            catch (Exception)
+            {
 
-        //    }
+                var instance = GetDbProviderFactory(@namespace);
+                if (instance != null)
+                {
+                    DbProviderFactories.RegisterFactory(@namespace, instance);
+                    return instance;
+                }
 
-        //    return sb.ToString()
-        //         .Replace("___", "_")
-        //         .Replace("__", "_");
+                throw;
+            }
 
-        //}
+        }
 
-        //private static Dictionary<char, char> _accepted = build();
+        private static DbProviderFactory GetDbProviderFactory(string @namespace)
+        {
 
-        //private static Dictionary<char, char> build()
-        //{
+            var types = TypeDiscovery.Instance.GetTypesAssignableFrom(typeof(DbProviderFactory)).ToList();
 
-        //    var dic = new Dictionary<char, char>();
+            foreach (var item in types)
+            {
+                if (item.Namespace == @namespace)
+                {
+                    var instance = GetDbProviderFactory(item);
+                    if (instance != null)
+                        return instance;
+                }
+            }
 
-        //    Add(dic, (int)'a', (int)'z');
-        //    Add(dic, (int)'A', (int)'Z');
-        //    Add(dic, (int)'0', (int)'9');
+            return null;
+        }
 
-        //    dic.Add(' ', '_');
-        //    dic.Add('\'', '_');
-        //    dic.Add('"', '_');
-        //    dic.Add('é', 'e');
-        //    dic.Add('è', 'e');
-        //    dic.Add('ë', 'e');
-        //    dic.Add('î', 'i');
-        //    dic.Add('ï', 'i');
-        //    dic.Add('Ï', 'I');
-        //    dic.Add('Ö', 'O');
-        //    dic.Add('Ü', 'U');
-        //    dic.Add('ô', 'o');
-        //    dic.Add('à', 'a');
-        //    dic.Add('ê', 'e');
-        //    dic.Add('ñ', 'n');
-        //    dic.Add('Ñ', 'N');
-        //    dic.Add('¡', 'i');
-        //    dic.Add('á', 'a');
-        //    dic.Add('í', 'i');
-        //    dic.Add('ó', 'o');
-        //    dic.Add('ú', 'u');
-        //    dic.Add('Á', 'A');
-        //    dic.Add('É', 'E');
-        //    dic.Add('Í', 'I');
-        //    dic.Add('Ó', 'O');
-        //    dic.Add('Ú', 'U');
-        //    dic.Add('ä', 'a');
-        //    dic.Add('ö', 'o');
-        //    dic.Add('Ä', 'A');
-        //    dic.Add('Ë', 'E');
+        private static DbProviderFactory GetDbProviderFactory(Type type)
+        {
 
-        //    return dic;
+            var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Static)
+                .Where(c => typeof(DbProviderFactory).IsAssignableFrom(c.PropertyType))
+                .ToList();
+            if (properties.Any())
+                return (DbProviderFactory)properties[0].GetValue(null);
 
-        //}
+            var fields = type.GetFields(BindingFlags.Public | BindingFlags.Static)
+                .Where(c => typeof(DbProviderFactory).IsAssignableFrom(c.FieldType))
+                .ToList();
+            if (fields.Any())
+                return (DbProviderFactory)fields[0].GetValue(null);
 
-        //private static void Add(Dictionary<char, char> dic, int s, int e)
-        //{
-        //    for (int i = s; i <= e; i++)
-        //        dic.Add((char)i, (char)i);
-        //}
+            return null;
+
+        }
+
 
     }
 

@@ -5,7 +5,7 @@ using Bb.CommandLines.Outs;
 using Bb.CommandLines.Validators;
 using Bb.Csv;
 using Bb.Jslt.Services.Sql;
-using Bb.Json.Jslt.CustomServices;
+using Bb.Jslt.CustomServices;
 using Microsoft.Extensions.CommandLineUtils;
 using Oldtonsoft.Json;
 using Oldtonsoft.Json.Linq;

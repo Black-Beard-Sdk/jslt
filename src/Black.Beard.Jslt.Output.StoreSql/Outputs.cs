@@ -1,5 +1,5 @@
-﻿using Bb.Json.Attributes;
-using Bb.Json.Jslt.Services;
+﻿using Bb.Attributes;
+using Bb.Jslt.Services;
 using Bb.Sql;
 using Oldtonsoft.Json;
 using Oldtonsoft.Json.Linq;

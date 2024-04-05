@@ -1,12 +1,12 @@
-using Bb.Json.Jslt.Asts;
-using Bb.Json.Jslt.Parser;
-using Bb.Json.Jslt.Services;
-using ICSharpCode.Decompiler.Metadata;
+using Bb;
+using Bb.Jslt.Asts;
+using Bb.Jslt.Services;
+using Microsoft.Data.Sqlite;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using Oldtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
+using System.Data.Common;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -93,7 +93,7 @@ namespace Black.Beard.Jslt.UnitTests
         public void TestMObjectWithFunction()
         {
 
-            var expected = "{ 'propertyName': myMethod(6.6, 'test') }".Replace("'", "\"");
+            var expected = "{ 'propertyName': myMethod(6.6, 2.0) }".Replace("'", "\"");
             var source = "{ }";
 
             var src = new SourceJson[] { SourceJson.GetFromText(source) };
@@ -189,7 +189,7 @@ namespace Black.Beard.Jslt.UnitTests
 
 
         }
-        
+
         [TestMethod]
         public void TestJPathBinarySubstractDecimal()
         {
@@ -259,14 +259,14 @@ namespace Black.Beard.Jslt.UnitTests
 
     '$functions': ['DataClass2.cs'],
 
-    'propertyName': mult('$.prop1', 2)
+    'propertyName': mult($.prop1, 2)
 
 }".Replace("'", "\"")
  .Replace("`", "'")
 ;
             var source = "{ 'prop1':3 }".Replace("'", "\"");
             var src = new SourceJson[] { SourceJson.GetFromText(source) };
-            RuntimeContext result = Test(expected, src);
+            RuntimeContext result = Test(expected, src );
             Assert.AreEqual(result.TokenResult["propertyName"], 6.0D);
         }
 
@@ -291,8 +291,8 @@ namespace Black.Beard.Jslt.UnitTests
         {
             var expected = @"
 { 
-    '@var1' : '$.prop1', 
-    'propertyName': get('src2', '$[?(@.Id == @@var1)]' @string)
+    '@var1' : $.prop1, 
+    'propertyName': get('src2', '$[?(@.Id == @@var1)]' #string)
 
 }".Replace("'", "\"")
  .Replace("`", "'")
@@ -301,9 +301,8 @@ namespace Black.Beard.Jslt.UnitTests
             var source2 = "[ { 'Id':1, Name:'name1'}, { 'Id':2, Name:'name2' }, { 'Id':3, Name:'name3' } ]".Replace("'", "\"");
             var src = new SourceJson[] { SourceJson.GetFromText(source1), SourceJson.GetFromText(source2, "src2") };
             RuntimeContext result = Test(expected, src);
-            Assert.AreEqual(result.TokenResult["propertyName"]["Name"], "name2");
+            Assert.AreEqual(result.TokenResult["propertyName"]["prop1"],2);
         }
-
 
         [TestMethod]
         public void TestSum()
@@ -319,7 +318,6 @@ namespace Black.Beard.Jslt.UnitTests
             RuntimeContext result = Test(expected, src);
             Assert.AreEqual(result.TokenResult["prices"], 6);
         }
-
 
         [TestMethod]
         public void Testconcat()
@@ -449,17 +447,16 @@ namespace Black.Beard.Jslt.UnitTests
 
             var dte = (result.TokenResult["result"]).Value<DateTime>();
 
-            Assert.AreEqual(dte>dte1, true);
+            Assert.AreEqual(dte > dte1, true);
         }
 
         [TestMethod]
         public void TestDistinct()
         {
 
-            var expected = @"
-{ 'result': distinct('$') } 
-".Replace("'", "\"")
- .Replace("`", "'")
+            var expected = @" { 'result': distinct($, '$') } 
+                            ".Replace("'", "\"")
+                             .Replace("`", "'")
 ;
             var source1 = "[1,2,1,3]".Replace("'", "\"");
 
@@ -469,9 +466,69 @@ namespace Black.Beard.Jslt.UnitTests
         }
 
 
+        [TestMethod]
+        public void TestDirectiveAssemblies()
+        {
+
+            var db = "c:\\temp\\test.db";
+            var dbFile = db.AsFile();
+
+            if (dbFile.Exists)
+                dbFile.Delete();
+
+            else if (!dbFile.Directory.Exists)
+                dbFile.Directory.Create();
+
+            
+            var cnx = $"Data Source={db}";
+
+            var instance = System.Data.SQLite.SQLiteFactory.Instance;
+            using (DbConnection cnn = instance.CreateConnection())
+            {
+
+                cnn.ConnectionString = cnx;
+                cnn.Open();
+
+                using (var cmd = instance.CreateCommand())
+                {
+                    cmd.Connection = cnn;
+                    cmd.CommandText = "CREATE TABLE table1 (key INTEGER PRIMARY KEY, value TEXT)";
+                    cmd.ExecuteNonQuery();
+                }
+
+                using (var cmd = instance.CreateCommand())
+                {
+                    cmd.Connection = cnn;
+                    cmd.CommandText = "INSERT INTO table1 VALUES(1, 'test1')";
+                    cmd.ExecuteNonQuery();
+                }
+            }
+
+
+            string sql = "SELECT * FROM table1";
+
+            var template = new JsltObject()
+                 .Append(new JsltDirectives()
+                     .SetAssemblies("Microsoft.Data.Sqlite")
+                     .SetAssemblies("Black.Beard.Jslt.Services")
+                     .SetCulture(CultureInfo.CurrentCulture))
+                 .Append(new JsltVariable("cnx").SetValue(new JsltFunctionCall("connectsql", "Microsoft.Data.Sqlite".AsJsltConstant(), cnx.AsJsltConstant())))
+                 .Append(new JsltProperty("Data").SetValue(new JsltFunctionCall("readsql", "cnx".AsJsltVariable(), sql.AsJsltConstant())))
+                 ;
+
+            RuntimeContext result = Test(template, null);
+            var a = result.TokenResult as Oldtonsoft.Json.Linq.JObject;
+            var b = a["Data"][0] as Oldtonsoft.Json.Linq.JObject;
+
+            Assert.AreEqual(b["$_line"], 1);
+            Assert.AreEqual(b["value"], "test1");
+
+        }
+
+
         private static RuntimeContext Test(string templatePayload, SourceJson[] sources, params (string, Type)[] services)
         {
-            
+
             var src = new Sources(sources[0]);
             for (int i = 1; i < sources.Length; i++)
                 src.Add(sources[i]);
@@ -492,24 +549,17 @@ namespace Black.Beard.Jslt.UnitTests
         private static RuntimeContext Test(JsltBase templateTree, SourceJson[] sources, params (string, Type)[] services)
         {
 
-            var src = new Sources(sources[0]);
-            for (int i = 1; i < sources.Length; i++)
-                src.Add(sources[i]);
-
-            VariableResolver.Intercept = (a, b, c, d) => 
+            Sources src;
+            if (sources != null)
             {
-            
-            };
-
+                src = new Sources(sources[0]);
+                for (int i = 1; i < sources.Length; i++)
+                    src.Add(sources[i]);
+            }
+            else
+                src = new Sources(SourceJson.GetEmpty());
 
             var template = GetProvider(templateTree, services);
-
-            if (!template.Diagnostics.Success)
-            {
-                var error = template.Diagnostics.Errors.First();
-                throw new Exception(error.Message);
-            }
-
             var result = template.Transform(src);
 
             return result;
@@ -523,8 +573,11 @@ namespace Black.Beard.Jslt.UnitTests
 
             var configuration = new TranformJsonAstConfiguration()
             {
-                
+
             };
+
+            ServiceContainer.AddAssembly(typeof(DataClass).Assembly);
+
             foreach (var item in services)
                 configuration.Services.ServiceDiscovery.AddService(item.Item2, item.Item1);
 
@@ -539,7 +592,7 @@ namespace Black.Beard.Jslt.UnitTests
         {
 
             StringBuilder sb = new StringBuilder(payloadTemplate.ToString());
-
+            // 
             var configuration = new TranformJsonAstConfiguration()
             {
 
@@ -549,6 +602,13 @@ namespace Black.Beard.Jslt.UnitTests
 
             TemplateProvider Templateprovider = TemplateProvider.Get(configuration);
             JsltTemplate template = Templateprovider.GetTemplate(sb, false, string.Empty);
+
+            if (!template.Diagnostics.Success)
+            {
+                var error = template.Diagnostics.Errors.First();
+                throw new Exception(error.Message);
+            }
+
 
             return template;
 

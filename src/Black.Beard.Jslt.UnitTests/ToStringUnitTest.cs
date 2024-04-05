@@ -1,6 +1,6 @@
-using Bb.Json.Jslt.Asts;
-using Bb.Json.Jslt.Parser;
-using Bb.Json.Jslt.Services;
+using Bb.Jslt.Asts;
+using Bb.Jslt.Parser;
+using Bb.Jslt.Services;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using Oldtonsoft.Json.Linq;
