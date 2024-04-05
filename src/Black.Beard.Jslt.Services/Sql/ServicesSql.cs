@@ -4,6 +4,7 @@ using Bb.Json.Jslt.Services;
 using Oldtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 
 namespace Bb.Jslt.Services.Sql
 {
@@ -11,17 +12,24 @@ namespace Bb.Jslt.Services.Sql
     public static partial class ServicesSql
     {
 
-        [JsltExtensionMethod("readsqlserver")]
+
+        //private static Dictionary<string, string> names = new Dictionary<string, string>()
+        //{
+        //    { "System.Data.SqlClient",  "System.Data.SqlClient" } //var factory = System.Data.SqlClient.SqlClientFactory.Instance;
+        //};
+
+        [JsltExtensionMethod("readsql")]
+        [JsltExtensionMethodParameter("client", "client clef")]
         [JsltExtensionMethodParameter("connection", "connection")]
         [JsltExtensionMethodParameter("sql", "sql query")]
-        public static JToken ExecuteSqlServer(RuntimeContext ctx, string connection, string sql)
+        public static JToken ExecuteSqlServer(RuntimeContext ctx, string client, string connection, string sql)
         {
-            var factory = System.Data.SqlClient.SqlClientFactory.Instance;
-            var result = ReadSql(ctx, factory, connection, sql);
+            var clientFactory = DbProviderFactories.GetFactory(client);
+            var result = ReadSql(ctx, clientFactory, connection, sql);
             return result;
         }
 
-        private static JArray ReadSql(RuntimeContext ctx, System.Data.SqlClient.SqlClientFactory factory, string connexion, string sql)
+        private static JArray ReadSql(RuntimeContext ctx, DbProviderFactory factory, string connexion, string sql)
         {
 
             List<JToken> list = new List<JToken>(500);

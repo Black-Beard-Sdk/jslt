@@ -953,13 +953,17 @@ namespace Bb.Json.Jslt.Services
             if (value is JToken token)
             {
                 
-                if (token.GetType() == type) 
+                if (type.IsAssignableFrom( token.GetType())) 
                     return token;
 
-                var payload = value.ToString();
-                var Jvalue = JToken.Parse(payload);
-                
-                return Jvalue;
+                if (type == typeof(JObject) || type == typeof(JArray))
+                {
+                    var payload1 = value.ToString();
+                    return JToken.Parse(payload1);
+                }
+
+                if (type == typeof(JValue))
+                    return new JValue(value);                
 
             }
 
