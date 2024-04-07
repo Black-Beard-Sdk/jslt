@@ -35,6 +35,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Jslt.Output.Sto
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentations", "Documentations", "{6DF656E4-3485-4E5B-9091-7B774E3E9561}"
 	ProjectSection(SolutionItems) = preProject
+		..\Documentation\Added_custom_services.md = ..\Documentation\Added_custom_services.md
 		..\Documentation\Custom_services.md = ..\Documentation\Custom_services.md
 		..\Documentation\docker.md = ..\Documentation\docker.md
 		..\Documentation\Format_DateTime.md = ..\Documentation\Format_DateTime.md

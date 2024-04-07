@@ -56,36 +56,31 @@ If you want create an array with items of the source json, you can use the follo
 ]
 ```
 
-Like that
-```JSON
-    "property__name": .mymethod( $.property, arg2, ...)
-```
-
 ## Using method ##
 you can use functions for extend the process. 
 
 Like that
 ```JSON
-    "property__name": .mymethod( $.property, arg2, ...)
+    "property__name": mymethod( $.property, arg2, ...)
 ```
 
 **'mymethod'** is the name of the service you want to call. The sdk provide another keys like sum or distinct. the list is available [here](Documentation/Custom_services.md).
 If you write your own method, you must register the methods before in the configuration. the arguments must be any json part (see the directives for register your extension).
 
 ```JSON
-{ "prices": method($..n) } 
+    { "prices": method($..n) } 
 ```  
 
 A sample for call the method
 ```JSON
-// Source
-{ "prices": [{"n" : 1}, {"n" : 2}, {"n" : 3}] }
+    // Source
+    { "prices": [{"n" : 1}, {"n" : 2}, {"n" : 3}] }
 
-// Template
-{ "prices": sum($..n) } // sum method is a service registered in the service's list.
+    // Template
+    { "prices": sum($..n) } // sum method is a service registered in the service's list.
 
-// Result
-{ "prices":  6 }
+    // Result
+    { "prices":  6 }
 ```  
 
 
@@ -242,7 +237,6 @@ You can manage any directives
 {
    "culture":"FR-fr",
    "assemblies":["assembly name referenced in the gac"],
-   "functions":["path of the csharp file"],
    "packages":["path of the package on nuget.org"],
    "imports": ["path of the assembly flie"],
    "output": 
@@ -251,7 +245,6 @@ You can manage any directives
        "mode": to_block(),    // Behavior the output serialization
    }
 }   
-
 ``` 
 
 ### culture
@@ -265,23 +258,19 @@ Take a list of assemblies name referenced in the GAC.
 
 ### Functions
 Take a list of c# source code file. the path is relative to the json template file.
-The file contains Csharp source code like this class [see the DistinctService like sample](src/Black.Beard.Jslt/Json/Jslt/CustomServices/Services.distinct.cs)
+The file contains Csharp source code like this class [see the DistinctService like sample](src/Black.Beard.Jslt/Jslt/CustomServices/Services.distinct.cs)
 
 ### Packages
 You can use 
 ```JSON
-"$directives":
-{
-   "packages": ["path of the assembly file on nuget"],
-}
-
-// or 
-
-"$directives":
-{
-   "packages": [ ["https://www.nuget.org/api/v2/package/", "path of the assembly file"] ],
-}
-
+    "$directives":
+    {
+       "packages": ["path of the package {, optional version}"],
+       "assemblies": ["assembly name"],
+       "imports": ["path of the file assembly"],
+       "functions": ["path of the csharp file"],
+    }
+   
 ``` 
 
 

@@ -1,7 +1,5 @@
 ﻿using Bb.Asts;
 using Bb.Contracts;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Oldtonsoft.Json.Linq;
 using System.Collections.Generic;
 
 namespace Bb.Jslt.Asts

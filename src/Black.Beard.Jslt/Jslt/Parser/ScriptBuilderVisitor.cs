@@ -4,12 +4,14 @@ using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
 using Bb.Analysis.DiagTraces;
 using Bb.Attributes;
+using Bb.Builds;
 using Bb.Compilers;
 using Bb.ComponentModel;
 using Bb.ComponentModel.Factories;
 using Bb.Jslt.Asts;
 using Bb.Jslt.Builds;
 using Bb.Jslt.Services;
+using Bb.Nugets;
 using Microsoft.CodeAnalysis;
 using Oldtonsoft.Json.Linq;
 using System;
@@ -50,9 +52,6 @@ namespace Bb.Jslt.Parser
             this._configuration = configuration;
             this._currentCulture = _configuration.Culture;
             this._functions = new List<JsltFunctionCall>();
-
-            foreach (Assembly assembly in configuration.Assemblies)
-                ServiceContainer.AddAssembly(assembly);
 
         }
 
@@ -310,7 +309,7 @@ namespace Bb.Jslt.Parser
         {
 
             var txt = context.VARIABLE_NAME().GetText();
-            
+
             JsltBase result = new JsltVariable() { Name = txt.Substring(1), Location = context.ToLocation() };
 
             var jsonType = context.jsonType();
@@ -1046,13 +1045,13 @@ namespace Bb.Jslt.Parser
 
                 else if (item.Value is JsltBinaryOperator)
                     _types.Add(typeof(JToken));
-                
+
                 else if (item.Value is JsltObject)
                     _types.Add(typeof(JToken));
-                
+
                 else if (item.Value is JsltArray)
                     _types.Add(typeof(JArray));
-                
+
                 else
                 {
                     LocalDebug.Stop();
@@ -1124,7 +1123,7 @@ namespace Bb.Jslt.Parser
 
 
         }
-             
+
         #endregion Jsonpath
 
         public void EvaluateErrors(IParseTree item)
@@ -1179,7 +1178,7 @@ namespace Bb.Jslt.Parser
 
         #region load files
 
-        private void LoadAssemblyFromCs(List<FileInfo> sources)
+        private void LoadAssemblyFromCs(List<FileInfo> sources, TextLocation location)
         {
 
             AssemblyResult assemblyDescription = CSharp.GetAssembly(sources.Select(c => c.FullName).ToArray());
@@ -1211,64 +1210,31 @@ namespace Bb.Jslt.Parser
 
             }
 
-            // Add assembly to the service discovery for explore service to adding
-            Assembly assembly = AssemblyLoader.Instance.LoadAssembly(assemblyDescription.AssemblyFile, System.Diagnostics.Debugger.IsAttached);
-            var discovery = this._configuration.Services.ServiceDiscovery;
-            discovery.AddAssembly(assembly);
+            _configuration.AddAssemblyFile(assemblyDescription.AssemblyFile, _diagnostics, location);
 
         }
 
-        private void LoadAssembly(List<FileInfo> sources)
+        private void CollectLib(string u, JsltBase item, TextLocation location)
         {
-
-            var discovery = this._configuration.Services.ServiceDiscovery;
-
-            foreach (var file in sources)
-            {
-                Assembly assembly = AssemblyLoader.Instance.LoadAssembly(file.FullName, System.Diagnostics.Debugger.IsAttached);
-                discovery.AddAssembly(assembly);
-            }
-
-        }
-
-        private void CollectLib(string u, List<FileInfo> dll, JsltBase item)
-        {
-            var file = ResolveFile(u);
+            var file = this._configuration.ResolveFile(u);
             if (file.Exists)
             {
 
                 if (file.Extension == ".dll")
-                    dll.Add(file);
+                    _configuration.AddAssemblyFile(file, _diagnostics, location);
 
                 else if (file.Extension == ".exe")
-                    dll.Add(file);
+                    _configuration.AddAssemblyFile(file, _diagnostics, location);
 
             }
             else
-                AddError(item.Location, u, $"Failed : {item.ToString()} : '{u}'");
-
-        }
-
-        private void CollectPackages(JsltConstant rootUrl, List<FileInfo> packages, JsltConstant package)
-        {
-
-            var p = this._scriptPathDirectory;
-            string packageName = package.Value as string;
-            string url = rootUrl.Value as string;
-
-            var folderLib = Packages
-                    .EnsurePackageIsLoaded(url, packageName,
-                        Path.Combine(this._scriptPathDirectory, "packages")
-                    );
-
-            foreach (var item in folderLib.GetFiles("*.dll"))
-                packages.Add(item);
+                AddError(item.Location, u, $"Failed : {item} : '{u}'");
 
         }
 
         private void CollectCs(string u, List<FileInfo> cs, JsltBase item)
         {
-            var file = ResolveFile(u);
+            var file = this._configuration.ResolveFile(u);
             if (file.Exists)
             {
                 if (file.Extension == ".cs")
@@ -1276,17 +1242,6 @@ namespace Bb.Jslt.Parser
             }
             else
                 AddError(item.Location, u, $"Failed : {item.ToString()} : '{u}'");
-
-        }
-
-        private FileInfo ResolveFile(string u)
-        {
-            var file = new FileInfo(u);
-
-            if (!file.Exists)
-                file = this._configuration.ResolveFile(u);
-
-            return file;
 
         }
 
@@ -1401,6 +1356,58 @@ namespace Bb.Jslt.Parser
                         }
                         break;
 
+                    case "packages":
+                        if (prop.Value is JsltArray ar4)
+                        {
+                            foreach (JsltBase fu in ar4.Items)
+                            {
+                                if (fu is JsltConstant packageName)
+                                {
+                                    var name = packageName.Value.ToString();
+                                    Version version = null;
+                                    if (name.Contains(','))
+                                    {
+                                        var array = name.Split(',');
+                                        name = array[0].Trim();
+                                        Version.TryParse(array[1].Trim(), out version);
+                                    }
+                                    _configuration.AddPackage(name, version, _diagnostics, fu.Location);
+                                }
+                                else
+                                    AddError(prop.Location, "syntax", $"'packages' must to have an array of string with the package names.");
+                            }
+                        }
+                        else
+                            AddError(prop.Location, "syntax", $"'packages' must to have an array of string with the package names.");
+                        break;
+
+                    case "assemblies":
+                        if (prop.Value is JsltArray ar2)
+                        {
+                            foreach (JsltBase fu in ar2.Items)
+                                if (fu is JsltConstant v)
+                                    if (v.Value is string str && !string.IsNullOrEmpty(str))
+                                        _configuration.AddAssemblyName(str, _diagnostics, fu.Location);
+
+                        }
+                        else
+                            AddError(prop.Location, "syntax", $"'assemblies' must to have an array of string with the assemblies referenced in the Gac.");
+                        break;
+
+                    case "imports":
+                        if (prop.Value is JsltArray ar3)
+                        {
+                            foreach (JsltBase fu in ar3.Items)
+                                if (fu is JsltConstant v)
+                                    if (v.Value is Uri u)
+                                        CollectLib(u.AbsoluteUri, fu, v.Location);
+                                    else if (v.Value is string str)
+                                        CollectLib(str, fu, v.Location);
+                        }
+                        else
+                            AddError(prop.Location, "syntax", $"'imports' must to have an array of string with the filenames of libraries.");
+                        break;
+
                     case "functions":
                         var cs = new List<FileInfo>();
                         if (prop.Value is JsltArray ar1)
@@ -1414,101 +1421,19 @@ namespace Bb.Jslt.Parser
                         }
                         else
                             AddError(prop.Location, "syntax", $"'functions' must to have an array of string with the filenames of scripts.");
-                        LoadAssemblyFromCs(cs);
-                        break;
-
-                    case "assemblies":
-                        if (prop.Value is JsltArray ar2)
-                        {
-                            foreach (JsltBase fu in ar2.Items)
-                                if (fu is JsltConstant v)
-                                    if (v.Value is string str && !string.IsNullOrEmpty(str))
-                                        AddAssemblyName(str, fu.Location);
-
-                        }
-                        else
-                            AddError(prop.Location, "syntax", $"'assemblies' must to have an array of string with the assemblies referenced in the Gac.");
-                        break;
-
-                    case "imports":
-                        var dll1 = new List<FileInfo>();
-                        if (prop.Value is JsltArray ar3)
-                        {
-                            foreach (JsltBase fu in ar3.Items)
-                                if (fu is JsltConstant v)
-                                    if (v.Value is Uri u)
-                                        CollectLib(u.AbsoluteUri, dll1, fu);
-                                    else if (v.Value is string str)
-                                        CollectLib(str, dll1, fu);
-                        }
-                        else
-                            AddError(prop.Location, "syntax", $"'imports' must to have an array of string with the filenames of libraries.");
-                        LoadAssembly(dll1);
-                        break;
-
-                    case "packages":
-                        var dll2 = new List<FileInfo>();
-                        if (prop.Value is JsltArray ar4)
-                        {
-                            foreach (JsltBase fu in ar4.Items)
-                            {
-                                if (fu is JsltConstant packageName)
-                                    CollectPackages(new JsltConstant(@"https://www.nuget.org/api/v2/package/", JsltKind.String) { }, dll2, packageName);
-
-                                else if (fu is JsltArray ar5)
-                                {
-                                    if (ar5.Items.Count != 2)
-                                        this._diagnostics.AddError(null, String.Empty, "the directives packages must to have two strings");
-
-                                    else
-                                    {
-                                        CollectPackages(ar5.Items[0] as JsltConstant, dll2, ar5.Items[1] as JsltConstant);
-                                    }
-                                }
-                                else
-                                    this._diagnostics.AddError(null, String.Empty, "the directives packages accepts only array of string or an array of array of two strings.");
-                            }
-                        }
-                        else
-                            AddError(prop.Location, "syntax", $"'packages' must to have an array of string with the package names.");
-
-                        LoadAssembly(dll2);
+                        LoadAssemblyFromCs(cs, prop.Location);
                         break;
 
                     default:
                         AddWarning(prop.Location, "syntax", $"Not recognized property '{prop.Name}' of $directives.");
                         break;
+
                 }
 
             }
 
         }
 
-        /// <summary>
-        /// Discovers services in assembly specified by name
-        /// </summary>
-        /// <param name="assemblyname"></param>
-        /// <returns></returns>
-        private Assembly AddAssemblyName(string assemblyname, TextLocation location)
-        {
-            try
-            {
-
-                var assembly = AssemblyLoader.Instance.LoadAssemblyName(new AssemblyName(assemblyname));
-                if (assembly != null)
-                {
-                    ServiceContainer.AddAssembly(assembly);
-                    return assembly;
-                }
-            }
-            catch (FileNotFoundException)
-            {
-            }
-
-            _diagnostics.AddError(location, assemblyname, $"Failed to resolve assembly {assemblyname}");
-            return null;
-
-        }
 
         #endregion directives
 

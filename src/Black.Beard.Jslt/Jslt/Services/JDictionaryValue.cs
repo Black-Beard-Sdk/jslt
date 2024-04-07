@@ -1,5 +1,4 @@
-﻿using Oldtonsoft.Json;
-using Oldtonsoft.Json.Linq;
+﻿using Oldtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 

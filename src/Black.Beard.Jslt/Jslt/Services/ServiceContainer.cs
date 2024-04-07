@@ -3,8 +3,6 @@ using Bb.ComponentModel.Factories;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
-using static Bb.Jslt.Services.TranformJsonAstConfiguration;
 
 namespace Bb.Jslt.Services
 {
@@ -26,17 +24,6 @@ namespace Bb.Jslt.Services
             service.ServiceDiscovery.AddAssembly(typeof(TranformJsonAstConfiguration).Assembly);
         }
 
-
-        /// <summary>
-        /// add a new assembly to the service container
-        /// </summary>
-        /// <param name="assembly"></param>
-        public static void AddAssembly(Assembly assembly)
-        {
-            ServiceContainer.Instance.ServiceDiscovery.AddAssembly(assembly);
-        }
-
-
         /// <summary>
         /// private creation
         /// </summary>
@@ -52,6 +39,15 @@ namespace Bb.Jslt.Services
 
             this.ServiceDiscovery = new ServiceDiscovery(this);
 
+        }
+
+        /// <summary>
+        /// add a new assembly to the service container
+        /// </summary>
+        /// <param name="assembly"></param>
+        public static void AddAssembly(Assembly assembly)
+        {
+            ServiceContainer.Instance.ServiceDiscovery.AddAssembly(assembly);
         }
 
         /// <summary>
@@ -132,6 +128,7 @@ namespace Bb.Jslt.Services
 
         }
 
+
         public IEnumerable<TransformJsonServiceProvider> GetServices(FunctionKindEnum kind)
         {
 
@@ -145,7 +142,6 @@ namespace Bb.Jslt.Services
                 yield return item;
 
         }
-
 
 
         public ServiceDiscovery ServiceDiscovery { get; }

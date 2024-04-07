@@ -27,7 +27,6 @@ namespace Black.Beard.Jslt.UnitTests
             Assert.AreEqual(value, @"""^([A-Za-z0-9]?\\s?-?)+$""");
         }
 
-
         [TestMethod]
         public void TestGenerationOfDirectives()
         {
@@ -55,7 +54,6 @@ namespace Black.Beard.Jslt.UnitTests
             Assert.AreEqual(resultTxt, expected);
 
         }
-
 
         [TestMethod]
         public void TestGenerationArray()

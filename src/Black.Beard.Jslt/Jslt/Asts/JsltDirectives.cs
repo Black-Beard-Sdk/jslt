@@ -101,6 +101,12 @@ namespace Bb.Jslt.Asts
             return this;
         }
 
+        public JsltDirectives SetPackages(params string[] packages)
+        {
+            SetArray("packages", packages);
+            return this;
+        }
+
         public JsltDirectives SetAssemblies(params string[] assemblies)
         {
             SetArray("assemblies", assemblies);
@@ -110,12 +116,6 @@ namespace Bb.Jslt.Asts
         public JsltDirectives SetFunctions(params string[] functions)
         {
             SetArray("functions", functions);
-            return this;
-        }
-
-        public JsltDirectives SetPackages(params string[] packages)
-        {
-            SetArray("packages", packages);
             return this;
         }
 
@@ -130,7 +130,6 @@ namespace Bb.Jslt.Asts
         {
             return visitor.VisitDirective(this);
         }
-
 
         public override bool ToString(Writer writer, StrategySerializationItem strategy)
         {

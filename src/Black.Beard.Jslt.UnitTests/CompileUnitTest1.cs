@@ -465,7 +465,6 @@ namespace Black.Beard.Jslt.UnitTests
             Assert.AreEqual(result.TokenResult["result"], "test");
         }
 
-
         [TestMethod]
         public void TestDirectiveAssemblies()
         {
@@ -526,6 +525,64 @@ namespace Black.Beard.Jslt.UnitTests
         }
 
 
+        [TestMethod]
+        public void TestDirectivePackage()
+        {
+
+            var db = "c:\\temp\\test.db";
+            var dbFile = db.AsFile();
+
+            if (dbFile.Exists)
+                dbFile.Delete();
+
+            else if (!dbFile.Directory.Exists)
+                dbFile.Directory.Create();
+
+
+            var cnx = $"Data Source={db}";
+
+            var instance = System.Data.SQLite.SQLiteFactory.Instance;
+            using (DbConnection cnn = instance.CreateConnection())
+            {
+
+                cnn.ConnectionString = cnx;
+                cnn.Open();
+
+                using (var cmd = instance.CreateCommand())
+                {
+                    cmd.Connection = cnn;
+                    cmd.CommandText = "CREATE TABLE table1 (key INTEGER PRIMARY KEY, value TEXT)";
+                    cmd.ExecuteNonQuery();
+                }
+
+                using (var cmd = instance.CreateCommand())
+                {
+                    cmd.Connection = cnn;
+                    cmd.CommandText = "INSERT INTO table1 VALUES(1, 'test1')";
+                    cmd.ExecuteNonQuery();
+                }
+            }
+
+            string sql = "SELECT * FROM table1";
+
+            var template = new JsltObject()
+                 .Append(new JsltDirectives()
+                     .SetPackages("Microsoft.Data.SqlClient")
+                     .SetAssemblies("Black.Beard.Jslt.Services")
+                     .SetCulture(CultureInfo.CurrentCulture))
+                 .Append(new JsltVariable("cnx").SetValue(new JsltFunctionCall("connectsql", "Microsoft.Data.SqlClient".AsJsltConstant(), cnx.AsJsltConstant())))
+                 .Append(new JsltProperty("Data").SetValue(new JsltFunctionCall("readsql", "cnx".AsJsltVariable(), sql.AsJsltConstant())))
+                 ;
+
+            RuntimeContext result = Test(template, null);
+            var a = result.TokenResult as Oldtonsoft.Json.Linq.JObject;
+            var b = a["Data"][0] as Oldtonsoft.Json.Linq.JObject;
+
+            Assert.AreEqual(b["$_line"], 1);
+            Assert.AreEqual(b["value"], "test1");
+
+        }
+
         private static RuntimeContext Test(string templatePayload, SourceJson[] sources, params (string, Type)[] services)
         {
 
@@ -569,19 +626,13 @@ namespace Black.Beard.Jslt.UnitTests
         private static JsltTemplate GetProvider(string payloadTemplate, params (string, Type)[] services)
         {
 
-            StringBuilder sb = new StringBuilder(payloadTemplate.Replace('\'', '"').Replace('§', '\''));
-
             var configuration = new TranformJsonAstConfiguration()
-            {
-
-            };
-
-            ServiceContainer.AddAssembly(typeof(DataClass).Assembly);
-
-            foreach (var item in services)
-                configuration.Services.ServiceDiscovery.AddService(item.Item2, item.Item1);
+                .AddAssembly(typeof(DataClass))
+                .AddServices(services)
+                ;
 
             TemplateProvider Templateprovider = TemplateProvider.Get(configuration);
+            StringBuilder sb = new StringBuilder(payloadTemplate.Replace('\'', '"').Replace('§', '\''));
             JsltTemplate template = Templateprovider.GetTemplate(sb, false, string.Empty);
 
             return template;
@@ -590,17 +641,14 @@ namespace Black.Beard.Jslt.UnitTests
 
         private static JsltTemplate GetProvider(JsltBase payloadTemplate, params (string, Type)[] services)
         {
-
-            StringBuilder sb = new StringBuilder(payloadTemplate.ToString());
-            // 
+            
             var configuration = new TranformJsonAstConfiguration()
-            {
-
-            };
-            foreach (var item in services)
-                configuration.Services.ServiceDiscovery.AddService(item.Item2, item.Item1);
+                .AddAssembly(typeof(DataClass))
+                .AddServices(services)
+                ;
 
             TemplateProvider Templateprovider = TemplateProvider.Get(configuration);
+            StringBuilder sb = new StringBuilder(payloadTemplate.ToString());
             JsltTemplate template = Templateprovider.GetTemplate(sb, false, string.Empty);
 
             if (!template.Diagnostics.Success)

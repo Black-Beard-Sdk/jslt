@@ -1,19 +1,12 @@
 ﻿using Bb.Attributes;
-using Bb.Jslt.Services;
 using Oldtonsoft.Json.Linq;
 using PhoneNumbers;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace Bb.Jslt.Services
 {
 
 
-    public static partial class Services
+    public static partial class AddedServices
     {
 
 

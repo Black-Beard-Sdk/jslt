@@ -49,7 +49,8 @@ namespace Bb.Expressions
 
 
                 var dir = Path.Combine(Environment.CurrentDirectory, Path.GetRandomFileName());
-                var controller = new NugetController().AddFolder(dir, NugetController.HostNugetOrg);
+                var controller = new NugetController()
+                    .AddFolder(dir, NugetController.HostNugetOrg);
 
                 // Build assembly
                 BuildCSharp build = new BuildCSharp()

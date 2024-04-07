@@ -68,16 +68,11 @@ namespace AppJsonEvaluator
         public static TemplateProvider GetProvider(string[] paths, params Type[] services)
         {
 
-            var configuration = new TranformJsonAstConfiguration();
-            configuration.Assemblies.Add(typeof(Bb.Jslt.Services.Services).Assembly);
-
-            if (paths != null)
-            foreach (var item in paths)
-                if (!string.IsNullOrEmpty(item))
-                    configuration.Paths.Add(item);
-
-            foreach (var item in services)
-                configuration.Services.ServiceDiscovery.AddService(item);
+            var configuration = new TranformJsonAstConfiguration()
+                .AddAssembly(typeof(Bb.Jslt.Services.AddedServices).Assembly)
+                .AddServices(services)
+                .AddPaths(paths)
+                ;
 
             TemplateProvider Templateprovider = new TemplateProvider(configuration);
 

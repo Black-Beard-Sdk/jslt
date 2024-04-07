@@ -44,7 +44,7 @@ namespace Black.Beard.Jslt.UnitTests
         {
 
             var expected = @"{	
-	""propertyName3"" : 1
+	""propertyName1"" : 1
 }";
 
             var i = new JsltObject()
@@ -60,11 +60,11 @@ namespace Black.Beard.Jslt.UnitTests
         [TestMethod]
         public void TestPropertyDecimal()
         {
-            
+
             var expected = @"{	
 	""propertyName1"" : 1,6
 }";
-            
+
             var i = new JsltObject()
                 .Append("propertyName1", (1.6).AsJsltConstant())
                 ;
@@ -118,11 +118,11 @@ namespace Black.Beard.Jslt.UnitTests
         [TestMethod]
         public void TestPropertyUri()
         {
-            
+
             var expected = @"{	
 	""propertyName1"" : ""http://localhost/""
 }";
-            
+
             var i = new JsltObject()
                 .Append("propertyName1", new Uri("http://localhost").AsJsltConstant())
                 ;
@@ -160,7 +160,7 @@ namespace Black.Beard.Jslt.UnitTests
 }";
 
             var i = new JsltObject()
-                .Append("propertyName1",  Guid.Empty.AsJsltConstant())
+                .Append("propertyName1", Guid.Empty.AsJsltConstant())
                 ;
 
             var payload = i.ToString();
@@ -277,16 +277,16 @@ namespace Black.Beard.Jslt.UnitTests
         [TestMethod]
         public void TestPropertyVariable()
         {
-            
+
             var expected = @"[	
 	{	
 		""$source"" : @body,
 		""key"" : $.Key
 	}
 ]";
-            
+
             var i = new JsltArray()
-                .Append( new JsltObject()
+                .Append(new JsltObject()
                     .SetSource("body".AsJsltVariable())
                     .Append("key", "$.Key".AsJsltPath())
                     )
