@@ -4,9 +4,9 @@ using System.Linq.Expressions;
 namespace Bb.Expressions
 {
 
+
     public static partial class SourceCodeExtension
     {
-
 
         public static SourceCode Assign(this SourceCode source, Expression left, Expression right)
         {

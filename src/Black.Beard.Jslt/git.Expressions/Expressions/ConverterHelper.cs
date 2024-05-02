@@ -49,7 +49,7 @@ namespace Bb.Expressions
                         Register(p[0].ParameterType, item.ReturnType, item);
                 }
 
-            ms = typeof(CustomConverter).GetMethods(BindingFlags.Static | BindingFlags.Public);
+            ms = typeof(NullableConverter).GetMethods(BindingFlags.Static | BindingFlags.Public);
             foreach (var item in ms)
                 {
                     var p = item.GetParameters();
@@ -97,7 +97,7 @@ namespace Bb.Expressions
         }
 
         /// <summary>
-        /// Resolve the mothod to convert sourceType to targetType
+        /// Resolve the method to convert sourceType to targetType
         /// </summary>
         /// <param name="type"></param>
         /// <param name="toOverride"></param>

@@ -24,7 +24,7 @@ namespace Bb.Expressions
                 this._variables.Add(variable.Name, variable);
 
             else if (variable.Instance != variable2.Instance)
-                throw new Exceptions.DuplicatedArgumentNameException($"{variable.Name} already existings");
+                throw new Exceptions.DuplicatedArgumentNameException($"{variable.Name} already existing");
 
             return variable;
 
