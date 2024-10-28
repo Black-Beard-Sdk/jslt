@@ -22,9 +22,7 @@ namespace Bb.Jslt.Services
 
         static TemplateWithExpressionBuilder()
         {
-
-            Bb.Expressions.ConverterHelper.ResolveConverter(typeof(InternalConverters), (m) => true);
-
+            
             _ctorJProperty = typeof(JProperty).GetConstructor(new Type[] { typeof(string), typeof(object) });
             _ctorJObject = typeof(JObject).GetConstructor(new Type[] { });
             //this._AddJObject = typeof(JObject).GetMethod("Add", new Type[] { typeof(object) });

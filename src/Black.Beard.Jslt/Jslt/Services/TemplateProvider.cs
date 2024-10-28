@@ -11,6 +11,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq.Expressions;
 using System.Text;
+using System.Reflection;
 
 namespace Bb.Jslt.Services
 {
@@ -21,6 +22,7 @@ namespace Bb.Jslt.Services
         static TemplateProvider()
         {
             Default = new TemplateProvider();
+            ConverterHelper.AppendConverters(typeof(InternalConverters), true, BindingFlags.Public, (m) => true);
         }
 
 

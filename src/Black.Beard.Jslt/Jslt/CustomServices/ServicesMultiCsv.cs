@@ -28,7 +28,7 @@ namespace Bb.Jslt.CustomServices
                     //IgnoreEmptyProperties = true,
                 };
 
-                FileReader reader = FileReader.Readfile(file.FullName, rulePayload ?? string.Empty);
+                FileReader reader = FileReader.FileReadFile(file.FullName, rulePayload ?? string.Empty, null);
 
                 foreach (var item in reader.Items)
                 {

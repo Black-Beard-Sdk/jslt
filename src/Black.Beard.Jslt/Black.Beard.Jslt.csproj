@@ -39,9 +39,9 @@
 	<ItemGroup>
 		<PackageReference Include="Antlr4.Runtime.Standard" Version="4.9.3" />
 		<PackageReference Include="Black.Beard.Analysis" Version="1.0.120" />
-		<PackageReference Include="Black.Beard.ComponentModel" Version="1.0.91" />
-		<PackageReference Include="Black.Beard.Helpers.Randoms" Version="2.0.39" />
-		<PackageReference Include="Black.Beard.Roslyn" Version="1.0.118" />
+		<PackageReference Include="Black.Beard.ComponentModel" Version="1.0.117" />
+		<PackageReference Include="Black.Beard.Helpers.Randoms" Version="2.0.40" />
+		<PackageReference Include="Black.Beard.Roslyn" Version="1.0.120" />
 		<PackageReference Include="System.CodeDom" Version="8.0.0" />
 	</ItemGroup>
 

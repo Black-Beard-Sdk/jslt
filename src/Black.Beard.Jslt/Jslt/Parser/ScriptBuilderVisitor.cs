@@ -8,6 +8,7 @@ using Bb.Builds;
 using Bb.Compilers;
 using Bb.ComponentModel;
 using Bb.ComponentModel.Factories;
+using Bb.Expressions;
 using Bb.Jslt.Asts;
 using Bb.Jslt.Builds;
 using Bb.Jslt.Services;
@@ -484,7 +485,7 @@ namespace Bb.Jslt.Parser
                 result = new JsltConstant(Guid.Parse(txt), JsltKind.Array) { Location = context.ToLocation() };
 
             else if (type == typeof(bool))
-                result = new JsltConstant(InternalConverters.ToBoolean(txt), JsltKind.Guid) { Location = context.ToLocation() };
+                result = new JsltConstant(ConverterHelper.ToBoolean(txt), JsltKind.Boolean) { Location = context.ToLocation() };
 
             else
                 result = new JsltConstant(txt, JsltKind.String) { Location = context.ToLocation() };
