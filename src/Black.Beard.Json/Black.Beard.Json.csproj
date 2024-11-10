@@ -10,10 +10,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Compile Remove="Commands\Command.Import.cs" />
-	</ItemGroup>
-
-	<ItemGroup>
 	  <None Include="..\..\Dockerfile.Ubuntu" Link="Dockerfile.Ubuntu" />
 	</ItemGroup>
 

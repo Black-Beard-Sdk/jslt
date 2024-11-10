@@ -3,7 +3,7 @@ using Bb.Jslt.Asts;
 using Bb.Jslt.Services;
 using Microsoft.Data.Sqlite;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json.Linq;
+using Oldtonsoft.Json.Linq;
 using Oldtonsoft.Json.Linq;
 using System;
 using System.Data.Common;

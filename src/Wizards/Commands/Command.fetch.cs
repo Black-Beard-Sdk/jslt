@@ -8,7 +8,7 @@ using Bb.Wizards;
 using LibGit2Sharp;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.Extensions.CommandLineUtils;
-using Newtonsoft.Json.Linq;
+using Oldtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Data;

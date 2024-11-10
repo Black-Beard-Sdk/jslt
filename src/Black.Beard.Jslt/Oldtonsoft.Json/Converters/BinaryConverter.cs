@@ -26,7 +26,7 @@
 #if HAVE_LINQ || HAVE_ADO_NET
 using System;
 using System.Globalization;
-using Newtonsoft.Json.Utilities;
+using Oldtonsoft.Json.Utilities;
 using System.Collections.Generic;
 using System.Diagnostics;
 #if HAVE_ADO_NET

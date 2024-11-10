@@ -7,7 +7,7 @@ using Bb.Compilers;
 using Bb.Wizards;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.Extensions.CommandLineUtils;
-using Newtonsoft.Json.Linq;
+using Oldtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Data;

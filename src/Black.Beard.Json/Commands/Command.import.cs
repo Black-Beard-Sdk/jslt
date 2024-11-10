@@ -21,19 +21,19 @@ namespace Bb.Json.Commands
     public partial class Command : Command<CommandLine>
     {
 
-        public CommandLineApplication CommandExport(CommandLine app)
+        public CommandLineApplication CommandImport(CommandLine app)
         {
 
             // json template 
 
-            var cmd = app.Command("export", config =>
+            var cmd = app.Command("import", config =>
             {
-                config.Description = "export process";
+                config.Description = "import process";
                 config.HelpOption(HelpFlag);
             });
 
             /*
-                json export csv <template> <target folder> --source 'source file' --name 'nameRoot' --h --s ';' --q '"'
+                json import csv <template> <target folder> --source 'source file' --name 'nameRoot' --h --s ';' --q '"'
             */
             cmd.Command("csv", config =>
             {
