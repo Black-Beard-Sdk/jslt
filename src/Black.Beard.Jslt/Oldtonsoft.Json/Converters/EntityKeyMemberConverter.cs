@@ -25,12 +25,12 @@
 
 #if HAVE_ENTITY_FRAMEWORK
 using System;
-using Newtonsoft.Json.Serialization;
+using Oldtonsoft.Json.Serialization;
 using System.Globalization;
-using Newtonsoft.Json.Utilities;
+using Oldtonsoft.Json.Utilities;
 using System.Diagnostics;
 
-namespace Newtonsoft.Json.Converters
+namespace Oldtonsoft.Json.Converters
 {
     /// <summary>
     /// Converts an Entity Framework <see cref="T:System.Data.EntityKeyMember"/> to and from JSON.

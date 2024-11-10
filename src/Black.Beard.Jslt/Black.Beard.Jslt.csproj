@@ -18,14 +18,20 @@
 		<Compile Remove="ConvertToDatables\**" />
 		<Compile Remove="Jslt\Parser\Grammar\.antlr\cache\**" />
 		<Compile Remove="Jslt\Parser\Grammar\.vscode\**" />
+		<Compile Remove="Oldtonsoft.Json\Bson\**" />
+		<Compile Remove="Oldtonsoft.Json\Properties\**" />
 		<Compile Remove="src\**" />
 		<EmbeddedResource Remove="ConvertToDatables\**" />
 		<EmbeddedResource Remove="Jslt\Parser\Grammar\.antlr\cache\**" />
 		<EmbeddedResource Remove="Jslt\Parser\Grammar\.vscode\**" />
+		<EmbeddedResource Remove="Oldtonsoft.Json\Bson\**" />
+		<EmbeddedResource Remove="Oldtonsoft.Json\Properties\**" />
 		<EmbeddedResource Remove="src\**" />
 		<None Remove="ConvertToDatables\**" />
 		<None Remove="Jslt\Parser\Grammar\.antlr\cache\**" />
 		<None Remove="Jslt\Parser\Grammar\.vscode\**" />
+		<None Remove="Oldtonsoft.Json\Bson\**" />
+		<None Remove="Oldtonsoft.Json\Properties\**" />
 		<None Remove="src\**" />
 	</ItemGroup>
 
@@ -34,6 +40,10 @@
 	  <Compile Remove="git.Expressions\Expressions\ExpressionHelper.cs" />
 	  <Compile Remove="git.Expressions\Expressions\NullableConverter.cs" />
 	  <Compile Remove="git.Expressions\Expressions\NullableConverter2.cs" />
+	  <Compile Remove="Oldtonsoft.Json\Converters\BsonObjectIdConverter.cs" />
+	  <Compile Remove="Oldtonsoft.Json\Converters\DiscriminatedUnionConverter.cs" />
+	  <Compile Remove="Oldtonsoft.Json\Converters\EntityKeyMemberConverter.cs" />
+	  <Compile Remove="Oldtonsoft.Json\Converters\ExpandoObjectConverter.cs" />
 	</ItemGroup>
 
 	<ItemGroup>

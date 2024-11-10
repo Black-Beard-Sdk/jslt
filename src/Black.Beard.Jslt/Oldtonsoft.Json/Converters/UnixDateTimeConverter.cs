@@ -34,6 +34,7 @@ namespace Oldtonsoft.Json.Converters
     /// </summary>
     public class UnixDateTimeConverter : DateTimeConverterBase
     {
+
         internal static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         /// <summary>
@@ -50,12 +51,12 @@ namespace Oldtonsoft.Json.Converters
             {
                 seconds = (long)(dateTime.ToUniversalTime() - UnixEpoch).TotalSeconds;
             }
-#if HAVE_DATE_TIME_OFFSET
+
             else if (value is DateTimeOffset dateTimeOffset)
             {
                 seconds = (long)(dateTimeOffset.ToUniversalTime() - UnixEpoch).TotalSeconds;
             }
-#endif
+
             else
             {
                 throw new JsonSerializationException("Expected date object value.");
@@ -110,9 +111,9 @@ namespace Oldtonsoft.Json.Converters
 
             if (seconds >= 0)
             {
+
                 DateTime d = UnixEpoch.AddSeconds(seconds);
 
-#if HAVE_DATE_TIME_OFFSET
                 Type t = (nullable)
                     ? Nullable.GetUnderlyingType(objectType)
                     : objectType;
@@ -120,8 +121,9 @@ namespace Oldtonsoft.Json.Converters
                 {
                     return new DateTimeOffset(d, TimeSpan.Zero);
                 }
-#endif
+
                 return d;
+
             }
             else
             {

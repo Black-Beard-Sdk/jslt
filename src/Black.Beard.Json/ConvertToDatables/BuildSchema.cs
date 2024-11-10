@@ -1,8 +1,6 @@
 ﻿using Oldtonsoft.Json.Linq;
-using System;
 using System.Data;
 using System.Linq;
-using System.Text;
 
 namespace Bb.ConvertToDatables
 {

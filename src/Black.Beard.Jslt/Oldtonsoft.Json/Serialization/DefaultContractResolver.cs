@@ -74,27 +74,12 @@ namespace Oldtonsoft.Json.Serialization
 
         private static readonly JsonConverter[] BuiltInConverters =
         {
-#if HAVE_ENTITY_FRAMEWORK
-            new EntityKeyMemberConverter(),
-#endif
-#if HAVE_DYNAMIC
-            new ExpandoObjectConverter(),
-#endif
-#if (HAVE_XML_DOCUMENT || HAVE_XLINQ)
-            new XmlNodeConverter(),
-#endif
-#if HAVE_ADO_NET
+            //new ExpandoObjectConverter(),
+            //new XmlNodeConverter(),
             new BinaryConverter(),
             new DataSetConverter(),
             new DataTableConverter(),
-#endif
-#if HAVE_FSHARP_TYPES
-            new DiscriminatedUnionConverter(),
-#endif
             new KeyValuePairConverter(),
-#pragma warning disable 618
-            new BsonObjectIdConverter(),
-#pragma warning restore 618
             new RegexConverter()
         };
 

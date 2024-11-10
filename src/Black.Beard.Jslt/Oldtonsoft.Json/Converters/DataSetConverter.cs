@@ -23,12 +23,12 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 #endregion
 
-#if HAVE_ADO_NET
+
 using System;
 using System.Data;
-using Newtonsoft.Json.Serialization;
+using Oldtonsoft.Json.Serialization;
 
-namespace Newtonsoft.Json.Converters
+namespace Oldtonsoft.Json.Converters
 {
     /// <summary>
     /// Converts a <see cref="DataSet"/> to and from JSON.
@@ -121,5 +121,3 @@ namespace Newtonsoft.Json.Converters
         }
     }
 }
-
-#endif

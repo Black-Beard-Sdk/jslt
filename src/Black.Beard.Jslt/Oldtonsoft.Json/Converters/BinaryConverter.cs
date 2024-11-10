@@ -23,28 +23,25 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 #endregion
 
-#if HAVE_LINQ || HAVE_ADO_NET
+
 using System;
 using System.Globalization;
 using Oldtonsoft.Json.Utilities;
 using System.Collections.Generic;
-using System.Diagnostics;
-#if HAVE_ADO_NET
 using System.Data.SqlTypes;
-#endif
 
-namespace Newtonsoft.Json.Converters
+namespace Oldtonsoft.Json.Converters
 {
     /// <summary>
     /// Converts a binary value to and from a base 64 string value.
     /// </summary>
     public class BinaryConverter : JsonConverter
     {
-#if HAVE_LINQ
+
         private const string BinaryTypeName = "System.Data.Linq.Binary";
         private const string BinaryToArrayName = "ToArray";
         private static ReflectionObject? _reflectionObject;
-#endif
+
 
         /// <summary>
         /// Writes the JSON representation of the object.
@@ -67,7 +64,7 @@ namespace Newtonsoft.Json.Converters
 
         private byte[] GetByteArray(object value)
         {
-#if HAVE_LINQ
+
             if (value.GetType().FullName == BinaryTypeName)
             {
                 EnsureReflectionObject(value.GetType());
@@ -75,18 +72,18 @@ namespace Newtonsoft.Json.Converters
 
                 return (byte[])_reflectionObject.GetValue(value, BinaryToArrayName)!;
             }
-#endif
-#if HAVE_ADO_NET
+
+
             if (value is SqlBinary binary)
             {
                 return binary.Value;
             }
-#endif
+
 
             throw new JsonSerializationException("Unexpected value type when writing binary: {0}".FormatWith(CultureInfo.InvariantCulture, value.GetType()));
         }
 
-#if HAVE_LINQ
+
         private static void EnsureReflectionObject(Type t)
         {
             if (_reflectionObject == null)
@@ -94,7 +91,7 @@ namespace Newtonsoft.Json.Converters
                 _reflectionObject = ReflectionObject.Create(t, t.GetConstructor(new[] { typeof(byte[]) }), BinaryToArrayName);
             }
         }
-#endif
+
 
         /// <summary>
         /// Reads the JSON representation of the object.
@@ -138,7 +135,7 @@ namespace Newtonsoft.Json.Converters
                 ? Nullable.GetUnderlyingType(objectType)
                 : objectType;
 
-#if HAVE_LINQ
+
             if (t.FullName == BinaryTypeName)
             {
                 EnsureReflectionObject(t);
@@ -146,14 +143,14 @@ namespace Newtonsoft.Json.Converters
 
                 return _reflectionObject.Creator!(data);
             }
-#endif
 
-#if HAVE_ADO_NET
+
+
             if (t == typeof(SqlBinary))
             {
                 return new SqlBinary(data);
             }
-#endif
+
 
             throw JsonSerializationException.Create(reader, "Unexpected object type when writing binary: {0}".FormatWith(CultureInfo.InvariantCulture, objectType));
         }
@@ -191,22 +188,21 @@ namespace Newtonsoft.Json.Converters
         /// </returns>
         public override bool CanConvert(Type objectType)
         {
-#if HAVE_LINQ
+
             if (objectType.FullName == BinaryTypeName)
             {
                 return true;
             }
-#endif
-#if HAVE_ADO_NET
+
+
             if (objectType == typeof(SqlBinary) || objectType == typeof(SqlBinary?))
             {
                 return true;
             }
-#endif
+
 
             return false;
         }
     }
 }
 
-#endif
