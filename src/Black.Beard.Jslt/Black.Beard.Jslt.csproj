@@ -20,18 +20,21 @@
 		<Compile Remove="Jslt\Parser\Grammar\.vscode\**" />
 		<Compile Remove="Oldtonsoft.Json\Bson\**" />
 		<Compile Remove="Oldtonsoft.Json\Properties\**" />
+		<Compile Remove="Oldtonsoft.Json\Schema\**" />
 		<Compile Remove="src\**" />
 		<EmbeddedResource Remove="ConvertToDatables\**" />
 		<EmbeddedResource Remove="Jslt\Parser\Grammar\.antlr\cache\**" />
 		<EmbeddedResource Remove="Jslt\Parser\Grammar\.vscode\**" />
 		<EmbeddedResource Remove="Oldtonsoft.Json\Bson\**" />
 		<EmbeddedResource Remove="Oldtonsoft.Json\Properties\**" />
+		<EmbeddedResource Remove="Oldtonsoft.Json\Schema\**" />
 		<EmbeddedResource Remove="src\**" />
 		<None Remove="ConvertToDatables\**" />
 		<None Remove="Jslt\Parser\Grammar\.antlr\cache\**" />
 		<None Remove="Jslt\Parser\Grammar\.vscode\**" />
 		<None Remove="Oldtonsoft.Json\Bson\**" />
 		<None Remove="Oldtonsoft.Json\Properties\**" />
+		<None Remove="Oldtonsoft.Json\Schema\**" />
 		<None Remove="src\**" />
 	</ItemGroup>
 
@@ -44,6 +47,7 @@
 	  <Compile Remove="Oldtonsoft.Json\Converters\DiscriminatedUnionConverter.cs" />
 	  <Compile Remove="Oldtonsoft.Json\Converters\EntityKeyMemberConverter.cs" />
 	  <Compile Remove="Oldtonsoft.Json\Converters\ExpandoObjectConverter.cs" />
+	  <Compile Remove="Oldtonsoft.Json\JsonValidatingReader.cs" />
 	</ItemGroup>
 
 	<ItemGroup>

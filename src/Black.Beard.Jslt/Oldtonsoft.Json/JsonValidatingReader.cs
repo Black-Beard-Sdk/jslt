@@ -25,21 +25,14 @@
 
 using System;
 using System.Collections.Generic;
-#if HAVE_BIG_INTEGER
 using System.Numerics;
-#endif
 using Oldtonsoft.Json.Linq;
 using Oldtonsoft.Json.Schema;
 using Oldtonsoft.Json.Utilities;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using System.IO;
-#if !HAVE_LINQ
 using Oldtonsoft.Json.Utilities.LinqBridge;
-#else
-using System.Linq;
-
-#endif
 
 #nullable disable
 
@@ -823,7 +816,7 @@ namespace Oldtonsoft.Json
             if (schema.DivisibleBy != null)
             {
                 bool notDivisible;
-#if HAVE_BIG_INTEGER
+
                 if (value is BigInteger i)
                 {
                     // not that this will lose any decimal point on DivisibleBy
@@ -839,7 +832,6 @@ namespace Oldtonsoft.Json
                     }
                 }
                 else
-#endif
                 {
                     notDivisible = !IsZero(Convert.ToInt64(value, CultureInfo.InvariantCulture) % schema.DivisibleBy.GetValueOrDefault());
                 }
