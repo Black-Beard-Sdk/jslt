@@ -233,6 +233,13 @@ namespace Bb.Jslt.Services
         private Func<RuntimeContext, JToken, JToken> Get(JsltBase tree, ScriptDiagnostics _errors, string filepathCode, string scriptPath, bool withDebug)
         {
 
+            var path = string.IsNullOrEmpty(scriptPath)
+                ? string.IsNullOrEmpty(this._configuration.OutputPath) 
+                    ? Environment.CurrentDirectory
+                    : this._configuration.OutputPath
+                : scriptPath;
+
+
             Func<RuntimeContext, JToken, JToken> fnc;
 
             if (tree != null)
@@ -240,7 +247,7 @@ namespace Bb.Jslt.Services
 
                 var sourceCompiler = new LocalMethodCompiler(withDebug)
                 {
-                    OutputPath = this._configuration.OutputPath,
+                    OutputPath = path,
                 };
 
                 var builder = new TemplateWithExpressionBuilder(_errors, sourceCompiler, withDebug)

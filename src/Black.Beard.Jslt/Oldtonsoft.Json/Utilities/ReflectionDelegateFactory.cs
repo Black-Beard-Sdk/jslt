@@ -28,10 +28,6 @@ using System.Globalization;
 using System.Reflection;
 using Oldtonsoft.Json.Serialization;
 
-#if !HAVE_LINQ
-using Oldtonsoft.Json.Utilities.LinqBridge;
-#endif
-
 namespace Oldtonsoft.Json.Utilities
 {
     internal abstract class ReflectionDelegateFactory

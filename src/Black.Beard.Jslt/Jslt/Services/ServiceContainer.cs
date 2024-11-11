@@ -110,24 +110,23 @@ namespace Bb.Jslt.Services
         /// <param name="name"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public Factory GetService(FunctionKindEnum kind, string name, Type[] parameters)
+        public Factory GetService(FunctionKindEnum kind, string name, Type[] parameters, RuleMatching[] ruleMatchings)
         {
 
             var d = _dic[kind];
 
-            List<Type> sign = new List<Type> { typeof(RuntimeContext) }; // add the runtime context as first parameter becauses it's alway the first parameter of all services
+            List<Type> sign = new List<Type> { typeof(RuntimeContext) }; // add the runtime context as first parameter because it's alway the first parameter of all services
             sign.AddRange(parameters);
 
             //if (ServiceContainer.Instance != this)
             //    return ServiceContainer.Instance.GetService(kind, name, parameters);
 
             if (d.TryGetValue(name.ToLower(), out TransformJsonServiceProvider serviceProvider))
-                return serviceProvider.Get_Impl(sign.ToArray());
+                return serviceProvider.Get_Impl(sign.ToArray(), ruleMatchings);
 
             return null;
 
         }
-
 
         public IEnumerable<TransformJsonServiceProvider> GetServices(FunctionKindEnum kind)
         {
@@ -143,12 +142,9 @@ namespace Bb.Jslt.Services
 
         }
 
-
         public ServiceDiscovery ServiceDiscovery { get; }
 
         public static ServiceContainer Instance { get; }
-
-
 
         private readonly Dictionary<FunctionKindEnum, Dictionary<string, TransformJsonServiceProvider>> _dic;
 

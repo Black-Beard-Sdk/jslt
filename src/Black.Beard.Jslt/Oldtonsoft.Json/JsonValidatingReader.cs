@@ -454,7 +454,6 @@ namespace Oldtonsoft.Json
             return dateTime;
         }
 
-#if HAVE_DATE_TIME_OFFSET
         /// <summary>
         /// Reads the next JSON token from the underlying <see cref="JsonReader"/> as a <see cref="Nullable{T}"/> of <see cref="DateTimeOffset"/>.
         /// </summary>
@@ -466,7 +465,6 @@ namespace Oldtonsoft.Json
             ValidateCurrentToken();
             return dateTimeOffset;
         }
-#endif
 
         /// <summary>
         /// Reads the next JSON token from the underlying <see cref="JsonReader"/>.

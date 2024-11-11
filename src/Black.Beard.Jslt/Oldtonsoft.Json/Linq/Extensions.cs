@@ -27,14 +27,7 @@ using System;
 using System.Collections.Generic;
 using Oldtonsoft.Json.Utilities;
 using System.Globalization;
-using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
-#if !HAVE_LINQ
-using Oldtonsoft.Json.Utilities.LinqBridge;
-#else
 using System.Linq;
-
-#endif
 
 namespace Oldtonsoft.Json.Linq
 {

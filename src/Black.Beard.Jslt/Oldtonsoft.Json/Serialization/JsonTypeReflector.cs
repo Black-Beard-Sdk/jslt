@@ -33,11 +33,7 @@ using System.Security;
 using System.Security.Permissions;
 #endif
 using Oldtonsoft.Json.Utilities;
-#if !HAVE_LINQ
-using Oldtonsoft.Json.Utilities.LinqBridge;
-#else
 using System.Linq;
-#endif
 using System.Runtime.Serialization;
 
 namespace Oldtonsoft.Json.Serialization
@@ -71,7 +67,7 @@ namespace Oldtonsoft.Json.Serialization
             return CachedAttributeGetter<T>.GetAttribute(attributeProvider);
         }
 
-#if HAVE_TYPE_DESCRIPTOR
+
         public static bool CanTypeDescriptorConvertString(Type type, out TypeConverter typeConverter)
         {
             typeConverter = TypeDescriptor.GetConverter(type);
@@ -93,7 +89,7 @@ namespace Oldtonsoft.Json.Serialization
 
             return false;
         }
-#endif
+
 
 #if HAVE_DATA_CONTRACTS
         public static DataContractAttribute? GetDataContractAttribute(Type type)
@@ -488,23 +484,9 @@ namespace Oldtonsoft.Json.Serialization
             {
                 if (_fullyTrusted == null)
                 {
-#if (DOTNET || PORTABLE || PORTABLE40)
                     _fullyTrusted = true;
-#elif !(NET20 || NET35 || PORTABLE40)
                     AppDomain appDomain = AppDomain.CurrentDomain;
-
                     _fullyTrusted = appDomain.IsHomogenous && appDomain.IsFullyTrusted;
-#else
-                    try
-                    {
-                        new SecurityPermission(PermissionState.Unrestricted).Demand();
-                        _fullyTrusted = true;
-                    }
-                    catch (Exception)
-                    {
-                        _fullyTrusted = false;
-                    }
-#endif
                 }
 
                 return _fullyTrusted.GetValueOrDefault();
@@ -515,16 +497,7 @@ namespace Oldtonsoft.Json.Serialization
         {
             get
             {
-//#if !(PORTABLE40 || PORTABLE || DOTNET || NETSTANDARD2_0)
-//                if (DynamicCodeGeneration)
-//                {
-//                    return DynamicReflectionDelegateFactory.Instance;
-//                }
-
-//                return LateBoundReflectionDelegateFactory.Instance;
-//#else
                 return ExpressionReflectionDelegateFactory.Instance;
-//#endif
             }
         }
     }

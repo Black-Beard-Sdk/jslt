@@ -24,11 +24,7 @@
 #endregion
 
 using System;
-using System.Diagnostics;
-using System.Globalization;
-#if HAVE_BIG_INTEGER
 using System.Numerics;
-#endif
 using Oldtonsoft.Json.Utilities;
 
 namespace Oldtonsoft.Json.Linq
@@ -224,14 +220,12 @@ namespace Oldtonsoft.Json.Linq
         /// <param name="value">The <see cref="Object"/> value to write.</param>
         public override void WriteValue(object? value)
         {
-#if HAVE_BIG_INTEGER
             if (value is BigInteger)
             {
                 InternalWriteValue(JsonToken.Integer);
                 AddValue(value, JsonToken.Integer);
             }
             else
-#endif
             {
                 base.WriteValue(value);
             }
@@ -436,7 +430,6 @@ namespace Oldtonsoft.Json.Linq
             AddValue(value, JsonToken.Date);
         }
 
-#if HAVE_DATE_TIME_OFFSET
         /// <summary>
         /// Writes a <see cref="DateTimeOffset"/> value.
         /// </summary>
@@ -446,7 +439,6 @@ namespace Oldtonsoft.Json.Linq
             base.WriteValue(value);
             AddValue(value, JsonToken.Date);
         }
-#endif
 
         /// <summary>
         /// Writes a <see cref="Byte"/>[] value.

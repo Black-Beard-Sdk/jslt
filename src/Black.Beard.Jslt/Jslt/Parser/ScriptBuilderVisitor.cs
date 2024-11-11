@@ -9,10 +9,12 @@ using Bb.Compilers;
 using Bb.ComponentModel;
 using Bb.ComponentModel.Factories;
 using Bb.Expressions;
+using Bb.JPaths;
 using Bb.Jslt.Asts;
 using Bb.Jslt.Builds;
 using Bb.Jslt.Services;
 using Bb.Nugets;
+using ICSharpCode.Decompiler.IL;
 using Microsoft.CodeAnalysis;
 using Oldtonsoft.Json.Linq;
 using System;
@@ -35,6 +37,17 @@ namespace Bb.Jslt.Parser
     public class ScriptBuilderVisitor : JsltParserBaseVisitor<object>
     {
 
+        static ScriptBuilderVisitor()
+        {
+            var rules = new List<RuleMatching>()
+            {
+                new RuleMatching(typeof(RuntimeContext), (source, target) => typeof(RuntimeContext) == source ? 0 : -1),
+                new RuleMatching(typeof(object), (source, target) => source == target ? 0 : ExpressionHelper.CanBeConverted(source, target)),
+                new RuleMatching(typeof(JToken), (source, target) => source == typeof(JsonPath) ? 1 : -1),
+            };
+            _ruleMatchings = rules.ToArray();
+        }
+
         /// <summary>
         /// Create a new instance of <see cref="ScriptBuilderVisitor"/>
         /// </summary>
@@ -52,7 +65,6 @@ namespace Bb.Jslt.Parser
 
             this._configuration = configuration;
             this._currentCulture = _configuration.Culture;
-            this._functions = new List<JsltFunctionCall>();
 
         }
 
@@ -63,65 +75,52 @@ namespace Bb.Jslt.Parser
         /// <returns></returns>
         public override object VisitScript([NotNull] JsltParser.ScriptContext context)
         {
-
             this._initialSource = new StringBuilder(context.Start.InputStream.ToString());
-
-            // parse document
             var result = context.json().Accept(this);
-
-            // resolve functions
-            foreach (var item in this._functions)
-            {
-
-                var types = ResolveArgumentsTypes(item);
-                Factory service;
-
-                if (this.OutputConfiguration != null && item == this.OutputConfiguration.Function)
-                    service = this.GetService(FunctionKindEnum.Output, item.Name, types, this._diagnostics, context.ToLocation());
-
-                else if (this.OutputConfiguration != null && item == this.OutputConfiguration.Writer)
-                    service = this.GetService(FunctionKindEnum.Writer, item.Name, types, this._diagnostics, context.ToLocation());
-
-                else
-                    service = this.GetService(FunctionKindEnum.FunctionStandard, item.Name, types, this._diagnostics, context.ToLocation());
-
-                if (service == null)
-                    AddError(item.Location, string.Empty, $"the service {item.Name} can't be resolved.");
-
-                else
-                {
-                    item.ServiceProvider = service;
-                    item.ParameterTypes = service.Types;
-                }
-
-            }
-
             return result;
-
         }
 
+        private JsltFunctionCall ResolveFunction(JsltFunctionCall item)
+        {
+
+            var types = ResolveArgumentsTypes(item);
+            Factory service;
+
+            if (this.OutputConfiguration != null && item == this.OutputConfiguration.Function)
+                service = this.GetService(FunctionKindEnum.Output, item.Name, types, this._diagnostics, item.GetLocation());
+
+            else if (this.OutputConfiguration != null && item == this.OutputConfiguration.Writer)
+                service = this.GetService(FunctionKindEnum.Writer, item.Name, types, this._diagnostics, item.GetLocation());
+
+            else
+                service = this.GetService(FunctionKindEnum.FunctionStandard, item.Name, types, this._diagnostics, item.GetLocation());
+
+            if (service == null)
+                AddError(item.Location, string.Empty, $"the service {item.Name} can't be resolved.");
+
+            else
+                item.ServiceProvider = service;
+
+            return item;
+        }
 
         internal Factory GetService(FunctionKindEnum kind, string name, Type[] types, ScriptDiagnostics diagnostics, TextLocation location)
         {
 
-            var result = ServiceContainer.Instance.GetService(kind, name, types);
-            if (result != null)
-                return result;
-
-            result = ServiceContainer.Instance.GetService(kind, name, types);
+            var result = ServiceContainer.Instance.GetService(kind, name, types, _ruleMatchings);
             if (result != null)
                 return result;
 
             var result2 = ServiceContainer.Instance.GetService(kind, name);
             if (result2 != null)
-                diagnostics.AddError(location, name, $"Service {name} exists but bad arguments calling");
+                diagnostics.AddError(location, name, $"Service {name} exists but arguments type not match");
 
             else
             {
+
                 result2 = ServiceContainer.Instance.GetService(kind, name);
                 if (result2 != null)
                     diagnostics.AddError(location, name, $"Service {name} exists but bad arguments calling");
-
                 else
                     diagnostics.AddError(location, name, $"Service {name} not found");
 
@@ -131,16 +130,8 @@ namespace Bb.Jslt.Parser
 
         }
 
-        ///// <summary>
-        ///// json : jsonValue
-        ///// </summary>
-        ///// <param name="context"></param>
-        ///// <returns></returns>
-        //public override object VisitJson([NotNull] JsltParser.JsonContext context)
-        //{
-        //    var result = base.VisitJson(context);
-        //    return result;
-        //}
+
+        #region json
 
         /// <summary>
         /// obj : 
@@ -423,42 +414,42 @@ namespace Bb.Jslt.Parser
             if (jsonType != null)
                 type = ((JsltConstant)jsonType.Accept(this)).Value as Type;
 
-            if (!forceText && txt.StartsWith("$")) // Convert text in jsonpath
-            {
+            //if (!forceText && txt.StartsWith("$")) // Convert text in jsonpath
+            //{
 
-                result = new JsltPath() { Value = txt, Location = context.ToLocation() };
+            //    result = new JsltPath() { Value = txt, Location = context.ToLocation() };
 
-                if (type != typeof(string))
-                {
+            //    if (type != typeof(string))
+            //    {
 
-                    List<JsltBase> args = null;
-                    var c = new JsltConstant(type, JsltKind.Type) { Location = context.ToLocation() };
+            //        List<JsltBase> args = null;
+            //        var c = new JsltConstant(type, JsltKind.Type) { Location = context.ToLocation() };
 
-                    if (containsVariable)
-                        args = new List<JsltBase>() { result, new JsltTranslateVariable(c) };
-                    else
-                        args = new List<JsltBase>() { result, c };
+            //        if (containsVariable)
+            //            args = new List<JsltBase>() { result, new JsltTranslateVariable(c) };
+            //        else
+            //            args = new List<JsltBase>() { result, c };
 
-                    var call = new JsltFunctionCall("convert", args) { Location = context.ToLocation() };
-                    this._functions.Add(call);
-                    result = call;
+            //        var call = new JsltFunctionCall("convert", args) { Location = context.ToLocation() };
+            //        ResolveFunction(call);
+            //        result = call;
 
-                }
-                else if (containsVariable) // Path without conversion
-                {
-                    result = new JsltTranslateVariable(result);
-                }
+            //    }
+            //    else if (containsVariable) // Path without conversion
+            //    {
+            //        result = new JsltTranslateVariable(result);
+            //    }
 
-            }
+            //}
 
+            //else
+            //{
+            // Text with conversion
+            if (containsVariable)
+                result = new JsltTranslateVariable(GetConstant(txt, type, context));
             else
-            {
-                // Text with conversion
-                if (containsVariable)
-                    result = new JsltTranslateVariable(GetConstant(txt, type, context));
-                else
-                    result = GetConstant(txt, type, context);
-            }
+                result = GetConstant(txt, type, context);
+            //}
 
             return result;
 
@@ -672,6 +663,8 @@ namespace Bb.Jslt.Parser
             return metadatas;
         }
 
+        #endregion json
+
 
         #region Jsonslt
 
@@ -806,9 +799,7 @@ namespace Bb.Jslt.Parser
                     LocalDebug.Stop();
 
                 var c = new JsltConstant(type, JsltKind.Type) { Location = jsonType.ToLocation() };
-                var call = new JsltFunctionCall("convert", new List<JsltBase>() { left, c }) { Location = jsonType.ToLocation() };
-                this._functions.Add(call);
-                left = call;
+                left = ResolveFunction(new JsltFunctionCall("convert", new List<JsltBase>() { left, c }) { Location = jsonType.ToLocation() });
             }
 
             return left;
@@ -961,15 +952,13 @@ namespace Bb.Jslt.Parser
 
                     else
                     {
-                        var call = new JsltFunctionCall(name, argumentsJson) { Location = context.ToLocation() };
-                        this._functions.Add(call);
+                        var call = ResolveFunction(new JsltFunctionCall(name, argumentsJson) { Location = context.ToLocation() });
 
                         var type = context.jsonType();
                         if (type != null)
                         {
                             var c = new JsltConstant(type, JsltKind.Type) { Location = type.ToLocation() };
-                            call = new JsltFunctionCall("convert", new List<JsltBase>() { call, c });
-                            this._functions.Add(call);
+                            call = ResolveFunction(new JsltFunctionCall("convert", new List<JsltBase>() { call, c }));
                         }
 
                         result = call;
@@ -1036,7 +1025,7 @@ namespace Bb.Jslt.Parser
                     _types.Add(v.Type);
 
                 else if (item.Value is JsltPath)
-                    _types.Add(typeof(JToken));
+                    _types.Add(typeof(JsonPath));
 
                 else if (item.Value is JsltVariable)
                     _types.Add(typeof(JToken));
@@ -1435,18 +1424,16 @@ namespace Bb.Jslt.Parser
 
         }
 
-
         #endregion directives
 
         private StringBuilder _initialSource;
         private readonly JsltParser _parser;
         private ScriptDiagnostics _diagnostics;
-        //private readonly ServiceFunctionFoundry _foundry;
         private readonly string _scriptPath;
         private readonly string _scriptPathDirectory;
+        private static readonly RuleMatching[] _ruleMatchings;
         private TranformJsonAstConfiguration _configuration;
         private CultureInfo _currentCulture;
-        private List<JsltFunctionCall> _functions;
 
     }
 

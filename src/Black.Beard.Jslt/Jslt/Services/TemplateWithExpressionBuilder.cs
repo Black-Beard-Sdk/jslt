@@ -4,6 +4,7 @@ using Bb.Codings;
 using Bb.Contracts;
 using Bb.Expressions;
 using Bb.Expressions.Statements;
+using Bb.JPaths;
 using Bb.Jslt.Asts;
 using Bb.Jslt.Parser;
 using Bb.Metrology;
@@ -22,7 +23,7 @@ namespace Bb.Jslt.Services
 
         static TemplateWithExpressionBuilder()
         {
-            
+
             _ctorJProperty = typeof(JProperty).GetConstructor(new Type[] { typeof(string), typeof(object) });
             _ctorJObject = typeof(JObject).GetConstructor(new Type[] { });
             //this._AddJObject = typeof(JObject).GetMethod("Add", new Type[] { typeof(object) });
@@ -116,7 +117,7 @@ namespace Bb.Jslt.Services
 
                     if (node.Source != null)
                     {
-                        
+
                         var mem = node.Source;
                         var resultToken = src.AddVar((typeof(JToken)), src.GetUniqueVariableName("source"), (Expression)node.Source.Accept(this));
                         node.Source = null;
@@ -317,7 +318,7 @@ namespace Bb.Jslt.Services
                     {
                         var t = type.AsConstant();
                         return RuntimeContext._getVariable.Call(ctx.Current.Context, name, t, node.GetLocation().AsConstant());
-                        
+
                     }
                 }
 
@@ -421,12 +422,14 @@ namespace Bb.Jslt.Services
                 }
 
                 foreach (var property in node.Arguments)
-                {
-                    Type targetType = node.ParameterTypes[args.Count];
-                    var argSourceValue = ((Expression)property.Value.Accept(this))
-                        .ConvertIfDifferent(targetType);
-                    args.Add(argSourceValue);
-                }
+                    using (CurrentContext ctx2 = NewContext())
+                    {
+                        Type targetType = node.ParameterTypes[args.Count];
+                        var argSourceValue = ((Expression)property.Value.Accept(this));
+                        argSourceValue = argSourceValue.ConvertIfDifferent(targetType);
+                        args.Add(argSourceValue);
+                    }
+
 
                 var arguments = typeof(object).NewArray(args.ToArray());
                 var keyMethod = Expression.Constant($"service_{this._indexMethod++}");
@@ -593,6 +596,10 @@ namespace Bb.Jslt.Services
             using (CurrentContext ctx = NewContext())
             {
 
+
+                var path = JsonPath.Parse(node.Value);
+                var value = Expression.Constant(JsonPath.Parse(node.Value));
+
                 var source = ctx.Current.RootSource;
 
                 if (node.Source != null)
@@ -600,14 +607,22 @@ namespace Bb.Jslt.Services
                     source = (Expression)node.Source.Accept(this);
                 }
 
-                ctx.Current.RootSource = Expression.Call
-                (
-                    RuntimeContext._getContentByJPath.Method,
-                    ctx.Current.Context,
-                    source,
-                    Expression.Constant(node.Value),
-                    node.GetLocation().AsConstant()
-                );
+                if (node.HasTag(TagEnum.ToExecute))
+                {
+                    ctx.Current.RootSource = Expression.Call
+                    (
+                        RuntimeContext._getContentByJPath.Method,
+                        ctx.Current.Context,
+                        source,
+                        value,
+                        node.GetLocation().AsConstant()
+                    );
+                }
+                else
+                {
+                    ctx.Current.RootSource = value;
+                }
+
                 return ctx.Current.RootSource;
             }
 
@@ -737,6 +752,11 @@ namespace Bb.Jslt.Services
         private class BuildContext
         {
 
+            public BuildContext()
+            {
+                this._dic = new Dictionary<string, object>();
+            }
+
             public ParameterExpression Argument;
 
             public ParameterExpression Context;
@@ -748,6 +768,19 @@ namespace Bb.Jslt.Services
             public SourceCode Source;
 
             public KindGenerating IsKindGenerating { get; internal set; }
+
+            public void AddInStorage(string key, object value)
+            {
+                _dic[key] = value;
+            }
+
+            public bool TryGetInStorage(string key, out object value)
+            {
+                return _dic.TryGetValue(key, out value);
+            }
+
+            private Dictionary<string, object> _dic;
+
         }
 
         private enum KindGenerating

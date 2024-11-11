@@ -29,6 +29,8 @@ using System.Collections.Generic;
 using Oldtonsoft.Json.Utilities;
 using System.IO;
 using System.Globalization;
+using ZstdSharp.Unsafe;
+using System.Net.Http.Headers;
 
 namespace Oldtonsoft.Json.Linq
 {
@@ -87,7 +89,7 @@ namespace Oldtonsoft.Json.Linq
         public JArray(object content)
         {
             Add(content);
-        }   
+        }
 
         internal override bool DeepEquals(JToken node)
         {
@@ -97,122 +99,6 @@ namespace Oldtonsoft.Json.Linq
         internal override JToken CloneToken()
         {
             return new JArray(this);
-        }
-
-        /// <summary>
-        /// Loads an <see cref="JArray"/> from a <see cref="JsonReader"/>. 
-        /// </summary>
-        /// <param name="reader">A <see cref="JsonReader"/> that will be read for the content of the <see cref="JArray"/>.</param>
-        /// <returns>A <see cref="JArray"/> that contains the JSON that was read from the specified <see cref="JsonReader"/>.</returns>
-        public new static JArray Load(JsonReader reader)
-        {
-            return Load(reader, null);
-        }
-
-        /// <summary>
-        /// Loads an <see cref="JArray"/> from a <see cref="JsonReader"/>. 
-        /// </summary>
-        /// <param name="reader">A <see cref="JsonReader"/> that will be read for the content of the <see cref="JArray"/>.</param>
-        /// <param name="settings">The <see cref="JsonLoadSettings"/> used to load the JSON.
-        /// If this is <c>null</c>, default load settings will be used.</param>
-        /// <returns>A <see cref="JArray"/> that contains the JSON that was read from the specified <see cref="JsonReader"/>.</returns>
-        public new static JArray Load(JsonReader reader, JsonLoadSettings? settings)
-        {
-            if (reader.TokenType == JsonToken.None)
-                if (!reader.Read())
-                    throw JsonReaderException.Create(reader, "Error reading JArray from JsonReader.");
-
-            reader.MoveToContent();
-
-            if (reader.TokenType != JsonToken.StartArray)
-                throw JsonReaderException.Create(reader, "Error reading JArray from JsonReader. Current JsonReader item is not an array: {0}".FormatWith(CultureInfo.InvariantCulture, reader.TokenType));
-
-            JArray a = new JArray();
-            a.SetLineInfo(reader as IJsonLineInfo, settings);
-
-            a.ReadTokenFrom(reader, settings);
-
-            return a;
-        }
-
-        /// <summary>
-        /// Load a <see cref="JArray"/> from a string that contains JSON.
-        /// </summary>
-        /// <param name="json">A <see cref="String"/> that contains JSON.</param>
-        /// <returns>A <see cref="JArray"/> populated from the string that contains JSON.</returns>
-        /// <example>
-        ///   <code lang="cs" source="..\Src\Newtonsoft.Json.Tests\Documentation\LinqToJsonTests.cs" region="LinqToJsonCreateParseArray" title="Parsing a JSON Array from Text" />
-        /// </example>
-        public new static JArray Parse(string json)
-        {
-            return Parse(json, null);
-        }
-
-        /// <summary>
-        /// Load a <see cref="JArray"/> from a string that contains JSON.
-        /// </summary>
-        /// <param name="json">A <see cref="String"/> that contains JSON.</param>
-        /// <param name="settings">The <see cref="JsonLoadSettings"/> used to load the JSON.
-        /// If this is <c>null</c>, default load settings will be used.</param>
-        /// <returns>A <see cref="JArray"/> populated from the string that contains JSON.</returns>
-        /// <example>
-        ///   <code lang="cs" source="..\Src\Newtonsoft.Json.Tests\Documentation\LinqToJsonTests.cs" region="LinqToJsonCreateParseArray" title="Parsing a JSON Array from Text" />
-        /// </example>
-        public new static JArray Parse(string json, JsonLoadSettings? settings)
-        {
-            using (JsonReader reader = new JsonTextReader(new StringReader(json)))
-            {
-                JArray a = Load(reader, settings);
-
-                while (reader.Read())
-                {
-                    // Any content encountered here other than a comment will throw in the reader.
-                }
-
-                return a;
-            }
-        }
-
-        /// <summary>
-        /// Creates a <see cref="JArray"/> from an object.
-        /// </summary>
-        /// <param name="o">The object that will be used to create <see cref="JArray"/>.</param>
-        /// <returns>A <see cref="JArray"/> with the values of the specified object.</returns>
-        public new static JArray FromObject(object o)
-        {
-            return FromObject(o, JsonSerializer.CreateDefault());
-        }
-
-        /// <summary>
-        /// Creates a <see cref="JArray"/> from an object.
-        /// </summary>
-        /// <param name="o">The object that will be used to create <see cref="JArray"/>.</param>
-        /// <param name="jsonSerializer">The <see cref="JsonSerializer"/> that will be used to read the object.</param>
-        /// <returns>A <see cref="JArray"/> with the values of the specified object.</returns>
-        public new static JArray FromObject(object o, JsonSerializer jsonSerializer)
-        {
-            JToken token = FromObjectInternal(o, jsonSerializer);
-
-            if (token.Type != JTokenType.Array)
-                throw new ArgumentException("Object serialized to {0}. JArray instance expected.".FormatWith(CultureInfo.InvariantCulture, token.Type));
-
-            return (JArray)token;
-
-        }
-
-        /// <summary>
-        /// Writes this token to a <see cref="JsonWriter"/>.
-        /// </summary>
-        /// <param name="writer">A <see cref="JsonWriter"/> into which this method will write.</param>
-        /// <param name="converters">A collection of <see cref="JsonConverter"/> which will be used when writing the token.</param>
-        public override void WriteTo(JsonWriter writer, params JsonConverter[] converters)
-        {
-            writer.WriteStartArray();
-
-            for (int i = 0; i < _values.Count; i++)
-                _values[i].WriteTo(writer, converters);
-
-            writer.WriteEndArray();
         }
 
         /// <summary>
@@ -370,6 +256,8 @@ namespace Oldtonsoft.Json.Linq
         /// <returns><c>true</c> if the <see cref="JArray"/> is read-only; otherwise, <c>false</c>.</returns>
         public bool IsReadOnly => false;
 
+
+
         /// <summary>
         /// Removes the first occurrence of a specific object from the <see cref="JArray"/>.
         /// </summary>
@@ -387,5 +275,134 @@ namespace Oldtonsoft.Json.Linq
         {
             return ContentsHashCode();
         }
+          
+
     }
+
+
+    public partial class JArray
+    {
+
+        /// <summary>
+        /// Loads an <see cref="JArray"/> from a <see cref="JsonReader"/>. 
+        /// </summary>
+        /// <param name="reader">A <see cref="JsonReader"/> that will be read for the content of the <see cref="JArray"/>.</param>
+        /// <returns>A <see cref="JArray"/> that contains the JSON that was read from the specified <see cref="JsonReader"/>.</returns>
+        public new static JArray Load(JsonReader reader)
+        {
+            return Load(reader, null);
+        }
+
+        /// <summary>
+        /// Loads an <see cref="JArray"/> from a <see cref="JsonReader"/>. 
+        /// </summary>
+        /// <param name="reader">A <see cref="JsonReader"/> that will be read for the content of the <see cref="JArray"/>.</param>
+        /// <param name="settings">The <see cref="JsonLoadSettings"/> used to load the JSON.
+        /// If this is <c>null</c>, default load settings will be used.</param>
+        /// <returns>A <see cref="JArray"/> that contains the JSON that was read from the specified <see cref="JsonReader"/>.</returns>
+        public new static JArray Load(JsonReader reader, JsonLoadSettings? settings)
+        {
+            if (reader.TokenType == JsonToken.None)
+                if (!reader.Read())
+                    throw JsonReaderException.Create(reader, "Error reading JArray from JsonReader.");
+
+            reader.MoveToContent();
+
+            if (reader.TokenType != JsonToken.StartArray)
+                throw JsonReaderException.Create(reader, "Error reading JArray from JsonReader. Current JsonReader item is not an array: {0}".FormatWith(CultureInfo.InvariantCulture, reader.TokenType));
+
+            JArray a = new JArray();
+            a.SetLineInfo(reader as IJsonLineInfo, settings);
+
+            a.ReadTokenFrom(reader, settings);
+
+            return a;
+        }
+
+        /// <summary>
+        /// Load a <see cref="JArray"/> from a string that contains JSON.
+        /// </summary>
+        /// <param name="json">A <see cref="String"/> that contains JSON.</param>
+        /// <returns>A <see cref="JArray"/> populated from the string that contains JSON.</returns>
+        /// <example>
+        ///   <code lang="cs" source="..\Src\Newtonsoft.Json.Tests\Documentation\LinqToJsonTests.cs" region="LinqToJsonCreateParseArray" title="Parsing a JSON Array from Text" />
+        /// </example>
+        public new static JArray Parse(string json)
+        {
+            return Parse(json, null);
+        }
+
+        /// <summary>
+        /// Load a <see cref="JArray"/> from a string that contains JSON.
+        /// </summary>
+        /// <param name="json">A <see cref="String"/> that contains JSON.</param>
+        /// <param name="settings">The <see cref="JsonLoadSettings"/> used to load the JSON.
+        /// If this is <c>null</c>, default load settings will be used.</param>
+        /// <returns>A <see cref="JArray"/> populated from the string that contains JSON.</returns>
+        /// <example>
+        ///   <code lang="cs" source="..\Src\Newtonsoft.Json.Tests\Documentation\LinqToJsonTests.cs" region="LinqToJsonCreateParseArray" title="Parsing a JSON Array from Text" />
+        /// </example>
+        public new static JArray Parse(string json, JsonLoadSettings? settings)
+        {
+            using (JsonReader reader = new JsonTextReader(new StringReader(json)))
+            {
+                JArray a = Load(reader, settings);
+
+                while (reader.Read())
+                {
+                    // Any content encountered here other than a comment will throw in the reader.
+                }
+
+                return a;
+            }
+        }
+
+        /// <summary>
+        /// Creates a <see cref="JArray"/> from an object.
+        /// </summary>
+        /// <param name="o">The object that will be used to create <see cref="JArray"/>.</param>
+        /// <returns>A <see cref="JArray"/> with the values of the specified object.</returns>
+        public new static JArray FromObject(object o)
+        {
+            return FromObject(o, JsonSerializer.CreateDefault());
+        }
+
+        /// <summary>
+        /// Creates a <see cref="JArray"/> from an object.
+        /// </summary>
+        /// <param name="o">The object that will be used to create <see cref="JArray"/>.</param>
+        /// <param name="jsonSerializer">The <see cref="JsonSerializer"/> that will be used to read the object.</param>
+        /// <returns>A <see cref="JArray"/> with the values of the specified object.</returns>
+        public new static JArray FromObject(object o, JsonSerializer jsonSerializer)
+        {
+            JToken token = FromObjectInternal(o, jsonSerializer);
+
+            if (token.Type != JTokenType.Array)
+                throw new ArgumentException("Object serialized to {0}. JArray instance expected.".FormatWith(CultureInfo.InvariantCulture, token.Type));
+
+            return (JArray)token;
+
+        }
+
+        /// <summary>
+        /// Writes this token to a <see cref="JsonWriter"/>.
+        /// </summary>
+        /// <param name="writer">A <see cref="JsonWriter"/> into which this method will write.</param>
+        /// <param name="converters">A collection of <see cref="JsonConverter"/> which will be used when writing the token.</param>
+        public override void WriteTo(JsonWriter writer, params JsonConverter[] converters)
+        {
+            writer.WriteStartArray();
+
+            for (int i = 0; i < _values.Count; i++)
+                _values[i].WriteTo(writer, converters);
+
+            writer.WriteEndArray();
+        }
+
+
+
+    }
+
+
+
 }

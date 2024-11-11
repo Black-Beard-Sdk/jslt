@@ -30,26 +30,27 @@ using Oldtonsoft.Json.Utilities;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
+using System.Linq.Expressions;
+
 #if HAVE_DYNAMIC
 using System.Dynamic;
 using System.Linq.Expressions;
 #endif
-#if HAVE_BIG_INTEGER
 using System.Numerics;
-#endif
 
 namespace Oldtonsoft.Json.Linq
 {
     /// <summary>
     /// Represents a value in JSON (string, integer, date, etc).
     /// </summary>
-    public partial class JValue : JToken, IEquatable<JValue>, IFormattable, IComparable, IComparable<JValue>
-#if HAVE_ICONVERTIBLE
-        , IConvertible
-#endif
+    public partial class JValue : JToken, IEquatable<JValue>, IFormattable, IComparable, IComparable<JValue>, IConvertible
+
     {
         private JTokenType _valueType;
         private object? _value;
+
+        #region ctors
 
         internal JValue(object? value, JTokenType type)
         {
@@ -131,7 +132,6 @@ namespace Oldtonsoft.Json.Linq
         {
         }
 
-#if HAVE_DATE_TIME_OFFSET
         /// <summary>
         /// Initializes a new instance of the <see cref="JValue"/> class with the given value.
         /// </summary>
@@ -140,7 +140,6 @@ namespace Oldtonsoft.Json.Linq
             : this(value, JTokenType.Date)
         {
         }
-#endif
 
         /// <summary>
         /// Initializes a new instance of the <see cref="JValue"/> class with the given value.
@@ -196,6 +195,8 @@ namespace Oldtonsoft.Json.Linq
         {
         }
 
+        #endregion ctors
+
         internal override bool DeepEquals(JToken node)
         {
             if (!(node is JValue other))
@@ -218,7 +219,6 @@ namespace Oldtonsoft.Json.Linq
         /// </value>
         public override bool HasValues => false;
 
-#if HAVE_BIG_INTEGER
         private static int CompareBigInteger(BigInteger i1, object i2)
         {
             int result = i1.CompareTo(ConvertUtils.ToBigInteger(i2));
@@ -242,7 +242,6 @@ namespace Oldtonsoft.Json.Linq
 
             return result;
         }
-#endif
 
         internal static int Compare(JTokenType valueType, object? objA, object? objB)
         {
@@ -262,47 +261,43 @@ namespace Oldtonsoft.Json.Linq
             switch (valueType)
             {
                 case JTokenType.Integer:
-                {
-#if HAVE_BIG_INTEGER
-                    if (objA is BigInteger integerA)
                     {
-                        return CompareBigInteger(integerA, objB);
-                    }
-                    if (objB is BigInteger integerB)
-                    {
+                        if (objA is BigInteger integerA)
+                        {
+                            return CompareBigInteger(integerA, objB);
+                        }
+                        if (objB is BigInteger integerB)
+                        {
                             return -CompareBigInteger(integerB, objA);
                         }
-#endif
-                    if (objA is ulong || objB is ulong || objA is decimal || objB is decimal)
-                    {
-                        return Convert.ToDecimal(objA, CultureInfo.InvariantCulture).CompareTo(Convert.ToDecimal(objB, CultureInfo.InvariantCulture));
+                        if (objA is ulong || objB is ulong || objA is decimal || objB is decimal)
+                        {
+                            return Convert.ToDecimal(objA, CultureInfo.InvariantCulture).CompareTo(Convert.ToDecimal(objB, CultureInfo.InvariantCulture));
+                        }
+                        else if (objA is float || objB is float || objA is double || objB is double)
+                        {
+                            return CompareFloat(objA, objB);
+                        }
+                        else
+                        {
+                            return Convert.ToInt64(objA, CultureInfo.InvariantCulture).CompareTo(Convert.ToInt64(objB, CultureInfo.InvariantCulture));
+                        }
                     }
-                    else if (objA is float || objB is float || objA is double || objB is double)
-                    {
-                        return CompareFloat(objA, objB);
-                    }
-                    else
-                    {
-                        return Convert.ToInt64(objA, CultureInfo.InvariantCulture).CompareTo(Convert.ToInt64(objB, CultureInfo.InvariantCulture));
-                    }
-                }
                 case JTokenType.Float:
-                {
-#if HAVE_BIG_INTEGER
-                    if (objA is BigInteger integerA)
                     {
-                        return CompareBigInteger(integerA, objB);
-                    }
-                    if (objB is BigInteger integerB)
-                    {
-                        return -CompareBigInteger(integerB, objA);
-                    }
-#endif
-                    if (objA is ulong || objB is ulong || objA is decimal || objB is decimal)
-                    {
-                        return Convert.ToDecimal(objA, CultureInfo.InvariantCulture).CompareTo(Convert.ToDecimal(objB, CultureInfo.InvariantCulture));
-                    }
-                    return CompareFloat(objA, objB);
+                        if (objA is BigInteger integerA)
+                        {
+                            return CompareBigInteger(integerA, objB);
+                        }
+                        if (objB is BigInteger integerB)
+                        {
+                            return -CompareBigInteger(integerB, objA);
+                        }
+                        if (objA is ulong || objB is ulong || objA is decimal || objB is decimal)
+                        {
+                            return Convert.ToDecimal(objA, CultureInfo.InvariantCulture).CompareTo(Convert.ToDecimal(objB, CultureInfo.InvariantCulture));
+                        }
+                        return CompareFloat(objA, objB);
                     }
                 case JTokenType.Comment:
                 case JTokenType.String:
@@ -317,27 +312,20 @@ namespace Oldtonsoft.Json.Linq
 
                     return b1.CompareTo(b2);
                 case JTokenType.Date:
-#if HAVE_DATE_TIME_OFFSET
                     if (objA is DateTime dateA)
                     {
-#else
-                        DateTime dateA = (DateTime)objA;
-#endif
                         DateTime dateB;
 
-#if HAVE_DATE_TIME_OFFSET
                         if (objB is DateTimeOffset offsetB)
                         {
                             dateB = offsetB.DateTime;
                         }
                         else
-#endif
                         {
                             dateB = Convert.ToDateTime(objB, CultureInfo.InvariantCulture);
                         }
 
                         return dateA.CompareTo(dateB);
-#if HAVE_DATE_TIME_OFFSET
                     }
                     else
                     {
@@ -349,7 +337,6 @@ namespace Oldtonsoft.Json.Linq
 
                         return offsetA.CompareTo(offsetB);
                     }
-#endif
                 case JTokenType.Bytes:
                     if (!(objB is byte[] bytesB))
                     {
@@ -409,7 +396,7 @@ namespace Oldtonsoft.Json.Linq
             return d1.CompareTo(d2);
         }
 
-#if HAVE_EXPRESSIONS
+
         private static bool Operation(ExpressionType operation, object? objA, object? objB, out object? result)
         {
             if (objA is string || objB is string)
@@ -421,7 +408,6 @@ namespace Oldtonsoft.Json.Linq
                 }
             }
 
-#if HAVE_BIG_INTEGER
             if (objA is BigInteger || objB is BigInteger)
             {
                 if (objA == null || objB == null)
@@ -456,7 +442,7 @@ namespace Oldtonsoft.Json.Linq
                 }
             }
             else
-#endif
+
                 if (objA is ulong || objB is ulong || objA is decimal || objB is decimal)
                 {
                     if (objA == null || objB == null)
@@ -555,7 +541,7 @@ namespace Oldtonsoft.Json.Linq
             result = null;
             return false;
         }
-#endif
+
 
         internal override JToken CloneToken()
         {
@@ -625,12 +611,10 @@ namespace Oldtonsoft.Json.Linq
             {
                 return JTokenType.Integer;
             }
-#if HAVE_BIG_INTEGER
             else if (value is BigInteger)
             {
                 return JTokenType.Integer;
             }
-#endif
             else if (value is double || value is float || value is decimal)
             {
                 return JTokenType.Float;
@@ -639,12 +623,10 @@ namespace Oldtonsoft.Json.Linq
             {
                 return JTokenType.Date;
             }
-#if HAVE_DATE_TIME_OFFSET
             else if (value is DateTimeOffset)
             {
                 return JTokenType.Date;
             }
-#endif
             else if (value is byte[])
             {
                 return JTokenType.Bytes;
@@ -758,12 +740,10 @@ namespace Oldtonsoft.Json.Linq
                     {
                         writer.WriteValue(ul);
                     }
-#if HAVE_BIG_INTEGER
                     else if (_value is BigInteger integer)
                     {
                         writer.WriteValue(integer);
                     }
-#endif
                     else
                     {
                         writer.WriteValue(Convert.ToInt64(_value, CultureInfo.InvariantCulture));
@@ -794,13 +774,11 @@ namespace Oldtonsoft.Json.Linq
                     writer.WriteValue(Convert.ToBoolean(_value, CultureInfo.InvariantCulture));
                     return;
                 case JTokenType.Date:
-#if HAVE_DATE_TIME_OFFSET
                     if (_value is DateTimeOffset offset)
                     {
                         writer.WriteValue(offset);
                     }
                     else
-#endif
                     {
                         writer.WriteValue(Convert.ToDateTime(_value, CultureInfo.InvariantCulture));
                     }
@@ -877,12 +855,12 @@ namespace Oldtonsoft.Json.Linq
         /// </returns>
         public override int GetHashCode()
         {
+
             if (_value == null)
-            {
                 return 0;
-            }
 
             return _value.GetHashCode();
+
         }
 
         /// <summary>
@@ -955,6 +933,7 @@ namespace Oldtonsoft.Json.Linq
         }
 
 #if HAVE_DYNAMIC
+
         /// <summary>
         /// Returns the <see cref="DynamicMetaObject"/> responsible for binding operations performed on this object.
         /// </summary>
@@ -1092,7 +1071,6 @@ namespace Oldtonsoft.Json.Linq
             return Compare(comparisonType, _value, obj._value);
         }
 
-#if HAVE_ICONVERTIBLE
         TypeCode IConvertible.GetTypeCode()
         {
             if (_value == null)
@@ -1182,6 +1160,6 @@ namespace Oldtonsoft.Json.Linq
         {
             return ToObject(conversionType);
         }
-#endif
+
     }
 }

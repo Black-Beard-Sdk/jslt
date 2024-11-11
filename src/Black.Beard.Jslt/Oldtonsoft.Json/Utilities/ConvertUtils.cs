@@ -27,24 +27,13 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
-#if HAVE_BIG_INTEGER
 using System.Numerics;
-#endif
-#if !HAVE_GUID_TRY_PARSE
 using System.Text;
 using System.Text.RegularExpressions;
-#endif
 using Oldtonsoft.Json.Serialization;
 using System.Reflection;
 using System.Diagnostics.CodeAnalysis;
-#if !HAVE_LINQ
-using Oldtonsoft.Json.Utilities.LinqBridge;
-#endif
-#if HAVE_ADO_NET
 using System.Data.SqlTypes;
-
-#endif
 
 namespace Oldtonsoft.Json.Utilities
 {
@@ -145,20 +134,16 @@ namespace Oldtonsoft.Json.Utilities
                 { typeof(double?), PrimitiveTypeCode.DoubleNullable },
                 { typeof(DateTime), PrimitiveTypeCode.DateTime },
                 { typeof(DateTime?), PrimitiveTypeCode.DateTimeNullable },
-#if HAVE_DATE_TIME_OFFSET
                 { typeof(DateTimeOffset), PrimitiveTypeCode.DateTimeOffset },
                 { typeof(DateTimeOffset?), PrimitiveTypeCode.DateTimeOffsetNullable },
-#endif
                 { typeof(decimal), PrimitiveTypeCode.Decimal },
                 { typeof(decimal?), PrimitiveTypeCode.DecimalNullable },
                 { typeof(Guid), PrimitiveTypeCode.Guid },
                 { typeof(Guid?), PrimitiveTypeCode.GuidNullable },
                 { typeof(TimeSpan), PrimitiveTypeCode.TimeSpan },
                 { typeof(TimeSpan?), PrimitiveTypeCode.TimeSpanNullable },
-#if HAVE_BIG_INTEGER
                 { typeof(BigInteger), PrimitiveTypeCode.BigInteger },
                 { typeof(BigInteger?), PrimitiveTypeCode.BigIntegerNullable },
-#endif
                 { typeof(Uri), PrimitiveTypeCode.Uri },
                 { typeof(string), PrimitiveTypeCode.String },
                 { typeof(byte[]), PrimitiveTypeCode.Bytes },
@@ -167,7 +152,6 @@ namespace Oldtonsoft.Json.Utilities
 #endif
             };
 
-#if HAVE_ICONVERTIBLE
         private static readonly TypeInformation[] PrimitiveTypeCodes =
         {
             // need all of these. lookup against the index with TypeCode value
@@ -191,7 +175,6 @@ namespace Oldtonsoft.Json.Utilities
             new TypeInformation(typeof(object), PrimitiveTypeCode.Empty), // no 17 in TypeCode for some reason
             new TypeInformation(typeof(string), PrimitiveTypeCode.String)
         };
-#endif
 
         public static PrimitiveTypeCode GetTypeCode(Type t)
         {
@@ -228,32 +211,23 @@ namespace Oldtonsoft.Json.Utilities
             return PrimitiveTypeCode.Object;
         }
 
-#if HAVE_ICONVERTIBLE
         public static TypeInformation GetTypeInformation(IConvertible convertable)
         {
             TypeInformation typeInformation = PrimitiveTypeCodes[(int)convertable.GetTypeCode()];
             return typeInformation;
         }
-#endif
 
         public static bool IsConvertible(Type t)
         {
-#if HAVE_ICONVERTIBLE
             return typeof(IConvertible).IsAssignableFrom(t);
-#else
-            return (
-                t == typeof(bool) || t == typeof(byte) || t == typeof(char) || t == typeof(DateTime) || t == typeof(decimal) || t == typeof(double) || t == typeof(short) || t == typeof(int) ||
-                t == typeof(long) || t == typeof(sbyte) || t == typeof(float) || t == typeof(string) || t == typeof(ushort) || t == typeof(uint) || t == typeof(ulong) || t.IsEnum());
-#endif
+            //return (
+            //    t == typeof(bool) || t == typeof(byte) || t == typeof(char) || t == typeof(DateTime) || t == typeof(decimal) || t == typeof(double) || t == typeof(short) || t == typeof(int) ||
+            //    t == typeof(long) || t == typeof(sbyte) || t == typeof(float) || t == typeof(string) || t == typeof(ushort) || t == typeof(uint) || t == typeof(ulong) || t.IsEnum());
         }
 
         public static TimeSpan ParseTimeSpan(string input)
         {
-#if HAVE_TIME_SPAN_PARSE_WITH_CULTURE
             return TimeSpan.Parse(input, CultureInfo.InvariantCulture);
-#else
-            return TimeSpan.Parse(input);
-#endif
         }
 
         private static readonly ThreadSafeStore<StructMultiKey<Type, Type>, Func<object?, object?>?> CastConverters =
@@ -276,7 +250,6 @@ namespace Oldtonsoft.Json.Utilities
             return o => call(null, o);
         }
 
-#if HAVE_BIG_INTEGER
         internal static BigInteger ToBigInteger(object value)
         {
             if (value is BigInteger integer)
@@ -358,7 +331,6 @@ namespace Oldtonsoft.Json.Utilities
                 throw new InvalidOperationException("Can not convert from BigInteger to {0}.".FormatWith(CultureInfo.InvariantCulture, targetType), ex);
             }
         }
-#endif
 
 #region TryConvert
         internal enum ConvertResult
@@ -446,13 +418,11 @@ namespace Oldtonsoft.Json.Utilities
                 return ConvertResult.Success;
             }
 
-#if HAVE_DATE_TIME_OFFSET
             if (initialValue is DateTime dt && targetType == typeof(DateTimeOffset))
             {
                 value = new DateTimeOffset(dt);
                 return ConvertResult.Success;
             }
-#endif
 
             if (initialValue is byte[] bytes && targetType == typeof(Guid))
             {
@@ -505,7 +475,6 @@ namespace Oldtonsoft.Json.Utilities
                 }
             }
 
-#if HAVE_BIG_INTEGER
             if (targetType == typeof(BigInteger))
             {
                 value = ToBigInteger(initialValue);
@@ -516,9 +485,7 @@ namespace Oldtonsoft.Json.Utilities
                 value = FromBigInteger(integer, targetType);
                 return ConvertResult.Success;
             }
-#endif
 
-#if HAVE_TYPE_DESCRIPTOR
             // see if source or target types have a TypeConverter that converts between the two
             TypeConverter toConverter = TypeDescriptor.GetConverter(initialType);
 
@@ -535,8 +502,8 @@ namespace Oldtonsoft.Json.Utilities
                 value = fromConverter.ConvertFrom(null, culture, initialValue);
                 return ConvertResult.Success;
             }
-#endif
-#if HAVE_ADO_NET
+
+
             // handle DBNull
             if (initialValue == DBNull.Value)
             {
@@ -550,7 +517,6 @@ namespace Oldtonsoft.Json.Utilities
                 value = null;
                 return ConvertResult.CannotConvertNull;
             }
-#endif
 
             if (targetType.IsInterface() || targetType.IsGenericTypeDefinition() || targetType.IsAbstract())
             {
@@ -1519,26 +1485,7 @@ namespace Oldtonsoft.Json.Utilities
 
         public static bool TryConvertGuid(string s, out Guid g)
         {
-            // GUID has to have format 00000000-0000-0000-0000-000000000000
-#if !HAVE_GUID_TRY_PARSE
-            if (s == null)
-            {
-                throw new ArgumentNullException("s");
-            }
-
-            Regex format = new Regex("^[A-Fa-f0-9]{8}-([A-Fa-f0-9]{4}-){3}[A-Fa-f0-9]{12}$");
-            Match match = format.Match(s);
-            if (match.Success)
-            {
-                g = new Guid(s);
-                return true;
-            }
-
-            g = Guid.Empty;
-            return false;
-#else
             return Guid.TryParseExact(s, "D", out g);
-#endif
         }
 
         public static bool TryHexTextToInt(char[] text, int start, int end, out int value)

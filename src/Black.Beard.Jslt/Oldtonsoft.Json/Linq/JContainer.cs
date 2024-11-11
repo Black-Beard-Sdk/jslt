@@ -30,11 +30,7 @@ using Oldtonsoft.Json.Utilities;
 using System.Collections;
 using System.Globalization;
 using System.Diagnostics.CodeAnalysis;
-#if !HAVE_LINQ
-using Oldtonsoft.Json.Utilities.LinqBridge;
-#else
 using System.Linq;
-#endif
 
 namespace Oldtonsoft.Json.Linq
 {
@@ -103,7 +99,7 @@ namespace Oldtonsoft.Json.Linq
                     return false;
 
             return true;
-        
+
         }
 
         /// <summary>
@@ -189,11 +185,11 @@ namespace Oldtonsoft.Json.Linq
                 if (o is JContainer c)
                     foreach (JToken d in c.Descendants())
                         yield return d;
-            
+
             }
         }
 
-        internal bool IsMultiContent([NotNullWhen(true)]object? content)
+        internal bool IsMultiContent([NotNullWhen(true)] object? content)
         {
             return (content is IEnumerable && !(content is string) && !(content is JToken) && !(content is byte[]));
         }
@@ -379,7 +375,7 @@ namespace Oldtonsoft.Json.Linq
 
             if (arrayIndex >= array.Length && arrayIndex != 0)
                 throw new ArgumentException("arrayIndex is equal to or greater than the length of array.");
-            
+
             if (Count > array.Length - arrayIndex)
                 throw new ArgumentException("The number of elements in the source JObject is greater than the available space from arrayIndex to the end of the destination array.");
 
@@ -413,7 +409,7 @@ namespace Oldtonsoft.Json.Linq
 
             if (o.Type == JTokenType.Property)
                 throw new ArgumentException("Can not add {0} to {1}.".FormatWith(CultureInfo.InvariantCulture, o.GetType(), GetType()));
-        
+
         }
 
         /// <summary>
@@ -453,6 +449,7 @@ namespace Oldtonsoft.Json.Linq
                 int multiIndex = index;
                 foreach (object c in enumerable)
                 {
+                    ResetCrc();
                     TryAddInternal(multiIndex, c, skipParentCheck);
                     multiIndex++;
                 }
@@ -499,6 +496,7 @@ namespace Oldtonsoft.Json.Linq
         public void RemoveAll()
         {
             ClearItems();
+            ResetCrc();
         }
 
         internal abstract void MergeItem(object content, JsonMergeSettings? settings);
@@ -509,13 +507,14 @@ namespace Oldtonsoft.Json.Linq
         /// <param name="content">The content to be merged.</param>
         public void Merge(object? content)
         {
-        
+
             if (content == null)
                 return;
 
             ValidateContent(content);
             MergeItem(content, null);
-        
+            ResetCrc();
+
         }
 
         /// <summary>
@@ -530,15 +529,16 @@ namespace Oldtonsoft.Json.Linq
 
             ValidateContent(content);
             MergeItem(content, settings);
+            ResetCrc();
 
         }
 
         private void ValidateContent(object content)
         {
-            
+
             if (content.GetType().IsSubclassOf(typeof(JToken)))
                 return;
-            
+
             if (IsMultiContent(content))
                 return;
 
@@ -558,7 +558,7 @@ namespace Oldtonsoft.Json.Linq
 
             if (endDepth > startDepth)
                 throw JsonReaderException.Create(reader, "Unexpected end of content while loading {0}.".FormatWith(CultureInfo.InvariantCulture, GetType().Name));
-        
+
         }
 
         internal void ReadContentFrom(JsonReader r, JsonLoadSettings? settings)
@@ -572,7 +572,7 @@ namespace Oldtonsoft.Json.Linq
             {
                 if (parent is JProperty p && p.Value != null)
                 {
-                    
+
                     if (parent == this)
                         return;
 
@@ -659,10 +659,10 @@ namespace Oldtonsoft.Json.Linq
                         break;
                     case JsonToken.PropertyName:
                         JProperty? property = ReadProperty(r, settings, lineInfo, parent);
-                        
+
                         if (property != null)
                             parent = property;
-                        
+
                         else
                             r.Skip();
 
@@ -682,22 +682,22 @@ namespace Oldtonsoft.Json.Linq
             JProperty? existingPropertyWithName = parentObject.Property(propertyName, StringComparison.Ordinal);
             if (existingPropertyWithName != null)
             {
-                
+
                 if (duplicatePropertyNameHandling == DuplicatePropertyNameHandling.Ignore)
                     return null;
-            
+
                 else if (duplicatePropertyNameHandling == DuplicatePropertyNameHandling.Error)
                     throw JsonReaderException.Create(r, "Property with the name '{0}' already exists in the current JSON object.".FormatWith(CultureInfo.InvariantCulture, propertyName));
-            
+
             }
 
             JProperty property = new JProperty(propertyName);
             property.SetLineInfo(lineInfo, settings);
-            
+
             // handle multiple properties with the same name in JSON
             if (existingPropertyWithName == null)
                 parent.Add(property);
-            
+
             else
                 existingPropertyWithName.Replace(property);
 
@@ -709,9 +709,9 @@ namespace Oldtonsoft.Json.Linq
             int hashCode = 0;
             foreach (JToken item in ChildrenTokens)
                 hashCode ^= item.GetDeepHashCode();
-            
+
             return hashCode;
-        
+
         }
 
         #region IList<JToken> Members
@@ -960,7 +960,7 @@ namespace Oldtonsoft.Json.Linq
 
                             if (sourceItem is JContainer existingContainer)
                                 existingContainer.Merge(targetItem, settings);
-                    
+
                             else
                             {
                                 if (targetItem != null)
@@ -968,7 +968,7 @@ namespace Oldtonsoft.Json.Linq
                                     JToken contentValue = CreateFromContent(targetItem);
                                     if (contentValue.Type != JTokenType.Null)
                                         target[i] = contentValue;
-                            
+
                                 }
                             }
                         }

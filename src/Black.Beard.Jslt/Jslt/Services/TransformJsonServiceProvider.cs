@@ -1,5 +1,8 @@
 ﻿using Bb.ComponentModel.Factories;
 using Bb.Expressions;
+using Bb.JPaths;
+using ICSharpCode.Decompiler.Metadata;
+using Oldtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,8 +23,8 @@ namespace Bb.Jslt.Services
         {
             _instances.Add(factory);
         }
-        
-        public Factory Get_Impl(Type[] parameters)
+
+        public Factory Get_Impl(Type[] parameters, RuleMatching[] ruleMatchings)
         {
 
             List<(int[], Factory)> result = new List<(int[], Factory)>(_instances.Count);
@@ -29,14 +32,14 @@ namespace Bb.Jslt.Services
                 if (factory.IsCtor)
                 {
                     if (factory.Parameters.Length + 1 == parameters.Length)
-                        TestCtorMethod(parameters, result, factory);
+                        TestCtorMethod(parameters, result, factory, ruleMatchings);
                 }
                 else
                 {
                     if (factory.Parameters.Length == parameters.Length)
-                        TestMethod(parameters, result, factory);
+                        TestMethod(parameters, result, factory, ruleMatchings);
                 }
-            
+
 
             if (result.Count == 1)
                 return result[0].Item2 as Factory;
@@ -47,54 +50,67 @@ namespace Bb.Jslt.Services
             return null;
         }
 
-        private static void TestCtorMethod(Type[] parameters, List<(int[], Factory)> result, Factory factory)
+        private static void TestCtorMethod(Type[] parameters, List<(int[], Factory)> result, Factory factory, RuleMatching[] ruleMatchings)
         {
-            bool test = true;
             int[] scoring = new int[parameters.Length];
             for (int i = 0; i < parameters.Length - 1; i++)
             {
-                var t = ExpressionHelper.CanBeConverted(factory.Parameters[i].ParameterType, parameters[i + 1]);
-                if (t == -1)
-                {
-                    test = false;
-                    break;
-                }
 
-                scoring[i] = t;
+                Type source = parameters[i + 1];
+                Type target = factory.Parameters[i].ParameterType;
+                if (!ComputeScoring(ruleMatchings, scoring, i, source, target))
+                    return;
 
             }
 
-            if (test)
-                result.Add((new int[] { scoring.Count(c => c == 0), scoring.Count(c => c == 1), scoring.Count(c => c == 2) }, factory));
+            result.Add((new int[] { scoring.Count(c => c == 0), scoring.Count(c => c == 1), scoring.Count(c => c == 2) }, factory));
 
         }
 
+
+
         /// <summary>
-        /// this method evaluate the ranl scoring of the méthod 
+        /// this method evaluate the scoring of the method 
         /// </summary>
         /// <param name="parameters"></param>
         /// <param name="result"></param>
         /// <param name="factory"></param>
-        private static void TestMethod(Type[] parameters, List<(int[], Factory)> result, Factory factory)
+        private static void TestMethod(Type[] parameters, List<(int[], Factory)> result, Factory factory, RuleMatching[] ruleMatchings)
         {
-            bool test = true;
+
             int[] scoring = new int[parameters.Length];
             for (int i = 0; i < parameters.Length; i++)
             {
-                var t = ExpressionHelper.CanBeConverted(factory.Parameters[i].ParameterType, parameters[i]);
-                if (t == -1)
-                {
-                    test = false;
-                    break;
-                }
 
-                scoring[i] = t;
+                Type source = parameters[i];
+                Type target = factory.Parameters[i].ParameterType;
+                if (!ComputeScoring(ruleMatchings, scoring, i, source, target))
+                    return;
 
             }
 
-            if (test)
-                result.Add((new int[] { scoring.Count(c => c == 0), scoring.Count(c => c == 1), scoring.Count(c => c == 2) }, factory));
+            result.Add((new int[] { scoring.Count(c => c == 0), scoring.Count(c => c == 1), scoring.Count(c => c == 2) }, factory));
 
+        }
+
+        private static bool ComputeScoring(RuleMatching[] ruleMatchings, int[] scoring, int i, Type source, Type target)
+        {
+            int o = 100;
+            foreach (var rule in ruleMatchings)
+                if (rule.Type.IsAssignableFrom(target))
+                {
+                    var t1 = rule.Filter(source, target);
+                    if (t1 != -1)
+                        o = Math.Min(o, t1);
+                    if (o == 0)
+                        break;
+                }
+
+            if (o == -1)
+                return false;
+
+            scoring[i] = o;
+            return true;
         }
 
         public IEnumerable<Factory> GetItems()
@@ -118,5 +134,21 @@ namespace Bb.Jslt.Services
         private List<Factory> _instances = new List<Factory>();
 
     }
+
+    public class RuleMatching
+    {
+
+        public RuleMatching(Type targetType, Func<Type, Type, int> filter)
+        {
+            this.Type = targetType;
+            this.Filter = filter;
+        }
+
+        public Type Type { get; }
+
+        public Func<Type, Type, int> Filter { get; }
+
+    }
+
 
 }

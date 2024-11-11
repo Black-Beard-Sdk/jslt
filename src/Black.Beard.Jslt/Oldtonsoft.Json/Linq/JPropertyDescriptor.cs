@@ -23,12 +23,13 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 #endregion
 
-#if HAVE_COMPONENT_MODEL
+
 using System;
 using System.ComponentModel;
 
-namespace Newtonsoft.Json.Linq
+namespace Oldtonsoft.Json.Linq
 {
+
     /// <summary>
     /// Represents a view of a <see cref="JProperty"/>.
     /// </summary>
@@ -152,5 +153,3 @@ namespace Newtonsoft.Json.Linq
         }
     }
 }
-
-#endif

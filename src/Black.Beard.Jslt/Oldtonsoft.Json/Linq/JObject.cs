@@ -35,11 +35,7 @@ using Oldtonsoft.Json.Utilities;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Diagnostics.CodeAnalysis;
-#if !HAVE_LINQ
-using Oldtonsoft.Json.Utilities.LinqBridge;
-#else
 using System.Linq;
-#endif
 
 namespace Oldtonsoft.Json.Linq
 {
@@ -51,7 +47,7 @@ namespace Oldtonsoft.Json.Linq
     /// </example>
     public partial class JObject : JContainer, IDictionary<string, JToken?>, INotifyPropertyChanged
     {
-        private readonly JPropertyKeyedCollection _properties = new JPropertyKeyedCollection();
+
 
         /// <summary>
         /// Gets the container's children tokens.
@@ -151,7 +147,7 @@ namespace Oldtonsoft.Json.Linq
 
             if (_properties.TryGetValue(newProperty.Name, out existing))
                 throw new ArgumentException("Can not add property {0} to {1}. Property with the same name already exists on object.".FormatWith(CultureInfo.InvariantCulture, newProperty.Name, GetType()));
-        
+
         }
 
         internal override void MergeItem(object content, JsonMergeSettings? settings)
@@ -339,6 +335,259 @@ namespace Oldtonsoft.Json.Linq
         }
 
         /// <summary>
+        /// Gets the <see cref="Oldtonsoft.Json.Linq.JToken"/> with the specified property name.
+        /// </summary>
+        /// <param name="propertyName">Name of the property.</param>
+        /// <returns>The <see cref="Oldtonsoft.Json.Linq.JToken"/> with the specified property name.</returns>
+        public JToken? GetValue(string? propertyName)
+        {
+            return GetValue(propertyName, StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Gets the <see cref="Oldtonsoft.Json.Linq.JToken"/> with the specified property name.
+        /// The exact property name will be searched for first and if no matching property is found then
+        /// the <see cref="StringComparison"/> will be used to match a property.
+        /// </summary>
+        /// <param name="propertyName">Name of the property.</param>
+        /// <param name="comparison">One of the enumeration values that specifies how the strings will be compared.</param>
+        /// <returns>The <see cref="Oldtonsoft.Json.Linq.JToken"/> with the specified property name.</returns>
+        public JToken? GetValue(string? propertyName, StringComparison comparison)
+        {
+            if (propertyName == null)
+            {
+                return null;
+            }
+
+            // attempt to get value via dictionary first for performance
+            var property = Property(propertyName, comparison);
+
+            return property?.Value;
+        }
+
+        /// <summary>
+        /// Tries to get the <see cref="Oldtonsoft.Json.Linq.JToken"/> with the specified property name.
+        /// The exact property name will be searched for first and if no matching property is found then
+        /// the <see cref="StringComparison"/> will be used to match a property.
+        /// </summary>
+        /// <param name="propertyName">Name of the property.</param>
+        /// <param name="value">The value.</param>
+        /// <param name="comparison">One of the enumeration values that specifies how the strings will be compared.</param>
+        /// <returns><c>true</c> if a value was successfully retrieved; otherwise, <c>false</c>.</returns>
+        public bool TryGetValue(string propertyName, StringComparison comparison, [NotNullWhen(true)] out JToken? value)
+        {
+            value = GetValue(propertyName, comparison);
+            return (value != null);
+        }
+
+        #region IDictionary<string,JToken> Members
+        /// <summary>
+        /// Adds the specified property name.
+        /// </summary>
+        /// <param name="propertyName">Name of the property.</param>
+        /// <param name="value">The value.</param>
+        public void Add(string propertyName, JToken? value)
+        {
+            Add(new JProperty(propertyName, value));
+        }
+
+        /// <summary>
+        /// Determines whether the JSON object has the specified property name.
+        /// </summary>
+        /// <param name="propertyName">Name of the property.</param>
+        /// <returns><c>true</c> if the JSON object has the specified property name; otherwise, <c>false</c>.</returns>
+        public bool ContainsKey(string propertyName)
+        {
+            ValidationUtils.ArgumentNotNull(propertyName, nameof(propertyName));
+
+            return _properties.Contains(propertyName);
+        }
+
+        ICollection<string> IDictionary<string, JToken?>.Keys => _properties.Keys;
+
+        /// <summary>
+        /// Removes the property with the specified name.
+        /// </summary>
+        /// <param name="propertyName">Name of the property.</param>
+        /// <returns><c>true</c> if item was successfully removed; otherwise, <c>false</c>.</returns>
+        public bool Remove(string propertyName)
+        {
+            JProperty? property = Property(propertyName, StringComparison.Ordinal);
+            if (property == null)
+            {
+                return false;
+            }
+
+            property.Remove();
+            return true;
+        }
+
+        /// <summary>
+        /// Tries to get the <see cref="Oldtonsoft.Json.Linq.JToken"/> with the specified property name.
+        /// </summary>
+        /// <param name="propertyName">Name of the property.</param>
+        /// <param name="value">The value.</param>
+        /// <returns><c>true</c> if a value was successfully retrieved; otherwise, <c>false</c>.</returns>
+        public bool TryGetValue(string propertyName, [NotNullWhen(true)] out JToken? value)
+        {
+            JProperty? property = Property(propertyName, StringComparison.Ordinal);
+            if (property == null)
+            {
+                value = null;
+                return false;
+            }
+
+            value = property.Value;
+            return true;
+        }
+
+        ICollection<JToken?> IDictionary<string, JToken?>.Values => throw new NotImplementedException();
+
+        #endregion
+
+        #region ICollection<KeyValuePair<string,JToken>> Members
+        void ICollection<KeyValuePair<string, JToken?>>.Add(KeyValuePair<string, JToken?> item)
+        {
+            Add(new JProperty(item.Key, item.Value));
+        }
+
+        void ICollection<KeyValuePair<string, JToken?>>.Clear()
+        {
+            RemoveAll();
+        }
+
+        bool ICollection<KeyValuePair<string, JToken?>>.Contains(KeyValuePair<string, JToken?> item)
+        {
+            JProperty? property = Property(item.Key, StringComparison.Ordinal);
+            if (property == null)
+            {
+                return false;
+            }
+
+            return (property.Value == item.Value);
+        }
+
+        void ICollection<KeyValuePair<string, JToken?>>.CopyTo(KeyValuePair<string, JToken?>[] array, int arrayIndex)
+        {
+            if (array == null)
+            {
+                throw new ArgumentNullException(nameof(array));
+            }
+            if (arrayIndex < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(arrayIndex), "arrayIndex is less than 0.");
+            }
+            if (arrayIndex >= array.Length && arrayIndex != 0)
+            {
+                throw new ArgumentException("arrayIndex is equal to or greater than the length of array.");
+            }
+            if (Count > array.Length - arrayIndex)
+            {
+                throw new ArgumentException("The number of elements in the source JObject is greater than the available space from arrayIndex to the end of the destination array.");
+            }
+
+            int index = 0;
+            foreach (JProperty property in _properties)
+            {
+                array[arrayIndex + index] = new KeyValuePair<string, JToken?>(property.Name, property.Value);
+                index++;
+            }
+        }
+
+        bool ICollection<KeyValuePair<string, JToken?>>.IsReadOnly => false;
+
+        bool ICollection<KeyValuePair<string, JToken?>>.Remove(KeyValuePair<string, JToken?> item)
+        {
+            if (!((ICollection<KeyValuePair<string, JToken?>>)this).Contains(item))
+            {
+                return false;
+            }
+
+            ((IDictionary<string, JToken>)this).Remove(item.Key);
+            return true;
+        }
+        #endregion
+
+        internal override int GetDeepHashCode()
+        {
+            return ContentsHashCode();
+        }
+
+        /// <summary>
+        /// Returns an enumerator that can be used to iterate through the collection.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="IEnumerator{T}"/> that can be used to iterate through the collection.
+        /// </returns>
+        public IEnumerator<KeyValuePair<string, JToken?>> GetEnumerator()
+        {
+            foreach (JProperty property in _properties)
+            {
+                yield return new KeyValuePair<string, JToken?>(property.Name, property.Value);
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="PropertyChanged"/> event with the provided arguments.
+        /// </summary>
+        /// <param name="propertyName">Name of the property.</param>
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+      
+#if HAVE_DYNAMIC                            
+        /// <summary>
+        /// Returns the <see cref="DynamicMetaObject"/> responsible for binding operations performed on this object.
+        /// </summary>
+        /// <param name="parameter">The expression tree representation of the runtime value.</param>
+        /// <returns>
+        /// The <see cref="DynamicMetaObject"/> to bind this object.
+        /// </returns>
+        protected override DynamicMetaObject GetMetaObject(Expression parameter)
+        {
+            return new DynamicProxyMetaObject<JObject>(parameter, this, new JObjectDynamicProxy());
+        }
+
+        private class JObjectDynamicProxy : DynamicProxy<JObject>
+        {
+            public override bool TryGetMember(JObject instance, GetMemberBinder binder, out object? result)
+            {
+                // result can be null
+                result = instance[binder.Name];
+                return true;
+            }
+
+            public override bool TrySetMember(JObject instance, SetMemberBinder binder, object value)
+            {
+                // this can throw an error if value isn't a valid for a JValue
+                if (!(value is JToken v))
+                {
+                    v = new JValue(value);
+                }
+
+                instance[binder.Name] = v;
+                return true;
+            }
+
+            public override IEnumerable<string> GetDynamicMemberNames(JObject instance)
+            {
+                return instance.Properties().Select(p => p.Name);
+            }
+        }
+#endif
+
+        private readonly JPropertyKeyedCollection _properties = new JPropertyKeyedCollection();
+
+
+    }
+
+
+    public partial class JObject
+    {
+
+        /// <summary>
         /// Loads a <see cref="JObject"/> from a <see cref="JsonReader"/>.
         /// </summary>
         /// <param name="reader">A <see cref="JsonReader"/> that will be read for the content of the <see cref="JObject"/>.</param>
@@ -477,338 +726,8 @@ namespace Oldtonsoft.Json.Linq
             writer.WriteEndObject();
         }
 
-        /// <summary>
-        /// Gets the <see cref="Oldtonsoft.Json.Linq.JToken"/> with the specified property name.
-        /// </summary>
-        /// <param name="propertyName">Name of the property.</param>
-        /// <returns>The <see cref="Oldtonsoft.Json.Linq.JToken"/> with the specified property name.</returns>
-        public JToken? GetValue(string? propertyName)
-        {
-            return GetValue(propertyName, StringComparison.Ordinal);
-        }
 
-        /// <summary>
-        /// Gets the <see cref="Oldtonsoft.Json.Linq.JToken"/> with the specified property name.
-        /// The exact property name will be searched for first and if no matching property is found then
-        /// the <see cref="StringComparison"/> will be used to match a property.
-        /// </summary>
-        /// <param name="propertyName">Name of the property.</param>
-        /// <param name="comparison">One of the enumeration values that specifies how the strings will be compared.</param>
-        /// <returns>The <see cref="Oldtonsoft.Json.Linq.JToken"/> with the specified property name.</returns>
-        public JToken? GetValue(string? propertyName, StringComparison comparison)
-        {
-            if (propertyName == null)
-            {
-                return null;
-            }
-
-            // attempt to get value via dictionary first for performance
-            var property = Property(propertyName, comparison);
-
-            return property?.Value;
-        }
-
-        /// <summary>
-        /// Tries to get the <see cref="Oldtonsoft.Json.Linq.JToken"/> with the specified property name.
-        /// The exact property name will be searched for first and if no matching property is found then
-        /// the <see cref="StringComparison"/> will be used to match a property.
-        /// </summary>
-        /// <param name="propertyName">Name of the property.</param>
-        /// <param name="value">The value.</param>
-        /// <param name="comparison">One of the enumeration values that specifies how the strings will be compared.</param>
-        /// <returns><c>true</c> if a value was successfully retrieved; otherwise, <c>false</c>.</returns>
-        public bool TryGetValue(string propertyName, StringComparison comparison, [NotNullWhen(true)]out JToken? value)
-        {
-            value = GetValue(propertyName, comparison);
-            return (value != null);
-        }
-
-        #region IDictionary<string,JToken> Members
-        /// <summary>
-        /// Adds the specified property name.
-        /// </summary>
-        /// <param name="propertyName">Name of the property.</param>
-        /// <param name="value">The value.</param>
-        public void Add(string propertyName, JToken? value)
-        {
-            Add(new JProperty(propertyName, value));
-        }
-
-        /// <summary>
-        /// Determines whether the JSON object has the specified property name.
-        /// </summary>
-        /// <param name="propertyName">Name of the property.</param>
-        /// <returns><c>true</c> if the JSON object has the specified property name; otherwise, <c>false</c>.</returns>
-        public bool ContainsKey(string propertyName)
-        {
-            ValidationUtils.ArgumentNotNull(propertyName, nameof(propertyName));
-
-            return _properties.Contains(propertyName);
-        }
-
-        ICollection<string> IDictionary<string, JToken?>.Keys => _properties.Keys;
-
-        /// <summary>
-        /// Removes the property with the specified name.
-        /// </summary>
-        /// <param name="propertyName">Name of the property.</param>
-        /// <returns><c>true</c> if item was successfully removed; otherwise, <c>false</c>.</returns>
-        public bool Remove(string propertyName)
-        {
-            JProperty? property = Property(propertyName, StringComparison.Ordinal);
-            if (property == null)
-            {
-                return false;
-            }
-
-            property.Remove();
-            return true;
-        }
-
-        /// <summary>
-        /// Tries to get the <see cref="Oldtonsoft.Json.Linq.JToken"/> with the specified property name.
-        /// </summary>
-        /// <param name="propertyName">Name of the property.</param>
-        /// <param name="value">The value.</param>
-        /// <returns><c>true</c> if a value was successfully retrieved; otherwise, <c>false</c>.</returns>
-        public bool TryGetValue(string propertyName, [NotNullWhen(true)]out JToken? value)
-        {
-            JProperty? property = Property(propertyName, StringComparison.Ordinal);
-            if (property == null)
-            {
-                value = null;
-                return false;
-            }
-
-            value = property.Value;
-            return true;
-        }
-
-        ICollection<JToken?> IDictionary<string, JToken?>.Values => throw new NotImplementedException();
-
-        #endregion
-
-        #region ICollection<KeyValuePair<string,JToken>> Members
-        void ICollection<KeyValuePair<string, JToken?>>.Add(KeyValuePair<string, JToken?> item)
-        {
-            Add(new JProperty(item.Key, item.Value));
-        }
-
-        void ICollection<KeyValuePair<string, JToken?>>.Clear()
-        {
-            RemoveAll();
-        }
-
-        bool ICollection<KeyValuePair<string, JToken?>>.Contains(KeyValuePair<string, JToken?> item)
-        {
-            JProperty? property = Property(item.Key, StringComparison.Ordinal);
-            if (property == null)
-            {
-                return false;
-            }
-
-            return (property.Value == item.Value);
-        }
-
-        void ICollection<KeyValuePair<string, JToken?>>.CopyTo(KeyValuePair<string, JToken?>[] array, int arrayIndex)
-        {
-            if (array == null)
-            {
-                throw new ArgumentNullException(nameof(array));
-            }
-            if (arrayIndex < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(arrayIndex), "arrayIndex is less than 0.");
-            }
-            if (arrayIndex >= array.Length && arrayIndex != 0)
-            {
-                throw new ArgumentException("arrayIndex is equal to or greater than the length of array.");
-            }
-            if (Count > array.Length - arrayIndex)
-            {
-                throw new ArgumentException("The number of elements in the source JObject is greater than the available space from arrayIndex to the end of the destination array.");
-            }
-
-            int index = 0;
-            foreach (JProperty property in _properties)
-            {
-                array[arrayIndex + index] = new KeyValuePair<string, JToken?>(property.Name, property.Value);
-                index++;
-            }
-        }
-
-        bool ICollection<KeyValuePair<string, JToken?>>.IsReadOnly => false;
-
-        bool ICollection<KeyValuePair<string, JToken?>>.Remove(KeyValuePair<string, JToken?> item)
-        {
-            if (!((ICollection<KeyValuePair<string, JToken?>>)this).Contains(item))
-            {
-                return false;
-            }
-
-            ((IDictionary<string, JToken>)this).Remove(item.Key);
-            return true;
-        }
-        #endregion
-
-        internal override int GetDeepHashCode()
-        {
-            return ContentsHashCode();
-        }
-
-        /// <summary>
-        /// Returns an enumerator that can be used to iterate through the collection.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="IEnumerator{T}"/> that can be used to iterate through the collection.
-        /// </returns>
-        public IEnumerator<KeyValuePair<string, JToken?>> GetEnumerator()
-        {
-            foreach (JProperty property in _properties)
-            {
-                yield return new KeyValuePair<string, JToken?>(property.Name, property.Value);
-            }
-        }
-
-        /// <summary>
-        /// Raises the <see cref="PropertyChanged"/> event with the provided arguments.
-        /// </summary>
-        /// <param name="propertyName">Name of the property.</param>
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-#if HAVE_INOTIFY_PROPERTY_CHANGING
-        /// <summary>
-        /// Raises the <see cref="PropertyChanging"/> event with the provided arguments.
-        /// </summary>
-        /// <param name="propertyName">Name of the property.</param>
-        protected virtual void OnPropertyChanging(string propertyName)
-        {
-            PropertyChanging?.Invoke(this, new PropertyChangingEventArgs(propertyName));
-        }
-#endif
-
-#if HAVE_COMPONENT_MODEL
-        // include custom type descriptor on JObject rather than use a provider because the properties are specific to a type
-
-        #region ICustomTypeDescriptor
-        PropertyDescriptorCollection ICustomTypeDescriptor.GetProperties()
-        {
-            return ((ICustomTypeDescriptor)this).GetProperties(null);
-        }
-
-        PropertyDescriptorCollection ICustomTypeDescriptor.GetProperties(Attribute[] attributes)
-        {
-            PropertyDescriptor[] propertiesArray = new PropertyDescriptor[Count];
-            int i = 0;
-            foreach (KeyValuePair<string, JToken?> propertyValue in this)
-            {
-                propertiesArray[i] = new JPropertyDescriptor(propertyValue.Key);
-                i++;
-            }
-
-            return new PropertyDescriptorCollection(propertiesArray);
-        }
-
-        AttributeCollection ICustomTypeDescriptor.GetAttributes()
-        {
-            return AttributeCollection.Empty;
-        }
-
-        string? ICustomTypeDescriptor.GetClassName()
-        {
-            return null;
-        }
-
-        string? ICustomTypeDescriptor.GetComponentName()
-        {
-            return null;
-        }
-
-        TypeConverter ICustomTypeDescriptor.GetConverter()
-        {
-            return new TypeConverter();
-        }
-
-        EventDescriptor? ICustomTypeDescriptor.GetDefaultEvent()
-        {
-            return null;
-        }
-
-        PropertyDescriptor? ICustomTypeDescriptor.GetDefaultProperty()
-        {
-            return null;
-        }
-
-        object? ICustomTypeDescriptor.GetEditor(Type editorBaseType)
-        {
-            return null;
-        }
-
-        EventDescriptorCollection ICustomTypeDescriptor.GetEvents(Attribute[] attributes)
-        {
-            return EventDescriptorCollection.Empty;
-        }
-
-        EventDescriptorCollection ICustomTypeDescriptor.GetEvents()
-        {
-            return EventDescriptorCollection.Empty;
-        }
-
-        object? ICustomTypeDescriptor.GetPropertyOwner(PropertyDescriptor pd)
-        {
-            if (pd is JPropertyDescriptor)
-            {
-                return this;
-            }
-
-            return null;
-        }
-        #endregion
-
-#endif
-
-#if HAVE_DYNAMIC                            
-        /// <summary>
-        /// Returns the <see cref="DynamicMetaObject"/> responsible for binding operations performed on this object.
-        /// </summary>
-        /// <param name="parameter">The expression tree representation of the runtime value.</param>
-        /// <returns>
-        /// The <see cref="DynamicMetaObject"/> to bind this object.
-        /// </returns>
-        protected override DynamicMetaObject GetMetaObject(Expression parameter)
-        {
-            return new DynamicProxyMetaObject<JObject>(parameter, this, new JObjectDynamicProxy());
-        }
-
-        private class JObjectDynamicProxy : DynamicProxy<JObject>
-        {
-            public override bool TryGetMember(JObject instance, GetMemberBinder binder, out object? result)
-            {
-                // result can be null
-                result = instance[binder.Name];
-                return true;
-            }
-
-            public override bool TrySetMember(JObject instance, SetMemberBinder binder, object value)
-            {
-                // this can throw an error if value isn't a valid for a JValue
-                if (!(value is JToken v))
-                {
-                    v = new JValue(value);
-                }
-
-                instance[binder.Name] = v;
-                return true;
-            }
-
-            public override IEnumerable<string> GetDynamicMemberNames(JObject instance)
-            {
-                return instance.Properties().Select(p => p.Name);
-            }
-        }
-#endif
     }
+
+
 }

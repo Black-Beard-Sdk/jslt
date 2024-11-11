@@ -20,6 +20,7 @@ namespace Bb.Jslt.Asts
         public JsltBase()
         {
             this._comments = new List<JsltComment>();
+            _tags = new HashSet<TagEnum>();
         }
 
         /// <summary>
@@ -60,7 +61,6 @@ namespace Bb.Jslt.Asts
         /// The location.
         /// </value>
         public TextLocation? Location { get; set; }
-
 
         /// <summary>
         /// Gets the comment's list.
@@ -125,10 +125,42 @@ namespace Bb.Jslt.Asts
             _comments.AddRange(comments);
         }
 
-        private List<JsltComment> _comments;
+        public bool AddTag(bool test, TagEnum tag)
+        {
+            if (test)
+                return _tags.Add(tag);
+            return false;
+        }
+
+        public bool AddTag(TagEnum tag)
+        {
+            return _tags.Add(tag);
+        }
+
+        public bool HasTag(TagEnum tag)
+        {
+            return _tags.Contains(tag);
+        }
+
+        public bool DelTag(TagEnum tag)
+        {
+            return _tags.Remove(tag);
+        }
+
+        private readonly List<JsltComment> _comments;
+        private readonly HashSet<TagEnum> _tags;
 
         public const string Quote = "\"";
 
     }
+
+
+    public enum TagEnum
+    {
+
+        ToExecute,
+
+    }
+
 
 }

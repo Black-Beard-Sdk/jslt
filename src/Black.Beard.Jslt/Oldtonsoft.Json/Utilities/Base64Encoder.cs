@@ -25,10 +25,6 @@
 
 using System;
 using System.IO;
-#if HAVE_ASYNC
-using System.Threading;
-using System.Threading.Tasks;
-#endif
 
 namespace Oldtonsoft.Json.Utilities
 {
@@ -155,63 +151,6 @@ namespace Oldtonsoft.Json.Utilities
         {
             _writer.Write(chars, index, count);
         }
-
-#if HAVE_ASYNC
-
-        public async Task EncodeAsync(byte[] buffer, int index, int count, CancellationToken cancellationToken)
-        {
-            ValidateEncode(buffer, index, count);
-
-            if (_leftOverBytesCount > 0)
-            {
-                if (FulfillFromLeftover(buffer, index, ref count))
-                {
-                    return;
-                }
-
-                int num2 = Convert.ToBase64CharArray(_leftOverBytes, 0, 3, _charsLine, 0);
-                await WriteCharsAsync(_charsLine, 0, num2, cancellationToken).ConfigureAwait(false);
-            }
-
-            StoreLeftOverBytes(buffer, index, ref count);
-
-            int num4 = index + count;
-            int length = LineSizeInBytes;
-            while (index < num4)
-            {
-                if (index + length > num4)
-                {
-                    length = num4 - index;
-                }
-                int num6 = Convert.ToBase64CharArray(buffer, index, length, _charsLine, 0);
-                await WriteCharsAsync(_charsLine, 0, num6, cancellationToken).ConfigureAwait(false);
-                index += length;
-            }
-        }
-
-        private Task WriteCharsAsync(char[] chars, int index, int count, CancellationToken cancellationToken)
-        {
-            return _writer.WriteAsync(chars, index, count, cancellationToken);
-        }
-
-        public Task FlushAsync(CancellationToken cancellationToken)
-        {
-            if (cancellationToken.IsCancellationRequested)
-            {
-                return cancellationToken.FromCanceled();
-            }
-
-            if (_leftOverBytesCount > 0)
-            {
-                int count = Convert.ToBase64CharArray(_leftOverBytes, 0, _leftOverBytesCount, _charsLine, 0);
-                _leftOverBytesCount = 0;
-                return WriteCharsAsync(_charsLine, 0, count, cancellationToken);
-            }
-
-            return AsyncUtils.CompletedTask;
-        }
-
-#endif
 
     }
 }

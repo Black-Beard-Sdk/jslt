@@ -1,8 +1,10 @@
 ﻿using Bb.Attributes;
+using Bb.JPaths;
 using Bb.Jslt.Services;
 using Oldtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Linq;
+using static Refs.Microsoft.AspNetCore.Http;
 
 namespace Bb.Jslt.CustomServices
 {
@@ -15,7 +17,7 @@ namespace Bb.Jslt.CustomServices
         [JsltExtensionMethod("select")]
         [JsltExtensionMethodParameter("source", "source of data")]
         [JsltExtensionMethodParameter("sourcePath", "filter")]
-        public static JToken ExecuteSelectOne(RuntimeContext ctx, JToken source, string filter)
+        public static JToken ExecuteSelectOne(RuntimeContext ctx, JToken source, JsonPath filter)
         {
 
             if (source != null)
@@ -112,7 +114,7 @@ namespace Bb.Jslt.CustomServices
         [JsltExtensionMethod("distinct")]
         [JsltExtensionMethodParameter("source", "Json array that contains duplicated datas.")]
         [JsltExtensionMethodParameter("sourcePath", "json path that select the unique key")]
-        public static JToken ExecuteDistinct(RuntimeContext ctx, JToken source, string sourcePath)
+        public static JArray ExecuteDistinct(RuntimeContext ctx, JToken source, JsonPath sourcePath)
         {
 
             List<JToken> resultValue = null;
@@ -135,61 +137,59 @@ namespace Bb.Jslt.CustomServices
 
         }
 
-        private static void ExecuteDistinct(JArray a, string sourcePath, List<JToken> resultValue, HashSet<object> _index)
+        private static void ExecuteDistinct(JArray a, JsonPath sourcePath, List<JToken> resultValue, HashSet<object> _index)
         {
-            foreach (var item in a)
+
+            var  pp = a.SelectTokens(sourcePath).ToList();
+            foreach (var item in pp)
             {
-                JToken result = item.SelectToken(sourcePath);
-                if (result != null)
+                switch (item.Type)
                 {
 
-                    switch (result.Type)
-                    {
+                    case JTokenType.TimeSpan:
+                    case JTokenType.Guid:
+                    case JTokenType.Uri:
+                    case JTokenType.Boolean:
+                    case JTokenType.Integer:
+                    case JTokenType.Float:
+                    case JTokenType.Date:
+                    case JTokenType.String:
 
-                        case JTokenType.TimeSpan:
-                        case JTokenType.Guid:
-                        case JTokenType.Uri:
-                        case JTokenType.Boolean:
-                        case JTokenType.Integer:
-                        case JTokenType.Float:
-                        case JTokenType.Date:
-                        case JTokenType.String:
+                    case JTokenType.Bytes:
+                        var v2 = item as JValue;
+                        if (_index.Add(v2.Value))
+                            resultValue.Add(item);
 
-                        case JTokenType.Bytes:
-                            var v2 = result as JValue;
-                            if (_index.Add(v2.Value))
-                                resultValue.Add(item);
+                        break;
 
-                            break;
+                    case JTokenType.Array:
+                        var a2 = item as JArray;
+                        if (_index.Add(a2.GetHashCode()))
+                            resultValue.Add(item);                        
+                        break;
 
-                        case JTokenType.Array:
-                            var a2 = result as JArray;
-                            ExecuteDistinct(a2, sourcePath, resultValue, _index);
-                            break;
+                    case JTokenType.Object:
+                        break;
 
-                        case JTokenType.Object:
-                            break;
+                    case JTokenType.Null:
+                    case JTokenType.None:
+                        break;
 
-                        case JTokenType.Null:
-                        case JTokenType.None:
-                            break;
+                    case JTokenType.Constructor:
+                    case JTokenType.Property:
+                    case JTokenType.Comment:
+                        break;
 
-                        case JTokenType.Constructor:
-                        case JTokenType.Property:
-                        case JTokenType.Comment:
-                            break;
+                    case JTokenType.Raw:
+                        break;
 
-                        case JTokenType.Raw:
-                            break;
-
-                        case JTokenType.Undefined:
-                        default:
-                            break;
-
-                    }
+                    case JTokenType.Undefined:
+                    default:
+                        break;
 
                 }
             }
+            
         }
 
     }

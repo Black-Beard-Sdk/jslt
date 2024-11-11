@@ -14,11 +14,16 @@
 		<RepositoryUrl>https://github.com/Black-Beard-Sdk/jslt</RepositoryUrl>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" />
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'" />
+
 	<ItemGroup>
 		<Compile Remove="ConvertToDatables\**" />
 		<Compile Remove="Jslt\Parser\Grammar\.antlr\cache\**" />
 		<Compile Remove="Jslt\Parser\Grammar\.vscode\**" />
 		<Compile Remove="Oldtonsoft.Json\Bson\**" />
+		<Compile Remove="Oldtonsoft.Json\Linq\JsonPath\**" />
 		<Compile Remove="Oldtonsoft.Json\Properties\**" />
 		<Compile Remove="Oldtonsoft.Json\Schema\**" />
 		<Compile Remove="src\**" />
@@ -26,6 +31,7 @@
 		<EmbeddedResource Remove="Jslt\Parser\Grammar\.antlr\cache\**" />
 		<EmbeddedResource Remove="Jslt\Parser\Grammar\.vscode\**" />
 		<EmbeddedResource Remove="Oldtonsoft.Json\Bson\**" />
+		<EmbeddedResource Remove="Oldtonsoft.Json\Linq\JsonPath\**" />
 		<EmbeddedResource Remove="Oldtonsoft.Json\Properties\**" />
 		<EmbeddedResource Remove="Oldtonsoft.Json\Schema\**" />
 		<EmbeddedResource Remove="src\**" />
@@ -33,6 +39,7 @@
 		<None Remove="Jslt\Parser\Grammar\.antlr\cache\**" />
 		<None Remove="Jslt\Parser\Grammar\.vscode\**" />
 		<None Remove="Oldtonsoft.Json\Bson\**" />
+		<None Remove="Oldtonsoft.Json\Linq\JsonPath\**" />
 		<None Remove="Oldtonsoft.Json\Properties\**" />
 		<None Remove="Oldtonsoft.Json\Schema\**" />
 		<None Remove="src\**" />
@@ -47,7 +54,29 @@
 	  <Compile Remove="Oldtonsoft.Json\Converters\DiscriminatedUnionConverter.cs" />
 	  <Compile Remove="Oldtonsoft.Json\Converters\EntityKeyMemberConverter.cs" />
 	  <Compile Remove="Oldtonsoft.Json\Converters\ExpandoObjectConverter.cs" />
+	  <Compile Remove="Oldtonsoft.Json\FormatterAssemblyStyle.cs" />
+	  <Compile Remove="Oldtonsoft.Json\JsonReader.Async.cs" />
+	  <Compile Remove="Oldtonsoft.Json\JsonTextReader.Async.cs" />
+	  <Compile Remove="Oldtonsoft.Json\JsonTextWriter.Async.cs" />
 	  <Compile Remove="Oldtonsoft.Json\JsonValidatingReader.cs" />
+	  <Compile Remove="Oldtonsoft.Json\JsonWriter.Async.cs" />
+	  <Compile Remove="Oldtonsoft.Json\Linq\JContainer.Async.cs" />
+	  <Compile Remove="Oldtonsoft.Json\Linq\JsonSelectSettings.cs" />
+	  <Compile Remove="Oldtonsoft.Json\SerializationBinder.cs" />
+	  <Compile Remove="Oldtonsoft.Json\Serialization\DiagnosticsTraceWriter.cs" />
+	  <Compile Remove="Oldtonsoft.Json\Serialization\DynamicValueProvider.cs" />
+	  <Compile Remove="Oldtonsoft.Json\Serialization\FormatterConverter.cs" />
+	  <Compile Remove="Oldtonsoft.Json\Serialization\JsonDynamicContract.cs" />
+	  <Compile Remove="Oldtonsoft.Json\Serialization\JsonFormatterConverter.cs" />
+	  <Compile Remove="Oldtonsoft.Json\Serialization\JsonISerializableContract.cs" />
+	  <Compile Remove="Oldtonsoft.Json\Utilities\AsyncUtils.cs" />
+	  <Compile Remove="Oldtonsoft.Json\Utilities\DynamicProxy.cs" />
+	  <Compile Remove="Oldtonsoft.Json\Utilities\DynamicProxyMetaObject.cs" />
+	  <Compile Remove="Oldtonsoft.Json\Utilities\DynamicReflectionDelegateFactory.cs" />
+	  <Compile Remove="Oldtonsoft.Json\Utilities\DynamicUtils.cs" />
+	  <Compile Remove="Oldtonsoft.Json\Utilities\FSharpUtils.cs" />
+	  <Compile Remove="Oldtonsoft.Json\Utilities\LinqBridge.cs" />
+	  <Compile Remove="Oldtonsoft.Json\Utilities\MethodBinder.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -62,7 +91,6 @@
 	<ItemGroup>
 		<Folder Include="git.Expressions\Expressions\Statements\" />
 		<Folder Include="Jslt\Parser\Grammar\.antlr\" />
-		<Folder Include="Oldtonsoft.Json\" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -128,11 +128,11 @@ namespace Black.Beard.Jslt.UnitTests
         public void TestJPath()
         {
 
-            var expected = "{ 'propertyName': '$.prop1.SubPprop1' }".Replace("'", "\"");
+            var template = "{ 'propertyName': $.prop1.SubPprop1 }".Replace("'", "\"");
             var source = "{ 'prop1': { 'SubPprop1':2 }, 'prop2':3 }".Replace("'", "\"");
 
             var src = new SourceJson[] { SourceJson.GetFromText(source) };
-            RuntimeContext result = Test(expected, src);
+            RuntimeContext result = Test(template, src);
             Assert.AreEqual(result.TokenResult["propertyName"], 2);
 
         }
@@ -141,7 +141,7 @@ namespace Black.Beard.Jslt.UnitTests
         public void TestJPathUnary()
         {
 
-            var expected = "{ 'propertyName': '$.prop1' }".Replace("'", "\"");
+            var expected = "{ 'propertyName': $.prop1 }".Replace("'", "\"");
             var source = "{ 'prop1': false }".Replace("'", "\"");
 
             var src = new SourceJson[] { SourceJson.GetFromText(source) };
@@ -154,7 +154,7 @@ namespace Black.Beard.Jslt.UnitTests
         public void TestJPathBinaryAddDecimal()
         {
 
-            var expected = "{'propertyName':'$.prop1.SubPprop1' + '$.prop2' }".Replace("'", "\"");
+            var expected = "{'propertyName': $.prop1.SubPprop1 + $.prop2 }".Replace("'", "\"");
             var source = "{ 'prop1': { 'SubPprop1':2.5 }, 'prop2':3 }".Replace("'", "\"");
 
             var src = new SourceJson[] { SourceJson.GetFromText(source) };
@@ -167,7 +167,7 @@ namespace Black.Beard.Jslt.UnitTests
         public void TestJPathBinaryAdd()
         {
 
-            var expected = "{'propertyName':'$.prop1.SubPprop1' + '$.prop2' }".Replace("'", "\"");
+            var expected = "{'propertyName': $.prop1.SubPprop1 +  $.prop2 }".Replace("'", "\"");
             var source = "{ 'prop1': { 'SubPprop1':2 }, 'prop2':3 }".Replace("'", "\"");
 
             var src = new SourceJson[] { SourceJson.GetFromText(source) };
@@ -180,7 +180,7 @@ namespace Black.Beard.Jslt.UnitTests
         public void TestJPathconcat()
         {
 
-            var expected = "{'propertyName':'$.prop1' + '$.prop2' }".Replace("'", "\"");
+            var expected = "{'propertyName': $.prop1  +  $.prop2 }".Replace("'", "\"");
             var source = "{ 'prop1': 'hello', 'prop2':' world' }".Replace("'", "\"");
 
             var src = new SourceJson[] { SourceJson.GetFromText(source) };
@@ -193,7 +193,7 @@ namespace Black.Beard.Jslt.UnitTests
         [TestMethod]
         public void TestJPathBinarySubstractDecimal()
         {
-            var expected = "{'propertyName':'$.prop1' - '$.prop2' }".Replace("'", "\"");
+            var expected = "{'propertyName': $.prop1 - $.prop2 }".Replace("'", "\"");
             var source = "{ 'prop1':2.5, 'prop2':1 }".Replace("'", "\"");
             var src = new SourceJson[] { SourceJson.GetFromText(source) };
             RuntimeContext result = Test(expected, src);
@@ -203,7 +203,7 @@ namespace Black.Beard.Jslt.UnitTests
         [TestMethod]
         public void TestJPathBinarySubstractInt()
         {
-            var expected = "{'propertyName':'$.prop1.SubPprop1' - '$.prop2' }".Replace("'", "\"");
+            var expected = "{'propertyName': $.prop1.SubPprop1 - $.prop2 }".Replace("'", "\"");
             var source = "{ 'prop1': { 'SubPprop1':2 }, 'prop2':3 }".Replace("'", "\"");
             var src = new SourceJson[] { SourceJson.GetFromText(source) };
             RuntimeContext result = Test(expected, src);
@@ -213,7 +213,7 @@ namespace Black.Beard.Jslt.UnitTests
         [TestMethod]
         public void TestJPathBinaryMultiplyInt()
         {
-            var expected = "{'propertyName':'$.prop1.SubPprop1' * '$.prop2' }".Replace("'", "\"");
+            var expected = "{'propertyName': $.prop1.SubPprop1 * $.prop2 }".Replace("'", "\"");
             var source = "{ 'prop1': { 'SubPprop1':2 }, 'prop2':3 }".Replace("'", "\"");
             var src = new SourceJson[] { SourceJson.GetFromText(source) };
             RuntimeContext result = Test(expected, src);
@@ -223,7 +223,7 @@ namespace Black.Beard.Jslt.UnitTests
         [TestMethod]
         public void TestJPathBinaryModuloInt()
         {
-            var expected = "{'propertyName':'$.prop1.SubPprop1' % '$.prop2' }".Replace("'", "\"");
+            var expected = "{'propertyName': $.prop1.SubPprop1 % $.prop2 }".Replace("'", "\"");
             var source = "{ 'prop1': { 'SubPprop1':7 }, 'prop2':3 }".Replace("'", "\"");
             var src = new SourceJson[] { SourceJson.GetFromText(source) };
             RuntimeContext result = Test(expected, src);
@@ -234,17 +234,16 @@ namespace Black.Beard.Jslt.UnitTests
         public void TestCaseWhen()
         {
             var expected = @"
-{
+            {
+                'propertyName': when($.prop1) 
+                {
+                    '1' : { 'sub1' : 11 },
+                    '3' : { 'sub1' : 22 }
+                }
+            }"
+            .Replace("'", "\"")
+            .Replace("`", "'");
 
-    'propertyName': when('$.prop1') 
-                    {
-                        '1' : { 'sub1' : 11 },
-                        '3' : { 'sub1' : 22 }
-                    }
-
-}".Replace("'", "\"")
- .Replace("`", "'")
-;
             var source = "{ 'prop1':3 }".Replace("'", "\"");
             var src = new SourceJson[] { SourceJson.GetFromText(source) };
             RuntimeContext result = Test(expected, src);
@@ -255,15 +254,11 @@ namespace Black.Beard.Jslt.UnitTests
         public void TestMethodCompiled()
         {
             var expected = @"
-{ 
-
-    '$functions': ['DataClass2.cs'],
-
-    'propertyName': mult($.prop1, 2)
-
-}".Replace("'", "\"")
- .Replace("`", "'")
-;
+            { 
+                '$functions': ['DataClass2.cs'],
+                'propertyName': mult($.prop1, 2)
+            }".Replace("'", "\"")
+             .Replace("`", "'");
             var source = "{ 'prop1':3 }".Replace("'", "\"");
             var src = new SourceJson[] { SourceJson.GetFromText(source) };
             RuntimeContext result = Test(expected, src );
@@ -274,12 +269,11 @@ namespace Black.Beard.Jslt.UnitTests
         public void TestCoalesce()
         {
             var expected = @"
-{ 
-    'propertyName': '$.prop1' ?? '$.prop2' ?? '$.prop3'
+            { 
+                'propertyName': $.prop1 ?? $.prop2 ?? $.prop3
 
-}".Replace("'", "\"")
- .Replace("`", "'")
-;
+            }".Replace("'", "\"")
+             .Replace("`", "'");
             var source = "{ 'prop3':3 }".Replace("'", "\"");
             var src = new SourceJson[] { SourceJson.GetFromText(source) };
             RuntimeContext result = Test(expected, src);
@@ -290,12 +284,12 @@ namespace Black.Beard.Jslt.UnitTests
         public void TestMethodMerge()
         {
             var expected = @"
-{ 
-    '@var1' : $.prop1, 
-    'propertyName': get('src2', '$[?(@.Id == @@var1)]' #string)
+            { 
+                '@var1' : $.prop1, 
+                'propertyName': get('src2', $[?(@.Id == @@var1)] #string)
 
-}".Replace("'", "\"")
- .Replace("`", "'")
+            }".Replace("'", "\"")
+             .Replace("`", "'")
 ;
             var source1 = "{ 'prop1':2 }".Replace("'", "\"");
             var source2 = "[ { 'Id':1, Name:'name1'}, { 'Id':2, Name:'name2' }, { 'Id':3, Name:'name3' } ]".Replace("'", "\"");
@@ -307,11 +301,9 @@ namespace Black.Beard.Jslt.UnitTests
         [TestMethod]
         public void TestSum()
         {
-            var expected = @"
-{ 'prices': sum('$..n') } 
-".Replace("'", "\"")
- .Replace("`", "'")
-;
+            var expected = @"{ 'prices': sum($..n) }"
+                .Replace("'", "\"")
+                .Replace("`", "'");
             var source1 = "{ 'prices': [{'n' : 1}, {'n' : 2}, {'n' : 3}] }".Replace("'", "\"");
 
             var src = new SourceJson[] { SourceJson.GetFromText(source1) };
@@ -323,10 +315,9 @@ namespace Black.Beard.Jslt.UnitTests
         public void Testconcat()
         {
             var expected = @"
-{ 'result': concat('$..n', null, null) } 
-".Replace("'", "\"")
- .Replace("`", "'")
-;
+            { 'result': concat($..n, null, null) } 
+            ".Replace("'", "\"")
+             .Replace("`", "'");
             var source1 = "{ 'prices': [{'n' : 1}, {'n' : 2}, {'n' : 3}] }".Replace("'", "\"");
 
             var src = new SourceJson[] { SourceJson.GetFromText(source1) };
@@ -337,11 +328,9 @@ namespace Black.Beard.Jslt.UnitTests
         [TestMethod]
         public void TestCrc32()
         {
-            var expected = @"
-{ 'result': crc32('toto') } 
-".Replace("'", "\"")
- .Replace("`", "'")
-;
+            var expected = @"{ 'result': crc32('toto') }"
+                .Replace("'", "\"")
+                .Replace("`", "'");
             var source1 = "{ }".Replace("'", "\"");
 
             var src = new SourceJson[] { SourceJson.GetFromText(source1) };
@@ -353,10 +342,10 @@ namespace Black.Beard.Jslt.UnitTests
         public void TestId()
         {
             var expected = @"
-{ 'result': uuid() } 
-".Replace("'", "\"")
- .Replace("`", "'")
-;
+            { 'result': uuid() } 
+            ".Replace("'", "\"")
+             .Replace("`", "'");
+
             var source1 = "{ }".Replace("'", "\"");
 
             var src = new SourceJson[] { SourceJson.GetFromText(source1) };
@@ -371,10 +360,9 @@ namespace Black.Beard.Jslt.UnitTests
         {
 
             var expected = @"
-{ 'result': format(103254895, 'C', 'fr-FR') } 
-".Replace("'", "\"")
- .Replace("`", "'")
-;
+            { 'result': format(103254895, 'C', 'fr-FR') } 
+            ".Replace("'", "\"")
+             .Replace("`", "'");
             var source1 = "{ }".Replace("'", "\"");
 
             var src = new SourceJson[] { SourceJson.GetFromText(source1) };
@@ -387,10 +375,9 @@ namespace Black.Beard.Jslt.UnitTests
         {
 
             var expected = @"
-{ 'result': parsedate('Freitag, 31. Oktober 2008', 'de-DE') } 
-".Replace("'", "\"")
- .Replace("`", "'")
-;
+            { 'result': parsedate('Freitag, 31. Oktober 2008', 'de-DE') } 
+            ".Replace("'", "\"")
+             .Replace("`", "'");
             var source1 = "{ }".Replace("'", "\"");
 
             var src = new SourceJson[] { SourceJson.GetFromText(source1) };
@@ -403,10 +390,9 @@ namespace Black.Beard.Jslt.UnitTests
         {
 
             var expected = @"
-{ 'result': tobase64('test') } 
-".Replace("'", "\"")
- .Replace("`", "'")
-;
+            { 'result': tobase64('test') } 
+            ".Replace("'", "\"")
+             .Replace("`", "'");
             var source1 = "{ }".Replace("'", "\"");
 
             var src = new SourceJson[] { SourceJson.GetFromText(source1) };
@@ -419,10 +405,9 @@ namespace Black.Beard.Jslt.UnitTests
         {
 
             var expected = @"
-{ 'result': Frombase64('dGVzdA==') } 
-".Replace("'", "\"")
- .Replace("`", "'")
-;
+            { 'result': Frombase64('dGVzdA==') } 
+            ".Replace("'", "\"")
+             .Replace("`", "'");
             var source1 = "{ }".Replace("'", "\"");
 
             var src = new SourceJson[] { SourceJson.GetFromText(source1) };
@@ -435,10 +420,9 @@ namespace Black.Beard.Jslt.UnitTests
         {
 
             var expected = @"
-{ 'result': now(false) } 
-".Replace("'", "\"")
- .Replace("`", "'")
-;
+            { 'result': now(false) } 
+            ".Replace("'", "\"")
+             .Replace("`", "'");
             var source1 = "{ }".Replace("'", "\"");
 
             var dte1 = DateTime.Now;
@@ -454,15 +438,18 @@ namespace Black.Beard.Jslt.UnitTests
         public void TestDistinct()
         {
 
-            var expected = @" { 'result': distinct($, '$') } 
-                            ".Replace("'", "\"")
-                             .Replace("`", "'")
-;
-            var source1 = "[1,2,1,3]".Replace("'", "\"");
+            var expected = @" { 'result': distinct($, $.*) }"
+                    .Replace("'", "\"")
+                    .Replace("`", "'");
 
+            var source1 = "[1,2,1,3]".Replace("'", "\"");
             var src = new SourceJson[] { SourceJson.GetFromText(source1) };
             RuntimeContext result = Test(expected, src);
-            Assert.AreEqual(result.TokenResult["result"], "test");
+            var j = (JArray)result.TokenResult["result"];
+            Assert.AreEqual(j.Count, 3);
+            Assert.AreEqual(j[0], 1);
+            Assert.AreEqual(j[1], 2);
+            Assert.AreEqual(j[2], 3);
         }
 
         [TestMethod]
@@ -575,8 +562,8 @@ namespace Black.Beard.Jslt.UnitTests
                  ;
 
             RuntimeContext result = Test(template, null);
-            var a = result.TokenResult as Oldtonsoft.Json.Linq.JObject;
-            var b = a["Data"][0] as Oldtonsoft.Json.Linq.JObject;
+            var a = result.TokenResult as JObject;
+            var b = a["Data"][0] as JObject;
 
             Assert.AreEqual(b["$_line"], 1);
             Assert.AreEqual(b["value"], "test1");
@@ -585,12 +572,17 @@ namespace Black.Beard.Jslt.UnitTests
 
         private static RuntimeContext Test(string templatePayload, SourceJson[] sources, params (string, Type)[] services)
         {
+            return Test(templatePayload, false, sources, services);
+        }
+
+            private static RuntimeContext Test(string templatePayload, bool withDebug, SourceJson[] sources, params (string, Type)[] services)
+        {
 
             var src = new Sources(sources[0]);
             for (int i = 1; i < sources.Length; i++)
                 src.Add(sources[i]);
 
-            var template = GetProvider(templatePayload, services);
+            var template = GetProvider(templatePayload, withDebug, services);
 
             if (!template.Diagnostics.Success)
             {
@@ -623,7 +615,7 @@ namespace Black.Beard.Jslt.UnitTests
         }
 
 
-        private static JsltTemplate GetProvider(string payloadTemplate, params (string, Type)[] services)
+        private static JsltTemplate GetProvider(string payloadTemplate, bool withDebug, params (string, Type)[] services)
         {
 
             var configuration = new TranformJsonAstConfiguration()
@@ -633,7 +625,7 @@ namespace Black.Beard.Jslt.UnitTests
 
             TemplateProvider Templateprovider = TemplateProvider.Get(configuration);
             StringBuilder sb = new StringBuilder(payloadTemplate.Replace('\'', '"').Replace('§', '\''));
-            JsltTemplate template = Templateprovider.GetTemplate(sb, false, string.Empty);
+            JsltTemplate template = Templateprovider.GetTemplate(sb, withDebug, string.Empty);
 
             return template;
 

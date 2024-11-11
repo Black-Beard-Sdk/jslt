@@ -2,7 +2,35 @@
 
 [![Build status](https://ci.appveyor.com/api/projects/status/9uj618usw1xuqt8r?svg=true)](https://ci.appveyor.com/project/gaelgael5/jslt)
 
-Implementation of jslt language in DOTNET. Use a template for transform Json To another json. Consider the following template. note this template is a json that describe the structure of the target json. If the template is empty, the process return the initial source json.
+Implementation of jslt language in DOTNET.
+Use a template for transform Json To another json. Consider the following template. note this template is a json that describe the structure of the target json. If the template is empty, the process return the initial source json.
+
+a template is json artifact. 
+a value of property can be 
+* a array
+  * "property" : [ \{ } ]
+* a json object
+  * "property" : \{ }
+* a json value
+  * "property" : 6
+  * "property" : 'toto'
+  * "property" : true
+  * "property" : null
+* a variable
+  * "property" : @variable
+* a json path
+    * $.property
+    * @variable:$.property
+* a method
+  * "property" : sum(1, 2)
+* a loop
+  * "property" : [ { "$" : $.items } ]
+* a cast
+  * "property" : @variable #integer
+* a when
+    * "property" : when(@variable) 
+      * { "case1" : { "toto" : 1 }, "case2" : { 'titi" : "test" } }
+
 
 ## Default case ##  
 
@@ -44,6 +72,13 @@ Like that
 }
 ```
 
+* The variable @a contains value 6. 
+* The output target 'a' contains the value 6 (the value of the variable).
+* The variable @b contains an object with a property Test1.
+* The output target 'bb' contains a projection '$.Test1.Test2' of the variable @b.
+
+
+
 ## Using loop and array ##
 If you want create an array with items of the source json, you can use the following syntax.
 
@@ -54,7 +89,10 @@ If you want create an array with items of the source json, you can use the follo
         "Key"           : $.name
     }    
 ]
+
 ```
+In json [ ] is an array and  { } is an object. $source is setted by the property items of the parent source block.
+
 
 ## Using method ##
 you can use functions for extend the process. 

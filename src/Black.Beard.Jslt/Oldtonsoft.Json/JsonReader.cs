@@ -27,9 +27,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Globalization;
-#if HAVE_BIG_INTEGER
 using System.Numerics;
-#endif
 using Oldtonsoft.Json.Serialization;
 using Oldtonsoft.Json.Utilities;
 
@@ -185,11 +183,8 @@ namespace Oldtonsoft.Json
             set
             {
                 if (value < DateParseHandling.None ||
-#if HAVE_DATE_TIME_OFFSET
                     value > DateParseHandling.DateTimeOffset
-#else
-                    value > DateParseHandling.DateTime
-#endif
+                    //value > DateParseHandling.DateTime
                     )
                 {
                     throw new ArgumentOutOfRangeException(nameof(value));
@@ -417,13 +412,11 @@ namespace Oldtonsoft.Json
                         return i;
                     }
 
-#if HAVE_BIG_INTEGER
                     if (v is BigInteger value)
                     {
                         i = (int)value;
                     }
                     else
-#endif
                     {
                         try
                         {
@@ -636,13 +629,11 @@ namespace Oldtonsoft.Json
                         return d;
                     }
 
-#if HAVE_BIG_INTEGER
                     if (v is BigInteger value)
                     {
                         d = (double)value;
                     }
                     else
-#endif
                     {
                         d = Convert.ToDouble(v, CultureInfo.InvariantCulture);
                     }
@@ -694,13 +685,11 @@ namespace Oldtonsoft.Json
                 case JsonToken.Integer:
                 case JsonToken.Float:
                     bool b;
-#if HAVE_BIG_INTEGER
                     if (Value is BigInteger integer)
                     {
                         b = integer != 0;
                     }
                     else
-#endif
                     {
                         b = Convert.ToBoolean(Value, CultureInfo.InvariantCulture);
                     }
@@ -759,13 +748,11 @@ namespace Oldtonsoft.Json
                         return d;
                     }
 
-#if HAVE_BIG_INTEGER
                     if (v is BigInteger value)
                     {
                         d = (decimal)value;
                     }
                     else
-#endif
                     {
                         try
                         {
@@ -826,12 +813,10 @@ namespace Oldtonsoft.Json
                 case JsonToken.EndArray:
                     return null;
                 case JsonToken.Date:
-#if HAVE_DATE_TIME_OFFSET
                     if (Value is DateTimeOffset offset)
                     {
                         SetToken(JsonToken.Date, offset.DateTime, false);
                     }
-#endif
 
                     return (DateTime)Value!;
                 case JsonToken.String:
@@ -866,7 +851,6 @@ namespace Oldtonsoft.Json
             throw JsonReaderException.Create(this, "Could not convert string to DateTime: {0}.".FormatWith(CultureInfo.InvariantCulture, s));
         }
 
-#if HAVE_DATE_TIME_OFFSET
         /// <summary>
         /// Reads the next JSON token from the source as a <see cref="Nullable{T}"/> of <see cref="DateTimeOffset"/>.
         /// </summary>
@@ -919,7 +903,6 @@ namespace Oldtonsoft.Json
             SetToken(JsonToken.String, s, false);
             throw JsonReaderException.Create(this, "Could not convert string to DateTimeOffset: {0}.".FormatWith(CultureInfo.InvariantCulture, s));
         }
-#endif
 
         internal void ReaderReadAndAssert()
         {
@@ -1223,11 +1206,9 @@ namespace Oldtonsoft.Json
                 case ReadType.ReadAsDateTime:
                     ReadAsDateTime();
                     break;
-#if HAVE_DATE_TIME_OFFSET
                 case ReadType.ReadAsDateTimeOffset:
                     ReadAsDateTimeOffset();
                     break;
-#endif
                 default:
                     throw new ArgumentOutOfRangeException();
             }

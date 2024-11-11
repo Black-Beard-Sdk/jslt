@@ -26,9 +26,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-#if HAVE_BIG_INTEGER
 using System.Numerics;
-#endif
 using System.Text;
 using System.IO;
 using System.Xml;
@@ -162,10 +160,7 @@ namespace Oldtonsoft.Json
             _indentation = 2;
 
             UpdateCharEscapeFlags();
-
-#if HAVE_ASYNC
-            _safeAsync = GetType() == typeof(JsonTextWriter);
-#endif
+            //_safeAsync = GetType() == typeof(JsonTextWriter);
         }
 
         /// <summary>
@@ -390,14 +385,12 @@ namespace Oldtonsoft.Json
         /// <param name="value">The <see cref="Object"/> value to write.</param>
         public override void WriteValue(object? value)
         {
-#if HAVE_BIG_INTEGER
             if (value is BigInteger i)
             {
                 InternalWriteValue(JsonToken.Integer);
                 WriteValueInternal(i.ToString(CultureInfo.InvariantCulture), JsonToken.String);
             }
             else
-#endif
             {
                 base.WriteValue(value);
             }
@@ -679,7 +672,6 @@ namespace Oldtonsoft.Json
             }
         }
 
-#if HAVE_DATE_TIME_OFFSET
         /// <summary>
         /// Writes a <see cref="DateTimeOffset"/> value.
         /// </summary>
@@ -713,7 +705,7 @@ namespace Oldtonsoft.Json
             _writeBuffer[pos++] = _quoteChar;
             return pos;
         }
-#endif
+
 
         /// <summary>
         /// Writes a <see cref="Guid"/> value.

@@ -541,6 +541,19 @@ namespace Bb.Expressions.CsharpGenerators
             else
                 targetObject = (CodeExpression)Visit(node.Object);
 
+            if (name == "op_Implicit")
+                return (CodeExpression)Visit(node.Arguments[0]);
+
+            if (name == "op_Explicit")
+            {
+                if (node.Method.ReturnType.IsAssignableFrom(node.Type))
+                {
+                    var target = (CodeExpression)Visit(node.Arguments[0]);
+                    return new CodeCastExpression(node.Type.ToRefType(_usings), target);
+
+                }
+            }
+
             var call = new CodeMethodInvokeExpression(targetObject, name);
 
             foreach (var item in node.Arguments)

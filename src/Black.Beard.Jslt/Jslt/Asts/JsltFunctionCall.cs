@@ -2,6 +2,7 @@
 using Bb.Asts;
 using Bb.ComponentModel.Factories;
 using Bb.Contracts;
+using Bb.Jslt.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -93,13 +94,41 @@ namespace Bb.Jslt.Asts
 
         public IEnumerable<JsltArgument> Arguments { get => _items; }
 
+
+        public JsltArgument this[int index]
+        {
+            get => _items[index];
+        }
+
+        public int ArgumentCount { get => _items.Count; }
+
         public List<JsltArgument> ArgumentsBis { get => _items2; }
 
-        public Type[] ParameterTypes { get; internal set; }
 
-        //public string Type { get; internal set; }
+        public Factory ServiceProvider
+        {
+            get => _serviceProvider;
+            internal set
+            {
 
-        public Factory ServiceProvider { get; internal set; }
+                _serviceProvider = value;
+
+                int j = 0;
+                if (_serviceProvider.Types[0] == typeof(RuntimeContext))
+                    j++;
+
+                for (int i = 0; i < ArgumentCount; i++)
+                {
+                    var current = _items[i];
+                    current.MethodType = _serviceProvider.Types[j];
+                    j++;
+                }
+
+            }
+        }
+
+        public Type[] ParameterTypes => _serviceProvider.Types;
+
 
         /// <summary>
         /// Gets the name of the function.
@@ -127,7 +156,7 @@ namespace Bb.Jslt.Asts
         /// <returns></returns>
         public override bool ToString(Writer writer, StrategySerializationItem strategy)
         {
-            
+
             writer.Append(Name);
             writer.Append("(");
 
@@ -150,6 +179,7 @@ namespace Bb.Jslt.Asts
 
         }
 
+        private Factory _serviceProvider;
         private readonly List<JsltArgument> _items;
         private readonly List<JsltArgument> _items2;
 

@@ -32,6 +32,7 @@ using System.Xml.Linq;
 using Oldtonsoft.Json.Utilities;
 using System.Runtime.CompilerServices;
 using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
 
 namespace Oldtonsoft.Json.Converters
 {
@@ -1737,12 +1738,10 @@ namespace Oldtonsoft.Json.Converters
                 case JsonToken.String:
                     return reader.Value?.ToString();
                 case JsonToken.Integer:
-#if HAVE_BIG_INTEGER
                     if (reader.Value is BigInteger i)
                     {
                         return i.ToString(CultureInfo.InvariantCulture);
                     }
-#endif
                     return XmlConvert.ToString(Convert.ToInt64(reader.Value, CultureInfo.InvariantCulture));
                 case JsonToken.Float:
                 {
@@ -1762,19 +1761,14 @@ namespace Oldtonsoft.Json.Converters
                     return XmlConvert.ToString(Convert.ToBoolean(reader.Value, CultureInfo.InvariantCulture));
                 case JsonToken.Date:
                 {
-#if HAVE_DATE_TIME_OFFSET
                     if (reader.Value is DateTimeOffset offset)
                     {
                         return XmlConvert.ToString(offset);
                     }
 
-#endif
                     DateTime d = Convert.ToDateTime(reader.Value, CultureInfo.InvariantCulture);
-#if !PORTABLE || NETSTANDARD1_3
                     return XmlConvert.ToString(d, DateTimeUtils.ToSerializationMode(d.Kind));
-#else
-                    return d.ToString(DateTimeUtils.ToDateTimeFormat(d.Kind), CultureInfo.InvariantCulture);
-#endif
+
                 }
                 case JsonToken.Bytes:
                     return Convert.ToBase64String((byte[])reader.Value!);

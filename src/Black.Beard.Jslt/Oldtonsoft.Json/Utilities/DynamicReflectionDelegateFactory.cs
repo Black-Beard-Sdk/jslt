@@ -26,9 +26,6 @@
 #if HAVE_REFLECTION_EMIT
 using System;
 using System.Collections.Generic;
-#if !HAVE_LINQ
-using Newtonsoft.Json.Utilities.LinqBridge;
-#endif
 using System.Reflection;
 using System.Reflection.Emit;
 using Newtonsoft.Json.Serialization;

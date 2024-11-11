@@ -237,4 +237,5 @@ value
    | NULL
    | obj
    | array
+   | variable
    ;

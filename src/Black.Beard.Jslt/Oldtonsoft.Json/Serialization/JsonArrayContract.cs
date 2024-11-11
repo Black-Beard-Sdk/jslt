@@ -32,12 +32,7 @@ using System.Reflection;
 using Oldtonsoft.Json.Utilities;
 using System.Collections;
 using System.Diagnostics;
-#if !HAVE_LINQ
-using Oldtonsoft.Json.Utilities.LinqBridge;
-#else
 using System.Linq;
-
-#endif
 
 namespace Oldtonsoft.Json.Serialization
 {

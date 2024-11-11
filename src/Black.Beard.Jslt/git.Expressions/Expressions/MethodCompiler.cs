@@ -13,7 +13,7 @@ namespace Bb.Expressions
 
         public MethodCompiler()
         {
-
+            
         }
 
         public string OutputPath { get; set; }

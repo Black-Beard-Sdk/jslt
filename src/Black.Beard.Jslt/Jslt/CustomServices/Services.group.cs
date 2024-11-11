@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Bb.Jslt.Parser;
+using Bb.JPaths;
 
 namespace Bb.Jslt.CustomServices
 {
@@ -43,7 +44,7 @@ namespace Bb.Jslt.CustomServices
         [JsltExtensionMethodParameter("sourceLeft", "array that contains left items")]
         [JsltExtensionMethodParameter("keyLeft", "Key of the left object that must matches with the rights items.")]
         [JsltExtensionMethodParameter("rights", "List of right that fetch on the left objects")]
-        public static JToken ExecuteJoin(RuntimeContext ctx, JArray sourceLeft, string keyLeft, bool cleanSource, RightJoins rights)
+        public static JToken ExecuteJoin(RuntimeContext ctx, JArray sourceLeft, JsonPath keyLeft, bool cleanSource, RightJoins rights)
         {
 
             var list = new List<JToken>(sourceLeft.Count);

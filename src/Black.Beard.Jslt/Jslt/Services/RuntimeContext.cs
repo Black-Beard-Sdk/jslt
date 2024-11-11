@@ -1,5 +1,6 @@
 ﻿using Bb.Analysis.DiagTraces;
 using Bb.Contracts;
+using Bb.JPaths;
 using Bb.Jslt.Parser;
 using Oldtonsoft.Json.Linq;
 using System;
@@ -1035,7 +1036,7 @@ namespace Bb.Jslt.Services
 
         }
 
-        public static JToken GetContentFromService(RuntimeContext ctx, JToken token, ITransformJsonService service, Analysis.DiagTraces.TextLocation trace, string serviceName)
+        public static JToken GetContentFromService(RuntimeContext ctx, JToken token, ITransformJsonService service, TextLocation trace, string serviceName)
         {
 
             TraceLocation(ctx, serviceName, trace);
@@ -1067,7 +1068,7 @@ namespace Bb.Jslt.Services
 
         public void Break() { MusToBreak = true; }
 
-        public static JToken GetContentByJPath(RuntimeContext ctx, JToken token, string path, Analysis.DiagTraces.TextLocation trace)
+        public static JToken GetContentByJPath(RuntimeContext ctx, JToken token, JsonPath path, TextLocation trace)
         {
 
             JToken result = null;
@@ -1162,11 +1163,11 @@ namespace Bb.Jslt.Services
 
         internal static readonly Func<JToken, Type, object> _convertToken;
         internal static readonly Func<RuntimeContext, JToken, Func<RuntimeContext, JToken, JToken>, JToken> _getProjectionFromSource;
-        internal static readonly Func<RuntimeContext, JToken, string, Analysis.DiagTraces.TextLocation, JToken> _getContentByJPath;
-        internal static readonly Func<RuntimeContext, JToken, ITransformJsonService, Analysis.DiagTraces.TextLocation, string, JToken> _getContentFromService;
+        internal static readonly Func<RuntimeContext, JToken, JsonPath, TextLocation, JToken> _getContentByJPath;
+        internal static readonly Func<RuntimeContext, JToken, ITransformJsonService, TextLocation, string, JToken> _getContentFromService;
         internal static readonly Func<RuntimeContext, JToken, OperationEnum, JToken> _evaluateUnaryOperator;
         internal static readonly Func<RuntimeContext, object, OperationEnum, object, JToken> _evaluateBinaryOperator;
-        internal static readonly Func<RuntimeContext, string, string[], Analysis.DiagTraces.TextLocation, object> _translateVariable;
+        internal static readonly Func<RuntimeContext, string, string[], TextLocation, object> _translateVariable;
 
         internal static readonly MethodInfo _addProperty;
         internal static readonly MethodInfo _setVariable;

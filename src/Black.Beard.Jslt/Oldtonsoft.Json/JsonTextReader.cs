@@ -28,9 +28,7 @@ using System.Runtime.CompilerServices;
 using System.IO;
 using System.Globalization;
 using System.Diagnostics;
-#if HAVE_BIG_INTEGER
 using System.Numerics;
-#endif
 using Oldtonsoft.Json.Utilities;
 
 namespace Oldtonsoft.Json
@@ -44,9 +42,7 @@ namespace Oldtonsoft.Json
         ReadAsString,
         ReadAsDecimal,
         ReadAsDateTime,
-#if HAVE_DATE_TIME_OFFSET
         ReadAsDateTimeOffset,
-#endif
         ReadAsDouble,
         ReadAsBoolean
     }
@@ -57,9 +53,9 @@ namespace Oldtonsoft.Json
     public partial class JsonTextReader : JsonReader, IJsonLineInfo
     {
         private const char UnicodeReplacementChar = '\uFFFD';
-#if HAVE_BIG_INTEGER
+
         private const int MaximumJavascriptIntegerCharacterLength = 380;
-#endif
+
 #if DEBUG
         internal int LargeBufferLength { get; set; } = int.MaxValue / 2;
 #else
@@ -90,10 +86,8 @@ namespace Oldtonsoft.Json
 
             _reader = reader;
             _lineNumber = 1;
+            //_safeAsync = GetType() == typeof(JsonTextReader);
 
-#if HAVE_ASYNC
-            _safeAsync = GetType() == typeof(JsonTextReader);
-#endif
         }
 
 #if DEBUG
@@ -206,12 +200,10 @@ namespace Oldtonsoft.Json
                         {
                             dateParseHandling = DateParseHandling.DateTime;
                         }
-#if HAVE_DATE_TIME_OFFSET
                         else if (readType == ReadType.ReadAsDateTimeOffset)
                         {
                             dateParseHandling = DateParseHandling.DateTimeOffset;
                         }
-#endif
                         else
                         {
                             dateParseHandling = _dateParseHandling;
@@ -225,7 +217,6 @@ namespace Oldtonsoft.Json
                                 return;
                             }
                         }
-#if HAVE_DATE_TIME_OFFSET
                         else
                         {
                             if (DateTimeUtils.TryParseDateTimeOffset(_stringReference, DateFormatString, Culture, out DateTimeOffset dt))
@@ -234,7 +225,6 @@ namespace Oldtonsoft.Json
                                 return;
                             }
                         }
-#endif
                     }
 
                     SetToken(JsonToken.String, _stringReference.ToString(), false);
@@ -744,7 +734,6 @@ namespace Oldtonsoft.Json
                     }
 
                     return ReadDateTimeString((string?)Value);
-#if HAVE_DATE_TIME_OFFSET
                 case ReadType.ReadAsDateTimeOffset:
                     if (Value is DateTimeOffset offset)
                     {
@@ -752,7 +741,6 @@ namespace Oldtonsoft.Json
                     }
 
                     return ReadDateTimeOffsetString((string?)Value);
-#endif
                 default:
                     throw new ArgumentOutOfRangeException(nameof(readType));
             }
@@ -820,13 +808,11 @@ namespace Oldtonsoft.Json
                             case '9':
                                 ParseNumber(ReadType.Read);
                                 bool b;
-#if HAVE_BIG_INTEGER
                                 if (Value is BigInteger integer)
                                 {
                                     b = integer != 0;
                                 }
                                 else
-#endif
                                 {
                                     b = Convert.ToBoolean(Value, CultureInfo.InvariantCulture);
                                 }
@@ -1031,7 +1017,6 @@ namespace Oldtonsoft.Json
             }
         }
 
-#if HAVE_DATE_TIME_OFFSET
         /// <summary>
         /// Reads the next JSON token from the underlying <see cref="TextReader"/> as a <see cref="Nullable{T}"/> of <see cref="DateTimeOffset"/>.
         /// </summary>
@@ -1040,7 +1025,6 @@ namespace Oldtonsoft.Json
         {
             return (DateTimeOffset?)ReadStringValue(ReadType.ReadAsDateTimeOffset);
         }
-#endif
 
         /// <summary>
         /// Reads the next JSON token from the underlying <see cref="TextReader"/> as a <see cref="Nullable{T}"/> of <see cref="Decimal"/>.
@@ -2180,7 +2164,7 @@ namespace Oldtonsoft.Json
                             }
                             else if (parseResult == ParseResult.Overflow)
                             {
-#if HAVE_BIG_INTEGER
+
                                 string number = _stringReference.ToString();
 
                                 if (number.Length > MaximumJavascriptIntegerCharacterLength)
@@ -2190,9 +2174,7 @@ namespace Oldtonsoft.Json
 
                                 numberValue = BigIntegerParse(number, CultureInfo.InvariantCulture);
                                 numberType = JsonToken.Integer;
-#else
-                                throw ThrowReaderError("JSON integer {0} is too large or small for an Int64.".FormatWith(CultureInfo.InvariantCulture, _stringReference.ToString()));
-#endif
+
                             }
                             else
                             {
@@ -2243,7 +2225,6 @@ namespace Oldtonsoft.Json
             return JsonReaderException.Create(this, message, ex);
         }
 
-#if HAVE_BIG_INTEGER
         // By using the BigInteger type in a separate method,
         // the runtime can execute the ParseNumber even if 
         // the System.Numerics.BigInteger.Parse method is
@@ -2253,7 +2234,6 @@ namespace Oldtonsoft.Json
         {
             return System.Numerics.BigInteger.Parse(number, culture);
         }
-#endif
 
         private void ParseComment(bool setToken)
         {

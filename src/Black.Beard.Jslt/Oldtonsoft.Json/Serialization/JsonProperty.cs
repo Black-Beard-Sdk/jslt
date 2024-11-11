@@ -28,10 +28,6 @@ using System.Diagnostics;
 using System.Reflection;
 using Oldtonsoft.Json.Utilities;
 
-#if !HAVE_LINQ
-using Oldtonsoft.Json.Utilities.LinqBridge;
-#endif
-
 namespace Oldtonsoft.Json.Serialization
 {
     /// <summary>

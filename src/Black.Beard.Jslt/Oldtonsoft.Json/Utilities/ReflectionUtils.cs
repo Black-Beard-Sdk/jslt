@@ -25,20 +25,13 @@
 
 using System;
 using System.Collections.Generic;
-#if HAVE_BIG_INTEGER
 using System.Numerics;
-#endif
 using System.Reflection;
 using System.Collections;
 using System.Globalization;
 using System.Text;
-using System.Runtime.CompilerServices;
 using System.Diagnostics.CodeAnalysis;
-#if !HAVE_LINQ
-using Oldtonsoft.Json.Utilities.LinqBridge;
-#else
 using System.Linq;
-#endif
 using Oldtonsoft.Json.Serialization;
 
 namespace Oldtonsoft.Json.Utilities
@@ -1084,16 +1077,12 @@ namespace Oldtonsoft.Json.Utilities
                     return 0m;
                 case PrimitiveTypeCode.DateTime:
                     return new DateTime();
-#if HAVE_BIG_INTEGER
                 case PrimitiveTypeCode.BigInteger:
                     return new BigInteger();
-#endif
                 case PrimitiveTypeCode.Guid:
                     return new Guid();
-#if HAVE_DATE_TIME_OFFSET
                 case PrimitiveTypeCode.DateTimeOffset:
                     return new DateTimeOffset();
-#endif
             }
 
             if (IsNullable(type))

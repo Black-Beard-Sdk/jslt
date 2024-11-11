@@ -29,12 +29,7 @@ using System.IO;
 using System.Text;
 using System.Globalization;
 using System.Diagnostics.CodeAnalysis;
-#if !HAVE_LINQ
-using Oldtonsoft.Json.Utilities.LinqBridge;
-#else
 using System.Linq;
-#endif
-using Oldtonsoft.Json.Serialization;
 
 namespace Oldtonsoft.Json.Utilities
 {

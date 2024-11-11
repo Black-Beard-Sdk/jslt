@@ -1,5 +1,7 @@
 ﻿using Bb.Asts;
 using Bb.Contracts;
+using Oldtonsoft.Json.Linq;
+using System;
 
 namespace Bb.Jslt.Asts
 {
@@ -33,7 +35,33 @@ namespace Bb.Jslt.Asts
         /// <value>
         /// The value.
         /// </value>
-        public JsltBase Value { get; set; }
+        public JsltBase Value
+        {
+            get => _value;
+            set
+            {
+                _value = value;
+                if (_value != null && _value.Kind == JsltKind.Jpath)
+                    if (_methodType != null)
+                        _value.AddTag(typeof(JToken).IsAssignableFrom(_methodType), TagEnum.ToExecute);
+                    else
+                        _value.DelTag(TagEnum.ToExecute);
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the type of the method.
+        /// </summary>
+        public Type MethodType
+        {
+            get => _methodType;
+            internal set
+            {
+                _methodType = value;
+                if (_value != null && _value.Kind == JsltKind.Jpath)
+                    _value.AddTag(typeof(JToken).IsAssignableFrom(_methodType), TagEnum.ToExecute);
+            }
+        }
 
         /// <summary>
         /// Accepts the specified visitor for parsing the tree.
@@ -55,6 +83,9 @@ namespace Bb.Jslt.Asts
         {
             return writer.ToString(Value);
         }
+
+        private JsltBase _value;
+        private Type _methodType;
 
     }
 

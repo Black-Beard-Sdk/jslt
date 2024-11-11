@@ -90,7 +90,7 @@ namespace Oldtonsoft.Json.Converters
 
                 text = dateTime.ToString(_dateTimeFormat ?? DefaultDateTimeFormat, Culture);
             }
-#if HAVE_DATE_TIME_OFFSET
+
             else if (value is DateTimeOffset dateTimeOffset)
             {
                 if ((_dateTimeStyles & DateTimeStyles.AdjustToUniversal) == DateTimeStyles.AdjustToUniversal
@@ -101,7 +101,7 @@ namespace Oldtonsoft.Json.Converters
 
                 text = dateTimeOffset.ToString(_dateTimeFormat ?? DefaultDateTimeFormat, Culture);
             }
-#endif
+
             else
             {
                 throw new JsonSerializationException("Unexpected value when converting date. Expected DateTime or DateTimeOffset, got {0}.".FormatWith(CultureInfo.InvariantCulture, ReflectionUtils.GetObjectType(value)!));
@@ -131,15 +131,14 @@ namespace Oldtonsoft.Json.Converters
                 return null;
             }
 
-#if HAVE_DATE_TIME_OFFSET
             Type t = (nullable)
                 ? Nullable.GetUnderlyingType(objectType)
                 : objectType;
-#endif
+
 
             if (reader.TokenType == JsonToken.Date)
             {
-#if HAVE_DATE_TIME_OFFSET
+
                 if (t == typeof(DateTimeOffset))
                 {
                     return (reader.Value is DateTimeOffset) ? reader.Value : new DateTimeOffset((DateTime)reader.Value!);
@@ -150,7 +149,6 @@ namespace Oldtonsoft.Json.Converters
                 {
                     return offset.DateTime;
                 }
-#endif
 
                 return reader.Value;
             }
@@ -167,7 +165,6 @@ namespace Oldtonsoft.Json.Converters
                 return null;
             }
 
-#if HAVE_DATE_TIME_OFFSET
             if (t == typeof(DateTimeOffset))
             {
                 if (!StringUtils.IsNullOrEmpty(_dateTimeFormat))
@@ -179,7 +176,6 @@ namespace Oldtonsoft.Json.Converters
                     return DateTimeOffset.Parse(dateText, Culture, _dateTimeStyles);
                 }
             }
-#endif
 
             if (!StringUtils.IsNullOrEmpty(_dateTimeFormat))
             {

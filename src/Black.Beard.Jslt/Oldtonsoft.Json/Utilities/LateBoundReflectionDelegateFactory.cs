@@ -27,10 +27,6 @@ using System;
 using Oldtonsoft.Json.Serialization;
 using System.Reflection;
 
-#if !HAVE_LINQ
-using Oldtonsoft.Json.Utilities.LinqBridge;
-#endif
-
 namespace Oldtonsoft.Json.Utilities
 {
     internal class LateBoundReflectionDelegateFactory : ReflectionDelegateFactory

@@ -25,21 +25,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Reflection;
-using System.Text;
 using System.Collections;
-using System.Diagnostics;
-#if !HAVE_LINQ
-using Oldtonsoft.Json.Utilities.LinqBridge;
-#else
 using System.Linq;
-#endif
-using System.Globalization;
-#if HAVE_METHOD_IMPL_ATTRIBUTE
-using System.Runtime.CompilerServices;
-#endif
-using Oldtonsoft.Json.Serialization;
 
 namespace Oldtonsoft.Json.Utilities
 {
@@ -84,7 +72,7 @@ namespace Oldtonsoft.Json.Utilities
             }
         }
 
-#if !HAVE_COVARIANT_GENERICS
+
         public static void AddRange<T>(this IList<T> initial, IEnumerable collection)
         {
             ValidationUtils.ArgumentNotNull(initial, nameof(initial));
@@ -92,7 +80,7 @@ namespace Oldtonsoft.Json.Utilities
             // because earlier versions of .NET didn't support covariant generics
             initial.AddRange(collection.Cast<T>());
         }
-#endif
+
 
         public static bool IsDictionaryType(Type type)
         {
@@ -106,12 +94,6 @@ namespace Oldtonsoft.Json.Utilities
             {
                 return true;
             }
-#if HAVE_READ_ONLY_COLLECTIONS
-            if (ReflectionUtils.ImplementsGenericDefinition(type, typeof(IReadOnlyDictionary<,>)))
-            {
-                return true;
-            }
-#endif
 
             return false;
         }

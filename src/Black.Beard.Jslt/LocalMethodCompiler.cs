@@ -12,12 +12,11 @@ namespace Bb.Expressions
 {
 
 
-
-
     public class LocalMethodCompiler : MethodCompiler
     {
 
         public LocalMethodCompiler(bool withDebug)
+            : base()
         {
             this._withDebug = withDebug;
         }

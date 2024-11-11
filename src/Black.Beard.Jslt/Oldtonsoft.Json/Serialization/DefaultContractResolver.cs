@@ -25,9 +25,6 @@
 
 using System;
 using System.Collections;
-#if HAVE_CONCURRENT_DICTIONARY
-using System.Collections.Concurrent;
-#endif
 using System.Collections.Generic;
 using System.ComponentModel;
 #if HAVE_DYNAMIC
@@ -44,12 +41,7 @@ using Oldtonsoft.Json.Converters;
 using Oldtonsoft.Json.Utilities;
 using Oldtonsoft.Json.Linq;
 using System.Runtime.CompilerServices;
-#if !HAVE_LINQ
-using Oldtonsoft.Json.Utilities.LinqBridge;
-#else
 using System.Linq;
-
-#endif
 using Oldtonsoft.Json.Serialization;
 
 namespace Oldtonsoft.Json.Serialization
@@ -95,16 +87,13 @@ namespace Oldtonsoft.Json.Serialization
         /// </value>
         public bool DynamicCodeGeneration => JsonTypeReflector.DynamicCodeGeneration;
 
-#if !PORTABLE
         /// <summary>
         /// Gets or sets the default members search flags.
         /// </summary>
         /// <value>The default members search flags.</value>
         [Obsolete("DefaultMembersSearchFlags is obsolete. To modify the members serialized inherit from DefaultContractResolver and override the GetSerializableMembers method instead.")]
         public BindingFlags DefaultMembersSearchFlags { get; set; }
-#else
-        private readonly BindingFlags DefaultMembersSearchFlags;
-#endif
+
 
         /// <summary>
         /// Gets or sets a value indicating whether compiler generated members should be serialized.
@@ -641,24 +630,13 @@ namespace Oldtonsoft.Json.Serialization
 
         private ConstructorInfo? GetParameterizedConstructor(Type objectType)
         {
-#if PORTABLE
-            IEnumerable<ConstructorInfo> constructors = objectType.GetConstructors(BindingFlags.Public | BindingFlags.Instance);
-            IEnumerator<ConstructorInfo> en = constructors.GetEnumerator();
-            if (en.MoveNext())
-            {
-                ConstructorInfo conInfo = en.Current;
-                if (!en.MoveNext())
-                {
-                    return conInfo;
-                }
-            }
-#else
+
             ConstructorInfo[] constructors = objectType.GetConstructors(BindingFlags.Public | BindingFlags.Instance);
             if (constructors.Length == 1)
             {
                 return constructors[0];
             }
-#endif
+
             return null;
         }
 
@@ -1231,13 +1209,12 @@ namespace Oldtonsoft.Json.Serialization
             }
 #endif
 
-#if HAVE_ICONVERTIBLE
             // tested last because it is not possible to automatically deserialize custom IConvertible types
             if (IsIConvertible(t))
             {
                 return CreatePrimitiveContract(t);
             }
-#endif
+
 
             return CreateObjectContract(objectType);
         }
@@ -1249,7 +1226,6 @@ namespace Oldtonsoft.Json.Serialization
             return (typeCode != PrimitiveTypeCode.Empty && typeCode != PrimitiveTypeCode.Object);
         }
 
-#if HAVE_ICONVERTIBLE
         internal static bool IsIConvertible(Type t)
         {
             if (typeof(IConvertible).IsAssignableFrom(t)
@@ -1260,16 +1236,16 @@ namespace Oldtonsoft.Json.Serialization
 
             return false;
         }
-#endif
+
 
         internal static bool CanConvertToString(Type type)
         {
-#if HAVE_TYPE_DESCRIPTOR
+
             if (JsonTypeReflector.CanTypeDescriptorConvertString(type, out _))
             {
                 return true;
             }
-#endif
+
 
             if (type == typeof(Type) || type.IsSubclassOf(typeof(Type)))
             {
@@ -1398,7 +1374,7 @@ namespace Oldtonsoft.Json.Serialization
 //            {
 //                valueProvider = new ReflectionValueProvider(member);
 //            }
-//#elif !(PORTABLE40)
+//#elseif !(PORTABLE40)
 //            valueProvider = new ExpressionValueProvider(member);
 //#else
             valueProvider = new ReflectionValueProvider(member);

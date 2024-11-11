@@ -1,4 +1,4 @@
-// Generated from c:/Src/jslt/src/Black.Beard.Jslt/Json/Jslt/Parser/Grammar/JsltLexer.g4 by ANTLR 4.13.1
+// Generated from c:/Src/jslt/src/Black.Beard.Jslt/Jslt/Parser/Grammar/JsltLexer.g4 by ANTLR 4.13.1
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;

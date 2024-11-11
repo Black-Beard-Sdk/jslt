@@ -33,20 +33,14 @@ using System.Dynamic;
 #endif
 using System.Diagnostics;
 using System.Globalization;
-#if HAVE_BIG_INTEGER
 using System.Numerics;
-#endif
 using System.Reflection;
 using System.Runtime.Serialization;
 using Oldtonsoft.Json.Linq;
 using Oldtonsoft.Json.Utilities;
 using System.Runtime.CompilerServices;
 using System.Diagnostics.CodeAnalysis;
-#if !HAVE_LINQ
-using Oldtonsoft.Json.Utilities.LinqBridge;
-#else
 using System.Linq;
-#endif
 
 namespace Oldtonsoft.Json.Serialization
 {
@@ -987,12 +981,10 @@ namespace Oldtonsoft.Json.Serialization
                             }
                         }
 
-#if HAVE_BIG_INTEGER
                         if (value is BigInteger integer)
                         {
                             return ConvertUtils.FromBigInteger(integer, contract.NonNullableUnderlyingType);
                         }
-#endif
 
                         // this won't work when converting to a custom IConvertible
                         return Convert.ChangeType(value, contract.NonNullableUnderlyingType, culture);
@@ -1404,7 +1396,7 @@ namespace Oldtonsoft.Json.Serialization
                                             : EnsureType(reader, keyValue, CultureInfo.InvariantCulture, contract.KeyContract, contract.DictionaryKeyType)!;
                                         break;
                                     }
-#if HAVE_DATE_TIME_OFFSET
+
                                     case PrimitiveTypeCode.DateTimeOffset:
                                     case PrimitiveTypeCode.DateTimeOffsetNullable:
                                     {
@@ -1413,7 +1405,7 @@ namespace Oldtonsoft.Json.Serialization
                                             : EnsureType(reader, keyValue, CultureInfo.InvariantCulture, contract.KeyContract, contract.DictionaryKeyType)!;
                                         break;
                                     }
-#endif
+
                                     default:
                                         keyValue = contract.KeyContract != null && contract.KeyContract.IsEnum
                                             ? EnumUtils.ParseEnum(contract.KeyContract.NonNullableUnderlyingType, (Serializer._contractResolver as DefaultContractResolver)?.NamingStrategy, keyValue.ToString(), false)

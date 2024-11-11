@@ -28,12 +28,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using System.Globalization;
-#if !HAVE_LINQ
-using Oldtonsoft.Json.Utilities.LinqBridge;
-#else
 using System.Linq;
-
-#endif
 
 namespace Oldtonsoft.Json.Utilities
 {
