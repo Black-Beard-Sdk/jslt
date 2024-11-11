@@ -261,7 +261,7 @@ namespace Black.Beard.Jslt.UnitTests
              .Replace("`", "'");
             var source = "{ 'prop1':3 }".Replace("'", "\"");
             var src = new SourceJson[] { SourceJson.GetFromText(source) };
-            RuntimeContext result = Test(expected, src );
+            RuntimeContext result = Test(expected, src);
             Assert.AreEqual(result.TokenResult["propertyName"], 6.0D);
         }
 
@@ -281,22 +281,51 @@ namespace Black.Beard.Jslt.UnitTests
         }
 
         [TestMethod]
-        public void TestMethodMerge()
+        public void TestJpath1()
+        {
+            var template = @"
+            { 
+                'propertyName': $[?(@.Id == 2)]
+
+            }".Replace("'", "\"")
+             .Replace("`", "'");
+
+            var source = "[ { 'Id':1, Name:'name1'}, { 'Id':2, Name:'name2' }, { 'Id':3, Name:'name3' } ]".Replace("'", "\"");
+            var src = new SourceJson[] { SourceJson.GetFromText(source) };
+            RuntimeContext result = Test(template, src);
+            Assert.AreEqual(result.TokenResult["propertyName"]["Name"], "name2");
+        }
+
+        [TestMethod]
+        public void TestJpath2()
+        {
+            var template = @"
+            { 
+                'var1:' : [ { 'Id':1, 'Name':'name1'}, { 'Id':2, 'Name':'name2' }, { 'Id':3, 'Name':'name3' } ],
+                'propertyName': var1:$[?(@.Id == 2)]
+
+            }".Replace("'", "\"")
+             .Replace("`", "'");
+
+            var src = new SourceJson[0] ;
+            RuntimeContext result = Test(template, src);
+            Assert.AreEqual(result.TokenResult["propertyName"]["Name"], "name2");
+        }
+
+        [TestMethod]
+        public void TestVariable()
         {
             var expected = @"
             { 
-                '@var1' : $.prop1, 
-                'propertyName': get('src2', $[?(@.Id == @@var1)] #string)
+                'var1:' : 2, 
+                'propertyName': var1: #string
 
             }".Replace("'", "\"")
-             .Replace("`", "'")
-;
-            var source1 = "{ 'prop1':2 }".Replace("'", "\"");
-            var source2 = "[ { 'Id':1, Name:'name1'}, { 'Id':2, Name:'name2' }, { 'Id':3, Name:'name3' } ]".Replace("'", "\"");
-            var src = new SourceJson[] { SourceJson.GetFromText(source1), SourceJson.GetFromText(source2, "src2") };
-            RuntimeContext result = Test(expected, src);
-            Assert.AreEqual(result.TokenResult["propertyName"]["prop1"],2);
-        }
+             .Replace("`", "'");            
+            var src = new SourceJson[] { };
+            RuntimeContext result = Test(expected, true, src);
+            Assert.AreEqual(result.TokenResult["propertyName"], "2");
+        }     
 
         [TestMethod]
         public void TestSum()
@@ -465,7 +494,7 @@ namespace Black.Beard.Jslt.UnitTests
             else if (!dbFile.Directory.Exists)
                 dbFile.Directory.Create();
 
-            
+
             var cnx = $"Data Source={db}";
 
             var instance = System.Data.SQLite.SQLiteFactory.Instance;
@@ -510,7 +539,6 @@ namespace Black.Beard.Jslt.UnitTests
             Assert.AreEqual(b["value"], "test1");
 
         }
-
 
         [TestMethod]
         public void TestDirectivePackage()
@@ -575,11 +603,11 @@ namespace Black.Beard.Jslt.UnitTests
             return Test(templatePayload, false, sources, services);
         }
 
-            private static RuntimeContext Test(string templatePayload, bool withDebug, SourceJson[] sources, params (string, Type)[] services)
+        private static RuntimeContext Test(string templatePayload, bool withDebug, SourceJson[] sources, params (string, Type)[] services)
         {
 
-            var src = new Sources(sources[0]);
-            for (int i = 1; i < sources.Length; i++)
+            var src = new Sources();
+            for (int i = 0; i < sources.Length; i++)
                 src.Add(sources[i]);
 
             var template = GetProvider(templatePayload, withDebug, services);
@@ -633,7 +661,7 @@ namespace Black.Beard.Jslt.UnitTests
 
         private static JsltTemplate GetProvider(JsltBase payloadTemplate, params (string, Type)[] services)
         {
-            
+
             var configuration = new TranformJsonAstConfiguration()
                 .AddAssembly(typeof(DataClass))
                 .AddServices(services)

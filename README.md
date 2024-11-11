@@ -17,18 +17,18 @@ a value of property can be
   * "property" : true
   * "property" : null
 * a variable
-  * "property" : @variable
+  * "property" : variable:
 * a json path
     * $.property
-    * @variable:$.property
+    * variable:$.property
 * a method
   * "property" : sum(1, 2)
 * a loop
   * "property" : [ { "$" : $.items } ]
 * a cast
-  * "property" : @variable #integer
+  * "property" : variable: #integer
 * a when
-    * "property" : when(@variable) 
+    * "property" : when(variable:) 
       * { "case1" : { "toto" : 1 }, "case2" : { 'titi" : "test" } }
 
 

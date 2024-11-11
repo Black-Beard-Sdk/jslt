@@ -34,13 +34,38 @@ public static class JTokenExtensions
     /// <returns>True if successful; false otherwise.</returns>
     public static bool TryGetValue<T>(this JToken? node, [NotNullWhen(true)] out T? value)
     {
-        if (node is not JValue val)
+
+        if (node is JValue val)
+            if (TryGetValue(val, out T val2))
+            {
+                value = val2;
+                return true;
+            }
+
+        value = default;
+        return false;
+
+    }
+
+    /// <summary>
+    /// Extends <see cref="JValue.TryGetValue{T}(out T)"/> to the <see cref="JToken"/> base class.
+    /// </summary>
+    /// <typeparam name="T">The type of value desired.</typeparam>
+    /// <param name="node">The node that may contain the value.</param>
+    /// <param name="value">The value if successful; null otherwise.</param>
+    /// <returns>True if successful; false otherwise.</returns>
+    public static bool TryGetValue<T>(this JValue? node, [NotNullWhen(true)] out T? value)
+    {
+
+        if (node.Value is T val2)
         {
-            value = default;
-            return false;
+            value = val2;
+            return true;
         }
 
-        return val.TryGetValue(out value);
+        value = default;
+        return false;
+
     }
 
     /// <summary>
@@ -265,14 +290,20 @@ public static class JTokenExtensions
         if (value.TryGetValue(out decimal e))
             return e;
 
-        var number = value.GetInteger();
-        if (number != null) return number;
+        if (value.TryGetValue(out int i))
+            return i;
 
-        if (value.TryGetValue(out float f)) return (decimal)f;
-        if (value.TryGetValue(out double d)) return (decimal)d;
-        if (value.TryGetValue(out decimal dc)) return dc;
+        if (value.TryGetValue(out long l))
+            return l;
+
+        if (value.TryGetValue(out float f)) 
+            return (decimal)f;
+
+        if (value.TryGetValue(out double d))
+            return (decimal)d;
 
         return null;
+
     }
 
     /// <summary>

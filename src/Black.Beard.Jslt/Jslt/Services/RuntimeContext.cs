@@ -1082,39 +1082,17 @@ namespace Bb.Jslt.Services
                 else
                 {
 
-                    if (token is JObject o)
-                    {
-                        var h = o.SelectTokens(path).ToList();
-                        if (h.Count == 0)
-                            result = null;
+                    var h = token.SelectTokens(path).ToList();
 
-                        else if (h.Count == 1)
-                            result = h[0];
-
-                        else
-                            result = new JArray(h);
-
-                    }
-
-                    else if (token is JArray a)
-                    {
-
-                        var h = a.SelectTokens(path).ToList();
-                        if (h.Count == 1)
-                            result = h[0];
-
-                        else
-                            result = new JArray(h);
-
-                    }
-                    else if (token is JValue v)
+                    if (h.Count == 0)
                         return null;
 
+                    else if (h.Count == 1)
+                        result = h[0];
+
                     else
-                    {
-
-                    }
-
+                        result = new JArray(h);
+                  
                 }
             }
             catch (Oldtonsoft.Json.JsonException e)

@@ -44,7 +44,7 @@ pair :
    string COLON jsonValue
    ;
 
-string : STRING | STRING2;
+string : STRING;
 
 array :
      BRACKET_LEFT jsonValue ( COMMA jsonValue )* BRACKET_RIGHT
@@ -71,7 +71,7 @@ jsonType
    | GUID_TYPE 
    | INTEGER_TYPE 
    | DECIMAL_TYPE    
-   | CURRENT_VALUE IDLOWCASE
+   // | CURRENT_VALUE IDLOWCASE
    ;
 
 jsonLtOperations :
@@ -122,7 +122,7 @@ jsonValueList :
    jsonValue (COMMA jsonValue)*
    ;
 
-jsltJsonpath : (VARIABLE_NAME COLON)? jsonpath jsonType?;
+jsltJsonpath : VARIABLE_NAME? jsonpath jsonType?;
 jsonpath : DOLLAR jsonpath_subscript?;
 
 // -----------   Json path   -----------

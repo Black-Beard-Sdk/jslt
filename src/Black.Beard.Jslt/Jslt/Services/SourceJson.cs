@@ -175,7 +175,7 @@ namespace Bb.Jslt.Services
 
         private SourceJson(JToken datas, string name = null)
         {
-            this.Name = name;
+            this.Name = name = Guid.NewGuid().ToString();
             this.Datas = datas;
         }
 

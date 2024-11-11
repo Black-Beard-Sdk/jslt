@@ -34,8 +34,6 @@ GUID_TYPE : '#uuid';
 INTEGER_TYPE : '#integer';
 DECIMAL_TYPE : '#decimal';
 
-WHEN_TYPE : '@when';
-
 IN : 'in';
 NIN : 'nin';
 SUBSETOF : 'subsetof';
@@ -86,11 +84,6 @@ QUESTION : '?' ;
 STRING
    : ('"') (ESC | SAFECODEPOINT)* '"'
    ;
-
-STRING2
-   : ('$"') (ESC | SAFECODEPOINT)* '"'
-   ;
-
 
 MULTI_LINE_COMMENT : '/*' .*? '*/' -> skip;
 //CODE_STRING :        QUOTE_CODE_STRING .*? QUOTE_CODE_STRING;
@@ -145,7 +138,7 @@ IDQUOTED
    : '\'' ID '\''
    ;
 
-VARIABLE_NAME : CURRENT_VALUE [_A-Za-z][_A-Za-z0-9]*;
+VARIABLE_NAME : [_A-Za-z][_A-Za-z0-9]* COLON;
 
 IDLOWCASE
    : [_a-z] [_a-z0-9]*

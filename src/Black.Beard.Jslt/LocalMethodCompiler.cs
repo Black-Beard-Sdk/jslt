@@ -55,6 +55,8 @@ namespace Bb.Expressions
                 BuildCSharp build = new BuildCSharp()
                 {
                     OutputPath = path,
+                    Debug = _withDebug,
+                    
                 }
                 .SetNugetController(controller)
                 .AddSource(file)

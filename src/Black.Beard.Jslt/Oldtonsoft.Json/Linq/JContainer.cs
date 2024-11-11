@@ -729,6 +729,11 @@ namespace Oldtonsoft.Json.Linq
         {
             RemoveItemAt(index);
         }
+        public override JToken this[object key]
+        {
+            get => GetItem((int)key);
+            set => SetItem((int)key, value);
+        }
 
         JToken IList<JToken>.this[int index]
         {

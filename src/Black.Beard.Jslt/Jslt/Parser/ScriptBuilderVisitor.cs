@@ -180,7 +180,7 @@ namespace Bb.Jslt.Parser
 
                 else
                 {
-                    if (result.Properties.Any(c => c.Name == prop.Name))
+                    if (prop.Kind == JsltKind.Property && result.Properties.Any(c => c.Name == prop.Name))
                         AddError(prop.Location, "Semantic error", $"the property name '{prop.Name}' already exists");
                     else
                         result.Append(prop);
@@ -302,7 +302,7 @@ namespace Bb.Jslt.Parser
 
             var txt = context.VARIABLE_NAME().GetText();
 
-            JsltBase result = new JsltVariable() { Name = txt.Substring(1), Location = context.ToLocation() };
+            JsltBase result = new JsltVariable() { Name = txt.Substring(0, txt.Length - 1), Location = context.ToLocation() };
 
             var jsonType = context.jsonType();
             if (jsonType != null)
@@ -320,19 +320,13 @@ namespace Bb.Jslt.Parser
 
         public override object VisitString([NotNull] JsltParser.StringContext context)
         {
+            
             ITerminalNode str = context.STRING();
             if (str != null)
             {
                 var txt = str.GetText()?.Trim() ?? string.Empty;
                 return txt;
-            }
-
-            var str2 = context.STRING2();
-            if (str2 != null)
-            {
-                var txt = str2.GetText()?.Trim() ?? string.Empty;
-                return txt;
-            }
+            }             
 
             return string.Empty;
 
@@ -486,15 +480,7 @@ namespace Bb.Jslt.Parser
         }
 
         public override object VisitJsonType([NotNull] JsltParser.JsonTypeContext context)
-        {
-
-            var lowcase = context.IDLOWCASE();
-            if (lowcase != null)
-            {
-
-                LocalDebug.Stop();
-
-            }
+        {                  
 
             var txt = context.GetText().Substring(1);
 
@@ -558,9 +544,8 @@ namespace Bb.Jslt.Parser
                     else
                     {
 
-                        if (name.StartsWith("@"))
-                            return new JsltVariable() { Name = name.Substring(1), Value = value, Location = context.ToLocation() };
-
+                        if (name.EndsWith(":"))
+                            return new JsltVariable() { Name = name.Substring(0, name.Length - 1), Value = value, Location = context.ToLocation() };
 
                         else if (name.ToLower() == "$directives" && value is JsltObject directives)
                         {
@@ -1088,7 +1073,7 @@ namespace Bb.Jslt.Parser
             if (variable != null)
             {
                 var variable_name = variable.GetText();
-                variable_name = variable_name.Substring(1);
+                variable_name = variable_name.Substring(0, variable_name.Length - 1);
                 result.Source = new JsltVariable(variable_name) { Location = context.ToLocation() };
 
             }
@@ -1103,6 +1088,7 @@ namespace Bb.Jslt.Parser
             var txt = context.GetText();
 
             JsltBase result = new JsltPath() { Value = txt, Location = context.ToLocation() };
+            result.AddTag(TagEnum.ToExecute);
 
             var containsVariable = txt.Contains("@@");
 
@@ -1110,7 +1096,6 @@ namespace Bb.Jslt.Parser
                 result = new JsltTranslateVariable(result);
 
             return result;
-
 
         }
 
@@ -1137,7 +1122,7 @@ namespace Bb.Jslt.Parser
 
                 int c = item.ChildCount;
                 for (int i = 0; i < c; i++)
-                {
+                { 
                     IParseTree child = item.GetChild(i);
                     EvaluateErrors(child);
                 }

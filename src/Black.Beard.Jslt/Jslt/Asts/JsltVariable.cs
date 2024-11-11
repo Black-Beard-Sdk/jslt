@@ -19,8 +19,8 @@ namespace Bb.Jslt.Asts
         {
             Kind = JsltKind.JVariable;
             this.Name = name;
-            if (this.Name.StartsWith("@"))
-                this.Name = this.Name.Substring(1);
+            if (this.Name.EndsWith(":"))
+                this.Name = this.Name.Substring(0, this.Name.Length - 1);
         }
 
         /// <summary>
@@ -42,12 +42,12 @@ namespace Bb.Jslt.Asts
 
             if (Value != null)
             {
-                writer.Append($"\"@{Name}\"");
+                writer.Append($"\"{Name}:\"");
                 writer.Append(" : ");
                 writer.ToString(Value);
             }
             else
-               writer.Append("@" + Name);
+               writer.Append(Name + ":");
 
             return true;
         }

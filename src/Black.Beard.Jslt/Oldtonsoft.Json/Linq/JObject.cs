@@ -284,10 +284,14 @@ namespace Oldtonsoft.Json.Linq
 
                 if (!(key is string propertyName))
                 {
-                    throw new ArgumentException("Accessed JObject values with invalid key value: {0}. Object property name expected.".FormatWith(CultureInfo.InvariantCulture, MiscellaneousUtils.ToString(key)));
+                    throw new ArgumentException("Accessed JObject values with invalid key value: {0}. Object property name expected."
+                        .FormatWith(CultureInfo.InvariantCulture, MiscellaneousUtils.ToString(key)));
                 }
 
-                return this[propertyName];
+                var result = this[propertyName];
+
+                return result;
+
             }
             set
             {
@@ -295,7 +299,8 @@ namespace Oldtonsoft.Json.Linq
 
                 if (!(key is string propertyName))
                 {
-                    throw new ArgumentException("Set JObject values with invalid key value: {0}. Object property name expected.".FormatWith(CultureInfo.InvariantCulture, MiscellaneousUtils.ToString(key)));
+                    throw new ArgumentException("Set JObject values with invalid key value: {0}. Object property name expected."
+                        .FormatWith(CultureInfo.InvariantCulture, MiscellaneousUtils.ToString(key)));
                 }
 
                 this[propertyName] = value;

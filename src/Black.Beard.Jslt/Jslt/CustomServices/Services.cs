@@ -92,21 +92,7 @@ namespace Bb.Jslt.CustomServices
                         return new JValue(value);
                     }
 
-                    else if (token is JArray a)
-                    {
-                        if (targetType.IsArray)
-                        {
-                            List<JToken> tokens = new List<JToken>(a.Count);
-                            foreach (var item in a)
-                                tokens.Add(ExecuteConvert(ctx, item, targetType));
-                            return new JArray(tokens);
-                        }
-                    }
-
-                    else
-                    {
-                        LocalDebug.Stop();
-                    }
+                    return new JValue(token.ToString(Oldtonsoft.Json.Formatting.None));
 
                 }
                 catch (Exception ex)

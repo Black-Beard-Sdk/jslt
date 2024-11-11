@@ -1,4 +1,5 @@
-﻿using Oldtonsoft.Json.Linq;
+﻿using ICSharpCode.Decompiler.Metadata;
+using Oldtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,6 +14,12 @@ namespace Bb.Jslt.Services
     public class Sources
     {
 
+        public Sources(EnvironmentVariableTarget target = EnvironmentVariableTarget.Machine) 
+            : this(null, EnvironmentVariableTarget.Machine)
+        {
+
+        }
+
         /// <summary>
         /// Initialize a new instance of Sources
         /// </summary>
@@ -20,10 +27,10 @@ namespace Bb.Jslt.Services
         /// <param name="target"></param>
         public Sources(SourceJson? source, EnvironmentVariableTarget target = EnvironmentVariableTarget.Machine)
         {
-            
+
             this.Source = source;
-            
-            if (source != null &&!string.IsNullOrEmpty(source.Name))
+
+            if (source != null && !string.IsNullOrEmpty(source.Name))
                 this._datas = new Dictionary<string, SourceJson>() { { source.Name, source } };
             else
                 this._datas = new Dictionary<string, SourceJson>();
