@@ -7,13 +7,13 @@
 ## **Distinct**
 Return a unique list in the source that match withe the pattern
 ```JSON
-{ "result" : distinct("source", "json path to match" @string) }
+{ "result" : distinct("source", "json path to match" #string) }
 ``` 
 
 ## **Group**
 Return group from list a unique list in the source that match withe the pattern
 ```JSON
-{ "result" : group("$.source", [ "$.pattern1" @string ]) }
+{ "result" : group("$.source", [ "$.pattern1" #string ]) }
 ``` 
 
 ```JSON
@@ -39,7 +39,7 @@ Return an unified list of specified items
 ## **select**
 Return a single selection specified by the json path
 ```JSON
-{ "result" : select( {<object>}, "json path" @string ) }
+{ "result" : select( {<object>}, "json path" #string ) }
 ``` 
 
 ## **selectmany**

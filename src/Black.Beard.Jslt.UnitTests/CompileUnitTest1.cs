@@ -323,7 +323,7 @@ namespace Black.Beard.Jslt.UnitTests
             }".Replace("'", "\"")
              .Replace("`", "'");            
             var src = new SourceJson[] { };
-            RuntimeContext result = Test(expected, true, src);
+            RuntimeContext result = Test(expected, src);
             Assert.AreEqual(result.TokenResult["propertyName"], "2");
         }     
 
