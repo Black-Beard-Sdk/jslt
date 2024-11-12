@@ -1,5 +1,4 @@
 ﻿
-#if !HAVE_TRACE_WRITER
 using Oldtonsoft.Json.Serialization;
 
 namespace Oldtonsoft.Json
@@ -35,5 +34,3 @@ namespace Oldtonsoft.Json
         Verbose = 4
     }
 }
-
-#endif

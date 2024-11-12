@@ -2,18 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
-using System.Text.Encodings.Web;
 using System.Text.RegularExpressions;
 
-/* Modification non fusionnée à partir du projet 'JsonPath (netstandard2.0)'
-Avant :
-using System.Linq;
-Après :
-using System.Linq;
-using Json;
-using Json.Path;
-using Json.Path.Path;
-*/
 using System.Linq;
 using Oldtonsoft.Json.Linq;
 

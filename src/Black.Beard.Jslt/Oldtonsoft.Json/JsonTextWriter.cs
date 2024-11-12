@@ -24,14 +24,10 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Numerics;
-using System.Text;
 using System.IO;
-using System.Xml;
 using Oldtonsoft.Json.Utilities;
-using System.Diagnostics;
 
 namespace Oldtonsoft.Json
 {

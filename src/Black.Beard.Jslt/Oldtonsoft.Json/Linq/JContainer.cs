@@ -30,7 +30,6 @@ using Oldtonsoft.Json.Utilities;
 using System.Collections;
 using System.Globalization;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 
 namespace Oldtonsoft.Json.Linq
 {

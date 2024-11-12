@@ -27,17 +27,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-#if HAVE_DYNAMIC
-using System.Dynamic;
-#endif
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Security;
 using Oldtonsoft.Json.Linq;
 using Oldtonsoft.Json.Utilities;
-using System.Runtime.Serialization;
-using System.Runtime.CompilerServices;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 

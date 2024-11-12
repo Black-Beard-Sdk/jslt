@@ -29,8 +29,6 @@ using System.Collections.Generic;
 using Oldtonsoft.Json.Utilities;
 using System.IO;
 using System.Globalization;
-using ZstdSharp.Unsafe;
-using System.Net.Http.Headers;
 
 namespace Oldtonsoft.Json.Linq
 {

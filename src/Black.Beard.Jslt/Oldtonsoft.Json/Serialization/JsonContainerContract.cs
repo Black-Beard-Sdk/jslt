@@ -24,11 +24,7 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Reflection;
 using Oldtonsoft.Json.Utilities;
-using System.Collections;
-using System.Linq;
 
 namespace Oldtonsoft.Json.Serialization
 {

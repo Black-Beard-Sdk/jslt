@@ -26,8 +26,6 @@
 #if !(NET20 || NET35)
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Reflection;
 using Oldtonsoft.Json.Utilities;
 using System.Globalization;

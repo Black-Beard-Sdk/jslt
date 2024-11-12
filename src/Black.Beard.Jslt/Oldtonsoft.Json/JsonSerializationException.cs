@@ -24,18 +24,13 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Runtime.Serialization;
-using System.Text;
 
 namespace Oldtonsoft.Json
 {
     /// <summary>
     /// The exception thrown when an error occurs during JSON serialization or deserialization.
     /// </summary>
-#if HAVE_BINARY_EXCEPTION_SERIALIZATION
     [Serializable]
-#endif
     public class JsonSerializationException : JsonException
     {
         /// <summary>

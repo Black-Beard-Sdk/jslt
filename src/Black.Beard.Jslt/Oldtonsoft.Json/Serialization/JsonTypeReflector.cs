@@ -24,17 +24,11 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
-using System.Security;
-#if HAVE_CAS
-using System.Security.Permissions;
-#endif
 using Oldtonsoft.Json.Utilities;
 using System.Linq;
-using System.Runtime.Serialization;
 
 namespace Oldtonsoft.Json.Serialization
 {
@@ -57,10 +51,8 @@ namespace Oldtonsoft.Json.Serialization
         private static readonly ThreadSafeStore<Type, Func<object[]?, object>> CreatorCache = 
             new ThreadSafeStore<Type, Func<object[]?, object>>(GetCreator);
 
-#if !(NET20 || DOTNET)
         private static readonly ThreadSafeStore<Type, Type?> AssociatedMetadataTypesCache = new ThreadSafeStore<Type, Type?>(GetAssociateMetadataTypeFromAttribute);
         private static ReflectionObject? _metadataTypeAttributeReflectionObject;
-#endif
 
         public static T? GetCachedAttribute<T>(object attributeProvider) where T : Attribute
         {

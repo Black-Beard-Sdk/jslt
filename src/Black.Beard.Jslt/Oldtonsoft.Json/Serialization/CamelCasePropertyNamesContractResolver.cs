@@ -25,7 +25,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using Oldtonsoft.Json.Utilities;
 
 namespace Oldtonsoft.Json.Serialization

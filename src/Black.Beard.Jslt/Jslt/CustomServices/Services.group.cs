@@ -10,8 +10,6 @@ using Bb.JPaths;
 namespace Bb.Jslt.CustomServices
 {
 
-
-
     public static partial class CServices
     {
 

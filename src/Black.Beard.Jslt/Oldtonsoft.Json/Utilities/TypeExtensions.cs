@@ -26,82 +26,12 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 
 namespace Oldtonsoft.Json.Utilities
 {
     internal static class TypeExtensions
     {
-#if DOTNET || PORTABLE
-#if !DOTNET
-        private static readonly BindingFlags DefaultFlags = BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance;
-
-        public static MethodInfo? GetGetMethod(this PropertyInfo propertyInfo)
-        {
-            return propertyInfo.GetGetMethod(false);
-        }
-
-        public static MethodInfo? GetGetMethod(this PropertyInfo propertyInfo, bool nonPublic)
-        {
-            MethodInfo getMethod = propertyInfo.GetMethod;
-            if (getMethod != null && (getMethod.IsPublic || nonPublic))
-            {
-                return getMethod;
-            }
-
-            return null;
-        }
-
-        public static MethodInfo? GetSetMethod(this PropertyInfo propertyInfo)
-        {
-            return propertyInfo.GetSetMethod(false);
-        }
-
-        public static MethodInfo? GetSetMethod(this PropertyInfo propertyInfo, bool nonPublic)
-        {
-            MethodInfo setMethod = propertyInfo.SetMethod;
-            if (setMethod != null && (setMethod.IsPublic || nonPublic))
-            {
-                return setMethod;
-            }
-
-            return null;
-        }
-#endif
-
-        public static bool IsSubclassOf(this Type type, Type c)
-        {
-            return type.GetTypeInfo().IsSubclassOf(c);
-        }
-
-#if !DOTNET
-        public static bool IsAssignableFrom(this Type type, Type c)
-        {
-            return type.GetTypeInfo().IsAssignableFrom(c.GetTypeInfo());
-        }
-#endif
-
-        public static bool IsInstanceOfType(this Type type, object? o)
-        {
-            if (o == null)
-            {
-                return false;
-            }
-
-            return type.IsAssignableFrom(o.GetType());
-        }
-#endif
-
-        public static MethodInfo Method(this Delegate d)
-        {
-#if HAVE_FULL_REFLECTION
-            return d.Method;
-#else
-            return d.GetMethodInfo();
-#endif
-        }
 
         public static MemberTypes MemberType(this MemberInfo memberInfo)
         {

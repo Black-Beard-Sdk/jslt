@@ -24,8 +24,6 @@
 #endregion
 
 using System;
-using Oldtonsoft.Json.Utilities;
-using System.Globalization;
 
 namespace Oldtonsoft.Json
 {

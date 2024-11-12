@@ -24,7 +24,6 @@
 #endregion
 
 using System;
-using System.Reflection;
 using Oldtonsoft.Json.Utilities;
 
 namespace Oldtonsoft.Json.Serialization

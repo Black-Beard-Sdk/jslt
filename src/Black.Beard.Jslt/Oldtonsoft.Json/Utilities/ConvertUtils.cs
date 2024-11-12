@@ -28,12 +28,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.ComponentModel;
 using System.Numerics;
-using System.Text;
-using System.Text.RegularExpressions;
 using Oldtonsoft.Json.Serialization;
 using System.Reflection;
 using System.Diagnostics.CodeAnalysis;
-using System.Data.SqlTypes;
 
 namespace Oldtonsoft.Json.Utilities
 {

@@ -9,8 +9,6 @@ using Bb.Jslt.Parser;
 namespace Bb.Jslt.CustomServices
 {
 
-
-
     public static partial class CServices
     {
 

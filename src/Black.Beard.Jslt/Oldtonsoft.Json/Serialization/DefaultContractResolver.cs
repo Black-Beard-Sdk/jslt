@@ -27,22 +27,15 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-#if HAVE_DYNAMIC
-using System.Dynamic;
-#endif
 using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization;
-#if HAVE_CAS
-using System.Security.Permissions;
-#endif
 using Oldtonsoft.Json.Converters;
 using Oldtonsoft.Json.Utilities;
 using Oldtonsoft.Json.Linq;
 using System.Runtime.CompilerServices;
 using System.Linq;
-using Oldtonsoft.Json.Serialization;
 
 namespace Oldtonsoft.Json.Serialization
 {

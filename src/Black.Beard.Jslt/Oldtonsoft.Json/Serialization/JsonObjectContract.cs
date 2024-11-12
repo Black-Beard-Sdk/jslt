@@ -24,12 +24,7 @@
 #endregion
 
 using System;
-using System.Globalization;
-using System.Reflection;
-using System.Runtime.Serialization;
-using System.Security;
 using Oldtonsoft.Json.Linq;
-using Oldtonsoft.Json.Utilities;
 
 namespace Oldtonsoft.Json.Serialization
 {

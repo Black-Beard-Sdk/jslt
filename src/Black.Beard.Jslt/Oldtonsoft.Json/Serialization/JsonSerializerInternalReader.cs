@@ -26,20 +26,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-#if HAVE_DYNAMIC
-using System.ComponentModel;
-using System.Dynamic;
-#endif
-using System.Diagnostics;
 using System.Globalization;
 using System.Numerics;
-using System.Reflection;
-using System.Runtime.Serialization;
 using Oldtonsoft.Json.Linq;
 using Oldtonsoft.Json.Utilities;
-using System.Runtime.CompilerServices;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Oldtonsoft.Json.Serialization

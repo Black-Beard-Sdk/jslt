@@ -23,7 +23,6 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 #endregion
 
-using System;
 using Oldtonsoft.Json.Utilities;
 using System.Globalization;
 
