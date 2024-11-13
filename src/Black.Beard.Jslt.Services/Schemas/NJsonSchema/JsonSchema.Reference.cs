@@ -9,7 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using Oldtonsoft.Json;
+using Bb.Json;
 using NJsonSchema.References;
 
 namespace NJsonSchema

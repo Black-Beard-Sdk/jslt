@@ -19,7 +19,7 @@ namespace Bb.Json
                 GenerateEnumMappingDescription = true,
             };
 
-            _settings.ActualSerializerSettings.Converters.Add(new Oldtonsoft.Json.Converters.StringEnumConverter());
+            _settings.ActualSerializerSettings.Converters.Add(new Bb.Json.Converters.StringEnumConverter());
 
         }
 

@@ -14,9 +14,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Namotion.Reflection;
-using Oldtonsoft.Json;
-using Oldtonsoft.Json.Linq;
-using Oldtonsoft.Json.Serialization;
+using Bb.Json;
+using Bb.Json.Linq;
+using Bb.Json.Serialization;
 using NJsonSchema.References;
 
 namespace NJsonSchema.Visitors

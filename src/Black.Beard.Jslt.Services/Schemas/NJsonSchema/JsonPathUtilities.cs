@@ -12,8 +12,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Namotion.Reflection;
-using Oldtonsoft.Json.Linq;
-using Oldtonsoft.Json.Serialization;
+using Bb.Json.Linq;
+using Bb.Json.Serialization;
 
 namespace NJsonSchema
 {

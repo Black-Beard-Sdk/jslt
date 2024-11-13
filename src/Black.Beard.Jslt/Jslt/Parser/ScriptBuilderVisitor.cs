@@ -12,7 +12,7 @@ using Bb.Jslt.Asts;
 using Bb.Jslt.Builds;
 using Bb.Jslt.Services;
 using Microsoft.CodeAnalysis;
-using Oldtonsoft.Json.Linq;
+using Bb.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Globalization;

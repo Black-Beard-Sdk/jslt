@@ -9,8 +9,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Oldtonsoft.Json;
-using Oldtonsoft.Json.Linq;
+using Bb.Json;
+using Bb.Json.Linq;
 
 namespace NJsonSchema
 {

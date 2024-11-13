@@ -9,8 +9,8 @@
 using System.Collections;
 using System.Reflection;
 using Namotion.Reflection;
-using Oldtonsoft.Json;
-using Oldtonsoft.Json.Serialization;
+using Bb.Json;
+using Bb.Json.Serialization;
 
 namespace NJsonSchema.Infrastructure
 {

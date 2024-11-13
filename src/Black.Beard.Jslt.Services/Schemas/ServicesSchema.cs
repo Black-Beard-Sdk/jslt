@@ -1,6 +1,6 @@
 ﻿using Bb.Attributes;
 using Bb.Jslt.Services;
-using Oldtonsoft.Json.Linq;
+using Bb.Json.Linq;
 using NJsonSchema;
 
 namespace Bb.Jslt.Services.Schemas

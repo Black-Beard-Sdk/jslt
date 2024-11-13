@@ -7,7 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System.ComponentModel;
-using Oldtonsoft.Json;
+using Bb.Json;
 
 namespace NJsonSchema
 {

@@ -7,10 +7,10 @@
 //-----------------------------------------------------------------------
 
 using Namotion.Reflection;
-using Oldtonsoft.Json;
-using Oldtonsoft.Json.Converters;
-using Oldtonsoft.Json.Linq;
-using Oldtonsoft.Json.Serialization;
+using Bb.Json;
+using Bb.Json.Converters;
+using Bb.Json.Linq;
+using Bb.Json.Serialization;
 using NJsonSchema.Annotations;
 using NJsonSchema.Converters;
 using NJsonSchema.Generation.TypeMappers;
@@ -1190,7 +1190,7 @@ namespace NJsonSchema.Generation
             {
                 var converterType = (Type)jsonConverterAttribute.ConverterType;
                 if (converterType != null && (
-                    converterType.IsAssignableToTypeName(nameof(JsonInheritanceConverter), TypeNameStyle.Name) || // Oldtonsoft's converter
+                    converterType.IsAssignableToTypeName(nameof(JsonInheritanceConverter), TypeNameStyle.Name) || // Bb's converter
                     converterType.IsAssignableToTypeName(nameof(JsonInheritanceConverter) + "`1", TypeNameStyle.Name) // System.Text.Json's converter
                     ))
                 {

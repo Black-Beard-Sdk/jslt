@@ -7,9 +7,9 @@
 //-----------------------------------------------------------------------
 
 using Namotion.Reflection;
-using Oldtonsoft.Json;
-using Oldtonsoft.Json.Converters;
-using Oldtonsoft.Json.Serialization;
+using Bb.Json;
+using Bb.Json.Converters;
+using Bb.Json.Serialization;
 using System.Collections;
 using System.Linq;
 using System.Reflection;
@@ -22,11 +22,11 @@ namespace NJsonSchema.Generation
     public static class SystemTextJsonUtilities
     {
         /// <summary>
-        /// Converst System.Text.Json serializer options to Oldtonsoft JSON settings.
+        /// Converst System.Text.Json serializer options to Bb JSON settings.
         /// </summary>
         /// <param name="serializerOptions">The options.</param>
         /// <returns>The settings.</returns>
-        public static JsonSerializerSettings ConvertJsonOptionsToOldtonsoftSettings(dynamic serializerOptions)
+        public static JsonSerializerSettings ConvertJsonOptionsToBbSettings(dynamic serializerOptions)
         {
             var settings = new JsonSerializerSettings
             {

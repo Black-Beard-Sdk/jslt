@@ -6,8 +6,8 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using Oldtonsoft.Json;
-using Oldtonsoft.Json.Linq;
+using Bb.Json;
+using Bb.Json.Linq;
 
 namespace NJsonSchema.Validation
 {

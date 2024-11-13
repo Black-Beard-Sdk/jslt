@@ -11,9 +11,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Oldtonsoft.Json;
-using Oldtonsoft.Json.Converters;
-using Oldtonsoft.Json.Serialization;
+using Bb.Json;
+using Bb.Json.Converters;
+using Bb.Json.Serialization;
 using NJsonSchema.Annotations;
 using NJsonSchema.Generation.TypeMappers;
 using Namotion.Reflection;
@@ -97,7 +97,7 @@ namespace NJsonSchema.Generation
         /// <summary>Gets or sets the schema type to generate (default: JsonSchema).</summary>
         public SchemaType SchemaType { get; set; }
 
-        /// <summary>Gets or sets the Oldtonsoft JSON serializer settings.</summary>
+        /// <summary>Gets or sets the Bb JSON serializer settings.</summary>
         /// <remarks><see cref="DefaultPropertyNameHandling"/>, <see cref="DefaultEnumHandling"/> and <see cref="ContractResolver"/> will be ignored.</remarks>
         [JsonIgnore]
         public JsonSerializerSettings SerializerSettings
@@ -258,7 +258,7 @@ namespace NJsonSchema.Generation
                     throw new InvalidOperationException("The setting SerializerSettings cannot be used when SerializerOptions is set.");
                 }
 
-                ActualSerializerSettings = SystemTextJsonUtilities.ConvertJsonOptionsToOldtonsoftSettings(SerializerOptions);
+                ActualSerializerSettings = SystemTextJsonUtilities.ConvertJsonOptionsToBbSettings(SerializerOptions);
                 ActualContractResolver = ActualSerializerSettings.ContractResolver ?? new DefaultContractResolver();
                 return;
             }

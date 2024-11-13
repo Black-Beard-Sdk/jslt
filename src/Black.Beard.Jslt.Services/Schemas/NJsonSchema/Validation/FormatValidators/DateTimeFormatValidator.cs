@@ -5,7 +5,7 @@
 // <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
-using Oldtonsoft.Json.Linq;
+using Bb.Json.Linq;
 using System;
 using System.Globalization;
 

@@ -2,7 +2,7 @@
 using Bb.CommandLines.Validators;
 using Bb.ConvertToDatables;
 using Microsoft.Extensions.CommandLineUtils;
-using Oldtonsoft.Json.Linq;
+using Bb.Json.Linq;
 using System;
 using System.Data;
 using System.IO;

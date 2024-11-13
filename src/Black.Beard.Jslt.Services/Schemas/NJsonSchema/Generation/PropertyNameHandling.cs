@@ -7,8 +7,8 @@
 //-----------------------------------------------------------------------
 
 using System.Runtime.Serialization;
-using Oldtonsoft.Json;
-using Oldtonsoft.Json.Serialization;
+using Bb.Json;
+using Bb.Json.Serialization;
 
 namespace NJsonSchema.Generation
 {

@@ -1,7 +1,7 @@
 ﻿using Bb.Expressions;
 using Bb.Attributes;
 using Bb.Jslt.Services;
-using Oldtonsoft.Json.Linq;
+using Bb.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -92,7 +92,7 @@ namespace Bb.Jslt.CustomServices
                         return new JValue(value);
                     }
 
-                    return new JValue(token.ToString(Oldtonsoft.Json.Formatting.None));
+                    return new JValue(token.ToString(Bb.Json.Formatting.None));
 
                 }
                 catch (Exception ex)

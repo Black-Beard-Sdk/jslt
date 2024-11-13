@@ -7,12 +7,12 @@
 //-----------------------------------------------------------------------
 
 using System;
-using Oldtonsoft.Json;
+using Bb.Json;
 using System.Collections.Generic;
 using System.Reflection;
 using NJsonSchema.Infrastructure;
 using NJsonSchema.References;
-using Oldtonsoft.Json.Linq;
+using Bb.Json.Linq;
 
 namespace NJsonSchema
 {

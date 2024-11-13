@@ -11,8 +11,8 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Oldtonsoft.Json;
-using Oldtonsoft.Json.Serialization;
+using Bb.Json;
+using Bb.Json.Serialization;
 using NJsonSchema.References;
 
 namespace NJsonSchema.Infrastructure

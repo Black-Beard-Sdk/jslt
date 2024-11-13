@@ -1,6 +1,6 @@
 ﻿using Bb.Analysis.DiagTraces;
 using Bb.Jslt.Asts;
-using Oldtonsoft.Json.Linq;
+using Bb.Json.Linq;
 using System;
 using System.Globalization;
 using System.Linq;

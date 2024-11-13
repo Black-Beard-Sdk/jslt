@@ -6,7 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using Oldtonsoft.Json;
+using Bb.Json;
 
 namespace NJsonSchema.References
 {

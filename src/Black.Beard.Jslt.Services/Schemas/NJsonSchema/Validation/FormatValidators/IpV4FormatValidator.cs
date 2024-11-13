@@ -6,7 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using Oldtonsoft.Json.Linq;
+using Bb.Json.Linq;
 using System.Text.RegularExpressions;
 
 namespace NJsonSchema.Validation.FormatValidators

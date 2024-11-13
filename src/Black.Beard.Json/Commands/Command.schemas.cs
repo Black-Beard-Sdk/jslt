@@ -3,7 +3,7 @@ using Bb.CommandLines.Outs.Printings;
 using Bb.CommandLines.Validators;
 using Bb.ComponentModel;
 using Microsoft.Extensions.CommandLineUtils;
-using Oldtonsoft.Json.Linq;
+using Bb.Json.Linq;
 using NJsonSchema;
 using System;
 using System.Collections.Generic;
@@ -177,7 +177,7 @@ namespace Bb.Json.Commands
             if (File.Exists(filename))
                 File.Delete(filename);
 
-            filename.Save(payload.ToString(Oldtonsoft.Json.Formatting.Indented));
+            filename.Save(payload.ToString(Bb.Json.Formatting.Indented));
 
         }
 

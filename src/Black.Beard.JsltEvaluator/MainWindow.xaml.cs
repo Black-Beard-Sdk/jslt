@@ -10,7 +10,7 @@ using ICSharpCode.AvalonEdit.CodeCompletion;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Folding;
 using Microsoft.Win32;
-using Oldtonsoft.Json.Linq;
+using Bb.Json.Linq;
 using ScintillaNET;
 using System;
 using System.Collections.Generic;

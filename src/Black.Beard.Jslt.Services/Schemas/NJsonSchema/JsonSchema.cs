@@ -21,8 +21,8 @@ using NJsonSchema.Generation;
 using NJsonSchema.Infrastructure;
 using NJsonSchema.Validation;
 using NJsonSchema.Validation.FormatValidators;
-using Oldtonsoft.Json;
-using Oldtonsoft.Json.Linq;
+using Bb.Json;
+using Bb.Json.Linq;
 
 namespace NJsonSchema
 {
@@ -86,12 +86,12 @@ namespace NJsonSchema
         /// <summary>Gets the NJsonSchema toolchain version.</summary>
 #if LEGACY
         public static string ToolchainVersion => typeof(JsonSchema).Assembly.GetName().Version +
-                                                 " NET40 (Oldtonsoft.Json v" + typeof(JToken).Assembly.GetName().Version + ")";
+                                                 " NET40 (Bb.Json v" + typeof(JToken).Assembly.GetName().Version + ")";
 #else
         public static string ToolchainVersion => version;
 
         private static readonly string version = typeof(JsonSchema).GetTypeInfo().Assembly.GetName().Version +
-                                                 " (Oldtonsoft.Json v" + typeof(JToken).GetTypeInfo().Assembly.GetName().Version + ")";
+                                                 " (Bb.Json v" + typeof(JToken).GetTypeInfo().Assembly.GetName().Version + ")";
 #endif
 
         /// <summary>Creates a <see cref="JsonSchema" /> from a given type.</summary>

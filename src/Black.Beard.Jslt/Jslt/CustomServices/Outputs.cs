@@ -1,7 +1,7 @@
 ﻿using Bb.Attributes;
 using Bb.Jslt.Services;
-using Oldtonsoft.Json;
-using Oldtonsoft.Json.Linq;
+using Bb.Json;
+using Bb.Json.Linq;
 using System.Collections.Generic;
 using System.Text;
 
@@ -24,7 +24,7 @@ namespace Bb.Jslt.CustomServices
                 Formatting = indented ? Formatting.Indented : Formatting.None,
                 Culture = ctx.Configuration.Culture,
                 DefaultValueHandling = ignoreNullAndEmptyValue ? DefaultValueHandling.Ignore : DefaultValueHandling.Include,
-                NullValueHandling = ignoreNullAndEmptyValue ? Oldtonsoft.Json.NullValueHandling.Ignore : Oldtonsoft.Json.NullValueHandling.Include,
+                NullValueHandling = ignoreNullAndEmptyValue ? Bb.Json.NullValueHandling.Ignore : Bb.Json.NullValueHandling.Include,
                 TypeNameHandling = TypeNameHandling.All,
             };
 
@@ -92,11 +92,11 @@ namespace Bb.Jslt.CustomServices
             var result = new StringBuilder();
 
             if (source is JObject o)
-                result.AppendLine(o.ToString(Oldtonsoft.Json.Formatting.None));
+                result.AppendLine(o.ToString(Bb.Json.Formatting.None));
 
             else if (source is JArray a)
                 foreach (var item in a)
-                    result.AppendLine(item.ToString(Oldtonsoft.Json.Formatting.None));
+                    result.AppendLine(item.ToString(Bb.Json.Formatting.None));
 
             return result;
 

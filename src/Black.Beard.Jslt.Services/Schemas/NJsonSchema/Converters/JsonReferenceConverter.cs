@@ -6,7 +6,7 @@
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-using Oldtonsoft.Json;
+using Bb.Json;
 using System;
 
 namespace NJsonSchema.Converters
@@ -19,7 +19,7 @@ namespace NJsonSchema.Converters
         [ThreadStatic]
         private static bool _isWriting = false;
 
-        /// <summary>Gets a value indicating whether this <see cref="T:Oldtonsoft.Json.JsonConverter" /> can write JSON.</summary>
+        /// <summary>Gets a value indicating whether this <see cref="T:Bb.Json.JsonConverter" /> can write JSON.</summary>
         public override bool CanWrite => !_isWriting;
 
         /// <summary>Determines whether this instance can convert the specified object type.</summary>
@@ -31,7 +31,7 @@ namespace NJsonSchema.Converters
         }
 
         /// <summary>Reads the JSON representation of the object.</summary>
-        /// <param name="reader">The <see cref="T:Oldtonsoft.Json.JsonReader" /> to read from.</param>
+        /// <param name="reader">The <see cref="T:Bb.Json.JsonReader" /> to read from.</param>
         /// <param name="objectType">Type of the object.</param>
         /// <param name="existingValue">The existing value of object being read.</param>
         /// <param name="serializer">The calling serializer.</param>
@@ -42,7 +42,7 @@ namespace NJsonSchema.Converters
         }
 
         /// <summary>Writes the JSON representation of the object.</summary>
-        /// <param name="writer">The <see cref="T:Oldtonsoft.Json.JsonWriter" /> to write to.</param>
+        /// <param name="writer">The <see cref="T:Bb.Json.JsonWriter" /> to write to.</param>
         /// <param name="value">The value.</param>
         /// <param name="serializer">The calling serializer.</param>
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)

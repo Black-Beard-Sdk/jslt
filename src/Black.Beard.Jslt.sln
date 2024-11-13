@@ -63,6 +63,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Editor", "Editor", "{734C37
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{8BD72FA9-47BB-4A4D-838A-3AA5DD2E37EA}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.LiteDb", "Black.Beard.LiteDb\Black.Beard.LiteDb.csproj", "{81794303-DD10-4FF7-8C72-BF39F3F63084}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -142,6 +144,12 @@ Global
 		{8D51B8A3-764C-42F5-8743-CFBDE652709C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8D51B8A3-764C-42F5-8743-CFBDE652709C}.Signed|Any CPU.ActiveCfg = Debug|Any CPU
 		{8D51B8A3-764C-42F5-8743-CFBDE652709C}.Signed|Any CPU.Build.0 = Debug|Any CPU
+		{81794303-DD10-4FF7-8C72-BF39F3F63084}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81794303-DD10-4FF7-8C72-BF39F3F63084}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81794303-DD10-4FF7-8C72-BF39F3F63084}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81794303-DD10-4FF7-8C72-BF39F3F63084}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81794303-DD10-4FF7-8C72-BF39F3F63084}.Signed|Any CPU.ActiveCfg = Debug|Any CPU
+		{81794303-DD10-4FF7-8C72-BF39F3F63084}.Signed|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

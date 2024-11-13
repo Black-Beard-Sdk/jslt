@@ -3,13 +3,14 @@ using Bb.Jslt.Asts;
 using Bb.Jslt.Services;
 using Microsoft.Data.Sqlite;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Oldtonsoft.Json.Linq;
-using Oldtonsoft.Json.Linq;
+using Bb.Json.Linq;
+using Bb.Json.Linq;
 using System;
 using System.Data.Common;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Collections.Generic;
 
 namespace Black.Beard.Jslt.UnitTests
 {
@@ -116,7 +117,7 @@ namespace Black.Beard.Jslt.UnitTests
             var src = new SourceJson[] { SourceJson.GetFromText(source, "body") };
             RuntimeContext result = Test(i, src);
 
-            var a = result.TokenResult as Oldtonsoft.Json.Linq.JArray;
+            var a = result.TokenResult as Bb.Json.Linq.JArray;
 
             Assert.AreEqual(a.Count, 2);
             Assert.AreEqual(a[0]["key"], 2);
@@ -140,12 +141,11 @@ namespace Black.Beard.Jslt.UnitTests
         [TestMethod]
         public void TestJPathUnary()
         {
-
-            var expected = "{ 'propertyName': $.prop1 }".Replace("'", "\"");
+            var template = "{ 'propertyName': $.prop1 }".Replace("'", "\"");
             var source = "{ 'prop1': false }".Replace("'", "\"");
 
             var src = new SourceJson[] { SourceJson.GetFromText(source) };
-            RuntimeContext result = Test(expected, src);
+            RuntimeContext result = Test(template, src);
             Assert.AreEqual(result.TokenResult["propertyName"], false);
 
         }
@@ -176,6 +176,16 @@ namespace Black.Beard.Jslt.UnitTests
 
         }
 
+        public class tptp<T>
+        {
+
+            public string Name { get; set; }
+        
+            public T Value { get; set; }
+        
+        }
+
+
         [TestMethod]
         public void TestJPathconcat()
         {
@@ -186,8 +196,7 @@ namespace Black.Beard.Jslt.UnitTests
             var src = new SourceJson[] { SourceJson.GetFromText(source) };
             RuntimeContext result = Test(expected, src);
             Assert.AreEqual(result.TokenResult["propertyName"], "hello world");
-
-
+        
         }
 
         [TestMethod]
@@ -532,8 +541,8 @@ namespace Black.Beard.Jslt.UnitTests
                  ;
 
             RuntimeContext result = Test(template, null);
-            var a = result.TokenResult as Oldtonsoft.Json.Linq.JObject;
-            var b = a["Data"][0] as Oldtonsoft.Json.Linq.JObject;
+            var a = result.TokenResult as Bb.Json.Linq.JObject;
+            var b = a["Data"][0] as Bb.Json.Linq.JObject;
 
             Assert.AreEqual(b["$_line"], 1);
             Assert.AreEqual(b["value"], "test1");

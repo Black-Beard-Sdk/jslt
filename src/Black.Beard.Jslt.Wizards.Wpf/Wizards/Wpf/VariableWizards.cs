@@ -1,4 +1,4 @@
-﻿using Oldtonsoft.Json.Linq;
+﻿using Bb.Json.Linq;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
@@ -40,7 +40,7 @@ namespace Bb.Wizards
 
                 var datas = GetVariables();
 
-                var payload = datas.ToString(Oldtonsoft.Json.Formatting.Indented);
+                var payload = datas.ToString(Bb.Json.Formatting.Indented);
 
                 Filepath.Save(payload);
             }

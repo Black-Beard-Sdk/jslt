@@ -1,5 +1,5 @@
 ﻿using Bb.Jslt.Services;
-using Oldtonsoft.Json.Linq;
+using Bb.Json.Linq;
 
 namespace Bb.Contracts
 {

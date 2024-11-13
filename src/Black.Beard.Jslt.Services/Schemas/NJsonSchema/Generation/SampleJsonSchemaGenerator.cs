@@ -11,8 +11,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Oldtonsoft.Json;
-using Oldtonsoft.Json.Linq;
+using Bb.Json;
+using Bb.Json.Linq;
 
 namespace NJsonSchema.Generation
 {

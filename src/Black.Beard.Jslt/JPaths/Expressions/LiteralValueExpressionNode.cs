@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System;
-using Oldtonsoft.Json.Linq;
+using Bb.Json.Linq;
 using System.Text;
 
 namespace Bb.JPaths.Expressions;
@@ -23,12 +23,12 @@ internal class LiteralValueExpressionNode : LeafValueExpressionNode
 
     public override void BuildString(StringBuilder builder)
     {
-        builder.Append(_value.AsJsonString(Oldtonsoft.Json.Formatting.Indented));
+        builder.Append(_value.AsJsonString(Bb.Json.Formatting.Indented));
     }
 
     public override string ToString()
     {
-        return _value.AsJsonString(Oldtonsoft.Json.Formatting.Indented);
+        return _value.AsJsonString(Bb.Json.Formatting.Indented);
     }
 }
 

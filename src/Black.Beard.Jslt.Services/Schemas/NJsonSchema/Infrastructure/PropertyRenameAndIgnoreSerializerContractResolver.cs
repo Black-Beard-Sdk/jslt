@@ -9,8 +9,8 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Oldtonsoft.Json;
-using Oldtonsoft.Json.Serialization;
+using Bb.Json;
+using Bb.Json.Serialization;
 
 namespace NJsonSchema.Infrastructure
 {
@@ -58,7 +58,7 @@ namespace NJsonSchema.Infrastructure
         }
 
         /// <summary>Creates a JsonProperty for the given System.Reflection.MemberInfo.</summary>
-        /// <param name="member">The member's parent Oldtonsoft.Json.MemberSerialization.</param>
+        /// <param name="member">The member's parent Bb.Json.MemberSerialization.</param>
         /// <param name="memberSerialization">The member to create a JsonProperty for.</param>
         /// <returns>A created JsonProperty for the given System.Reflection.MemberInfo.</returns>
         protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)

@@ -7,7 +7,7 @@
 //-----------------------------------------------------------------------
 
 using NJsonSchema.Infrastructure;
-using Oldtonsoft.Json;
+using Bb.Json;
 
 namespace NJsonSchema.References
 {

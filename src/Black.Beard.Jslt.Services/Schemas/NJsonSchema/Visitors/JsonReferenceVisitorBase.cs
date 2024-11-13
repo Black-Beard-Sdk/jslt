@@ -12,9 +12,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Namotion.Reflection;
-using Oldtonsoft.Json;
-using Oldtonsoft.Json.Linq;
-using Oldtonsoft.Json.Serialization;
+using Bb.Json;
+using Bb.Json.Linq;
+using Bb.Json.Serialization;
 using NJsonSchema.References;
 
 namespace NJsonSchema.Visitors

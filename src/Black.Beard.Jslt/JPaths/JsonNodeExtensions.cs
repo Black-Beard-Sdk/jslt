@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 
 using System.Linq;
-using Oldtonsoft.Json.Linq;
+using Bb.Json.Linq;
 
 namespace Bb.JPaths;
 
@@ -264,9 +264,9 @@ public static class JTokenExtensions
     /// <param name="node">A node.</param>
     /// <param name="options">Serializer options</param>
     /// <returns>JSON string representation.</returns>
-    public static string AsJsonString(this JToken? node, Oldtonsoft.Json.Formatting? format)
+    public static string AsJsonString(this JToken? node, Bb.Json.Formatting? format)
     {
-        return node?.ToString(format ?? Oldtonsoft.Json.Formatting.None) ?? "null";
+        return node?.ToString(format ?? Bb.Json.Formatting.None) ?? "null";
     }
 
     /// <summary>
@@ -478,7 +478,7 @@ public static class JTokenExtensions
 
         }
 
-        return $"['{PrepForJsonPath(segment.AsJsonString(Oldtonsoft.Json.Formatting.None))}']";
+        return $"['{PrepForJsonPath(segment.AsJsonString(Bb.Json.Formatting.None))}']";
 
     }
 

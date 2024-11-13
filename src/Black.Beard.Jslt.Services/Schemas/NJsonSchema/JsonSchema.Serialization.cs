@@ -13,8 +13,8 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Runtime.Serialization;
 using Namotion.Reflection;
-using Oldtonsoft.Json;
-using Oldtonsoft.Json.Linq;
+using Bb.Json;
+using Bb.Json.Linq;
 using NJsonSchema.Collections;
 using NJsonSchema.Infrastructure;
 

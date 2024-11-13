@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Reflection;
-using Oldtonsoft.Json.Linq;
+using Bb.Json.Linq;
 using Bb.JPaths.Expressions;
 
 namespace Bb.JPaths;

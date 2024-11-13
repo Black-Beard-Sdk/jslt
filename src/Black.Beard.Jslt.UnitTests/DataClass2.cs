@@ -1,6 +1,6 @@
 ﻿using Bb.Jslt.Services;
 using Bb.Attributes;
-using Oldtonsoft.Json.Linq;
+using Bb.Json.Linq;
 using Bb.Contracts;
 
 namespace Black.Beard.Jslt.UnitTests

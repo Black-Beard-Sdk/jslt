@@ -4,7 +4,7 @@ using Bb.Expressions;
 using Bb.Expressions.Statements;
 using Bb.Jslt.Asts;
 using Bb.Jslt.Parser;
-using Oldtonsoft.Json.Linq;
+using Bb.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;

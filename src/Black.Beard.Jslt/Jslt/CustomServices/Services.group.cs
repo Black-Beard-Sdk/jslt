@@ -1,6 +1,6 @@
 ﻿using Bb.Attributes;
 using Bb.Jslt.Services;
-using Oldtonsoft.Json.Linq;
+using Bb.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -302,7 +302,7 @@ namespace Bb.Jslt.CustomServices
                     }
                     else
                     {
-                        ctx.Diagnostics.AddWarning(ctx.ScriptFile, ctx.GetCurrentLocation(), item.ToString(Oldtonsoft.Json.Formatting.None), $"no key '{key}' resolved.");
+                        ctx.Diagnostics.AddWarning(ctx.ScriptFile, ctx.GetCurrentLocation(), item.ToString(Bb.Json.Formatting.None), $"no key '{key}' resolved.");
                     }
 
                 }

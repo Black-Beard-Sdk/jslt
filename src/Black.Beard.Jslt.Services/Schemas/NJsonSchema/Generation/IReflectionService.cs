@@ -7,7 +7,7 @@
 //-----------------------------------------------------------------------
 
 using Namotion.Reflection;
-using Oldtonsoft.Json;
+using Bb.Json;
 using System;
 
 namespace NJsonSchema.Generation

@@ -14,8 +14,8 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Namotion.Reflection;
-using Oldtonsoft.Json;
-using Oldtonsoft.Json.Serialization;
+using Bb.Json;
+using Bb.Json.Serialization;
 using NJsonSchema.Infrastructure;
 using NJsonSchema.References;
 

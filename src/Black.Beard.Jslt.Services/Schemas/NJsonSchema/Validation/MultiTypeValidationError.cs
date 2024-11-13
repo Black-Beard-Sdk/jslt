@@ -7,7 +7,7 @@
 //-----------------------------------------------------------------------
 
 using System.Collections.Generic;
-using Oldtonsoft.Json.Linq;
+using Bb.Json.Linq;
 
 namespace NJsonSchema.Validation
 {

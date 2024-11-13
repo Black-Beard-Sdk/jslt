@@ -10,12 +10,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Oldtonsoft.Json;
-using Oldtonsoft.Json.Linq;
-using Oldtonsoft.Json.Serialization;
+using Bb.Json;
+using Bb.Json.Linq;
+using Bb.Json.Serialization;
 using NJsonSchema.Annotations;
 using System.Reflection;
-using Oldtonsoft.Json.Converters;
+using Bb.Json.Converters;
 using Namotion.Reflection;
 
 namespace NJsonSchema.Generation

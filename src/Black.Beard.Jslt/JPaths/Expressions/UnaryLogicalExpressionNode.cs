@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System;
 using System.Text;
-using Oldtonsoft.Json.Linq;
+using Bb.Json.Linq;
 
 namespace Bb.JPaths.Expressions;
 

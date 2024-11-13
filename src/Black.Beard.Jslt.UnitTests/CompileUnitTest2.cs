@@ -3,8 +3,8 @@ using Bb.Jslt.CustomServices;
 using Bb.Jslt.Parser;
 using Bb.Jslt.Services;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Oldtonsoft.Json.Linq;
-using Oldtonsoft.Json.Linq;
+using Bb.Json.Linq;
+using Bb.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -84,14 +84,14 @@ namespace Black.Beard.Jslt.UnitTests
         {
 
             HashSet<string> _h = new HashSet<string>() { "Business", "Private" };
-            var list = new List<Oldtonsoft.Json.Linq.JToken>();
+            var list = new List<Bb.Json.Linq.JToken>();
 
             foreach (string s in _h)
-                list.Add(new Oldtonsoft.Json.Linq.JValue(s));
+                list.Add(new Bb.Json.Linq.JValue(s));
 
             var ctx = new RuntimeContext();
 
-            var o = CServices.GetRandomInList(ctx, new Oldtonsoft.Json.Linq.JArray(list));
+            var o = CServices.GetRandomInList(ctx, new Bb.Json.Linq.JArray(list));
             Assert.IsTrue(_h.Contains(o.ToString()));
 
         }

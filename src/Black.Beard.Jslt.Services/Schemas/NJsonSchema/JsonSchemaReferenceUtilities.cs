@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Oldtonsoft.Json.Serialization;
+using Bb.Json.Serialization;
 using NJsonSchema.References;
 using NJsonSchema.Visitors;
 

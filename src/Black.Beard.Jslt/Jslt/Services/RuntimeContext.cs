@@ -2,7 +2,7 @@
 using Bb.Contracts;
 using Bb.JPaths;
 using Bb.Jslt.Parser;
-using Oldtonsoft.Json.Linq;
+using Bb.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -1095,7 +1095,7 @@ namespace Bb.Jslt.Services
                   
                 }
             }
-            catch (Oldtonsoft.Json.JsonException e)
+            catch (Bb.Json.JsonException e)
             {
                 ctx.Diagnostics.AddError(trace, $"invalid json path '{path}'." + e.Message, e.Message);
             }

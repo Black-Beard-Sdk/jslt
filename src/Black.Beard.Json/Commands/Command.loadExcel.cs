@@ -4,7 +4,7 @@ using Bb.CommandLines.Outs;
 using Bb.CommandLines.Validators;
 using Bb.Jslt.Services.Excels;
 using Microsoft.Extensions.CommandLineUtils;
-using Oldtonsoft.Json;
+using Bb.Json;
 using System.IO;
 
 namespace Bb.Json.Commands

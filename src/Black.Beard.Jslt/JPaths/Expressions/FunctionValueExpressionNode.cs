@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
-using Oldtonsoft.Json.Linq;
+using Bb.Json.Linq;
 
 namespace Bb.JPaths.Expressions;
 
