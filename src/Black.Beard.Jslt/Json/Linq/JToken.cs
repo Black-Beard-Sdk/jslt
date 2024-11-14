@@ -1553,14 +1553,14 @@ namespace Bb.Json.Linq
         }
         #endregion
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return ((IEnumerable<JToken>)this).GetEnumerator();
-        }
-
-        IEnumerator<JToken> IEnumerable<JToken>.GetEnumerator()
+        public virtual IEnumerator<JToken> GetEnumerator()
         {
             return Children().GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
 
         internal abstract int GetDeepHashCode();

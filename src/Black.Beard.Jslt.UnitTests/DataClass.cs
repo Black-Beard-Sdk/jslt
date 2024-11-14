@@ -1,5 +1,5 @@
 ﻿using Bb.Contracts;
-using Bb.Jslt.Services;
+using Bb.Jslt;
 using Bb.Json.Linq;
 
 namespace Black.Beard.Jslt.UnitTests

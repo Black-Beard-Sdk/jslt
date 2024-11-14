@@ -1,4 +1,4 @@
-﻿using Bb.Jslt.Services;
+﻿using Bb.Jslt;
 using Bb.Json.Linq;
 
 namespace Bb.Contracts

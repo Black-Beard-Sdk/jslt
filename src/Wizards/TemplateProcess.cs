@@ -1,4 +1,5 @@
 ﻿using Bb;
+using Bb.Jslt;
 using Bb.Jslt.Services;
 using Bb.Json.Linq;
 using System;
@@ -9,7 +10,7 @@ using System.Text;
 namespace Wizards
 {
 
-        public class TemplateProcess
+    public class TemplateProcess
         {
 
             public TemplateProcess(string rulePayloadFilename, JObject variables, bool debug, string[] paths)

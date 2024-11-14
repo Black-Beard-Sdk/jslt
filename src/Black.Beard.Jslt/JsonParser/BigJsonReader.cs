@@ -56,6 +56,26 @@ public class BigJsonReader : IDisposable, IStackStore
 
     }
 
+    public Task Read(Action<IStore> action)
+    {
+
+        return Task.Run
+        (
+            () =>
+            {
+
+                var task = Task.Run(Parse);
+
+                while (!task.IsCompleted || _toPush.Count > 0)
+                    lock (_lock)
+                        if (_toPush.Count > 0)
+                            action(_toPush.Dequeue());
+
+            }
+        );
+
+    }
+
     /// <summary>
     /// Parse the json file
     /// </summary>

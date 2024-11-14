@@ -1,21 +1,16 @@
 using Bb;
 using Bb.Jslt.Asts;
-using Bb.Jslt.Services;
-using Microsoft.Data.Sqlite;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Bb.Json.Linq;
 using Bb.Json.Linq;
 using System;
 using System.Data.Common;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Collections.Generic;
+using Bb.Jslt;
 
 namespace Black.Beard.Jslt.UnitTests
 {
     [TestClass]
-    public class CompileUnitTest1
+    public class CompileUnitTest1 : TemplateHelper
     {
 
 
@@ -23,11 +18,14 @@ namespace Black.Beard.Jslt.UnitTests
         public void TestMObjectWithPropertyString()
         {
 
-            var expected = "{ 'propertyName': 'toto' }".Replace("'", "\"");
+            var template = "{ 'propertyName': 'toto' }".Replace("'", "\"");
             var source = "{ }";
 
-            var src = new SourceJson[] { SourceJson.GetFromText(source) };
-            RuntimeContext result = Test(expected, src);
+            Action<Sources> src = (s) =>
+            {
+                s.SetSource(SourceJson.GetFromText(source));
+            };
+            RuntimeContext result = Test(template, src);
             var o2 = result.TokenResult;
 
             Assert.AreEqual(o2["propertyName"], "toto");
@@ -38,11 +36,14 @@ namespace Black.Beard.Jslt.UnitTests
         public void TestMObjectWithPropertyNumber()
         {
 
-            var expected = "{ 'propertyName': 6 }".Replace("'", "\"");
+            var template = "{ 'propertyName': 6 }".Replace("'", "\"");
             var source = "{ }";
 
-            var src = new SourceJson[] { SourceJson.GetFromText(source) };
-            RuntimeContext result = Test(expected, src);
+            Action<Sources> src = (s) =>
+            {
+                s.SetSource(SourceJson.GetFromText(source));
+            };
+            RuntimeContext result = Test(template, src);
             var o2 = result.TokenResult;
 
             Assert.AreEqual(o2["propertyName"], 6L);
@@ -53,11 +54,14 @@ namespace Black.Beard.Jslt.UnitTests
         public void TestMObjectWithPropertyNumber2()
         {
 
-            var expected = "{ 'propertyName': 6.7 }".Replace("'", "\"");
+            var template = "{ 'propertyName': 6.7 }".Replace("'", "\"");
             var source = "{ }";
 
-            var src = new SourceJson[] { SourceJson.GetFromText(source) };
-            RuntimeContext result = Test(expected, src);
+            Action<Sources> src = (s) =>
+            {
+                s.SetSource(SourceJson.GetFromText(source));
+            };
+            RuntimeContext result = Test(template, src);
             var o2 = result.TokenResult;
 
             Assert.AreEqual(o2["propertyName"], 6.7D);
@@ -68,11 +72,14 @@ namespace Black.Beard.Jslt.UnitTests
         public void TestMObjectWithPropertyArray()
         {
 
-            var expected = "{ 'propertyName': [6.6, 'test'] }".Replace("'", "\"");
+            var template = "{ 'propertyName': [6.6, 'test'] }".Replace("'", "\"");
             var source = "{ }";
 
-            var src = new SourceJson[] { SourceJson.GetFromText(source) };
-            RuntimeContext result = Test(expected, src);
+            Action<Sources> src = (s) =>
+            {
+                s.SetSource(SourceJson.GetFromText(source));
+            };
+            RuntimeContext result = Test(template, src);
             Assert.AreEqual(result.TokenResult["propertyName"][0], 6.6);
 
         }
@@ -81,11 +88,18 @@ namespace Black.Beard.Jslt.UnitTests
         public void TestMObjectWithFunctionStatic()
         {
 
-            var expected = "{ 'propertyName': crc32('test') }".Replace("'", "\"");
+            var template = "{ 'propertyName': crc32('test') }".Replace("'", "\"");
             var source = "{ }";
 
-            var src = new SourceJson[] { SourceJson.GetFromText(source) };
-            RuntimeContext result = Test(expected, src, ("myMethod", typeof(DataClass)));
+            Action<Sources> src = (s) =>
+            {
+                s.SetSource(SourceJson.GetFromText(source));
+            };
+            Action<TranformJsonAstConfiguration> initializerConfiguration = (c) =>
+            {
+                c.AddAssembly(typeof(DataClass));
+            };
+            RuntimeContext result = Test(template, src, initializerConfiguration);
             Assert.AreEqual(result.TokenResult["propertyName"], 3632233996);
 
         }
@@ -94,11 +108,14 @@ namespace Black.Beard.Jslt.UnitTests
         public void TestMObjectWithFunction()
         {
 
-            var expected = "{ 'propertyName': myMethod(6.6, 2.0) }".Replace("'", "\"");
+            var template = "{ 'propertyName': myMethod(6.6, 2.0) }".Replace("'", "\"");
             var source = "{ }";
-
-            var src = new SourceJson[] { SourceJson.GetFromText(source) };
-            RuntimeContext result = Test(expected, src, ("myMethod", typeof(DataClass)));
+            Action<TranformJsonAstConfiguration> initializerConfiguration = (c) =>
+            {
+                c.AddAssembly(typeof(DataClass));
+            };
+            Action<Sources> src = (s) => { s.SetSource(SourceJson.GetFromText(source)); };  
+            RuntimeContext result = Test(template, src, initializerConfiguration);
             Assert.AreEqual(result.TokenResult["propertyName"]["Uuid"], 6.6);
         }
 
@@ -114,10 +131,12 @@ namespace Black.Beard.Jslt.UnitTests
                     .Append("key", "$.Key".AsJsltPath())
             );
 
-            var src = new SourceJson[] { SourceJson.GetFromText(source, "body") };
-            RuntimeContext result = Test(i, src);
-
-            var a = result.TokenResult as Bb.Json.Linq.JArray;
+            Action<Sources> src = (s) =>
+            {
+                s.SetSource(SourceJson.GetFromText(source, "body"));
+            };
+            RuntimeContext result = Test(i,  src);
+            var a = result.TokenResult as JArray;
 
             Assert.AreEqual(a.Count, 2);
             Assert.AreEqual(a[0]["key"], 2);
@@ -132,7 +151,7 @@ namespace Black.Beard.Jslt.UnitTests
             var template = "{ 'propertyName': $.prop1.SubPprop1 }".Replace("'", "\"");
             var source = "{ 'prop1': { 'SubPprop1':2 }, 'prop2':3 }".Replace("'", "\"");
 
-            var src = new SourceJson[] { SourceJson.GetFromText(source) };
+            Action<Sources> src = (s) => { s.SetSource(SourceJson.GetFromText(source)); };
             RuntimeContext result = Test(template, src);
             Assert.AreEqual(result.TokenResult["propertyName"], 2);
 
@@ -144,7 +163,10 @@ namespace Black.Beard.Jslt.UnitTests
             var template = "{ 'propertyName': $.prop1 }".Replace("'", "\"");
             var source = "{ 'prop1': false }".Replace("'", "\"");
 
-            var src = new SourceJson[] { SourceJson.GetFromText(source) };
+            Action<Sources> src = (s) =>
+            {
+                s.SetSource(SourceJson.GetFromText(source));
+            };
             RuntimeContext result = Test(template, src);
             Assert.AreEqual(result.TokenResult["propertyName"], false);
 
@@ -154,11 +176,11 @@ namespace Black.Beard.Jslt.UnitTests
         public void TestJPathBinaryAddDecimal()
         {
 
-            var expected = "{'propertyName': $.prop1.SubPprop1 + $.prop2 }".Replace("'", "\"");
+            var template = "{'propertyName': $.prop1.SubPprop1 + $.prop2 }".Replace("'", "\"");
             var source = "{ 'prop1': { 'SubPprop1':2.5 }, 'prop2':3 }".Replace("'", "\"");
 
-            var src = new SourceJson[] { SourceJson.GetFromText(source) };
-            RuntimeContext result = Test(expected, src);
+            Action<Sources> src = (s) => { s.SetSource(SourceJson.GetFromText(source)); };
+            RuntimeContext result = Test(template, src);
             Assert.AreEqual(result.TokenResult["propertyName"], 5.5);
 
         }
@@ -167,34 +189,24 @@ namespace Black.Beard.Jslt.UnitTests
         public void TestJPathBinaryAdd()
         {
 
-            var expected = "{'propertyName': $.prop1.SubPprop1 +  $.prop2 }".Replace("'", "\"");
+            var template = "{'propertyName': $.prop1.SubPprop1 +  $.prop2 }".Replace("'", "\"");
             var source = "{ 'prop1': { 'SubPprop1':2 }, 'prop2':3 }".Replace("'", "\"");
 
-            var src = new SourceJson[] { SourceJson.GetFromText(source) };
-            RuntimeContext result = Test(expected, src);
+            Action<Sources> src = (s) => { s.SetSource(SourceJson.GetFromText(source)); };
+            RuntimeContext result = Test(template, src);
             Assert.AreEqual(result.TokenResult["propertyName"], 5);
 
         }
-
-        public class tptp<T>
-        {
-
-            public string Name { get; set; }
-        
-            public T Value { get; set; }
-        
-        }
-
 
         [TestMethod]
         public void TestJPathconcat()
         {
 
-            var expected = "{'propertyName': $.prop1  +  $.prop2 }".Replace("'", "\"");
+            var template = "{'propertyName': $.prop1  +  $.prop2 }".Replace("'", "\"");
             var source = "{ 'prop1': 'hello', 'prop2':' world' }".Replace("'", "\"");
 
-            var src = new SourceJson[] { SourceJson.GetFromText(source) };
-            RuntimeContext result = Test(expected, src);
+            Action<Sources> src = (s) => { s.SetSource(SourceJson.GetFromText(source)); };
+            RuntimeContext result = Test(template, src);
             Assert.AreEqual(result.TokenResult["propertyName"], "hello world");
         
         }
@@ -202,47 +214,54 @@ namespace Black.Beard.Jslt.UnitTests
         [TestMethod]
         public void TestJPathBinarySubstractDecimal()
         {
-            var expected = "{'propertyName': $.prop1 - $.prop2 }".Replace("'", "\"");
+            var template = "{'propertyName': $.prop1 - $.prop2 }".Replace("'", "\"");
             var source = "{ 'prop1':2.5, 'prop2':1 }".Replace("'", "\"");
-            var src = new SourceJson[] { SourceJson.GetFromText(source) };
-            RuntimeContext result = Test(expected, src);
+
+            Action<Sources> src = (s) =>
+            {
+                s.SetSource(SourceJson.GetFromText(source));
+            };
+            RuntimeContext result = Test(template, src);
             Assert.AreEqual(result.TokenResult["propertyName"], 1.5);
         }
 
         [TestMethod]
         public void TestJPathBinarySubstractInt()
         {
-            var expected = "{'propertyName': $.prop1.SubPprop1 - $.prop2 }".Replace("'", "\"");
+            var template = "{'propertyName': $.prop1.SubPprop1 - $.prop2 }".Replace("'", "\"");
             var source = "{ 'prop1': { 'SubPprop1':2 }, 'prop2':3 }".Replace("'", "\"");
-            var src = new SourceJson[] { SourceJson.GetFromText(source) };
-            RuntimeContext result = Test(expected, src);
+            Action<Sources> src = (s) => { s.SetSource(SourceJson.GetFromText(source)); };
+            RuntimeContext result = Test(template, src);
             Assert.AreEqual(result.TokenResult["propertyName"], -1);
         }
 
         [TestMethod]
         public void TestJPathBinaryMultiplyInt()
         {
-            var expected = "{'propertyName': $.prop1.SubPprop1 * $.prop2 }".Replace("'", "\"");
+            var template = "{'propertyName': $.prop1.SubPprop1 * $.prop2 }".Replace("'", "\"");
             var source = "{ 'prop1': { 'SubPprop1':2 }, 'prop2':3 }".Replace("'", "\"");
-            var src = new SourceJson[] { SourceJson.GetFromText(source) };
-            RuntimeContext result = Test(expected, src);
+            Action<Sources> src = (s) =>
+            {
+                s.SetSource(SourceJson.GetFromText(source));
+            };
+            RuntimeContext result = Test(template, src);
             Assert.AreEqual(result.TokenResult["propertyName"], 6);
         }
 
         [TestMethod]
         public void TestJPathBinaryModuloInt()
         {
-            var expected = "{'propertyName': $.prop1.SubPprop1 % $.prop2 }".Replace("'", "\"");
+            var template = "{'propertyName': $.prop1.SubPprop1 % $.prop2 }".Replace("'", "\"");
             var source = "{ 'prop1': { 'SubPprop1':7 }, 'prop2':3 }".Replace("'", "\"");
-            var src = new SourceJson[] { SourceJson.GetFromText(source) };
-            RuntimeContext result = Test(expected, src);
+            Action<Sources> src = (s) => { s.SetSource(SourceJson.GetFromText(source)); };
+            RuntimeContext result = Test(template, src);
             Assert.AreEqual(result.TokenResult["propertyName"], 1);
         }
 
         [TestMethod]
         public void TestCaseWhen()
         {
-            var expected = @"
+            var template = @"
             {
                 'propertyName': when($.prop1) 
                 {
@@ -254,38 +273,47 @@ namespace Black.Beard.Jslt.UnitTests
             .Replace("`", "'");
 
             var source = "{ 'prop1':3 }".Replace("'", "\"");
-            var src = new SourceJson[] { SourceJson.GetFromText(source) };
-            RuntimeContext result = Test(expected, src);
+            Action<Sources> src = (s) =>
+            {
+                s.SetSource(SourceJson.GetFromText(source));
+            };
+            RuntimeContext result = Test(template, src);
             Assert.AreEqual(result.TokenResult["propertyName"]["sub1"], 22);
         }
 
         [TestMethod]
         public void TestMethodCompiled()
         {
-            var expected = @"
+            var template = @"
             { 
                 '$functions': ['DataClass2.cs'],
                 'propertyName': mult($.prop1, 2)
             }".Replace("'", "\"")
              .Replace("`", "'");
             var source = "{ 'prop1':3 }".Replace("'", "\"");
-            var src = new SourceJson[] { SourceJson.GetFromText(source) };
-            RuntimeContext result = Test(expected, src);
+            Action<Sources> src = (s) =>
+            {
+                s.SetSource(SourceJson.GetFromText(source));
+            };
+            RuntimeContext result = Test(template, src);
             Assert.AreEqual(result.TokenResult["propertyName"], 6.0D);
         }
 
         [TestMethod]
         public void TestCoalesce()
         {
-            var expected = @"
+            var template = @"
             { 
                 'propertyName': $.prop1 ?? $.prop2 ?? $.prop3
 
             }".Replace("'", "\"")
              .Replace("`", "'");
             var source = "{ 'prop3':3 }".Replace("'", "\"");
-            var src = new SourceJson[] { SourceJson.GetFromText(source) };
-            RuntimeContext result = Test(expected, src);
+            Action<Sources> src = (s) =>
+            {
+                s.SetSource(SourceJson.GetFromText(source));
+            };
+            RuntimeContext result = Test(template, src);
             Assert.AreEqual(result.TokenResult["propertyName"], 3);
         }
 
@@ -300,7 +328,7 @@ namespace Black.Beard.Jslt.UnitTests
              .Replace("`", "'");
 
             var source = "[ { 'Id':1, Name:'name1'}, { 'Id':2, Name:'name2' }, { 'Id':3, Name:'name3' } ]".Replace("'", "\"");
-            var src = new SourceJson[] { SourceJson.GetFromText(source) };
+            Action<Sources> src = (s) => { s.SetSource(SourceJson.GetFromText(source)); };
             RuntimeContext result = Test(template, src);
             Assert.AreEqual(result.TokenResult["propertyName"]["Name"], "name2");
         }
@@ -316,78 +344,77 @@ namespace Black.Beard.Jslt.UnitTests
             }".Replace("'", "\"")
              .Replace("`", "'");
 
-            var src = new SourceJson[0] ;
-            RuntimeContext result = Test(template, src);
+            RuntimeContext result = Test(template, null);
             Assert.AreEqual(result.TokenResult["propertyName"]["Name"], "name2");
         }
 
         [TestMethod]
         public void TestVariable()
         {
-            var expected = @"
+            var template = @"
             { 
                 'var1:' : 2, 
                 'propertyName': var1: #string
 
             }".Replace("'", "\"")
              .Replace("`", "'");            
-            var src = new SourceJson[] { };
-            RuntimeContext result = Test(expected, src);
+
+            RuntimeContext result = Test(template, false);
             Assert.AreEqual(result.TokenResult["propertyName"], "2");
         }     
 
         [TestMethod]
         public void TestSum()
         {
-            var expected = @"{ 'prices': sum($..n) }"
+            var template = @"{ 'prices': sum($..n) }"
                 .Replace("'", "\"")
                 .Replace("`", "'");
             var source1 = "{ 'prices': [{'n' : 1}, {'n' : 2}, {'n' : 3}] }".Replace("'", "\"");
 
-            var src = new SourceJson[] { SourceJson.GetFromText(source1) };
-            RuntimeContext result = Test(expected, src);
+            Action<Sources> src = (s) => { s.SetSource(SourceJson.GetFromText(source1)); };
+            RuntimeContext result = Test(template, src);
             Assert.AreEqual(result.TokenResult["prices"], 6);
         }
 
         [TestMethod]
         public void Testconcat()
         {
-            var expected = @"
+            var template = @"
             { 'result': concat($..n, null, null) } 
             ".Replace("'", "\"")
              .Replace("`", "'");
             var source1 = "{ 'prices': [{'n' : 1}, {'n' : 2}, {'n' : 3}] }".Replace("'", "\"");
 
-            var src = new SourceJson[] { SourceJson.GetFromText(source1) };
-            RuntimeContext result = Test(expected, src);
+            Action<Sources> src = (s) => { s.SetSource(SourceJson.GetFromText(source1)); };
+            RuntimeContext result = Test(template, src);
             Assert.AreEqual(result.TokenResult["result"], "123");
         }
 
         [TestMethod]
         public void TestCrc32()
         {
-            var expected = @"{ 'result': crc32('toto') }"
+            var template = @"{ 'result': crc32('toto') }"
                 .Replace("'", "\"")
                 .Replace("`", "'");
             var source1 = "{ }".Replace("'", "\"");
 
-            var src = new SourceJson[] { SourceJson.GetFromText(source1) };
-            RuntimeContext result = Test(expected, src);
+            Action<Sources> src = (s) => { s.SetSource(SourceJson.GetFromText(source1)); };
+            RuntimeContext result = Test(template, src);
             Assert.AreEqual(result.TokenResult["result"], 281847025);
         }
 
         [TestMethod]
         public void TestId()
         {
-            var expected = @"
+            var template = @"
             { 'result': uuid() } 
             ".Replace("'", "\"")
              .Replace("`", "'");
 
             var source1 = "{ }".Replace("'", "\"");
 
-            var src = new SourceJson[] { SourceJson.GetFromText(source1) };
-            RuntimeContext result = Test(expected, src);
+            Action<Sources> src = (s) => { s.SetSource(SourceJson.GetFromText(source1)); };
+            RuntimeContext result = Test(template, src);
             var g = (Guid)result.TokenResult["result"];
             Guid dright = default;
             Assert.AreNotEqual(g, dright);
@@ -397,14 +424,14 @@ namespace Black.Beard.Jslt.UnitTests
         public void TestFormatInteger()
         {
 
-            var expected = @"
+            var template = @"
             { 'result': format(103254895, 'C', 'fr-FR') } 
             ".Replace("'", "\"")
              .Replace("`", "'");
             var source1 = "{ }".Replace("'", "\"");
 
-            var src = new SourceJson[] { SourceJson.GetFromText(source1) };
-            RuntimeContext result = Test(expected, src);
+            Action<Sources> src = (s) => { s.SetSource(SourceJson.GetFromText(source1)); };
+            RuntimeContext result = Test(template, src);
             Assert.AreEqual(result.TokenResult["result"], "103 254 895,00 €");
         }
 
@@ -412,14 +439,14 @@ namespace Black.Beard.Jslt.UnitTests
         public void TestParsedate()
         {
 
-            var expected = @"
+            var template = @"
             { 'result': parsedate('Freitag, 31. Oktober 2008', 'de-DE') } 
             ".Replace("'", "\"")
              .Replace("`", "'");
             var source1 = "{ }".Replace("'", "\"");
 
-            var src = new SourceJson[] { SourceJson.GetFromText(source1) };
-            RuntimeContext result = Test(expected, src);
+            Action<Sources> src = (s) => { s.SetSource(SourceJson.GetFromText(source1)); };
+            RuntimeContext result = Test(template, src);
             Assert.AreEqual(result.TokenResult["result"], new DateTime(2008, 10, 31));
         }
 
@@ -427,14 +454,14 @@ namespace Black.Beard.Jslt.UnitTests
         public void TestTobase64()
         {
 
-            var expected = @"
+            var template = @"
             { 'result': tobase64('test') } 
             ".Replace("'", "\"")
              .Replace("`", "'");
             var source1 = "{ }".Replace("'", "\"");
 
-            var src = new SourceJson[] { SourceJson.GetFromText(source1) };
-            RuntimeContext result = Test(expected, src);
+            Action<Sources> src = (s) => { s.SetSource(SourceJson.GetFromText(source1)); };
+            RuntimeContext result = Test(template, src);
             Assert.AreEqual(result.TokenResult["result"], "dGVzdA==");
         }
 
@@ -442,14 +469,14 @@ namespace Black.Beard.Jslt.UnitTests
         public void TestFrombase64()
         {
 
-            var expected = @"
+            var template = @"
             { 'result': Frombase64('dGVzdA==') } 
             ".Replace("'", "\"")
              .Replace("`", "'");
             var source1 = "{ }".Replace("'", "\"");
 
-            var src = new SourceJson[] { SourceJson.GetFromText(source1) };
-            RuntimeContext result = Test(expected, src);
+            Action<Sources> src = (s) => { s.SetSource(SourceJson.GetFromText(source1)); };
+            RuntimeContext result = Test(template, src);
             Assert.AreEqual(result.TokenResult["result"], "test");
         }
 
@@ -457,15 +484,15 @@ namespace Black.Beard.Jslt.UnitTests
         public void TestGetNow()
         {
 
-            var expected = @"
+            var template = @"
             { 'result': now(false) } 
             ".Replace("'", "\"")
              .Replace("`", "'");
             var source1 = "{ }".Replace("'", "\"");
 
             var dte1 = DateTime.Now;
-            var src = new SourceJson[] { SourceJson.GetFromText(source1) };
-            RuntimeContext result = Test(expected, src);
+            Action<Sources> src = (s) => { s.SetSource(SourceJson.GetFromText(source1)); };
+            RuntimeContext result = Test(template, src);
 
             var dte = (result.TokenResult["result"]).Value<DateTime>();
 
@@ -476,13 +503,13 @@ namespace Black.Beard.Jslt.UnitTests
         public void TestDistinct()
         {
 
-            var expected = @" { 'result': distinct($, $.*) }"
+            var template = @" { 'result': distinct($, $.*) }"
                     .Replace("'", "\"")
                     .Replace("`", "'");
 
             var source1 = "[1,2,1,3]".Replace("'", "\"");
-            var src = new SourceJson[] { SourceJson.GetFromText(source1) };
-            RuntimeContext result = Test(expected, src);
+            Action<Sources> src = (s) => { s.SetSource(SourceJson.GetFromText(source1)); };
+            RuntimeContext result = Test(template, src);
             var j = (JArray)result.TokenResult["result"];
             Assert.AreEqual(j.Count, 3);
             Assert.AreEqual(j[0], 1);
@@ -540,7 +567,7 @@ namespace Black.Beard.Jslt.UnitTests
                  .Append(new JsltProperty("Data").SetValue(new JsltFunctionCall("readsql", "cnx".AsJsltVariable(), sql.AsJsltConstant())))
                  ;
 
-            RuntimeContext result = Test(template, null);
+            RuntimeContext result = Test(template, false);
             var a = result.TokenResult as Bb.Json.Linq.JObject;
             var b = a["Data"][0] as Bb.Json.Linq.JObject;
 
@@ -598,96 +625,12 @@ namespace Black.Beard.Jslt.UnitTests
                  .Append(new JsltProperty("Data").SetValue(new JsltFunctionCall("readsql", "cnx".AsJsltVariable(), sql.AsJsltConstant())))
                  ;
 
-            RuntimeContext result = Test(template, null);
+            RuntimeContext result = Test(template);
             var a = result.TokenResult as JObject;
             var b = a["Data"][0] as JObject;
 
             Assert.AreEqual(b["$_line"], 1);
             Assert.AreEqual(b["value"], "test1");
-
-        }
-
-        private static RuntimeContext Test(string templatePayload, SourceJson[] sources, params (string, Type)[] services)
-        {
-            return Test(templatePayload, false, sources, services);
-        }
-
-        private static RuntimeContext Test(string templatePayload, bool withDebug, SourceJson[] sources, params (string, Type)[] services)
-        {
-
-            var src = new Sources();
-            for (int i = 0; i < sources.Length; i++)
-                src.Add(sources[i]);
-
-            var template = GetProvider(templatePayload, withDebug, services);
-
-            if (!template.Diagnostics.Success)
-            {
-                var error = template.Diagnostics.Errors.First();
-                throw new Exception(error.Message);
-            }
-
-            var result = template.Transform(src);
-
-            return result;
-        }
-
-        private static RuntimeContext Test(JsltBase templateTree, SourceJson[] sources, params (string, Type)[] services)
-        {
-
-            Sources src;
-            if (sources != null)
-            {
-                src = new Sources(sources[0]);
-                for (int i = 1; i < sources.Length; i++)
-                    src.Add(sources[i]);
-            }
-            else
-                src = new Sources(SourceJson.GetEmpty());
-
-            var template = GetProvider(templateTree, services);
-            var result = template.Transform(src);
-
-            return result;
-        }
-
-
-        private static JsltTemplate GetProvider(string payloadTemplate, bool withDebug, params (string, Type)[] services)
-        {
-
-            var configuration = new TranformJsonAstConfiguration()
-                .AddAssembly(typeof(DataClass))
-                .AddServices(services)
-                ;
-
-            TemplateProvider Templateprovider = TemplateProvider.Get(configuration);
-            StringBuilder sb = new StringBuilder(payloadTemplate.Replace('\'', '"').Replace('§', '\''));
-            JsltTemplate template = Templateprovider.GetTemplate(sb, withDebug, string.Empty);
-
-            return template;
-
-        }
-
-        private static JsltTemplate GetProvider(JsltBase payloadTemplate, params (string, Type)[] services)
-        {
-
-            var configuration = new TranformJsonAstConfiguration()
-                .AddAssembly(typeof(DataClass))
-                .AddServices(services)
-                ;
-
-            TemplateProvider Templateprovider = TemplateProvider.Get(configuration);
-            StringBuilder sb = new StringBuilder(payloadTemplate.ToString());
-            JsltTemplate template = Templateprovider.GetTemplate(sb, false, string.Empty);
-
-            if (!template.Diagnostics.Success)
-            {
-                var error = template.Diagnostics.Errors.First();
-                throw new Exception(error.Message);
-            }
-
-
-            return template;
 
         }
 

@@ -9,22 +9,14 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Bb.LiteDb;
+using Bb.Jslt;
 
 namespace Black.Beard.Jslt.UnitTests
 {
 
     [TestClass]
-    public class BigLoaderTest
+    public class BigLoaderTest : TemplateHelper
     {
-
-
-        [TestMethod]
-        public void TestA()
-        {
-
-
-        }
-
 
         [TestMethod]
         public void Test1()
@@ -180,55 +172,6 @@ namespace Black.Beard.Jslt.UnitTests
             model = loader.Parse().Select(c => c.JsonModel).ToList();
 
         }
-
-        [TestMethod]
-        public void Test7()
-        {
-
-            string srcFile = @"E:\REFERENTIEL_COMMUN.json";
-            string slicePath = "$.root.*";
-            string dbFile = @"E:\pudos.db";
-            string collectionName = "sites";
-            int buffStep = 10000;
-
-            BsonDocument[] _buffer = new BsonDocument[buffStep];
-            int count = 0;
-            var n = DateTime.Now;
-
-            using (var db = new LiteDatabase(dbFile))
-            {
-
-                var collection = db.GetCollection(collectionName);
-
-                using var loader = new BigJsonImporter(srcFile, slicePath);
-                foreach (IStore item in loader.Read())
-                {
-                    _buffer[count++] = (BsonDocument)item.ConvertToBson();
-                    if (count == buffStep)
-                    {
-                        collection.InsertBulk(_buffer);
-                        var n2 = DateTime.Now;
-                        Debug.WriteLine($"+ {count} - {n2.Subtract(n).Seconds}");
-                        count = 0;
-                        n = DateTime.Now;
-                    }
-
-                }
-
-                if (count > 0)
-                {
-                    var p = _buffer.Take(count - 1).ToArray();
-                    collection.InsertBulk(p);
-                }
-
-                collection.EnsureIndex("$.Account[0].PickupReference");
-                collection.EnsureIndex("$.Account[0].Type");
-                collection.EnsureIndex("$.Account[0].Subtype");
-
-            }
-
-        }
-
 
         private static string GetFile(JToken o)
         {

@@ -2,7 +2,6 @@
 using Bb.JsltEvaluator;
 using Bb.Wizards;
 using Bb.Jslt.Parser;
-using Bb.Jslt.Services;
 using Bb.Maj;
 using Bb.Parsers.Intellisense;
 using ICSharpCode.AvalonEdit;
@@ -31,6 +30,9 @@ using Bb;
 using Bb.Expressions;
 using Bb.Analysis.DiagTraces;
 using Bb.Attributes;
+using Bb.Jslt;
+using Bb.Jslt.Services;
+using Bb.Jslt.Visitors;
 
 namespace AppJsonEvaluator
 {
@@ -130,11 +132,11 @@ namespace AppJsonEvaluator
                     (key, result) =>
                     {
 
-                        foreach (var provider in Bb.Jslt.Services.ServiceContainer.Instance.GetServices(FunctionKindEnum.FunctionStandard))
+                        foreach (var provider in Bb.Jslt.ServiceContainer.Instance.GetServices(FunctionKindEnum.FunctionStandard))
                             foreach (Factory factory in provider.GetItems())
                                 result.Add(new CompletionData(factory.MethodInfos.Content, factory.MethodInfos.Name, string.IsNullOrEmpty(factory.MethodInfos.Description) ? factory.MethodInfos.Content : factory.MethodInfos.Description));
 
-                        foreach (var provider in Bb.Jslt.Services.ServiceContainer.Instance.GetServices(FunctionKindEnum.Output))
+                        foreach (var provider in Bb.Jslt.ServiceContainer.Instance.GetServices(FunctionKindEnum.Output))
                             foreach (Factory factory in provider.GetItems())
                                 result.Add(new CompletionData(factory.MethodInfos.Content, factory.MethodInfos.Name, string.IsNullOrEmpty(factory.MethodInfos.Description) ? factory.MethodInfos.Content : factory.MethodInfos.Description));
 

@@ -7,6 +7,7 @@ using Microsoft.Extensions.CommandLineUtils;
 using Bb.Json.Linq;
 using System.IO;
 using System.Text;
+using Bb.Jslt;
 
 namespace Bb.Json.Commands
 {

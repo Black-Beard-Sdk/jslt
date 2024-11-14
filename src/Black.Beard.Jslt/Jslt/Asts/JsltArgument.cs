@@ -41,11 +41,11 @@ namespace Bb.Jslt.Asts
             set
             {
                 _value = value;
-                if (_value != null && _value.Kind == JsltKind.Jpath)
-                    if (_methodType != null)
-                        _value.AddTag(typeof(JToken).IsAssignableFrom(_methodType), TagEnum.ToExecute);
-                    else
-                        _value.DelTag(TagEnum.ToExecute);
+                //if (_value != null && _value.Kind == JsltKind.Jpath)
+                //    if (_methodType != null)
+                //        _value.AddTag(typeof(JToken).IsAssignableFrom(_methodType), TagEnum.ToExecute);
+                //    else
+                //        _value.DelTag(TagEnum.ToExecute);
             }
         }
 

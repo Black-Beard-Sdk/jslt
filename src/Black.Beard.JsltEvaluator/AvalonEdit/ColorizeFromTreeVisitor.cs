@@ -1,8 +1,8 @@
 ﻿using AppJsonEvaluator;
 using Bb.Analysis.DiagTraces;
 using Bb.Contracts;
+using Bb.Jslt;
 using Bb.Jslt.Asts;
-using Bb.Jslt.Services;
 using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Document;
 using System.Windows.Media;

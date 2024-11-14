@@ -1,5 +1,6 @@
 ﻿using System.CodeDom;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -23,18 +24,31 @@ namespace Bb.Expressions.CsharpGenerators
             this._usings = new HashSet<string>(usings);
             this._usings.Add("System");
             this._usings.Add("System.Diagnostics");
-
-            foreach (var item in this._usings)
-                this._namespaceRoot.Imports.Add(new CodeNamespaceImport(item));
-
+            
         }
 
         public static CodeNamespace GetCode(Expression e, string @namespace, string classname, string methodname, bool withDebug, params string[] usings)
         {
             SourceCodeDomGenerator s = new SourceCodeDomGenerator(@namespace, classname, methodname, usings, withDebug);
-            s.Visit(e);
-            s.CreatePrivateMethod();
+            s.Parse(e);
             return s._namespaceRoot;
+        }
+
+
+        private void Parse(Expression e)
+        {
+
+            ExpressionCollectUsing.Collect(e, this._usings);
+            //foreach (var item in this._usings)
+            //    this._namespaceRoot.Imports.Add(new CodeNamespaceImport(item));
+
+            Visit(e);
+
+            CreatePrivateMethod();
+
+            foreach (var item in this._usings.OrderBy(c => c))
+                this._namespaceRoot.Imports.Add(new CodeNamespaceImport(item));
+
         }
 
         protected object Visit(Expression e)
@@ -888,6 +902,5 @@ namespace Bb.Expressions.CsharpGenerators
         private CodeStatement _last;
 
     }
-
 
 }

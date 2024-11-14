@@ -1,7 +1,7 @@
-﻿using Bb.Jslt.Services;
-using Bb.Attributes;
+﻿using Bb.Attributes;
 using Bb.Json.Linq;
 using Bb.Contracts;
+using Bb.Jslt;
 
 namespace Black.Beard.Jslt.UnitTests
 {
