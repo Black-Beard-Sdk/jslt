@@ -57,9 +57,15 @@ namespace Bb.Jslt.Asts
             get => _methodType;
             internal set
             {
+                
                 _methodType = value;
+
                 if (_value != null && _value.Kind == JsltKind.Jpath)
                     _value.AddTag(typeof(JToken).IsAssignableFrom(_methodType), TagEnum.ToExecute);
+
+                if (_value != null && _value.Kind ==  JsltKind.JVariable)
+                    ((JsltVariable)_value).TargetType = _methodType;
+
             }
         }
 

@@ -2,6 +2,8 @@
 using Bb.Json;
 using Bb.Json.Linq;
 using System;
+using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -12,11 +14,14 @@ namespace Bb.JsonParser;
 /// <summary>
 /// Big json parser
 /// </summary>
-public class BigJsonReader : IDisposable, IStackStore
+public class BigJsonReader : IDisposable, IStackStore, IEnumerable<IStore>
 {
 
+
+    #region ctors
+
     /// <summary>
-    /// 
+    /// initialize a new instance of <see cref="BigJsonReader"/>
     /// </summary>
     /// <param name="path"></param>
     /// <param name="jpath"></param>
@@ -33,235 +38,198 @@ public class BigJsonReader : IDisposable, IStackStore
     /// <param name="jpath"></param>
     public BigJsonReader(FileInfo file, JsonPath? jpath = null)
     {
-        _filterPath = jpath;
+        _slicerFilterPath = jpath;
         _file = file;
         _path = new List<string>();
         _stack = new Stack<IStore>();
-        _toPush = new Queue<IStore>(20);
     }
 
-    /// <summary>
-    /// Iterate on the json results
-    /// </summary>
-    /// <returns></returns>
-    public IEnumerable<IStore> Read()
-    {
+    #endregion ctors
 
-        var task = Task.Run(Parse);
 
-        while (!task.IsCompleted || _toPush.Count > 0)
-            lock (_lock)
-                if (_toPush.Count > 0)
-                    yield return _toPush.Dequeue();
-
-    }
-
-    public Task Read(Action<IStore> action)
-    {
-
-        return Task.Run
-        (
-            () =>
-            {
-
-                var task = Task.Run(Parse);
-
-                while (!task.IsCompleted || _toPush.Count > 0)
-                    lock (_lock)
-                        if (_toPush.Count > 0)
-                            action(_toPush.Dequeue());
-
-            }
-        );
-
-    }
+    #region Parser
 
     /// <summary>
     /// Parse the json file
     /// </summary>
     /// <returns></returns>
     /// <exception cref="FileNotFoundException"></exception>
-    public IEnumerable<IStore> Parse()
+    public void Parse(Action<IStore> action)
     {
 
+        if (this._stateRunning != StatusEnum.NotStarted)
+            throw new InvalidOperationException("The reader is already ran");
+
+        Prepare(action);
+
+        this._stateRunning = StatusEnum.Running;
+
+        try
+        {
+            if (_reader.Read())
+            {
+
+                var type = _reader.TokenType;
+
+                switch (type)
+                {
+
+                    case JsonToken.StartObject:
+                        LoadObject("$", true);
+                        break;
+
+                    case JsonToken.StartArray:
+                        LoadArray("$", true);
+                        break;
+
+                    case JsonToken.Comment:
+                        break;
+
+                    case JsonToken.Raw:
+                    case JsonToken.Integer:
+                    case JsonToken.Float:
+                    case JsonToken.String:
+                    case JsonToken.Boolean:
+                    case JsonToken.Date:
+                    case JsonToken.Bytes:
+                    case JsonToken.Null:
+                        var v = _reader.Value;
+                        _arg.Append(new StoreValue(new JValue(v)));
+                        break;
+
+                    case JsonToken.EndConstructor:
+                    case JsonToken.StartConstructor:
+                    case JsonToken.EndObject:
+                    case JsonToken.EndArray:
+                    case JsonToken.PropertyName:
+                    case JsonToken.None:
+                    case JsonToken.Undefined:
+                    default:
+                        break;
+
+                }
+
+            }
+
+            this._stateRunning = StatusEnum.Ended;
+
+        }
+        catch (Exception ex)
+        {
+            this._stateRunning = StatusEnum.Failed;
+            throw;
+        }
+        finally
+        {
+            Dispose();
+        }
+
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void Prepare(Action<IStore> action)
+    {
         _file.Refresh();
         if (!_file.Exists)
             throw new FileNotFoundException("File not found", _file.FullName);
 
         _sr = new StreamReader(_file.FullName);
         _reader = new JsonTextReader(_sr);
-
         _progress = new Progress(_file.Length, _reader);
-
-        if (_reader.Read())
-        {
-
-            var type = _reader.TokenType;
-
-            switch (type)
-            {
-
-                case JsonToken.StartObject:
-                    LoadObject("$", false, true);
-                    break;
-
-                case JsonToken.StartArray:
-                    LoadArray("$", false, true);
-                    break;
-
-                case JsonToken.Comment:
-                    break;
-
-                case JsonToken.EndConstructor:
-                case JsonToken.StartConstructor:
-                case JsonToken.EndObject:
-                case JsonToken.EndArray:
-                    break;
-
-                case JsonToken.PropertyName:
-                case JsonToken.Raw:
-                case JsonToken.Integer:
-                case JsonToken.Float:
-                case JsonToken.String:
-                case JsonToken.Boolean:
-                case JsonToken.Date:
-                case JsonToken.Bytes:
-                case JsonToken.Null:
-                    break;
-
-                case JsonToken.None:
-                case JsonToken.Undefined:
-                default:
-                    break;
-
-            }
-
-        }
-
-        if (_filterPath == null)
-            yield return _current;
-
-        else if (_toPush.Count > 0)
-            foreach (var item in _toPush)
-                yield return item;
-
-        else
-            yield return _current;
-
+        _arg = new JsonReaderArgs(_progress, action);
     }
 
-    internal void LoadObject(string name, bool skipNextReading, bool evaluateNextSegments)
+    internal void LoadObject(string name, bool evaluateNextSegments)
     {
 
-        using (var current = AppendObject(name, skipNextReading))
-            while (_reader.Read())
-            {
+        if (_current != null && _current.Skip)
+            Skip(JsonToken.EndObject);
 
-                var type = _reader.TokenType;
-                _progress.Append();
+        using (var current = AppendObject(name))
+            if (current.Skip)
+                Skip(JsonToken.EndObject);
 
-                switch (type)
+            else
+
+                while (_reader.Read())
                 {
 
-                    case JsonToken.EndObject:
-                        return;
+                    var type = _reader.TokenType;
+                    _progress.Append();
 
-                    case JsonToken.PropertyName:
-                        var propertyName = _reader.Value.ToString();
-                        LoadProperty("." + propertyName, skipNextReading, evaluateNextSegments);
-                        break;
+                    switch (type)
+                    {
 
-                    case JsonToken.EndConstructor:
-                    case JsonToken.StartConstructor:
-                        break;
+                        case JsonToken.EndObject:
+                            return;
 
-                    case JsonToken.Null:
-                    case JsonToken.Raw:
-                    case JsonToken.Integer:
-                    case JsonToken.Float:
-                    case JsonToken.String:
-                    case JsonToken.Boolean:
-                    case JsonToken.None:
-                    case JsonToken.StartObject:
-                    case JsonToken.StartArray:
-                    case JsonToken.EndArray:
-                    case JsonToken.Date:
-                    case JsonToken.Bytes:
-                        break;
+                        case JsonToken.PropertyName:
+                            var propertyName = _reader.Value.ToString();
+                            LoadProperty("." + propertyName, evaluateNextSegments);
+                            break;
 
-                    case JsonToken.Undefined:
-                    case JsonToken.Comment:
-                    default:
-                        break;
+                        default:
+                            break;
+
+                    }
 
                 }
 
-            }
-
     }
 
-    internal void LoadArray(string name, bool skipNextReading, bool evaluateNextSegments)
+    internal void LoadArray(string name, bool evaluateNextSegments)
     {
 
         int index = -1;
 
-        using (var current = AppendArray(name, skipNextReading))
-            while (_reader.Read())
-            {
-                index++;
-                var type = _reader.TokenType;
-                _progress.Append();
+        using (var current = AppendArray(name))
+            if (current.Skip)
+                Skip(JsonToken.EndArray);
 
-                switch (type)
+            else
+                while (_reader.Read())
                 {
 
-                    case JsonToken.EndArray:
-                        return;
+                    index++;
+                    var type = _reader.TokenType;
+                    _progress.Append();
 
-                    case JsonToken.StartObject:
-                        LoadObject("[" + index + "]", skipNextReading, evaluateNextSegments);
-                        break;
+                    switch (type)
+                    {
 
-                    case JsonToken.StartArray:
-                        LoadArray("[" + index + "]", skipNextReading, evaluateNextSegments);
-                        break;
+                        case JsonToken.EndArray:
+                            return;
 
-                    case JsonToken.Integer:
-                    case JsonToken.Float:
-                    case JsonToken.String:
-                    case JsonToken.Boolean:
-                    case JsonToken.Null:
-                    case JsonToken.Date:
-                    case JsonToken.Bytes:
-                        if (!skipNextReading)
-                        {
+                        case JsonToken.StartObject:
+                            LoadObject("[" + index + "]", evaluateNextSegments);
+                            break;
+
+                        case JsonToken.StartArray:
+                            LoadArray("[" + index + "]", evaluateNextSegments);
+                            break;
+
+                        case JsonToken.Integer:
+                        case JsonToken.Float:
+                        case JsonToken.String:
+                        case JsonToken.Boolean:
+                        case JsonToken.Null:
+                        case JsonToken.Date:
+                        case JsonToken.Raw:
+                        case JsonToken.Bytes:
                             var v = _reader.Value;
                             current.Add(new StoreValue(new JValue(v)));
-                        }
-                        break;
+                            break;
 
-                    case JsonToken.Raw:
-                        break;
+                        default:
+                            break;
+                    }
 
-                    case JsonToken.StartConstructor:
-                    case JsonToken.PropertyName:
-                    case JsonToken.EndObject:
-                    case JsonToken.EndConstructor:
-                        break;
 
-                    case JsonToken.Comment:
-                    case JsonToken.None:
-                    case JsonToken.Undefined:
-                    default:
-                        break;
                 }
-
-
-            }
 
     }
 
-    internal void LoadProperty(string propertyName, bool skipNextReading, bool evaluateNextSegments)
+    internal void LoadProperty(string propertyName, bool evaluateNextSegments)
     {
 
         bool m = false;
@@ -273,7 +241,7 @@ public class BigJsonReader : IDisposable, IStackStore
             _progress.Append();
             var v = _reader.Value;
 
-            using (var current = AppendProperty(propertyName, skipNextReading))
+            using (var current = AppendProperty(propertyName))
                 switch (type)
                 {
 
@@ -283,7 +251,7 @@ public class BigJsonReader : IDisposable, IStackStore
                     case JsonToken.Float:
                     case JsonToken.Integer:
                     case JsonToken.Date:
-                        if (!skipNextReading)
+                        if (!current.Skip)
                             current.Add(new StoreValue(new JValue(v)));
                         break;
 
@@ -294,11 +262,17 @@ public class BigJsonReader : IDisposable, IStackStore
                         break;
 
                     case JsonToken.StartObject:
-                        LoadObject(string.Empty, skipNextReading, evaluateNextSegments);
+                        if (current.Skip)
+                            Skip(JsonToken.EndObject);
+                        else
+                            LoadObject(string.Empty, evaluateNextSegments);
                         break;
 
                     case JsonToken.StartArray:
-                        LoadArray(string.Empty, skipNextReading, evaluateNextSegments);
+                        if (current.Skip)
+                            Skip(JsonToken.EndArray);
+                        else
+                            LoadArray(string.Empty, evaluateNextSegments);
                         break;
 
                     case JsonToken.StartConstructor:
@@ -319,6 +293,105 @@ public class BigJsonReader : IDisposable, IStackStore
 
     }
 
+    private void Skip(JsonToken end)
+    {
+        while (_reader.Read())
+        {
+
+            var type = _reader.TokenType;
+
+            if (type == end)
+                return;
+
+            switch (type)
+            {
+
+                case JsonToken.StartObject:
+                    Skip(JsonToken.EndObject);
+                    break;
+
+                case JsonToken.StartArray:
+                    Skip(JsonToken.EndArray);
+                    break;
+
+                case JsonToken.PropertyName:
+                    SkipValue();
+                    break;
+
+                case JsonToken.Null:
+                case JsonToken.Raw:
+                case JsonToken.Integer:
+                case JsonToken.Float:
+                case JsonToken.String:
+                case JsonToken.Boolean:
+                case JsonToken.None:
+                case JsonToken.Date:
+                case JsonToken.Bytes:
+                    return;
+
+                case JsonToken.StartConstructor:
+                    Skip(JsonToken.EndConstructor);
+                    break;
+
+                case JsonToken.Undefined:
+                case JsonToken.Comment:
+                default:
+                    break;
+
+            }
+
+        }
+
+    }
+
+    private void SkipValue()
+    {
+
+        if (_reader.Read())
+        {
+            var type = _reader.TokenType;
+            switch (type)
+            {
+
+                case JsonToken.StartObject:
+                    Skip(JsonToken.EndObject);
+                    break;
+
+                case JsonToken.StartArray:
+                    Skip(JsonToken.EndArray);
+                    break;
+
+                case JsonToken.Null:
+                case JsonToken.Raw:
+                case JsonToken.Integer:
+                case JsonToken.Float:
+                case JsonToken.String:
+                case JsonToken.Boolean:
+                case JsonToken.None:
+                case JsonToken.Date:
+                case JsonToken.Bytes:
+                    return;
+
+                case JsonToken.StartConstructor:
+                    Skip(JsonToken.EndConstructor);
+                    break;
+
+                case JsonToken.PropertyName:
+                case JsonToken.Undefined:
+                case JsonToken.Comment:
+                default:
+                    break;
+
+            }
+
+        }
+
+    }
+
+
+
+    #region internal
+
     private StrategyEnum OnBefore(bool skip, bool toReturn)
     {
 
@@ -328,24 +401,18 @@ public class BigJsonReader : IDisposable, IStackStore
         if (!skip)
         {
 
-            var arg = new JsonReaderArgs(_pathString, _current, EventEnum.PreparingToRead, _progress)
-            {
-                Skip = skip,
-                ToReturn = toReturn
-            };
+            _arg.Event = EventEnum.PreparingToRead;
+            _arg.Path = _pathString;
+            _arg.Item = _current;
+            _arg.Skip = skip;
+            _arg.ToReturn = toReturn;
+            _arg.Strategy = StrategyEnum.Ok;
 
+            OnBefore(_arg);
             if (OnObject != null)
-                OnObject.Invoke(this, arg);
+                OnObject.Invoke(this, _arg);
 
-            else
-                OnBefore(arg);
-
-            if (arg.Count > 0)
-                lock (_lock)
-                    foreach (var item in arg.Items)
-                        _toPush.Enqueue(item);
-
-            return arg.Strategy;
+            return _arg.Strategy;
 
         }
 
@@ -367,22 +434,19 @@ public class BigJsonReader : IDisposable, IStackStore
         if (!_current.Skip)
         {
 
-            var arg = new JsonReaderArgs(_pathString, _current, EventEnum.EndedToRead, _progress)
-            {
-                Removed = removedStore
-            };
+            _arg.Event = EventEnum.EndedToRead;
+            _arg.Path = _pathString;
+            _arg.Item = _current;
+            _arg.Removed = removedStore;
+            _arg.ToReturn = _current.ToReturn;
+            _arg.Strategy = StrategyEnum.Ok;
 
             if (OnObject != null)
-                OnObject.Invoke(this, arg);
-            else
-                OnAfter(arg);
+                OnObject.Invoke(this, _arg);
 
-            if (arg.Count > 0)
-                lock (_lock)
-                    foreach (var item in arg.Items)
-                        _toPush.Enqueue(item);
+            OnAfter(_arg);
 
-            return arg.Strategy;
+            return _arg.Strategy;
 
         }
 
@@ -392,80 +456,106 @@ public class BigJsonReader : IDisposable, IStackStore
 
     protected virtual void OnAfter(JsonReaderArgs arg)
     {
-
+        if (arg.Removed.ToReturn)
+            arg.Append(arg.Removed);
     }
 
-    /// <summary>
-    /// Object to follow the progressive reading
-    /// </summary>
-    public Progress Progress => _progress;
-
-    /// <summary>
-    /// Event raised when a new object is read
-    /// </summary>
-    public event EventHandler<JsonReaderArgs> OnObject;
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private IStore AppendObject(string name, bool skipNextReading)
+    private IStore AppendObject(string name)
     {
 
+        bool skipNextReading = _current != null && _current.Skip;
+        bool toReturn = false;
         _path.Add(name);
-        bool toReturn = EvaluatePath(_pathString = string.Concat(_path));
+        _pathString = string.Concat(_path);
 
         if (!skipNextReading)
+        {
+
+            var t = _slicerFilterPath == null && _stack.Count == 0;
+
+            if (_slicerFilterPath != null)
+            {
+                if (!t)
+                    toReturn = EvaluatePath(_pathString);
+            }
+            else if (t)
+                toReturn = true;
+
             skipNextReading |= OnBefore(skipNextReading, toReturn) == StrategyEnum.Skip;
 
-        return Append(new StoreObject(skipNextReading, toReturn, name, this));
+        }
+
+        return Append(new StoreObject(skipNextReading, toReturn, name, this, true, _pathString));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private IStore AppendArray(string name, bool skipNextReading)
+    private IStore AppendArray(string name)
     {
 
+        bool skipNextReading = _current != null && _current.Skip;
+
+        bool pathToRemove = false;
         bool toReturn = false;
-        if (name != "[")
+        var t = _slicerFilterPath == null && _stack.Count == 0;
+        if (name == "[")
         {
-            _path.Add(name);
-            toReturn = EvaluatePath(_pathString = string.Concat(_path));
+            if (!t)
+                toReturn = EvaluatePath(_pathString + "[0]");
         }
         else
-            toReturn = EvaluatePath(_pathString + "[0]");
+        {
+            _path.Add(name);
+            _pathString = string.Concat(_path);
+            pathToRemove = true;
+            if (!t)
+                toReturn = EvaluatePath(_pathString);
+        }
+
+        if (t)
+            toReturn = true;
 
         if (!skipNextReading)
             skipNextReading |= OnBefore(skipNextReading, toReturn) == StrategyEnum.Skip;
 
-        return Append(new StoreArray(skipNextReading, toReturn, name, this));
+        return Append(new StoreArray(skipNextReading, toReturn, name, this, pathToRemove, _pathString));
 
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private IStore AppendProperty(string name, bool skipNextReading)
+    private IStore AppendProperty(string name)
     {
 
+        bool skipNextReading = _current != null && _current.Skip;
+
+        bool toReturn = false;
         _path.Add(name);
-        var toReturn = EvaluatePath(_pathString = string.Concat(_path));
+        _pathString = string.Concat(_path);
 
         if (!skipNextReading)
+        {
+            var t = _slicerFilterPath == null && _stack.Count == 0;
+            if (!t && _slicerFilterPath != null)
+                toReturn = EvaluatePath(_pathString);
+
             skipNextReading |= OnBefore(skipNextReading, toReturn) == StrategyEnum.Skip;
 
-        return Append(new StoreProperty(skipNextReading, toReturn, name, this));
+        }
+
+        return Append(new StoreProperty(skipNextReading, toReturn, name, this, true, _pathString));
 
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private bool EvaluatePath(string path)
     {
-
-        if (_filterPath != null && _filterPath.TryToMatch(path))
-            return true;
-
-        return false;
-
+        return _slicerFilterPath != null && _slicerFilterPath.TryToMatch(path);
     }
 
     private IStore Append(IStore newItem)
     {
 
-        if (_current != null)
+        if (_current != null && !newItem.Skip)
             _current.Add(newItem);
 
         _stack.Push(newItem);
@@ -478,25 +568,82 @@ public class BigJsonReader : IDisposable, IStackStore
 
     }
 
+    #endregion internal
+
+    #endregion Parser
+
+
+
+    /// <summary>
+    /// Object to follow the progressive reading
+    /// </summary>
+    public Progress Progress => _progress;
+
+    /// <summary>
+    /// Event raised when a new object is read
+    /// </summary>
+    public event EventHandler<JsonReaderArgs> OnObject;
+
+    public StatusEnum StateRunning => _stateRunning;
+
+
+    #region Implementation interfaces
+
+    public IEnumerator<IStore> GetEnumerator()
+    {
+        return new StoreEnumerator<IStore>(this, c => c);
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return new StoreEnumerator<IStore>(this, c => c);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposedValue)
+        {
+            if (disposing)
+            {
+                _reader.Close();
+                _sr.Close();
+                _sr.Dispose();
+            }
+
+            disposedValue = true;
+        }
+    }
+
+    // // TODO: substituer le finaliseur uniquement si 'Dispose(bool disposing)' a du code pour libérer les ressources non managées
+    // ~BigJsonReader()
+    // {
+    //     // Ne changez pas ce code. Placez le code de nettoyage dans la méthode 'Dispose(bool disposing)'
+    //     Dispose(disposing: false);
+    // }
+
     /// <summary>
     /// Dispose method
     /// </summary>
     public void Dispose()
     {
-        _reader.Close();
-        _sr.Close();
-        _sr.Dispose();
+        // Ne changez pas ce code. Placez le code de nettoyage dans la méthode 'Dispose(bool disposing)'
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
     }
 
     void IStackStore.Remove(IStore storeBase)
     {
 
         IStore last = null;
+
         while (last != _current)
         {
             last = _stack.Pop();
-            if (_path.Count > 0)
-                _path.RemoveAt(_path.Count - 1);
+            if (storeBase.PathToRemove)
+            {
+                if (_path.Count > 0)
+                    _path.RemoveAt(_path.Count - 1);
+            }
         }
 
         if (_stack.Count > 0)
@@ -509,19 +656,28 @@ public class BigJsonReader : IDisposable, IStackStore
 
     }
 
+    #endregion Implementation interfaces
+
     private readonly Stack<IStore> _stack;
     private readonly FileInfo _file;
     private IStore _current;
     private IStore _base;
     private List<string> _path;
     private string _pathString;
-    private Queue<IStore> _toPush;
-    private JsonPath _filterPath;
-
-    private volatile object _lock = new object();
-
+    private JsonPath _slicerFilterPath;
     private JsonTextReader _reader;
     private Progress _progress;
     private StreamReader _sr;
+    private JsonReaderArgs _arg;
+    private StatusEnum _stateRunning;
+    private bool disposedValue;
 
+}
+
+public enum StatusEnum
+{
+    NotStarted,
+    Running,
+    Failed,
+    Ended
 }

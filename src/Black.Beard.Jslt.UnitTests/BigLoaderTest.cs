@@ -33,7 +33,11 @@ namespace Black.Beard.Jslt.UnitTests
             );
 
             using var loader = new BigJsonReader(GetFile(o));
-            model = (JObject)loader.Parse().Select(c => c.JsonModel).FirstOrDefault();
+            loader.Parse(
+                c =>
+                {
+                    model = (JObject)c.JsonModel;
+                });
 
             Assert.IsNotNull(model);
             Assert.AreEqual(model["p1"], 1);
@@ -56,7 +60,7 @@ namespace Black.Beard.Jslt.UnitTests
             );
 
             using var loader = new BigJsonReader(GetFile(o));
-            model = (JObject)loader.Parse().Select(c => c.JsonModel).FirstOrDefault();
+            model = (JObject)loader.Select(c => c.JsonModel).FirstOrDefault();
 
             Assert.IsNotNull(model);
             Assert.AreEqual(model["p1"], 1);
@@ -90,7 +94,7 @@ namespace Black.Beard.Jslt.UnitTests
             );
 
             using var loader = new BigJsonReader(GetFile(o));
-            model = (JObject)loader.Parse().Select(c => c.JsonModel).FirstOrDefault();
+            model = (JObject)loader.Select(c => c.JsonModel).FirstOrDefault();
 
             Assert.IsNotNull(model);
             Assert.AreEqual(model["p1"], 1);
@@ -121,7 +125,10 @@ namespace Black.Beard.Jslt.UnitTests
             );
 
             using var loader = new BigJsonReader(GetFile(o));
-            model = (JArray)loader.Parse().Select(c => c.JsonModel).FirstOrDefault();
+            loader.Parse(c =>
+            {
+                model = (JArray)c.JsonModel;
+            });
 
             Assert.IsNotNull(model);
             Assert.AreEqual(model[0]["p1"], 1);
@@ -143,7 +150,7 @@ namespace Black.Beard.Jslt.UnitTests
 
             using var loader = new BigLoadJsonParser(new BigJsonReader(GetFile(o)))
                 .Filter("$.b1.b12.b123");
-            model = (JObject)loader.Load().Select(c => c.JsonModel).FirstOrDefault();
+            model = (JObject)loader.Select(c => c.JsonModel).FirstOrDefault();
 
             Assert.IsNotNull(model);
             Assert.AreEqual(model.ContainsKey("a1"), false);
@@ -169,9 +176,11 @@ namespace Black.Beard.Jslt.UnitTests
             }
 
             using var loader = new BigJsonReader(GetFile(o), "$.*");
-            model = loader.Parse().Select(c => c.JsonModel).ToList();
+            model = loader.Select(c => c.JsonModel).ToList();
 
         }
+
+
 
         private static string GetFile(JToken o)
         {

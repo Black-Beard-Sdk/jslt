@@ -26,22 +26,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Runtime.CompilerServices;
-using Bb.Json.Linq;
 using System;
+using System.Collections.Concurrent;
+using System.Threading;
 
 namespace Bb.JsonParser
 {
     public class StoreEnumerator<T> : IEnumerator<T>
     {
 
-        public StoreEnumerator(BigJsonReader items, Func<IStore, T> converter)
+        public StoreEnumerator(BigJsonReader reader, Func<IStore, T> converter)
         {
             if (converter == null)
                 throw new NullReferenceException(nameof(converter));
             _converter = converter;
-            _reader = items;
-            _queue = new Queue<IStore>();
+            _reader = reader;
+            _queue = new ConcurrentQueue<IStore>();
         }
 
         public T Current => _converter(_current);
@@ -52,35 +52,28 @@ namespace Bb.JsonParser
         {
 
             _current = null;
+            if (_task == null)
+                Reset();
 
-            if (TryToDequeue())
-                return true;
+            while (_reader.StateRunning == StatusEnum.Running || _queue.Count > 0)
+                if (_queue.TryDequeue(out _current))
+                    return true;
+                else
+                    Thread.Sleep(10);
 
-            while (!_task.IsCompleted && _queue.Count == 0)
-                Task.Yield();
-
-            if (TryToDequeue())
-                return true;
 
             return false;
 
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool TryToDequeue()
-        {
-            if (_queue.Count > 0)
-            {
-                lock (_lock)
-                    _current = _queue.Dequeue();
-                return true;
-            }
-            return false;
         }
 
         public void Reset()
         {
-            _task = _reader.Read(Add);
+            _cancel = new System.Threading.CancellationToken();
+            _task = Task.Run(() => _reader.Parse(Add), _cancel).WaitStarted();
+
+            while (_reader.StateRunning == StatusEnum.NotStarted)
+                Thread.Sleep(10);
+
         }
 
         private void Add(IStore j)
@@ -93,12 +86,47 @@ namespace Bb.JsonParser
             _reader.Dispose();
         }
 
-        private volatile object _lock = new object();
         private readonly Func<IStore, T> _converter;
         private readonly BigJsonReader _reader;
-        private readonly Queue<IStore> _queue;
+        private readonly ConcurrentQueue<IStore> _queue;
+        private CancellationToken _cancel;
         private Task _task;
         private IStore _current;
+    }
+
+    public static class TaskHelper
+    {
+
+        public static Task WaitStarted(this Task self)
+        {
+            bool exit = false;
+            while (exit)
+            {
+                switch (self.Status)
+                {
+                    case TaskStatus.Created:                        // 0
+                    case TaskStatus.WaitingForActivation:           // 1
+                    case TaskStatus.WaitingToRun:                   // 2
+                        break;
+
+                    case TaskStatus.Running:                        // 3
+                    case TaskStatus.WaitingForChildrenToComplete:   // 4
+                        exit = true;
+                        break;
+
+                    case TaskStatus.RanToCompletion:                // 5
+                    case TaskStatus.Canceled:                       // 6
+                    case TaskStatus.Faulted:                        // 7
+                    default:
+                        throw new Exception("Failed to start the task");
+                }
+
+            }
+
+            return self;
+
+        }
+
     }
 
 }

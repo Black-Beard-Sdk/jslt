@@ -145,7 +145,7 @@ public class JsonPath
     public bool TryToMatch(JsonPath evaluatedPath, bool full = true)
     {
 
-        if (evaluatedPath.Segments.Length != this.Segments.Length)
+        if (full && evaluatedPath.Segments.Length != this.Segments.Length)
             return false;
 
         for (var i = 0; i < this.Segments.Length; i++)

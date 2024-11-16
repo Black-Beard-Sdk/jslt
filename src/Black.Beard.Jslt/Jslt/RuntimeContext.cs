@@ -945,7 +945,7 @@ namespace Bb.Jslt
                 ctx.Diagnostics.AddWarning(trace, name, $"the key '{name}' is set with null value.");
         }
 
-        public static JToken GetVariable(RuntimeContext ctx, string name, Type type, TextLocation trace)
+        public static object GetVariable(RuntimeContext ctx, string name, Type type, TextLocation trace)
         {
 
             if (!ctx.SubSources.Variables.Get(name, out var value))

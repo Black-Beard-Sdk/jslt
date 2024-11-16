@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using static System.Collections.Specialized.BitVector32;
 
 namespace Bb.JsonParser;
 
@@ -9,13 +10,10 @@ namespace Bb.JsonParser;
 public class JsonReaderArgs : EventArgs
 {
 
-    public JsonReaderArgs(string path, IStore model, EventEnum e, Progress progress)
+    public JsonReaderArgs(Progress progress, Action<IStore> action)
     {
         Progress = progress;
-        Path = path;
-        Item = model;
-        Event = e;
-        _array = new List<IStore>(20);
+        _action = action;
     }
 
     /// <summary>
@@ -36,17 +34,19 @@ public class JsonReaderArgs : EventArgs
     /// <summary>
     /// Current path
     /// </summary>
-    public string Path { get; }
+    public string Path { get; internal set; }
 
     /// <summary>
     /// Current item
     /// </summary>
-    public IStore Item { get; }
+    public IStore Item { get; internal set; }
 
     /// <summary>
     /// Event type
     /// </summary>
-    public EventEnum Event { get; }
+    public EventEnum Event { get; internal set; }
+
+    private readonly Action<IStore> _action;
 
     /// <summary>
     /// Strategy to follow
@@ -59,25 +59,13 @@ public class JsonReaderArgs : EventArgs
     /// <param name="token"></param>
     public void Append(IStore token)
     {
-        _array.Add(token);
+        _action?.Invoke(token);
     }
-
-    /// <summary>
-    /// Number of items in the block
-    /// </summary>
-    public int Count => _array.Count;
-
-    /// <summary>
-    /// Items in the block
-    /// </summary>
-    internal IEnumerable<IStore> Items => _array;
 
     /// <summary>
     /// Last removed item
     /// </summary>
     public IStore Removed { get; internal set; }
-
-    private readonly List<IStore> _array;
 
 }
 

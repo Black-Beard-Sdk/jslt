@@ -22,7 +22,7 @@ public readonly struct StoreObject : IStore
     /// <param name="toReturn"></param>
     /// <param name="name"></param>
     /// <param name="reader"></param>
-    public StoreObject(bool skip, bool toReturn, string name, IStackStore reader)
+    public StoreObject(bool skip, bool toReturn, string name, IStackStore reader, bool pathToRemove, string path)
     {
         _skip = skip;
         _toReturn = toReturn;
@@ -30,8 +30,10 @@ public readonly struct StoreObject : IStore
         _parent = reader;
         if (!_skip)
             _array = new List<IStore>(100);
-        else 
+        else
             _array = __array;
+        PathToRemove = pathToRemove;
+        this.Path = path;
     }
 
     /// <summary>
@@ -64,9 +66,14 @@ public readonly struct StoreObject : IStore
     {
         get
         {
-            if (_skip)
-                return null;
-            return new JObject(_array.Select(c => c.JsonModel).OfType<JProperty>());
+            List<JProperty> properties = new List<JProperty>();
+            foreach (var item in _array)
+            {
+                var property = item.JsonModel as JProperty;
+                if (property != null)
+                    properties.Add(property);
+            }
+            return new JObject(properties);
         }
     }
 
@@ -81,7 +88,7 @@ public readonly struct StoreObject : IStore
     /// <param name="newItem"></param>
     public void Add(IStore newItem)
     {
-        if (!_skip)
+        //if (!_skip)
             _array.Add(newItem);
     }
 
@@ -90,6 +97,8 @@ public readonly struct StoreObject : IStore
     /// </summary>
     public IEnumerable<IStore> GetChilds => _array;
 
+    public bool PathToRemove { get; }
+    public string Path { get; }
 
     private readonly bool _skip;
     private readonly bool _toReturn;

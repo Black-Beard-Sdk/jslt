@@ -1,5 +1,6 @@
 ﻿using Bb.JPaths;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Bb.JsonParser;
@@ -7,7 +8,7 @@ namespace Bb.JsonParser;
 /// <summary>
 /// Big json reader
 /// </summary>
-public class BigLoadJsonParser : IDisposable
+public class BigLoadJsonParser : IDisposable, IEnumerable<IStore>
 {
 
     /// <summary>
@@ -27,24 +28,21 @@ public class BigLoadJsonParser : IDisposable
         if (e.Event == EventEnum.PreparingToRead)
         {
 
-            if (!_freeFilterPath)
+            if (!_freeFilterPath && e.Item != null)
             {
-                var m = e.Item.JsonModel;
-                if (!_filterPath.TryToMatch(e.Path))
+
+                if (!_filterPath.TryToMatch(e.Path, false))
                     e.Strategy = StrategyEnum.Skip;
+
             }
 
         }
 
         else if (e.Event == EventEnum.EndedToRead)
         {
-
-            //foreach (var item in _slicePath.Evaluate(e.Item.JsonModel).Matches)
-            //    e.Append(item.Value);
-
-            if (e.Count > 0)
-                e.Strategy = StrategyEnum.NotAddItem;
-
+            //if (e.ToReturn)
+            //    e.Append(e.Removed);
+            //e.Strategy = StrategyEnum.NotAddItem;
         }
 
     }
@@ -70,9 +68,14 @@ public class BigLoadJsonParser : IDisposable
         return this;
     }
 
-    public IEnumerable<IStore> Load()
+    public IEnumerator<IStore> GetEnumerator()
     {
-        return _reader.Read();
+        return _reader.GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return _reader.GetEnumerator();
     }
 
     private JsonPath? _filterPath;

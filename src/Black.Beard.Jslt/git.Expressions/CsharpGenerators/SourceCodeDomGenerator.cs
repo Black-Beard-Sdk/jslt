@@ -39,15 +39,13 @@ namespace Bb.Expressions.CsharpGenerators
         {
 
             ExpressionCollectUsing.Collect(e, this._usings);
-            //foreach (var item in this._usings)
-            //    this._namespaceRoot.Imports.Add(new CodeNamespaceImport(item));
+
+            foreach (var item in this._usings.OrderBy(c => c))
+                this._namespaceRoot.Imports.Add(new CodeNamespaceImport(item));
 
             Visit(e);
 
             CreatePrivateMethod();
-
-            foreach (var item in this._usings.OrderBy(c => c))
-                this._namespaceRoot.Imports.Add(new CodeNamespaceImport(item));
 
         }
 

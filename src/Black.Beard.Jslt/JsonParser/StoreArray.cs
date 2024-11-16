@@ -7,7 +7,7 @@ namespace Bb.JsonParser;
 /// <summary>
 /// /// Hierarchy array of the json model
 /// </summary>
-public class StoreArray : IStore
+public struct StoreArray : IStore
 {
 
     /// <summary>
@@ -17,14 +17,20 @@ public class StoreArray : IStore
     /// <param name="toReturn"></param>
     /// <param name="name"></param>
     /// <param name="reader"></param>
-    public StoreArray(bool skip, bool toReturn, string name, IStackStore reader)
+    public StoreArray(bool skip, bool toReturn, string name, IStackStore reader, bool pathToRemove, string path)
     {
+
+        PathToRemove = pathToRemove;
+
         _skip = skip;
         _toReturn = toReturn;
         Name = name;
         _parent = reader;
         if (!_skip)
             _array = new List<IStore>(100);
+        else
+            _array = null;
+        this.Path = path;
 
     }
 
@@ -60,7 +66,13 @@ public class StoreArray : IStore
         {
             if (_skip)
                 return null;
+
+            List<JToken> properties = new List<JToken>();
+            foreach (var item in _array)
+                properties.Add(item.JsonModel);
+
             return new JArray(_array.Select(c => c.JsonModel));
+
         }
     }
 
@@ -74,9 +86,12 @@ public class StoreArray : IStore
     /// </summary>
     public IEnumerable<IStore> GetChilds => _array;
 
+    public bool PathToRemove { get; }
+    public string Path { get; }
+
     public void Add(IStore newItem)
     {
-        if (!_skip)
+        //if (!_skip)
             _array.Add(newItem);
     }
 

@@ -46,7 +46,9 @@ public interface IStore : IDisposable
     /// </summary>
     IEnumerable<IStore> GetChilds { get; }
 
+    bool PathToRemove { get; }
 
+    string Path { get; }
 
 }
 

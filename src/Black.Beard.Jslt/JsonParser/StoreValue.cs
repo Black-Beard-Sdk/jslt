@@ -6,7 +6,7 @@ namespace Bb.JsonParser;
 /// <summary>
 /// Hierarchy value of the json model
 /// </summary>
-public class StoreValue : IStore
+public struct StoreValue : IStore
 {
 
     /// <summary>
@@ -72,6 +72,8 @@ public class StoreValue : IStore
         }
     }
 
-    private readonly BigJsonReader _parent;
+    public bool PathToRemove => false;
+
+    public string Path => string.Empty;
 
 }

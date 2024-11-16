@@ -6,7 +6,7 @@ namespace Bb.JsonParser;
 /// <summary>
 /// /// Hierarchy property of the json model
 /// </summary>
-public class StoreProperty : IStore
+public struct StoreProperty : IStore
 {
 
     /// <summary>
@@ -16,12 +16,15 @@ public class StoreProperty : IStore
     /// <param name="toReturn"></param>
     /// <param name="name"></param>
     /// <param name="reader"></param>
-    public StoreProperty(bool skip, bool toReturn, string name, IStackStore reader)
+    public StoreProperty(bool skip, bool toReturn, string name, IStackStore reader, bool pathToRemove, string path)
     {
+        _value = null;
+        PathToRemove = pathToRemove;
         Name = name.Substring(1);
         _skip = skip;
         _toReturn = toReturn;
         _parent = reader;
+        this.Path = path;
     }
 
     /// <summary>
@@ -44,8 +47,8 @@ public class StoreProperty : IStore
     {
         get
         {
-            if (_skip)
-                return null;
+            //if (_skip)
+            //    return null;
             return new JProperty(Name, _value?.JsonModel);
         }
     }
@@ -81,6 +84,8 @@ public class StoreProperty : IStore
     /// </summary>
     public IStore Value => _value;
 
+    public bool PathToRemove { get; }
+
     /// <summary>
     /// Add a new item child to the store
     /// </summary>
@@ -94,5 +99,8 @@ public class StoreProperty : IStore
     private readonly bool _skip;
     private readonly bool _toReturn;
     private readonly IStackStore _parent;
+
+    public string Path { get; }
+
     private IStore _value;
 }

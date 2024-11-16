@@ -295,10 +295,12 @@ namespace Bb.Jslt.Visitors
 
             Type type = typeof(JToken);
 
-            if (TryGetInStorage<Type>("type", out var typeConversion))
-            {
-                type = typeConversion;
-            }
+            type = node.TargetType ?? typeof(JToken);
+
+            //if (TryGetInStorage<Type>("type", out var typeConversion))
+            //{
+            //    type = typeConversion;
+            //}
 
             using (CurrentContext ctx = NewContext())
             {

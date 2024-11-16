@@ -1,5 +1,6 @@
 ﻿using Bb.Asts;
 using Bb.Contracts;
+using System;
 
 namespace Bb.Jslt.Asts
 {
@@ -53,6 +54,8 @@ namespace Bb.Jslt.Asts
         }
 
         public bool ToDestruct { get; set; }
+        
+        public Type TargetType { get; set; }
 
     }
 
