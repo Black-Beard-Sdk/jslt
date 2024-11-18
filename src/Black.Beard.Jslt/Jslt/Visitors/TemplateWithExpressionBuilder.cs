@@ -13,6 +13,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Collections;
+using System.Linq;
 
 namespace Bb.Jslt.Visitors
 {
@@ -100,6 +102,14 @@ namespace Bb.Jslt.Visitors
         public object VisitArray(JsltArray node1)
         {
 
+
+            var m2 = typeof(IEnumerable).GetMethod("GetEnumerator");
+            var m3 = typeof(IEnumerator).GetMethod("MoveNext");
+
+            var m4 = typeof(Type).GetMethod("IsAssignableFrom");
+
+
+
             using (var store = NewStore())
             using (CurrentContext ctx = NewContext())
             {
@@ -122,18 +132,17 @@ namespace Bb.Jslt.Visitors
                         var resultToken = src.AddVar(typeof(JToken), src.GetUniqueVariableName("source"), (Expression)node.Source.Accept(this));
                         node.Source = null;
 
-                        // Case when result is array
-                        var i = src.If(resultToken.TypeIs(typeof(JArray)));
-                        var listArray = i.Then.AddVar(typeof(JArray), null, resultToken.ConvertIfDifferent(typeof(JArray)));
+                        // if ((source3.GetType() == typeof(IEnumerable<JToken>)))
+                        var type = resultToken.GetTypeExpression();
+                        var i = src.If(typeof(JArray).AsConstant().CallIsAssignableFrom(type));
+                        // var i = ((IEnumerable)source3).GetEnumerator();
+                        var enumerator = i.Then.AddVar(typeof(IEnumerator<JToken>), null, resultToken.ConvertIfDifferent(typeof(IEnumerable)).Call(m2));
 
-                        var _for = i.Then.For(Expression.Constant(0), listArray.Property("Count"));
-                        var m = ctx.Current.Context.Property(nameof(RuntimeContext.MusToBreak));
-                        _for.Condition = Expression.AndAlso(_for.Condition, m.IsFalse());
-
-                        //_for.Condition = Expression.LessThan(_for.Index, listArray.Property("Count"));
+                        // while ((var_IEnumerator`14.MoveNext() && (argContext.MusToBreak == false)))
+                        var _for = i.Then.While(Expression.AndAlso(enumerator.Call(m3), ctx.Current.Context.Property(nameof(RuntimeContext.MusToBreak)).IsFalse()));
                         ctx.Current.Source = _for.Body;
-
-                        var itemList = _for.Body.AddVar(typeof(JToken), src.GetUniqueVariableName("currentArrayItem"), Expression.Property(listArray, _propJArray_Item, _for.Index));
+                        // currentArrayItem7 = var_IEnumerator`14.Current;
+                        var itemList = _for.Body.AddVar(typeof(JToken), src.GetUniqueVariableName("currentArrayItem"), Expression.Property(enumerator, "Current").ConvertIfDifferent(typeof(JToken)));
                         ctx.Current.RootSource = itemList;
 
                         Expression b;
@@ -319,8 +328,8 @@ namespace Bb.Jslt.Visitors
                     else
                     {
                         var t = type.AsConstant();
-                        return RuntimeContext._getVariable.Call(ctx.Current.Context, name, t, node.GetLocation().AsConstant());
-
+                        var location = node.GetLocation().AsConstant();
+                        return RuntimeContext._getVariable.Call(ctx.Current.Context, name, t, location);
                     }
                 }
 

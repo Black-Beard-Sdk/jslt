@@ -209,7 +209,7 @@ namespace Bb.Json.Utilities
             return -1;
         }
 
-        public static bool Contains<T>(this List<T> list, T value, IEqualityComparer comparer)
+        public static bool Contains<T>(this IList<T> list, T value, IEqualityComparer comparer)
         {
             for (int i = 0; i < list.Count; i++)
             {
@@ -221,7 +221,7 @@ namespace Bb.Json.Utilities
             return false;
         }
 
-        public static int IndexOfReference<T>(this List<T> list, T item)
+        public static int IndexOfReference<T>(this IList<T> list, T item)
         {
             for (int i = 0; i < list.Count; i++)
             {
@@ -234,9 +234,9 @@ namespace Bb.Json.Utilities
             return -1;
         }
 
-#if HAVE_FAST_REVERSE
+
         // faster reverse in .NET Framework with value types - https://github.com/JamesNK/Newtonsoft.Json/issues/1430
-        public static void FastReverse<T>(this List<T> list)
+        public static void FastReverse<T>(this IList<T> list)
         {
             int i = 0;
             int j = list.Count - 1;
@@ -249,7 +249,7 @@ namespace Bb.Json.Utilities
                 j--;
             }
         }
-#endif
+
 
         private static IList<int> GetDimensions(IList values, int dimensionsCount)
         {

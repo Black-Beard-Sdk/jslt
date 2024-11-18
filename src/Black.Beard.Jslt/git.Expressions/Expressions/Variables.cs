@@ -81,9 +81,20 @@ namespace Bb.Expressions
             }
             else
             {
-                var o = $"var_{type.Name}{PrivatedIndex.GetNewIndex()}";
+                var o = $"var_{CleanName(type)}{PrivatedIndex.GetNewIndex()}";
                 return o;
             }
+
+        }
+
+        private string CleanName(Type type)
+        {
+
+            var result = type.Name;
+
+            result = result.Replace("`", "_");
+
+            return result;
 
         }
 

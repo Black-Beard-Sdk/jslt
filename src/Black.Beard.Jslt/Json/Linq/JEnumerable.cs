@@ -37,6 +37,8 @@ namespace Bb.Json.Linq
     /// <typeparam name="T">The type of token.</typeparam>
     public readonly struct JEnumerable<T> : IJEnumerable<T>, IEquatable<JEnumerable<T>> where T : JToken
     {
+
+
         /// <summary>
         /// An empty collection of <see cref="JToken"/> objects.
         /// </summary>

@@ -1,5 +1,6 @@
 ﻿using Bb.Analysis.DiagTraces;
 using Bb.Contracts;
+using Bb.Expressions;
 using Bb.JPaths;
 using Bb.Jslt.Parser;
 using Bb.Json.Linq;
@@ -9,6 +10,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using static Refs.System;
 
 namespace Bb.Jslt
 {
@@ -949,13 +951,20 @@ namespace Bb.Jslt
         {
 
             if (!ctx.SubSources.Variables.Get(name, out var value))
+            {
                 ctx.Diagnostics.AddWarning(trace, name, $"the key '{name}' is missing.");
+                value = ConverterHelper.ConvertTo(value, type);
+                return value;
+            }
+
+            if (value == null)
+                return null;
+
+            if (type.IsAssignableFrom(value.GetType()))
+                return value;
 
             if (value is JToken token)
             {
-
-                if (type.IsAssignableFrom(token.GetType()))
-                    return token;
 
                 if (type == typeof(JObject) || type == typeof(JArray))
                 {
@@ -963,12 +972,12 @@ namespace Bb.Jslt
                     return JToken.Parse(payload1);
                 }
 
-                if (type == typeof(JValue))
-                    return new JValue(value);
-
             }
 
-            return new JValue(value);
+            if (value.GetType() != type)
+                value = ConverterHelper.ConvertTo(value, type);
+            
+            return value;
 
         }
 

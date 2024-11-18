@@ -18,15 +18,22 @@ namespace Bb.Jslt.CustomServices
         [JsltExtensionMethod("IterateJsonFile")]
         [JsltExtensionMethodParameter("fileSource", "json file")]
         [JsltExtensionMethodParameter("slicer", "slicer json path expression.")]
-        public static IEnumerator<JToken> ExecuteSelectOne(RuntimeContext ctx, string fileSource, JsonPath slicer)
+        public static JArray IterateJsonFile(RuntimeContext ctx, string fileSource, JsonPath slicer)
         {
+
+            if (string.IsNullOrEmpty(fileSource))
+                throw new NullReferenceException (nameof(fileSource));            
+
+            if (slicer == null)
+                throw new NullReferenceException (nameof(slicer));
 
             var file = ctx.Configuration.ResolveFile(fileSource);
             if (!file.Exists)
                 throw new Exception($"missing file {file.FullName}");
 
-            var reader = new StoreEnumerator<JToken>(new BigJsonReader(file, slicer), c => c.ConvertToJson());
-            return reader;
+            var reader = new BigJsonReader(file, slicer);
+            var enumerator = new StoreEnumerator<JToken>(reader, c => c.JsonModel);
+            return new JArray(enumerator);
 
         }
 

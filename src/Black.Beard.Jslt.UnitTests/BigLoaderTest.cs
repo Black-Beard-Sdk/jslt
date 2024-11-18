@@ -180,7 +180,38 @@ namespace Black.Beard.Jslt.UnitTests
 
         }
 
+        [TestMethod]
+        public void TestServiceIterateJsonFile()
+        {
 
+            string srcFile = @"E:\REF.json";
+            string slicePath = "$.root.*";
+
+            var template = @"
+            { 
+                'result': 
+                [
+                    {
+                        '$' : IterateJsonFile(file:, path:),
+                        'p1': 1,
+                        'p2': $.Account[0].Reference
+
+                    }
+                ]
+            }"
+                .Replace("'", "\"")
+                .Replace("`", "'");
+
+            var dte1 = DateTime.Now;
+            var src = new SourceJson[] { };
+            RuntimeContext result = Test(template, true, c =>
+            {
+                c.Variables.Add("file", srcFile);
+                c.Variables.Add("path", slicePath);
+            });
+
+
+        }
 
         private static string GetFile(JToken o)
         {

@@ -29,9 +29,12 @@ using System.Collections.Generic;
 using Bb.Json.Utilities;
 using System.IO;
 using System.Globalization;
+using Bb.JsonParser;
+using static Refs.System.Resources;
 
 namespace Bb.Json.Linq
 {
+
     /// <summary>
     /// Represents a JSON array.
     /// </summary>
@@ -41,7 +44,7 @@ namespace Bb.Json.Linq
     public partial class JArray : JContainer, IList<JToken>
     {
 
-        private readonly List<JToken> _values = new List<JToken>();
+        private IList<JToken> _values;
 
         /// <summary>
         /// Gets the container's children tokens.
@@ -58,8 +61,27 @@ namespace Bb.Json.Linq
         /// <summary>
         /// Initializes a new instance of the <see cref="JArray"/> class.
         /// </summary>
+        /// <param name="enumerator">Reader.</param>
+        public JArray(StoreEnumerator<JToken> enumerator)
+        {
+            _values = new FakeList(enumerator);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JArray"/> class.
+        /// </summary>
+        /// <param name="capacity">The initial capacity of the <see cref="JArray"/>.</param>
+        public JArray(int capacity)
+        {
+            _values = new List<JToken>(capacity);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JArray"/> class.
+        /// </summary>
         public JArray()
         {
+            _values = new List<JToken>();
         }
 
         /// <summary>
@@ -69,6 +91,7 @@ namespace Bb.Json.Linq
         public JArray(JArray other)
             : base(other)
         {
+            _values = new List<JToken>();
         }
 
         /// <summary>
@@ -86,6 +109,7 @@ namespace Bb.Json.Linq
         /// <param name="content">The contents of the array.</param>
         public JArray(object content)
         {
+            _values = new List<JToken>();
             Add(content);
         }
 
@@ -140,7 +164,7 @@ namespace Bb.Json.Linq
             if (item == null)
                 return -1;
 
-            return _values.IndexOfReference(item);
+            return ChildrenTokens.IndexOfReference(item);
 
         }
 
@@ -272,8 +296,7 @@ namespace Bb.Json.Linq
         internal override int GetDeepHashCode()
         {
             return ContentsHashCode();
-        }
-          
+        }          
 
     }
 
@@ -391,16 +414,82 @@ namespace Bb.Json.Linq
         {
             writer.WriteStartArray();
 
-            for (int i = 0; i < _values.Count; i++)
-                _values[i].WriteTo(writer, converters);
+            for (int i = 0; i < ChildrenTokens.Count; i++)
+                ChildrenTokens[i].WriteTo(writer, converters);
 
             writer.WriteEndArray();
         }
 
+        private struct FakeList : IList<JToken>
+        {
 
+            const string _message = "This list is readonly. This array can only iterated, because it is a file reader parser\"";
+
+            public FakeList(StoreEnumerator<JToken> enumerator)
+            {
+                this._enumerator = enumerator;
+            }
+
+            public int Count => throw new NotImplementedException(_message);
+
+            public bool IsReadOnly => throw new NotImplementedException(_message);
+
+            public JToken this[int index] { get => throw new NotImplementedException(_message); set => throw new NotImplementedException(_message); }
+
+            public int IndexOf(JToken item)
+            {
+                throw new NotImplementedException(_message);
+            }
+
+            public void Insert(int index, JToken item)
+            {
+                throw new NotImplementedException(_message);
+            }
+
+            public void RemoveAt(int index)
+            {
+                throw new NotImplementedException(_message);
+            }
+
+            public void Add(JToken item)
+            {
+                throw new NotImplementedException(_message);
+            }
+
+            public void Clear()
+            {
+                throw new NotImplementedException(_message);
+            }
+
+            public bool Contains(JToken item)
+            {
+                throw new NotImplementedException(_message);
+            }
+
+            public void CopyTo(JToken[] array, int arrayIndex)
+            {
+                throw new NotImplementedException(_message);
+            }
+
+            public bool Remove(JToken item)
+            {
+                throw new NotImplementedException(_message);
+            }
+
+            public IEnumerator<JToken> GetEnumerator()
+            {
+                return _enumerator;
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return _enumerator;
+            }
+
+            private readonly StoreEnumerator<JToken> _enumerator;
+
+        }
 
     }
-
-
 
 }
