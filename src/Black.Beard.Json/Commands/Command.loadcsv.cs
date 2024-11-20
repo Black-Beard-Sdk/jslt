@@ -36,10 +36,10 @@ namespace Bb.Json.Commands
 
                 var validator = new GroupArgument(config);
 
-                var optHeader = validator.OptionNoValue("--noheader", "specifiy the cav source have'nt no header");
-                var optSeparator = validator.Option("--separator", "specifiy the sperator charset. by default the value is ';'");
-                var optQuote = validator.Option("--quote", "specifiy the quote charset. by default the value is '\"'");
-                var optEscape = validator.Option("--escape", "specifiy the escape charset. by default the value is '\'");
+                var optHeader = validator.OptionNoValue("--noheader", "specify the cav source haven't no header");
+                var optSeparator = validator.Option("--separator", "specify the separator character. by default the value is ';'");
+                var optQuote = validator.Option("--quote", "specify the quote character. by default the value is '\"'");
+                var optEscape = validator.Option("--escape", "specify the escape character. by default the value is '\'");
 
                 var argSource = validator.Option("--source", "csv source path that contains data source"
                    , ValidatorExtension.EvaluateFileExist

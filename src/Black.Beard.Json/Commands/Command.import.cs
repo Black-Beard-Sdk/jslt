@@ -52,11 +52,11 @@ namespace Bb.Json.Commands
                      , ValidatorExtension.EvaluateRequired
                      );
 
-                var argSource = validator.Option("--source", "json source file path that contains data source. if option is missing source is readed from stdin stream");
+                var argSource = validator.Option("--source", "json source file path that contains data source. if option is missing source is read from stdin stream");
                 var argTargetName = validator.Option("--name", "name of the output csv files. if the value is missing a randomized name is used");
                 var optWriteHeader = validator.OptionNoValue("--h", "Write header");
-                var optSeparator = validator.Option("--s", "specify the charset separator. by default the value is ';'");
-                var optQuote = validator.Option("--q", "specify the charset quote. by default the value is '\"'");
+                var optSeparator = validator.Option("--s", "specify the character separator. by default the value is ';'");
+                var optQuote = validator.Option("--q", "specify the character quote. by default the value is '\"'");
 
                 config.OnExecute(() =>
                 {

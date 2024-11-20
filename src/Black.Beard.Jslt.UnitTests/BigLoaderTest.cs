@@ -181,10 +181,58 @@ namespace Black.Beard.Jslt.UnitTests
         }
 
         [TestMethod]
+        public void Test7()
+        {
+
+            string srcFile = @"E:\REFERENTIEL_COMMUN.json";
+            string slicePath = "$.root.*";
+            string dbFile = @"E:\pudos.db";
+            string collectionName = "sites";
+            int buffStep = 10000;
+
+            BsonDocument[] _buffer = new BsonDocument[buffStep];
+            int count = 0;
+            var n = DateTime.Now;
+
+            using (var db = new LiteDatabase(dbFile))
+            {
+
+                var collection = db.GetCollection(collectionName);
+
+                using var loader = new BigJsonImporter(srcFile, slicePath);
+                foreach (IStore item in loader)
+                {
+                    _buffer[count++] = (BsonDocument)item.ConvertToBson();
+                    if (count == buffStep)
+                    {
+                        collection.InsertBulk(_buffer);
+                        var n2 = DateTime.Now;
+                        Debug.WriteLine($"+ {count} - {n2.Subtract(n).Seconds}");
+                        count = 0;
+                        n = DateTime.Now;
+                    }
+
+                }
+
+                if (count > 0)
+                {
+                    var p = _buffer.Take(count - 1).ToArray();
+                    collection.InsertBulk(p);
+                }
+
+                collection.EnsureIndex("$.Account[0].PickupReference");
+                collection.EnsureIndex("$.Account[0].Type");
+                collection.EnsureIndex("$.Account[0].Subtype");
+
+            }
+
+        }
+
+        [TestMethod]
         public void TestServiceIterateJsonFile()
         {
 
-            string srcFile = @"E:\REF.json";
+            string srcFile = @"E:\REFERENTIEL_COMMUN.json";
             string slicePath = "$.root.*";
 
             var template = @"
@@ -194,7 +242,7 @@ namespace Black.Beard.Jslt.UnitTests
                     {
                         '$' : IterateJsonFile(file:, path:),
                         'p1': 1,
-                        'p2': $.Account[0].Reference
+                        'p2': $.Account[0].PickupReference
 
                     }
                 ]
