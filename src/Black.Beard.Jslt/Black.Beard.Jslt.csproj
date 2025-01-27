@@ -85,7 +85,7 @@
 		<PackageReference Include="Black.Beard.ComponentModel" Version="1.0.146" />
 		<PackageReference Include="Black.Beard.Helpers.Randoms" Version="2.0.49" />
 		<PackageReference Include="Black.Beard.Roslyn" Version="1.0.132" />
-		<PackageReference Include="System.CodeDom" Version="9.0.0" />
+		<PackageReference Include="System.CodeDom" Version="9.0.1" />
 	</ItemGroup>
 
 	<ItemGroup>

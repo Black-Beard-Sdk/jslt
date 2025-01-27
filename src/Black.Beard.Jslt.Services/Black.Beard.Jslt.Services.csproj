@@ -17,8 +17,8 @@
 	<ItemGroup>
 		<PackageReference Include="ExcelDataReader" Version="3.7.0" />
 		<PackageReference Include="ExcelDataReader.DataSet" Version="3.7.0" />
-		<PackageReference Include="HtmlAgilityPack" Version="1.11.71" />
-		<PackageReference Include="libphonenumber-csharp" Version="8.13.51" />
+		<PackageReference Include="HtmlAgilityPack" Version="1.11.72" />
+		<PackageReference Include="libphonenumber-csharp" Version="8.13.53" />
 	</ItemGroup>
 
 	<ItemGroup>
