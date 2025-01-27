@@ -14,7 +14,7 @@
 
   <ItemGroup>
     <PackageReference Include="Black.Beard.CommandLine" Version="1.0.9" />
-    <PackageReference Include="Black.Beard.Roslyn" Version="1.0.131" />
+    <PackageReference Include="Black.Beard.Roslyn" Version="1.0.132" />
     <PackageReference Include="LibGit2Sharp" Version="0.31.0" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.0" />
   </ItemGroup>

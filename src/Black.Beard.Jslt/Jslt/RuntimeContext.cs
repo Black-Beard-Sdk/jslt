@@ -953,7 +953,7 @@ namespace Bb.Jslt
             if (!ctx.SubSources.Variables.Get(name, out var value))
             {
                 ctx.Diagnostics.AddWarning(trace, name, $"the key '{name}' is missing.");
-                value = ConverterHelper.ConvertTo(value, type);
+                value = ConverterHelper.ConvertToObject(value, type);
                 return value;
             }
 
@@ -975,7 +975,7 @@ namespace Bb.Jslt
             }
 
             if (value.GetType() != type)
-                value = ConverterHelper.ConvertTo(value, type);
+                value = ConverterHelper.ConvertToObject(value, type);
             
             return value;
 
