@@ -46,40 +46,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Remove="git.Expressions\Expressions\ConverterHelper.cs" />
-	  <Compile Remove="git.Expressions\Expressions\ExpressionHelper.cs" />
-	  <Compile Remove="git.Expressions\Expressions\NullableConverter.cs" />
-	  <Compile Remove="git.Expressions\Expressions\NullableConverter2.cs" />
-	  <Compile Remove="Json\Converters\BsonObjectIdConverter.cs" />
-	  <Compile Remove="Json\Converters\DiscriminatedUnionConverter.cs" />
-	  <Compile Remove="Json\Converters\EntityKeyMemberConverter.cs" />
-	  <Compile Remove="Json\Converters\ExpandoObjectConverter.cs" />
-	  <Compile Remove="Json\FormatterAssemblyStyle.cs" />
-	  <Compile Remove="Json\JsonReader.Async.cs" />
-	  <Compile Remove="Json\JsonTextReader.Async.cs" />
-	  <Compile Remove="Json\JsonTextWriter.Async.cs" />
-	  <Compile Remove="Json\JsonValidatingReader.cs" />
-	  <Compile Remove="Json\JsonWriter.Async.cs" />
-	  <Compile Remove="Json\Linq\JContainer.Async.cs" />
-	  <Compile Remove="Json\Linq\JsonSelectSettings.cs" />
-	  <Compile Remove="Json\SerializationBinder.cs" />
-	  <Compile Remove="Json\Serialization\DiagnosticsTraceWriter.cs" />
-	  <Compile Remove="Json\Serialization\DynamicValueProvider.cs" />
-	  <Compile Remove="Json\Serialization\FormatterConverter.cs" />
-	  <Compile Remove="Json\Serialization\JsonDynamicContract.cs" />
-	  <Compile Remove="Json\Serialization\JsonFormatterConverter.cs" />
-	  <Compile Remove="Json\Serialization\JsonISerializableContract.cs" />
-	  <Compile Remove="Json\Utilities\AsyncUtils.cs" />
-	  <Compile Remove="Json\Utilities\DynamicProxy.cs" />
-	  <Compile Remove="Json\Utilities\DynamicProxyMetaObject.cs" />
-	  <Compile Remove="Json\Utilities\DynamicReflectionDelegateFactory.cs" />
-	  <Compile Remove="Json\Utilities\DynamicUtils.cs" />
-	  <Compile Remove="Json\Utilities\FSharpUtils.cs" />
-	  <Compile Remove="Json\Utilities\LinqBridge.cs" />
-	  <Compile Remove="Json\Utilities\MethodBinder.cs" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<PackageReference Include="Antlr4.Runtime.Standard" Version="4.9.3" />
 		<PackageReference Include="Black.Beard.Analysis" Version="1.0.133" />
 		<PackageReference Include="Black.Beard.ComponentModel" Version="1.0.146" />
