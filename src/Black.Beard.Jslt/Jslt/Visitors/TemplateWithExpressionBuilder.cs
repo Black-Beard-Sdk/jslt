@@ -691,6 +691,11 @@ namespace Bb.Jslt.Visitors
 
         }
 
+        public object VisitComment(JsltComment comment)
+        {
+            return null;
+        }
+
         public TranformJsonAstConfiguration Configuration { get; set; }
 
         #region Context
@@ -731,11 +736,6 @@ namespace Bb.Jslt.Visitors
         {
             var ctx = _stack.Peek();
             return ctx;
-        }
-
-        public object VisitComment(JsltComment comment)
-        {
-            return null;
         }
 
         private class CurrentContext : IDisposable

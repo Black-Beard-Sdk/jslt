@@ -101,7 +101,7 @@ namespace Bb.Jslt
             var ctors = service.GetConstructors();
             foreach (var ctor in ctors)
             {
-                MethodDescription description = JsltExtensionMethodParameterAttribute.Map(new MethodDescription(name, ctor) { Description = _description });
+                MethodDescription description = JsltExtensionMethodParameterAttribute.Map(new MethodDescription(name, ctor, service) { Description = _description });
                 Factory<ITransformJsonService> factory = ObjectCreator.GetActivator<ITransformJsonService>(ctor, description);
                 ServiceContainer.AddService(name, factory, FunctionKindEnum.FunctionStandard);
             }
@@ -132,7 +132,7 @@ namespace Bb.Jslt
 
             }
 
-            MethodDescription description = JsltExtensionMethodParameterAttribute.Map(new MethodDescription(name, service) { Description = _description });
+            MethodDescription description = JsltExtensionMethodParameterAttribute.Map(new MethodDescription(name, service, service.ReturnType) { Description = _description });
             Factory factory = null;
 
             switch (_forOutput)

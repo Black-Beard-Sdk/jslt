@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<RootNamespace>Bb.Jslt.Services</RootNamespace>
 		<Nullable>disable</Nullable>
 		<RepositoryUrl>https://github.com/Black-Beard-Sdk/jslt</RepositoryUrl>
@@ -17,8 +17,8 @@
 	<ItemGroup>
 		<PackageReference Include="ExcelDataReader" Version="3.7.0" />
 		<PackageReference Include="ExcelDataReader.DataSet" Version="3.7.0" />
-		<PackageReference Include="HtmlAgilityPack" Version="1.11.72" />
-		<PackageReference Include="libphonenumber-csharp" Version="8.13.53" />
+		<PackageReference Include="HtmlAgilityPack" Version="1.12.0" />
+		<PackageReference Include="libphonenumber-csharp" Version="9.0.2" />
 	</ItemGroup>
 
 	<ItemGroup>

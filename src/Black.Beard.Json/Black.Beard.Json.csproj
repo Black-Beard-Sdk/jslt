@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
 		<Nullable>disable</Nullable>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<AssemblyName>Json</AssemblyName>
 		<RootNamespace>Bb.Json</RootNamespace>
 		<StartupObject>Bb.Json.Program</StartupObject>
@@ -18,12 +18,12 @@
 		<PackageReference Include="ExcelDataReader" Version="3.7.0" />
 		<PackageReference Include="ExcelDataReader.DataSet" Version="3.7.0" />
 		<PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.1" />
-		<PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.1" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.1" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.1" />
-		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.1" />
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.3" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.3" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.3" />
+		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.3" />
 		<PackageReference Include="System.Text.Encoding" Version="4.3.0" />
-		<PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.1" />
+		<PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.3" />
 		<PackageReference Include="Ude.NetStandard" Version="1.2.0" />
 	</ItemGroup>
 

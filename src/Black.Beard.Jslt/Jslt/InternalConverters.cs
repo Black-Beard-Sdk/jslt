@@ -1,4 +1,5 @@
-﻿using Bb.Expressions;
+﻿using Bb.Converters;
+using Bb.Expressions;
 using Bb.Json.Linq;
 using System;
 
@@ -23,7 +24,7 @@ namespace Bb.Jslt
 
             var targetType = typeof(bool);
 
-            var result = value.ToObject(targetType);
+            var result = value.ConvertTo(targetType);
 
             return (bool)result;
 

@@ -8,6 +8,7 @@ using Bb.Jslt.Parser;
 using Bb.CustomServices;
 using Bb.JPaths;
 using Bb.JsonParser;
+using Bb.Converters;
 
 namespace Bb.Jslt.CustomServices
 {
@@ -113,7 +114,7 @@ namespace Bb.Jslt.CustomServices
 
                     if (token is JValue v)
                     {
-                        object value = ConverterHelper.ToObject(v.Value, targetType);
+                        object value = ConverterHelper.ConvertTo(v.Value, targetType);
                         return new JValue(value);
                     }
 

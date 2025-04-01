@@ -13,6 +13,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Reflection;
 using Bb.Jslt.Visitors;
+using Bb.Converters;
 
 namespace Bb.Jslt
 {
