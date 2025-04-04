@@ -203,12 +203,13 @@ namespace Bb.Jslt.Services.Excels
                     else if (Name != null && Name != DBNull.Value)
                         Name = "renamed_" + _dicColumns.Count.ToString();
 
+                    if (Name != null)
+                    {
+                        var column = table.Columns[i];
+                        var type = column.DataType;
 
-                    var column = table.Columns[i];
-                    var type = column.DataType;
-
-                    _dicColumns.Add(i, new Column { Index = i, Name = Name.ToString(), Type = type });
-
+                        _dicColumns.Add(i, new Column { Index = i, Name = Name.ToString(), Type = type });
+                    }
                 }
 
             }

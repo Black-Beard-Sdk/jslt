@@ -216,7 +216,8 @@ namespace NJsonSchema.Collections
 
         public bool Remove(TKey key)
         {
-            if (key == null)
+
+            if (EqualityComparer<TKey>.Default.Equals(key, default(TKey)))
             {
                 throw new ArgumentNullException("key");
             }

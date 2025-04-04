@@ -118,7 +118,7 @@ namespace Bb.Parsers.Intellisense
 
 
         private readonly Dictionary<string, BoxParser> _dic = new Dictionary<string, BoxParser>();
-        private volatile object _lock = new object();
+        private readonly object _lock = new object();
         private readonly TextWriter _output;
         private readonly TextWriter _outputError;
 

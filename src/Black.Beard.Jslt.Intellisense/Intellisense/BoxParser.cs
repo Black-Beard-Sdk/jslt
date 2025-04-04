@@ -13,7 +13,10 @@ namespace Bb.Intellisense
         public void Lock()
         {
             while (Interlocked.CompareExchange(ref locked, 1, 0) != 0)
-                continue; // spin
+            {
+                Task.Yield();
+            }
+
         }
 
         public void Unlock()

@@ -7,10 +7,28 @@ using System.Text;
 
 namespace Bb
 {
-
+    /// <summary>
+    /// Provides helper methods for working with connection strings and mapping arguments to objects.
+    /// </summary>
     public static class ConnectionStringHelper
     {
-
+        /// <summary>
+        /// Generates a help string for the specified type, describing its properties.
+        /// </summary>
+        /// <param name="self">The type for which to generate the help string.</param>
+        /// <remarks>
+        /// This method inspects the properties of the provided type and generates a detailed description
+        /// including property names, types, and additional metadata such as whether the property is required.
+        /// </remarks>
+        /// <returns>
+        /// A <see cref="string"/> containing the generated help documentation.
+        /// </returns>
+        /// <example>
+        /// <code lang="C#">
+        /// var helpText = ConnectionStringHelper.GenerateHelp(typeof(MyClass));
+        /// Console.WriteLine(helpText);
+        /// </code>
+        /// </example>
         public static string GenerateHelp(Type self)
         {
 
@@ -54,6 +72,25 @@ namespace Bb
 
         }
 
+        /// <summary>
+        /// Converts a semicolon-separated string of key-value pairs into a dictionary.
+        /// </summary>
+        /// <param name="arguments">The semicolon-separated string of key-value pairs.</param>
+        /// <remarks>
+        /// This method parses the input string and resolves environment variables if the value starts with '@'.
+        /// </remarks>
+        /// <returns>
+        /// A <see cref="Dictionary{TKey, TValue}"/> where the keys and values are strings.
+        /// </returns>
+        /// <example>
+        /// <code lang="C#">
+        /// var dictionary = "key1=value1;key2=value2".ToDictionary();
+        /// foreach (var kvp in dictionary)
+        /// {
+        ///     Console.WriteLine($"{kvp.Key}: {kvp.Value}");
+        /// }
+        /// </code>
+        /// </example>
         public static Dictionary<string, string> ToDictionary(this string arguments)
         {
 
@@ -93,6 +130,30 @@ namespace Bb
 
         }
 
+        /// <summary>
+        /// Maps the provided dictionary of arguments to the properties of the specified object.
+        /// </summary>
+        /// <param name="self">The object to map the arguments to.</param>
+        /// <param name="arguments">A dictionary containing the arguments to map.</param>
+        /// <param name="respectCase">Indicates whether to respect case sensitivity when matching property names.</param>
+        /// <remarks>
+        /// This method attempts to map each key-value pair in the dictionary to a writable property on the object.
+        /// It supports basic types, value types, and generic lists.
+        /// </remarks>
+        /// <returns>
+        /// A <see cref="bool"/> indicating whether all required properties were successfully mapped.
+        /// </returns>
+        /// <exception cref="KeyNotFoundException">
+        /// Thrown if a required property is not found in the dictionary or cannot be mapped.
+        /// </exception>
+        /// <example>
+        /// <code lang="C#">
+        /// var obj = new MyClass();
+        /// var arguments = new Dictionary&lt;string, string&gt; { { "Property1", "Value1" } };
+        /// bool success = ConnectionStringHelper.Map(obj, arguments);
+        /// Console.WriteLine(success ? "Mapping succeeded" : "Mapping failed");
+        /// </code>
+        /// </example>
         public static bool Map(object self, Dictionary<string, string> arguments, bool respectCase = false)
         {
 
@@ -179,6 +240,4 @@ namespace Bb
         }
 
     }
-
-
 }

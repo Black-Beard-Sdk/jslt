@@ -18,7 +18,9 @@ namespace NJsonSchema.Infrastructure
     /// <summary>Provides extension methods for reading contextual type names and descriptions.</summary>
     public static class TypeExtensions
     {
+
         private static Dictionary<ContextualMemberInfo, string> _names = new Dictionary<ContextualMemberInfo, string>();
+        private static readonly object _lock = new object();
 
         /// <summary>Gets the name of the property for JSON serialization.</summary>
         /// <returns>The name.</returns>
@@ -26,7 +28,7 @@ namespace NJsonSchema.Infrastructure
         {
             if (!_names.ContainsKey(accessorInfo))
             {
-                lock (_names)
+                lock (_lock)
                 {
                     if (!_names.ContainsKey(accessorInfo))
                     {

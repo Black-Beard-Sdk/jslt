@@ -55,7 +55,7 @@ namespace Bb.Parsers.Intellisense
             //    f.Filename = this.File;
 
             if (System.Diagnostics.Debugger.IsAttached)
-                System.Diagnostics.Trace.WriteLine(this.File);
+                System.Diagnostics.Trace.TraceInformation(this.File);
 
             var context = this._context;
             return visitor.Visit(context);
@@ -84,5 +84,6 @@ namespace Bb.Parsers.Intellisense
         private JsltParser.ScriptContext _context;
 
         public bool IsFragment { get; private set; }
+    
     }
 }
