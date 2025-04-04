@@ -78,20 +78,13 @@ namespace Bb.Jslt.Services.Excels
                 var table = dataSet.Tables[Tablename];
 
                 if (this._dicColumns == null)
-                    try
-                    {
-                        ResolveColumns(table);
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
+                    ResolveColumns(table);
 
                 int rowLine = 0;
 
                 foreach (DataRow row in table.Rows)
                 {
-           
+
                     if (HeaderLine == 0 || rowLine > HeaderLine)
                     {
 
@@ -108,7 +101,8 @@ namespace Bb.Jslt.Services.Excels
 
                         }
 
-                        if (obj.Properties().Count() > 0 || !ByPassEmptyObject)
+                        var c = obj.Properties();
+                        if ((c != null && c.Count() > 0) || !ByPassEmptyObject)
                             tokens.Add(obj);
 
                         if (AddRowNumber)
@@ -152,7 +146,7 @@ namespace Bb.Jslt.Services.Excels
             }
             else if (value.GetType() == column.Type)
                 return value;
-            
+
             else
             {
                 try
@@ -295,7 +289,6 @@ namespace Bb.Jslt.Services.Excels
             {
                 var p = (int)c;
 
-                //if (p == 65279) // Bom // { } 
                 if (_accepted.TryGetValue(c, out char v))
                     sb.Append(v);
 
